@@ -1,0 +1,1 @@
+../0libs/Debug/MySQLCommon.cpp.o ../0libs/Debug/MySQLConnection.cpp.o ../0libs/Debug/MySQLResultSet.cpp.o ../0libs/Debug/MySQLStatement.cpp.o ../0libs/Debug/MySQLVariant.cpp.o

@@ -22,7 +22,7 @@ struct ITable {
 	virtual void AddField(const int field_size, const Tchar *field_name) = 0;
 	virtual void AddRecord() = 0;
 
-	virtual ImmutableString GetCellAsString(const size_t field, const size_t record) const = 0;
+	virtual ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const = 0;
 	virtual void SetCell(const size_t field, const size_t record, \
 							const Tchar *value) = 0;
 	virtual ~ITable(){ }

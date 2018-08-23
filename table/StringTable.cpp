@@ -15,11 +15,11 @@ int CFieldsProperties::GetWidth(const size_t index) const {
 	return fields_props[index].field_size;
 }
 
-ImmutableString CFieldsProperties::GetName(const size_t index) const {
+ImmutableString<Tchar> CFieldsProperties::GetName(const size_t index) const {
 
 	assert(index < fields_props.size());
 
-	ImmutableString field_name(fields_props[index].field_name.c_str(), \
+	ImmutableString<Tchar> field_name(fields_props[index].field_name.c_str(), \
 								fields_props[index].field_name.size());
 	return field_name;
 }
@@ -103,14 +103,14 @@ void CStringTable::AddRecord() {
 		handler->OnSizeChanged(text_table.size(), records_count);
 }
 
-ImmutableString CStringTable::GetCellAsString(const size_t field, \
+ImmutableString<Tchar> CStringTable::GetCellAsString(const size_t field, \
 												const size_t record) const {
 
 	if (text_table.empty() || \
 		!(field < text_table.size() && record < text_table[0].size()))
 		throw XException(0, _T("The index is out of range"));
 
-	return ImmutableString(text_table[field][record]);
+	return ImmutableString<Tchar>(text_table[field][record]);
 }
 
 void CStringTable::SetCell(const size_t field, const size_t record, \

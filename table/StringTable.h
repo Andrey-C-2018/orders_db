@@ -14,7 +14,7 @@ public:
 	void AddField(const int field_size, const Tchar *field_name);
 
 	int GetWidth(const size_t index) const override;
-	ImmutableString GetName(const size_t index) const override;
+	ImmutableString<Tchar> GetName(const size_t index) const override;
 
 	size_t size() const override;
 	int GetSizesSumm() const override;
@@ -44,7 +44,7 @@ public:
 	void AddField(const int field_size, const Tchar *field_name) override;
 	void AddRecord() override;
 
-	ImmutableString GetCellAsString(const size_t field, \
+	ImmutableString<Tchar> GetCellAsString(const size_t field, \
 									const size_t record) const override;
 	void SetCell(const size_t field, const size_t record, \
 					const Tchar *value) override;
