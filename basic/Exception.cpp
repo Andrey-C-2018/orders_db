@@ -122,13 +122,6 @@ XException &XException::operator<<(const size_t number) {
 	return *this;
 }
 
-XException &XException::operator<<(const unsigned long number) {
-	Tchar buffer[22];
-
-	err_msg.append(XConv::ToString(number, buffer));
-	return *this;
-}
-
 const Tchar* XException::what() const noexcept {
 
 	return err_msg.c_str();

@@ -25,7 +25,6 @@ public:
 	XException &operator<<(const std::wstring &new_data);
 	XException &operator<<(const int number);
 	XException &operator<<(const size_t number);
-	XException &operator<<(const unsigned long number);
 
 	virtual ~XException();
 };

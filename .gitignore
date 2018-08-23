@@ -46,6 +46,12 @@ Thumbs.db
 Debug/
 Release/
 x64/
+
+# Codelite specific
+######################
 .build-*/
 .clang/
 .codelite/
+*.workspace
+*.project
+*.mk
