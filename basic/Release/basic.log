@@ -1,0 +1,6 @@
+﻿  Exception.cpp
+  FileSystemImpl.cpp
+  ProcessImpl.cpp
+win\ProcessImpl.cpp(19): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(346): note:  см. объявление "strncpy"
+  basic.vcxproj -> D:\projects\basic\..\#libs\Release\basic.lib
