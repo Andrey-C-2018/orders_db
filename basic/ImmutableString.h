@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 template <typename Tchar_> \
 struct ImmutableString final {

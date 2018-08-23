@@ -18,10 +18,10 @@ CDate::CDate(const Tchar *date_str, const int format) noexcept : \
 
 switch (format) {
 	case SQL_FORMAT:
-		return SetDateSQL(date_str);
+		SetDateSQL(date_str);
 
 	case GERMAN_FORMAT:
-		return SetDateGerman(date_str);
+		SetDateGerman(date_str);
 	}
 }
 

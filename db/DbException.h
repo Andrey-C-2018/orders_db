@@ -1,5 +1,5 @@
 #pragma once
-#include <basic\Exception.h>
+#include <basic/Exception.h>
 
 class CDbException : public XException{
 	int db_error_code;

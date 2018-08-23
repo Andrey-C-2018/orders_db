@@ -6,8 +6,8 @@
 #include "chars.h"
 
 class XConv {
-	template <typename Tchar, typename TInt> static \
-		TInt ToInt(const Tchar *str, int &error, \
+	template <typename Tchar_, typename TInt> static \
+		TInt ToInt(const Tchar_ *str, int &error, \
 					const TInt max_value);
 	static inline const char *GetStrType(const char *str) { return str; }
 	static inline const char *GetStrType(const std::string &str) { return str.c_str(); }
@@ -21,11 +21,11 @@ public:
 		E_CONV_WRONG_VALUE = 3, \
 		E_CONV_VALUE_OUT_OF_RANGE = 4
 	};
-	template <typename Tchar, typename TInt> static \
-		Tchar *ToString(const TInt value, Tchar *buffer, size_t &size);
+	template <typename Tchar_, typename TInt> static \
+		Tchar_ *ToString(const TInt value, Tchar_ *buffer, size_t &size);
 		
-	template <typename Tchar, typename TInt> static inline \
-		Tchar *ToString(const TInt value, Tchar *buffer) {
+	template <typename Tchar_, typename TInt> static inline \
+		Tchar_ *ToString(const TInt value, Tchar_ *buffer) {
 			
 		size_t size;
 		return ToString(value, buffer, size);
@@ -70,8 +70,8 @@ public:
 
 //**********************************************************************
 
-template <typename Tchar, typename TInt> \
-Tchar *XConv::ToString(const TInt value, Tchar *buffer, size_t &size) {
+template <typename Tchar_, typename TInt> \
+Tchar_ *XConv::ToString(const TInt value, Tchar_ *buffer, size_t &size) {
 
 if (!buffer) {
 	size = 0;
@@ -104,8 +104,8 @@ while (v) {
 return buffer;
 }
 
-template <typename Tchar, typename TInt> \
-TInt XConv::ToInt(const Tchar *str, int &error, \
+template <typename Tchar_, typename TInt> \
+TInt XConv::ToInt(const Tchar_ *str, int &error, \
 						const TInt max_value) {
 
 if (!str) {
@@ -116,7 +116,7 @@ if (!str) {
 TInt number = 0;
 TInt max = max_value / 10;
 size_t i = 0;
-bool neg = (str[0] == _T('-'));
+bool neg = (str[0] == getMinusChar('-'));
 i += neg;
 
 while (number < max && str[i] != 0 && \
@@ -135,7 +135,7 @@ if (empty || (str[i] != 0 && \
 	return number;
 }
 
-const Tchar lowest_digit = max_value % 10;
+const Tchar_ lowest_digit = max_value % 10;
 if((number > max && str[i] != 0) || \
 	(number == max && (str[i] - getZeroChar('0')) > lowest_digit)) {
 	error = E_CONV_VALUE_OUT_OF_RANGE;
