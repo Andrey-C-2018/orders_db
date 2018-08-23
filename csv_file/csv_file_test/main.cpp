@@ -2,7 +2,7 @@
 #include <csv_file/CsvTable.h>
 
 int main() {
-	const char locale_str[] = "ukr_ukr.1251";
+	const char locale_str[] = "uk_UA.UTF-8";
 	
 	setlocale(LC_ALL, locale_str);
 
