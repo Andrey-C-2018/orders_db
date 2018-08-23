@@ -24,6 +24,9 @@ public:
 	XException &operator<<(const std::string &new_data);
 	XException &operator<<(const std::wstring &new_data);
 	XException &operator<<(const int number);
+#if _WIN64
+	XException &operator<<(const unsigned number);
+#endif
 	XException &operator<<(const size_t number);
 
 	virtual ~XException();

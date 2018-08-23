@@ -3,6 +3,11 @@
 #include <memory>
 #include <basic/tstring.h>
 
+enum {
+	RESULT_SUCCESS = S_OK, \
+	RESULT_FAIL = E_FAIL
+};
+
 #ifndef GET_KEYSTATE_WPARAM
 #define GET_KEYSTATE_WPARAM(wParam)     (LOWORD(wParam))
 #endif

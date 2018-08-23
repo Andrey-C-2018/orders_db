@@ -2,7 +2,6 @@
 #include "platform_specific.h"
 #include "XEventHandler.h"
 #include <basic/Exception.h>
-#include <basic/stdafx.h>
 
 XApp *XApp::instance = nullptr;
 

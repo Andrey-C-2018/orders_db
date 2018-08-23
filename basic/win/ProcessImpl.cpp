@@ -16,7 +16,15 @@ int exec(const char *exe_path, const char *cmd_line, const char *working_dir) {
 	std::vector<char> cmd_line_rw;
 	size_t cmd_line_size = strlen(cmd_line);
 	cmd_line_rw.resize(cmd_line_size + 1);
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
 	strncpy(&cmd_line_rw[0], cmd_line, cmd_line_size);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 	// Start the child process. 
 	if (!CreateProcessA(exe_path, &cmd_line_rw[0], // Command line
@@ -30,7 +38,7 @@ int exec(const char *exe_path, const char *cmd_line, const char *working_dir) {
 						&pi) // Pointer to PROCESS_INFORMATION structure
 		){
 		XException e(0, "CreateProcess failed: last error code = ");
-		e << GetLastError();
+		e << (size_t)GetLastError();
 		throw e;
 	}
 
@@ -40,7 +48,7 @@ int exec(const char *exe_path, const char *cmd_line, const char *working_dir) {
 	DWORD exit_code = 0;
 	if (FALSE == GetExitCodeProcess(pi.hProcess, &exit_code)) {
 		XException e(0, "GetExitCodeProcess failed: last error code = ");
-		e << GetLastError();
+		e << (size_t)GetLastError();
 		throw e;
 	}
 	assert(STILL_ACTIVE != exit_code);

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <basic/Delegate.h>
 #include <basic/Exception.h>
-#include <basic/stdafx.h>
+#include "platform_specific.h"
 #include "XEvent.h"
 
 class XEventHandlerException : public XException{

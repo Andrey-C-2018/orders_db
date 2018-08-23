@@ -115,6 +115,15 @@ XException &XException::operator<<(const int number) {
 	return *this;
 }
 
+#if _WIN64
+XException &XException::operator<<(const unsigned number) {
+	Tchar buffer[22];
+
+	err_msg.append(XConv::ToString(number, buffer));
+	return *this;
+}
+#endif
+
 XException &XException::operator<<(const size_t number) {
 	Tchar buffer[22];
 

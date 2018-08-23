@@ -1,6 +1,5 @@
 #pragma once
 #include "platform_specific.h"
-#include <basic/stdafx.h>
 #include <basic/Delegate.h>
 
 class XWindow;
