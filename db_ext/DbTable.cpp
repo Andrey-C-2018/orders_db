@@ -1,24 +1,21 @@
-#include "DbResultSet.h"
-#include "MetaInfo.h"
+#include "DbTable.h"
 
-class CGetCellPredicate : public std::unary_function<CDbFieldValue, void> {
-	const CDbTable &table;
+class CBindValuePredicate final{
+	std::shared_ptr<const CDbResultSet> result_set;
+	size_t curr_record;
 public:
-	CGetCellPredicate(const CDbResultSet &result_set_) : result_set(result_set_) { }
-	inline void operator()(CDbFieldValue &field_value) {
+	inline void operator()(const size_t field, \
+				std::shared_ptr<IDbBindingTarget> binding_target) const{
 
-		return table.GetDbCellValue(field_value);
+		result_set->getValueAndBindItTo( binding_target );
 	}
 };
 
-//****************************************************************************
+//****************************************************
 
 CDbTable::CDbTable(){ }
 
 void CDbTable::SetCell(const size_t field, const size_t record, \
-							const Tchar *value) {
-
-
-}
+							const Tchar *value) { }
 
 CDbTable::~CDbTable(){ }
