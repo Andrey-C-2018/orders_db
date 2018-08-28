@@ -36,6 +36,9 @@
     <ClCompile Include="DbException.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="MySQLResultSetMetadata.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IDbResultSet.h">
@@ -67,6 +70,15 @@
     </ClInclude>
     <ClInclude Include="DbException.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="IDbResultSetMetadata.h">
+      <Filter>interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQLResultSetMetadata.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="IDbBindingTarget.h">
+      <Filter>interfaces</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@ public:
 class CMySQLResultSet : public IDbResultSet {
 	size_t fields_count, records_count;
 	mutable std::shared_ptr<MYSQL_STMT> stmt;
-	MYSQL_RES *metadata;
+	std::shared_ptr<MYSQL_RES> metadata;
 	mutable size_t curr_record;
 
 	std::vector<CMySQLBindingTarget> fields;
@@ -28,7 +28,8 @@ class CMySQLResultSet : public IDbResultSet {
 	void goto_record(const size_t record) const;
 	inline void goto_rec_and_update(const size_t field, const size_t record) const;
 public:
-	CMySQLResultSet(std::shared_ptr<MYSQL_STMT> stmt_, MYSQL_RES *metadata_);
+	CMySQLResultSet(std::shared_ptr<MYSQL_STMT> stmt_, 
+						std::shared_ptr<MYSQL_RES> metadata_);
 
 	CMySQLResultSet(const CMySQLResultSet &obj) = delete;
 	CMySQLResultSet(CMySQLResultSet &&obj);
@@ -49,6 +50,10 @@ public:
 	ImmutableString<wchar_t> getImmutableWString(const size_t field, \
 													const size_t record) const override;
 	CDate getDate(const size_t field, const size_t record) const override;
+
+	void getValueAndBindItTo(const size_t field, const size_t record, \
+							const size_t binding_param_no, \
+							std::shared_ptr<IDbBindingTarget> binding_target) const override;
 
 	void Release();
 	virtual ~CMySQLResultSet();

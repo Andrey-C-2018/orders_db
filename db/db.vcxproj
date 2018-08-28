@@ -23,18 +23,22 @@
     <ClCompile Include="MySQLCommon.cpp" />
     <ClCompile Include="MySQLConnection.cpp" />
     <ClCompile Include="MySQLResultSet.cpp" />
+    <ClCompile Include="MySQLResultSetMetadata.cpp" />
     <ClCompile Include="MySQLStatement.cpp" />
     <ClCompile Include="MySQLVariant.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbException.h" />
+    <ClInclude Include="IDbBindingTarget.h" />
     <ClInclude Include="IDbCommon.h" />
     <ClInclude Include="IDbConnection.h" />
     <ClInclude Include="IDbResultSet.h" />
+    <ClInclude Include="IDbResultSetMetadata.h" />
     <ClInclude Include="IDbStatement.h" />
     <ClInclude Include="MySQLCommon.h" />
     <ClInclude Include="MySQLConnection.h" />
     <ClInclude Include="MySQLResultSet.h" />
+    <ClInclude Include="MySQLResultSetMetadata.h" />
     <ClInclude Include="MySQLStatement.h" />
     <ClInclude Include="MySQLVariant.h" />
   </ItemGroup>

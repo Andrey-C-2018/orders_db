@@ -1,4 +1,5 @@
 #include "MySQLStatement.h"
+#include "MySQLResultSetMetadata.h"
 
 CMySQLStatementException::CMySQLStatementException(const int err_code, \
 													const Tchar *err_descr) : \
@@ -127,6 +128,17 @@ void CMySQLStatement::bindValue(const size_t param_no, const CDate &value) {
 	assignParamBindingWithScalar(params_bindings[param_no], params[param_no].value);
 }
 
+void CMySQLStatement::bindValue(const size_t param_no, const CMySQLVariant &value) {
+
+	assert(param_no < params_count);
+	params[param_no].value = value;
+
+	if(value.IsVectorType())
+		assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
+	else
+		assignParamBindingWithScalar(params_bindings[param_no], params[param_no].value);
+}
+
 std::shared_ptr<IDbResultSet> CMySQLStatement::exec() {
 
 	if (params_count)
@@ -135,10 +147,13 @@ std::shared_ptr<IDbResultSet> CMySQLStatement::exec() {
 	if (mysql_stmt_execute(stmt.get()))
 		throw CMySQLException(stmt.get());
 
-	MYSQL_RES *metadata = mysql_stmt_result_metadata(stmt.get());
-	if (!metadata)
+	MYSQL_RES *metadata_ptr = mysql_stmt_result_metadata(stmt.get());
+	if (!metadata_ptr)
 		throw CMySQLStatementException(CMySQLStatementException::E_EXEC, \
 										_T("exec() used instead of execScalar()"));
+
+	metadata = std::shared_ptr<MYSQL_RES>(metadata_ptr, \
+										[](MYSQL_RES *ptr) { mysql_free_result(ptr); });
 
 	if (mysql_stmt_store_result(stmt.get()))
 		throw CMySQLStatementException(stmt.get());
@@ -159,6 +174,20 @@ record_t CMySQLStatement::execScalar() {
 										_T("execScalar() used instead of exec()"));
 
 	return mysql_stmt_affected_rows(stmt.get());
+}
+
+std::shared_ptr<IDbResultSetMetadata> CMySQLStatement::getResultSetMetadata() {
+
+	if (!metadata) {
+		MYSQL_RES *metadata_ptr = mysql_stmt_result_metadata(stmt.get());
+		if (!metadata_ptr)
+			throw CMySQLStatementException(stmt.get());
+
+		metadata = std::shared_ptr<MYSQL_RES>(metadata_ptr, \
+			[](MYSQL_RES *ptr) { mysql_free_result(ptr); });
+	}
+
+	return std::make_shared<CMySQLResultSetMetadata>(metadata);
 }
 
 CMySQLStatement::~CMySQLStatement() { }

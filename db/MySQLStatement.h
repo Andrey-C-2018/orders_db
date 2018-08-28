@@ -22,9 +22,11 @@ public:
 class CMySQLStatement : public IDbStatement {
 	std::shared_ptr<MYSQL_STMT> stmt;
 	size_t params_count;
-
+	
 	std::vector<CMySQLBindingTarget> params;
 	std::vector<MYSQL_BIND> params_bindings;
+
+	std::shared_ptr<MYSQL_RES> metadata;
 
 	void assignParamBindingWithScalar(MYSQL_BIND &param_binding, \
 										CMySQLVariant &value);
@@ -47,8 +49,11 @@ public:
 
 	void bindValue(const size_t param_no, const CDate &value) override;
 
+	void bindValue(const size_t param_no, const CMySQLVariant &value);
+
 	std::shared_ptr<IDbResultSet> exec() override;
 	record_t execScalar() override;
+	std::shared_ptr<IDbResultSetMetadata> getResultSetMetadata() override;
 
 	virtual ~CMySQLStatement();
 };

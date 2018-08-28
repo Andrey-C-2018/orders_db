@@ -29,13 +29,21 @@ public:
 	CMySQLVariant &operator=(const CMySQLVariant &obj) = default;
 	CMySQLVariant &operator=(CMySQLVariant &&obj) = default;
 
-	inline bool IsDate() const;
-	inline bool IsString() const;
-	inline bool IsDecimal() const;
-	inline bool IsEnum() const;
-	inline bool IsVectorType() const;
-	inline bool IsInteger() const;
-	inline bool IsNull() const { return value_type == MYSQL_TYPE_NULL; }
+	inline bool IsDate() const { return IsDate(value_type); }
+	inline bool IsString() const { return IsString(value_type); }
+	inline bool IsDecimal() const { return IsDecimal(value_type); }
+	inline bool IsEnum() const { return IsEnum(value_type); }
+	inline bool IsVectorType() const { return IsVectorType(value_type); }
+	inline bool IsInteger() const { return IsInteger(value_type); }
+	inline bool IsNull() const { return IsNull(value_type); }
+
+	static inline bool IsDate(const enum_field_types value_type);
+	static inline bool IsString(const enum_field_types value_type);
+	static inline bool IsDecimal(const enum_field_types value_type);
+	static inline bool IsEnum(const enum_field_types value_type);
+	static inline bool IsVectorType(const enum_field_types value_type);
+	static inline bool IsInteger(const enum_field_types value_type);
+	static inline bool IsNull(const enum_field_types value_type);
 
 	inline int GetInt() const;
 	inline unsigned GetUInt() const;
@@ -73,41 +81,48 @@ public:
 
 //*************************************************************
 
-bool CMySQLVariant::IsDate() const {
+bool CMySQLVariant::IsDate(const enum_field_types value_type) {
 
 	return value_type == MYSQL_TYPE_TIMESTAMP || \
 			value_type == MYSQL_TYPE_DATE;
 }
 
-bool CMySQLVariant::IsString() const{
+bool CMySQLVariant::IsString(const enum_field_types value_type) {
 
 	return value_type == MYSQL_TYPE_STRING || \
 			value_type == MYSQL_TYPE_VAR_STRING;
 }
 
-bool CMySQLVariant::IsDecimal() const{
+bool CMySQLVariant::IsDecimal(const enum_field_types value_type) {
 
 	return value_type == MYSQL_TYPE_DECIMAL || \
 			value_type == MYSQL_TYPE_NEWDECIMAL;
 }
 
-bool CMySQLVariant::IsEnum() const {
+bool CMySQLVariant::IsEnum(const enum_field_types value_type) {
 
 	return value_type == MYSQL_TYPE_ENUM;
 }
 
-bool CMySQLVariant::IsVectorType() const {
+bool CMySQLVariant::IsVectorType(const enum_field_types value_type) {
 
-	return IsString() || IsDecimal() || IsEnum();
+	return IsString(value_type) || \
+			IsDecimal(value_type) || \
+			IsEnum(value_type);
 }
 
-bool CMySQLVariant::IsInteger() const {
+bool CMySQLVariant::IsInteger(const enum_field_types value_type) {
 	
 	return value_type == MYSQL_TYPE_TINY || \
 			value_type == MYSQL_TYPE_SHORT || \
 			value_type == MYSQL_TYPE_INT24 || \
 			value_type == MYSQL_TYPE_LONG || \
 			value_type == MYSQL_TYPE_LONGLONG;
+}
+
+bool CMySQLVariant::IsNull(const enum_field_types value_type) {
+
+	return value_type == MYSQL_TYPE_NULL;
 }
 
 int CMySQLVariant::GetInt() const {

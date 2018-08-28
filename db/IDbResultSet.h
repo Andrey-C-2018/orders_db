@@ -2,6 +2,8 @@
 #include <basic/ImmutableString.h>
 #include <date/Date.h>
 
+struct IDbBindingTarget;
+
 struct IDbResultSet {
 	virtual bool empty() const = 0;
 	virtual size_t getFieldsCount() const = 0;
@@ -17,6 +19,10 @@ struct IDbResultSet {
 	virtual ImmutableString<wchar_t> getImmutableWString(const size_t field, \
 									const size_t record) const = 0;
 	virtual CDate getDate(const size_t field, const size_t record) const = 0;
+
+	virtual void getValueAndBindItTo(const size_t field, const size_t record, \
+									const size_t binding_param_no, \
+					std::shared_ptr<IDbBindingTarget> binding_target) const = 0;
 
 	virtual ~IDbResultSet() { }
 };

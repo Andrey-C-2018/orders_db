@@ -1,4 +1,5 @@
 #include "MySQLResultSet.h"
+#include "IDbBindingTarget.h"
 
 CMySQLResultSetException::CMySQLResultSetException(const int err_code, \
 													const Tchar *err_descr) : \
@@ -18,20 +19,20 @@ CMySQLResultSetException::~CMySQLResultSetException() { }
 //*************************************************************
 
 CMySQLResultSet::CMySQLResultSet(std::shared_ptr<MYSQL_STMT> stmt_, \
-								MYSQL_RES *metadata_) : \
+									std::shared_ptr<MYSQL_RES> metadata_) : \
 								stmt(stmt_), metadata(metadata_), \
 								fields_count(0), records_count(0), \
 								curr_record((size_t)-1) {
 	assert(stmt);
 	assert(metadata);
 
-	fields_count = mysql_num_fields(metadata);
+	fields_count = mysql_num_fields(metadata.get());
 	records_count = (size_t)mysql_stmt_num_rows(stmt.get());
 	fields.reserve(fields_count);
 	fields_bindings.reserve(fields_count);
 
 	for (size_t i = 0; i < fields_count; ++i) {
-		MYSQL_FIELD *field = mysql_fetch_field(metadata);
+		MYSQL_FIELD *field = mysql_fetch_field(metadata.get());
 		assert(field);
 
 		CMySQLBindingTarget rec;
@@ -170,12 +171,39 @@ CDate CMySQLResultSet::getDate(const size_t field, const size_t record) const {
 	return fields[field].value.GetDate();
 }
 
+void CMySQLResultSet::getValueAndBindItTo(const size_t field, const size_t record, \
+										const size_t binding_param_no, \
+								std::shared_ptr<IDbBindingTarget> binding_target) const {
+	assert(field < fields_count);
+	assert(record < records_count);
+
+	if (curr_record != record) goto_record(record);
+	
+	mysql_field_seek(metadata.get(), field);
+	MYSQL_FIELD *mysql_field = mysql_fetch_field(metadata.get());
+
+	if (CMySQLVariant::IsDate(mysql_field->type)) {
+		binding_target->bindValue(binding_param_no, fields[field].value.GetDate());
+		return;
+	}
+	if (CMySQLVariant::IsString(mysql_field->type) || \
+		CMySQLVariant::IsDecimal(mysql_field->type) || \
+		CMySQLVariant::IsEnum(mysql_field->type)) {
+
+		binding_target->bindValue(binding_param_no, fields[field].value.GetString());
+		return;
+	}
+	if (CMySQLVariant::IsInteger(mysql_field->type)) {
+		binding_target->bindValue(binding_param_no, fields[field].value.GetInt());
+		return;
+	}
+
+	binding_target->bindNull(binding_param_no);
+}
+
 void CMySQLResultSet::Release() {
 
-	if (metadata) {
-		mysql_free_result(metadata);
-		metadata = nullptr;
-	}
+	metadata.reset();
 	stmt.reset();
 }
 
