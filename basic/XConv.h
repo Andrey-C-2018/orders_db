@@ -60,13 +60,18 @@ public:
 			
 			return ToInt(GetStrType(str), error, (long long)LLONG_MAX);
 		}
-	
-	static inline size_t GetBufferSizeForLongLong(){
-		long long l = LLONG_MAX;
-		
-		return (size_t)floor(std::log10((long double)l)) + 1;
-	}
 };
+
+constexpr long double LOG2_10 = 3.3219280948873622950529408821735;
+
+template <typename T> \
+constexpr size_t getDigitsCountOfType() {
+
+	return (size_t)((((long double)(8 * sizeof(T)) / LOG2_10) - \
+		(long double)(size_t)((long double)(8 * sizeof(T)) / LOG2_10)) > 1e-15 ? \
+		((long double)(8 * sizeof(T)) / LOG2_10) + 1 : \
+		((long double)(8 * sizeof(T)) / LOG2_10));
+}
 
 //**********************************************************************
 

@@ -12,14 +12,4 @@ size_t CMySQLResultSetMetadata::getFieldsCount() const {
 	return fields_count;
 }
 
-CDbField<char> CMySQLResultSetMetadata::getField(const size_t field) const {
-	
-	return TgetField<char>(field);
-}
-
-CDbField<wchar_t> CMySQLResultSetMetadata::getFieldW(const size_t field) const {
-
-	return TgetField<wchar_t>(field);
-}
-
 CMySQLResultSetMetadata::~CMySQLResultSetMetadata(){ }
