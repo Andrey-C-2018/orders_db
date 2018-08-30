@@ -6,15 +6,16 @@
 class CDbTable : public ITable{
 	CQuery query;
 	std::shared_ptr<IDbResultSet> result_set;
+
 	size_t curr_record;
+
+	std::shared_ptr<IFieldsProperties> fields_props;
 public:
 	CDbTable(CQuery query_);
 
-	size_t getCurrentRecordNo() const;
+	inline size_t getCurrentRecordNo() const;
 
 	const CQuery &getQuery() const;
-	CQuery &getQuery();
-
 	std::shared_ptr<const IFieldsProperties> GetFieldsProperties() const override;
 
 	bool empty() const override;
@@ -24,6 +25,7 @@ public:
 
 	void AddField(const int field_size, const Tchar *field_name) override;
 	void AddRecord() override;
+	void SetFieldSize(const size_t field, const int field_size) override;
 
 	ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const override;
 	void SetCell(const size_t field, const size_t record, const Tchar *value) override;
@@ -31,3 +33,9 @@ public:
 	virtual ~CDbTable();
 };
 
+//*****************************************************
+
+size_t CDbTable::getCurrentRecordNo() const{
+
+	return curr_record;
+}

@@ -50,6 +50,7 @@ public:
 	void bindValue(const size_t param_no, const CDate &value) override;
 
 	void bindValue(const size_t param_no, const CMySQLVariant &value);
+	void bindNull(const size_t param_no) override;
 
 	std::shared_ptr<IDbResultSet> exec() override;
 	record_t execScalar() override;

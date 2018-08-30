@@ -64,9 +64,10 @@ MYSQL_STMT *CMySQLConnection::InternalPrepareQuery(const char *query_text) const
 
 	unsigned long size = (unsigned long)strlen(query_text);
 	if (mysql_stmt_prepare(stmt, query_text, size)) {
-
+		CMySQLException e(stmt);
+		
 		mysql_stmt_close(stmt);
-		throw CMySQLException(conn);
+		throw e;
 	}
 
 	return stmt;

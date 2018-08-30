@@ -139,6 +139,18 @@ void CMySQLStatement::bindValue(const size_t param_no, const CMySQLVariant &valu
 		assignParamBindingWithScalar(params_bindings[param_no], params[param_no].value);
 }
 
+void CMySQLStatement::bindNull(const size_t param_no) {
+
+	params_bindings[param_no].buffer_length = 0;
+	params_bindings[param_no].buffer_type = MYSQL_TYPE_NULL;
+	params_bindings[param_no].buffer = nullptr;
+
+	params[param_no].is_null = 1;
+	params[param_no].length = 0;
+	params_bindings[param_no].is_null = &params[param_no].is_null;
+	params_bindings[param_no].length = &params[param_no].length;
+}
+
 std::shared_ptr<IDbResultSet> CMySQLStatement::exec() {
 
 	if (params_count)

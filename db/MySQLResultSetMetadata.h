@@ -44,7 +44,7 @@ CDbField<Tchar_> CMySQLResultSetMetadata::TgetField(const size_t field) const {
 	MYSQL_FIELD *mysql_field = mysql_fetch_field(metadata.get());
 	field_item.field_name = ConvertIfNecessary(mysql_field->name, Tchar_());
 	field_item.table_name = ConvertIfNecessary(mysql_field->table, Tchar_());
-	field_item.is_primary_key = (mysql_field->flags | PRI_KEY_FLAG) > 0;
+	field_item.is_primary_key = (mysql_field->flags & PRI_KEY_FLAG) > 0;
 
 	return field_item;
 }
