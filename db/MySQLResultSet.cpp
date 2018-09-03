@@ -57,9 +57,9 @@ CMySQLResultSet::CMySQLResultSet(std::shared_ptr<MYSQL_STMT> stmt_, \
 }
 
 CMySQLResultSet::CMySQLResultSet(CMySQLResultSet &&obj) : \
-records_count(obj.records_count), \
-fields_count(obj.fields_count), \
-stmt(obj.stmt) {
+								records_count(obj.records_count), \
+								fields_count(obj.fields_count), \
+								stmt(obj.stmt) {
 
 	assert(fields_count || !records_count);
 	obj.records_count = 0;
@@ -95,7 +95,9 @@ size_t CMySQLResultSet::getRecordsCount() const {
 	return records_count;
 }
 
-void CMySQLResultSet::goto_record(const size_t record) const {
+void CMySQLResultSet::gotoRecord(const size_t record) const {
+
+	if (curr_record == record) return;
 
 	assert(stmt);
 	mysql_stmt_data_seek(stmt.get(), record);
@@ -105,42 +107,34 @@ void CMySQLResultSet::goto_record(const size_t record) const {
 	curr_record = record;
 }
 
-int CMySQLResultSet::getInt(const size_t field, const size_t record) const {
+int CMySQLResultSet::getInt(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(record < records_count);
-
-	if (curr_record != record) goto_record(record);
+	assert(curr_record != (size_t)-1);
 	return fields[field].value.GetInt();
 }
 
-const char *CMySQLResultSet::getString(const size_t field, \
-										const size_t record) const {
+const char *CMySQLResultSet::getString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(record < records_count);
-
-	goto_rec_and_update(field, record);
+	assert(curr_record != (size_t)-1);
+	fields[field].value.UpdateLength(fields[field].length);
 	return fields[field].value.GetString();
 }
 
-const wchar_t *CMySQLResultSet::getWString(const size_t field, \
-											const size_t record) const {
+const wchar_t *CMySQLResultSet::getWString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(record < records_count);
-
-	goto_rec_and_update(field, record);
+	assert(curr_record != (size_t)-1);
+	fields[field].value.UpdateLength(fields[field].length);
 	return fields[field].value.GetWString();
 }
 
-ImmutableString<char> CMySQLResultSet::getImmutableString(const size_t field, \
-														const size_t record) const {
+ImmutableString<char> CMySQLResultSet::getImmutableString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(record < records_count);
-
-	goto_rec_and_update(field, record);
+	assert(curr_record != (size_t)-1);
+	fields[field].value.UpdateLength(fields[field].length);
 
 	const char *str = fields[field].value.GetString();
 	size_t len = fields[field].value.GetValueLength();
@@ -148,13 +142,11 @@ ImmutableString<char> CMySQLResultSet::getImmutableString(const size_t field, \
 	return ImmutableString<char>(str, len);
 }
 
-ImmutableString<wchar_t> CMySQLResultSet::getImmutableWString(const size_t field, \
-															const size_t record) const {
+ImmutableString<wchar_t> CMySQLResultSet::getImmutableWString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(record < records_count);
-
-	goto_rec_and_update(field, record);
+	assert(curr_record != (size_t)-1);
+	fields[field].value.UpdateLength(fields[field].length);
 
 	const wchar_t *str = fields[field].value.GetWString();
 	size_t len = fields[field].value.GetValueLength();
@@ -162,43 +154,11 @@ ImmutableString<wchar_t> CMySQLResultSet::getImmutableWString(const size_t field
 	return ImmutableString<wchar_t>(str, len);
 }
 
-CDate CMySQLResultSet::getDate(const size_t field, const size_t record) const {
+CDate CMySQLResultSet::getDate(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(record < records_count);
-
-	if(curr_record != record) goto_record(record);
+	assert(curr_record != (size_t)-1);
 	return fields[field].value.GetDate();
-}
-
-void CMySQLResultSet::getValueAndBindItTo(const size_t field, const size_t record, \
-										const size_t binding_param_no, \
-								std::shared_ptr<IDbBindingTarget> binding_target) const {
-	assert(field < fields_count);
-	assert(record < records_count);
-
-	if (curr_record != record) goto_record(record);
-	
-	mysql_field_seek(metadata.get(), field);
-	MYSQL_FIELD *mysql_field = mysql_fetch_field(metadata.get());
-
-	if (CMySQLVariant::IsDate(mysql_field->type)) {
-		binding_target->bindValue(binding_param_no, fields[field].value.GetDate());
-		return;
-	}
-	if (CMySQLVariant::IsString(mysql_field->type) || \
-		CMySQLVariant::IsDecimal(mysql_field->type) || \
-		CMySQLVariant::IsEnum(mysql_field->type)) {
-
-		binding_target->bindValue(binding_param_no, fields[field].value.GetString());
-		return;
-	}
-	if (CMySQLVariant::IsInteger(mysql_field->type)) {
-		binding_target->bindValue(binding_param_no, fields[field].value.GetInt());
-		return;
-	}
-
-	binding_target->bindNull(binding_param_no);
 }
 
 void CMySQLResultSet::Release() {

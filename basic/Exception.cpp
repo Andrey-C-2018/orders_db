@@ -109,7 +109,7 @@ XException &XException::operator<<(const std::wstring &new_data) {
 }
 
 XException &XException::operator<<(const int number) {
-	Tchar buffer[22];
+	Tchar buffer[getDigitsCountOfType<int>() + 1];
 
 	err_msg.append(XConv::ToString(number, buffer));
 	return *this;
@@ -117,7 +117,7 @@ XException &XException::operator<<(const int number) {
 
 #if _WIN64
 XException &XException::operator<<(const unsigned number) {
-	Tchar buffer[22];
+	Tchar buffer[getDigitsCountOfType<unsigned>() + 1];
 
 	err_msg.append(XConv::ToString(number, buffer));
 	return *this;
@@ -125,7 +125,7 @@ XException &XException::operator<<(const unsigned number) {
 #endif
 
 XException &XException::operator<<(const size_t number) {
-	Tchar buffer[22];
+	Tchar buffer[getDigitsCountOfType<size_t>() + 1];
 
 	err_msg.append(XConv::ToString(number, buffer));
 	return *this;

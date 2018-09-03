@@ -1,51 +1,128 @@
-#include <basic/XConv.h>
 #include "MySQLField.h"
-#include "MySQLResultSet.h"
 
 CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
 							metadata(metadata_), field(field_) { }
 
-CDbFieldProperties<char> CMySQLField::getFieldProperties() const {
+CDbFieldProperties<std::string> CMySQLField::getFieldProperties() const {
+	CDbFieldProperties<std::string> field_props_item;
 
-	return TgetField<char>();
+	TgetField<std::string>(field_props_item);
+	return field_props_item;
 }
 
-CDbFieldProperties<wchar_t> CMySQLField::getFieldPropertiesW() const {
+CDbFieldProperties<std::wstring> CMySQLField::getFieldPropertiesW() const {
+	CDbFieldProperties<std::wstring> field_props_item;
 
-	return TgetField<wchar_t>();
+	TgetField<std::wstring>(field_props_item);
+	return field_props_item;
 }
 
 CMySQLField::~CMySQLField() { }
 
 //**************************************************
 
-CMySQLIntegerField::CMySQLIntegerField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
-										CMySQLField(metadata_, field_){ }
+CDbFieldProperties<std::string> CMySQLDateField::getFieldProperties() const {
+	CDbFieldProperties<std::string> field_props_item;
 
-const char *CMySQLIntegerField::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
-	char buffer[getDigitsCountOfType<int>() + 1];
-	int i = result_set->getInt(field);
-	int err = 0;
+	TgetField<std::string>(field_props_item);
+	field_props_item.field_size = CDate::GERMAN_FORMAT_LEN;
 
-	return XConv::ToString(i, buffer);
+	return field_props_item;
 }
 
-const wchar_t *CMySQLIntegerField::getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const {
-	wchar_t buffer[getDigitsCountOfType<int>() + 1];
-	int i = result_set->getInt(field);
-	int err = 0;
+CDbFieldProperties<std::wstring> CMySQLDateField::getFieldPropertiesW() const {
+	CDbFieldProperties<std::wstring> field_props_item;
 
-	return XConv::ToString(i, buffer);
+	TgetField<std::wstring>(field_props_item);
+	field_props_item.field_size = CDate::GERMAN_FORMAT_LEN;
+
+	return field_props_item;
 }
 
-void CMySQLIntegerField::bindValueAsString(std::shared_ptr<IDbBindingTarget> binding_target, \
+CMySQLDateField::CMySQLDateField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
+								CMySQLField(metadata_, field_) { }
+
+const char *CMySQLDateField::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
+	char *p = (char *)buffer;
+
+	CDate date_value = result_set->getDate(field);
+	date_value.ToStringGerman(p);
+
+	return p;
+}
+
+const wchar_t *CMySQLDateField::getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const {
+	CDate date_value = result_set->getDate(field);
+	date_value.ToStringGerman(buffer);
+
+	return buffer;
+}
+
+void CMySQLDateField::bindValueAsString(std::shared_ptr<IDbBindingTarget> binding_target, \
+										const size_t param_no, \
+										const char *value) const {
+	CDate date_value(value, CDate::GERMAN_FORMAT);
+
+	assert(!date_value.IsNull());
+	binding_target->bindValue(param_no, date_value);
+}
+
+void CMySQLDateField::bindValueAsWString(std::shared_ptr<IDbBindingTarget> binding_target, \
+										const size_t param_no, \
+										const wchar_t *value) const {
+	CDate date_value(value, CDate::GERMAN_FORMAT);
+
+	assert(!date_value.IsNull());
+	binding_target->bindValue(param_no, date_value);
+}
+
+void CMySQLDateField::getValueAndBindItTo(const std::shared_ptr<const IDbResultSet> result_set, \
+										std::shared_ptr<IDbBindingTarget> binding_target, \
+										const size_t param_no) const {
+
+	CDate date_value = result_set->getDate(field);
+	binding_target->bindValue(param_no, date_value);
+}
+
+CMySQLDateField::~CMySQLDateField() { }
+
+//**************************************************
+
+CMySQLStringField::CMySQLStringField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
+									CMySQLField(metadata_, field_) { }
+
+const char *CMySQLStringField::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
+
+	return result_set->getString(field);
+}
+
+const wchar_t *CMySQLStringField::getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const {
+	
+	return result_set->getWString(field);
+}
+
+void CMySQLStringField::bindValueAsString(std::shared_ptr<IDbBindingTarget> binding_target, \
+											const size_t param_no, \
 											const char *value) const {
-
+	
+	assert(value);
+	binding_target->bindValue(param_no, value);
 }
 
-void CMySQLIntegerField::bindValueAsWString(std::shared_ptr<IDbBindingTarget> binding_target, \
+void CMySQLStringField::bindValueAsWString(std::shared_ptr<IDbBindingTarget> binding_target, \
+											const size_t param_no, \
 											const wchar_t *value) const {
-
+	
+	assert(value);
+	binding_target->bindValue(param_no, value);
 }
 
-CMySQLIntegerField::~CMySQLIntegerField(){ }
+void CMySQLStringField::getValueAndBindItTo(const std::shared_ptr<const IDbResultSet> result_set, \
+											std::shared_ptr<IDbBindingTarget> binding_target, \
+											const size_t param_no) const {
+
+	const char *value = result_set->getString(field);
+	binding_target->bindValue(param_no, value);
+}
+
+CMySQLStringField::~CMySQLStringField() { }

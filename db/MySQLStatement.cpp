@@ -73,7 +73,8 @@ void CMySQLStatement::assignParamBindingWithVector(MYSQL_BIND &param_binding, \
 void CMySQLStatement::bindValue(const size_t param_no, const int value) {
 
 	assert(param_no < params_count);
-	params[param_no].value = CMySQLVariant(MYSQL_TYPE_LONG);
+	if(params[param_no].value.IsNull())
+		params[param_no].value = CMySQLVariant(MYSQL_TYPE_LONG);
 	params[param_no].value.SetInt(value);
 
 	assignParamBindingWithScalar(params_bindings[param_no], params[param_no].value);
@@ -83,7 +84,8 @@ void CMySQLStatement::bindValue(const size_t param_no, const char *value) {
 
 	assert(param_no < params_count);
 	size_t len = strlen(value);
-	params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, len);
+	if (params[param_no].value.IsNull())
+		params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, len);
 	params[param_no].value.SetString(value);
 
 	assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
@@ -93,7 +95,8 @@ void CMySQLStatement::bindValue(const size_t param_no, const wchar_t *value) {
 
 	assert(param_no < params_count);
 	size_t len = wcslen(value);
-	params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, len);
+	if (params[param_no].value.IsNull())
+		params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, len);
 	params[param_no].value.SetString(value);
 
 	assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
@@ -103,7 +106,8 @@ void CMySQLStatement::bindValue(const size_t param_no, \
 								const ImmutableString<char> value) {
 
 	assert(param_no < params_count);
-	params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, value.size);
+	if (params[param_no].value.IsNull())
+		params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, value.size);
 	params[param_no].value.SetString(value.str, value.size);
 
 	assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
@@ -113,7 +117,8 @@ void CMySQLStatement::bindValue(const size_t param_no, \
 								const ImmutableString<wchar_t> value) {
 
 	assert(param_no < params_count);
-	params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, value.size);
+	if (params[param_no].value.IsNull())
+		params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, value.size);
 	params[param_no].value.SetString(value.str, value.size);
 
 	assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
@@ -122,7 +127,8 @@ void CMySQLStatement::bindValue(const size_t param_no, \
 void CMySQLStatement::bindValue(const size_t param_no, const CDate &value) {
 
 	assert(param_no < params_count);
-	params[param_no].value = CMySQLVariant(MYSQL_TYPE_DATE);
+	if (params[param_no].value.IsNull())
+		params[param_no].value = CMySQLVariant(MYSQL_TYPE_DATE);
 	params[param_no].value.SetDate(value);
 
 	assignParamBindingWithScalar(params_bindings[param_no], params[param_no].value);

@@ -12,12 +12,12 @@ public:
 	
 	const CMetaInfo &getMetaInfo() const;
 
-	template <class BindValuePredicate> std::shared_ptr<IDbStatement> \
-		getCurrRecordUpdateStmt(const size_t updated_field, \
-					const BindValuePredicate binding_pred) const;
+	std::shared_ptr<IDbStatement> \
+		getUpdateStmt(const size_t updated_field, \
+				std::shared_ptr<IDbStatement> result_set) const;
 
-	template <class BindValuePredicate> std::shared_ptr<IDbStatement> \
-		getCurrRecordDeleteStmt(const BindValuePredicate binding_pred) const;
+	std::shared_ptr<IDbStatement> \
+		getDeleteStmt(std::shared_ptr<IDbStatement> result_set) const;
 
 	std::shared_ptr<IDbBindingTarget> getBindingTarget();
 	std::shared_ptr<IDbResultSet> exec();

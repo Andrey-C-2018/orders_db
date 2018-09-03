@@ -9,7 +9,14 @@ class CDbTable : public ITable{
 
 	size_t curr_record;
 
-	std::shared_ptr<IFieldsProperties> fields_props;
+	class CFieldsProperties;
+
+	std::shared_ptr<CFieldsProperties> fields_props;
+
+	enum Defaults {
+		DEF_ON_CHANGE_HANDLERS_COUNT = 5
+	};
+	std::vector<ITableOnSizeChangedHandlerPtr> on_size_changed_handlers;
 public:
 	CDbTable(CQuery query_);
 
@@ -24,12 +31,14 @@ public:
 	void ConnectOnSizeChangedHandler(ITableOnSizeChangedHandlerPtr handler) override;
 
 	void AddField(const int field_size, const Tchar *field_name) override;
+	void SetInsertString(ImmutableString<Tchar> insert_str);
 	void AddRecord() override;
 	void SetFieldSize(const size_t field, const int field_size) override;
 
 	ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const override;
 	void SetCell(const size_t field, const size_t record, const Tchar *value) override;
 
+	void reload();
 	virtual ~CDbTable();
 };
 
