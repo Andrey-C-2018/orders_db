@@ -10,7 +10,7 @@ public:
 		sizes.reserve(meta_info.getFieldsCount());
 		sizes_summ = 0;
 		for(size_t i = 0; i < meta_info.getFieldsCount(); ++i){
-			int sz = (int)meta_info.getField(i).field_size;
+			int sz = (int)meta_info.getFieldProperties(i).field_size;
 
 			sizes.push_back(sz);
 			sizes_summ += sz;
@@ -31,7 +31,7 @@ public:
 
 	ImmutableString<Tchar> GetName(const size_t index) const override{
 
-		return meta_info.getField().field_name;
+		return meta_info.getFieldProperties(index).field_name;
 	}
 
 	size_t size() const override{
@@ -41,7 +41,7 @@ public:
 
 	int GetSizesSumm() const override{
 
-		return summ;
+		return sizes_summ;
 	}
 
 	virtual ~CFieldsProperties();
@@ -62,7 +62,7 @@ std::shared_ptr<const IFieldsProperties> CDbTable::GetFieldsProperties() const{
 	return fields_props;
 }
 
-bool CDbTable::empty() const override{
+bool CDbTable::empty() const {
 
 	bool no_fields = query.getMetaInfo().empty();
 	return no_fields && !result_set->getRecordsCount();

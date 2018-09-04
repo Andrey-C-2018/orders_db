@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <basic/Exception.h>
 #include <table/ITable.h>
 #include <db/IDbResultSet.h>
 #include "Query.h"
@@ -47,4 +49,9 @@ public:
 size_t CDbTable::getCurrentRecordNo() const{
 
 	return curr_record;
+}
+
+const CQuery &CDbTable::getQuery() const {
+
+	return query;
 }

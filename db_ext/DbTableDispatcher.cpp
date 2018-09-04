@@ -8,6 +8,8 @@ CDbTableDispatcherException::~CDbTableDispatcherException() { }
 
 //****************************************************************************
 
+typedef CDbTableDispatcher::id_type id_type;
+
 CDbTableDispatcher::CDbTableDispatcher() { }
 
 id_type CDbTableDispatcher::AddCustomer(std::shared_ptr<IDbCustomer> obj, \

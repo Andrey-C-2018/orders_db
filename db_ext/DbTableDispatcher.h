@@ -19,9 +19,10 @@ public:
 };
 
 class CDbTableDispatcher final {
+
 	struct CDbTableRecord {
 		id_type id;
-		std::shared_ptr<CDbTable> db_table;
+		std::shared_ptr<IDbTable> db_table;
 	};
 
 	struct CCustomerRecord {
@@ -44,21 +45,23 @@ class CDbTableDispatcher final {
 	inline CustomerIterator FindCustomer(std::shared_ptr<IDbCustomer> obj) noexcept;
 
 public:
+	typedef int id_type;
+
 	CDbTableDispatcher();
 
-	id_type AddDbTable(std::shared_ptr<CDbTable> table, const int attribs);
+	id_type AddDbTable(std::shared_ptr<IDbTable> table, const int attribs);
 
 	id_type AddCustomer(std::shared_ptr<IDbCustomer> obj, const id_type id_query);
 	void DelCustomer(const id_type id_customer);
 	std::shared_ptr<IDbCustomer> GetCustomer(const id_type id) const;
 
-	virtual ~CDatabase();
+	virtual ~CDbTableDispatcher();
 };
 
 //****************************************************************************
 
 template <typename Iter> \
-Iter CDatabase::FindCustomer(const id_type id, Iter p_begin, Iter p_end){
+Iter CDbTableDispatcher::FindCustomer(const id_type id, Iter p_begin, Iter p_end){
 
 	Iter p_cust;
 
@@ -71,19 +74,21 @@ Iter CDatabase::FindCustomer(const id_type id, Iter p_begin, Iter p_end){
 	}
 }
 
-CDatabase::CustomerIterator CDatabase::FindCustomer(const id_type id) {
+CDbTableDispatcher::CustomerIterator CDbTableDispatcher::FindCustomer(const id_type id) {
 
 	return FindCustomer<CustomerIterator>(id, \
 											customers.begin(), customers.end());
 }
 
-CDatabase::CustomerConstIterator CDatabase::FindCustomer(const id_type id) const {
+CDbTableDispatcher::CustomerConstIterator \
+CDbTableDispatcher::FindCustomer(const id_type id) const {
 
 	return FindCustomer<CustomerConstIterator>(id, \
 											customers.cbegin(), customers.cend());
 }
 
-CDatabase::CustomerIterator CDatabase::FindCustomer(std::shared_ptr<IDbCustomer> obj) noexcept {
+CDbTableDispatcher::CustomerIterator \
+CDbTableDispatcher::FindCustomer(std::shared_ptr<IDbCustomer> obj) noexcept {
 	CustomerIterator p_cust;
 
 	p_cust = std::find_if(customers.begin(), customers.end(), \
