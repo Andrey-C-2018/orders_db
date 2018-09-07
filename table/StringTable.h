@@ -43,6 +43,7 @@ public:
 
 	void AddField(const int field_size, const Tchar *field_name) override;
 	void AddRecord() override;
+	void SetFieldSize(const size_t field, const int field_size) override;
 
 	ImmutableString<Tchar> GetCellAsString(const size_t field, \
 									const size_t record) const override;
