@@ -7,9 +7,11 @@
 #include <db/IDbField.h>
 
 class CMetaInfo{
-	typedef size_t IndexType;
+public:
 	typedef int id_type;
-
+private:
+	typedef size_t IndexType;
+	
 	typedef std::vector<IndexType>::iterator IndexIterator;
 	typedef std::vector<IndexType>::const_iterator ConstIndexIterator;
 
@@ -36,7 +38,7 @@ class CMetaInfo{
 
 	struct CTableRecord {
 		id_type id;
-		Tstring table_name;
+		std::string table_name;
 		inline bool operator==(const CTableRecord &obj) const;
 		inline bool operator<(const CTableRecord &obj) const;
 	};
@@ -49,26 +51,57 @@ class CMetaInfo{
 	std::vector<IndexType> keys_index_table;
 	std::vector<IndexType> tables_index_id, tables_index_name;
 
+	class CTablesIndexNamePredicate {
+		const std::vector<CTableRecord> &tables;
+	public:
+		CTablesIndexNamePredicate(const std::vector<CTableRecord> &value);
+		inline bool operator()(IndexType l, IndexType r) const;
+		inline bool operator()(IndexType l, const std::string &r) const;
+		inline bool operator()(IndexType l, const char *r) const;
+		inline bool operator()(const std::string &l, IndexType r) const;
+		inline bool operator()(const char *l, IndexType r) const;
+	} predTableName;
+
+	class CTablesIndexIdPredicate {
+		const std::vector<CTableRecord> &tables;
+	public:
+		CTablesIndexIdPredicate(const std::vector<CTableRecord> &value);
+		inline bool operator()(IndexType l, IndexType r) const;
+		inline bool operator()(IndexType l, id_type r) const;
+		inline bool operator()(id_type l, IndexType r) const;
+	} predTableId;
+
+	class CKeysIndexTableIdPredicate {
+		const std::vector<CKeyRecord> &keys;
+	public:
+		CKeysIndexTableIdPredicate(const std::vector<CKeyRecord> &value);
+		inline bool operator()(IndexType l, IndexType r) const;
+		inline bool operator()(IndexType l, id_type r) const;
+		inline bool operator()(id_type l, IndexType r) const;
+	} predKeyTableId;
+
 	id_type primary_table_id;
+	std::string primary_table_name;
 
-	inline IndexIterator FindTableRecord(const Tchar *table_name);
-	inline IndexIterator FindTableRecord(const id_type id_table);
-	inline ConstIndexIterator FindFieldRecord(const id_type id_field) const;
-	inline ConstIndexIterator FindFieldRecord(const size_t field_order_no) const;
-	inline std::pair<IndexIterator, IndexIterator> FindTableKeysRecords(const id_type id_table);
+	inline IndexIterator findTableRecord(const char *table_name);
+	inline IndexIterator findTableRecord(const id_type id_table);
+	inline std::pair<IndexIterator, IndexIterator> findTableKeysRecords(const id_type id_table);
 
-	inline bool IsTableRecordFound(const ConstIndexIterator p_table_name, \
-									const Tchar *table_name) const;
-	inline bool IsTableRecordFound(const ConstIndexIterator p_table_id, \
+	inline bool isTableRecordFound(const ConstIndexIterator p_table_name, \
+									const char *table_name) const;
+	inline bool isTableRecordFound(const ConstIndexIterator p_table_id, \
 									const id_type id_table) const;
-	inline bool IsFieldRecordFound(const ConstIndexIterator p_field_id, \
-									const id_type id_field) const;
 
+	id_type addNewTableRecord(const char *table_name);
+
+	template <class FieldPredicate> \
+		void enumeratePrimKey(const id_type table_id, \
+								FieldPredicate field_pred) const;
 public:
 	CMetaInfo();
 
 	CMetaInfo(const CMetaInfo &obj) = default;
-	CMetaInfo(CMetaInfo &&obj) = default;
+	CMetaInfo(CMetaInfo &&obj) = default;	
 	CMetaInfo &operator=(const CMetaInfo &obj) = default;
 	CMetaInfo &operator=(CMetaInfo &&obj) = default;
 	
@@ -79,20 +112,38 @@ public:
 
 	void setPrimaryTable(const Tchar *table_name);
 
-	void addFields(std::shared_ptr<IDbResultSetMetadata> metadata);
-	void addField(std::shared_ptr<IDbField> field);
+	void addField(std::shared_ptr<IDbField> field, const int order);
 
-	void getUpdateStr(const size_t updated_field, Tstring &str);
-	void getDeleteStr(std::string &str);
-
-	template <class FieldPredicate> \
-		void enumeratePrimKey(const size_t updated_field, \
-								FieldPredicate field_pred);
+	void getUpdateStr(const size_t field_order, std::string &query);
+	void getDeleteStr(std::string &query);
 
 	virtual ~CMetaInfo();
 };
 
 //*************************************************************
+
+template <class FieldPredicate> \
+void CMetaInfo::enumeratePrimKey(const id_type table_id, \
+									FieldPredicate field_pred) const {
+	auto table_prim_keys = findTableKeysRecords(table_id);
+
+	size_t counter = 0;
+	while (table_prim_keys.first != table_prim_keys.second) {
+		id_type id = keys[*(table_prim_keys.first)].id_field;
+
+		auto p_id_key = findFieldRecord(id);
+		assert(isFieldRecordFound(p_id_key, id));
+
+		auto rec = &fields[*p_id_key];
+		field_pred(rec.order);
+
+		++table_prim_keys.first;
+		++counter;
+	}
+	if (!counter)
+		throw CMetaInfoException(CMetaInfoException::E_NO_FKEY, \
+			_T("There are no foreign keys for the table the id field belongs to"));
+}
 
 bool CMetaInfo::CFieldRecord::operator==(const CMetaInfo::CFieldRecord &obj) const {
 
@@ -124,55 +175,40 @@ bool CMetaInfo::CTableRecord::operator<(const CMetaInfo::CTableRecord &obj) cons
 	return this->id < obj.id;
 }
 
-CMetaInfo::IndexIterator CMetaInfo::FindTableRecord(const Tchar *table_name) {
+CMetaInfo::IndexIterator CMetaInfo::findTableRecord(const char *table_name) {
 
 	return std::lower_bound(tables_index_name.begin(), \
 							tables_index_name.end(), \
 							table_name, predTableName);
 }
 
-CMetaInfo::IndexIterator CMetaInfo::FindTableRecord(const id_type id_table) {
+CMetaInfo::IndexIterator CMetaInfo::findTableRecord(const id_type id_table) {
 
 	return std::lower_bound(tables_index_id.begin(), \
 							tables_index_id.end(), \
 							id_table, predTableId);
 }
 
-CMetaInfo::ConstIndexIterator CMetaInfo::FindFieldRecord(const id_type id_field) const {
-
-	return std::lower_bound(fields_index_id.begin(), \
-							fields_index_id.end(), \
-							id_field, \
-							predFieldId);
-}
-
 std::pair<CMetaInfo::IndexIterator, CMetaInfo::IndexIterator> \
-	CMetaInfo::FindTableKeysRecords(const id_type id_table) {
+	CMetaInfo::findTableKeysRecords(const id_type id_table) {
 
 	return std::equal_range(keys_index_table.begin(), \
 							keys_index_table.end(), \
-							id_table, predFKeyTableId);
+							id_table, predKeyTableId);
 }
 
-bool CMetaInfo::IsTableRecordFound(const CMetaInfo::ConstIndexIterator p_table_name, \
-									const Tchar *table_name) const {
+bool CMetaInfo::isTableRecordFound(const CMetaInfo::ConstIndexIterator p_table_name, \
+									const char *table_name) const {
 
 	return p_table_name != tables_index_name.end() && \
 		!tables[*p_table_name].table_name.compare(table_name);
 }
 
-bool CMetaInfo::IsTableRecordFound(const CMetaInfo::ConstIndexIterator p_table_id, \
+bool CMetaInfo::isTableRecordFound(const CMetaInfo::ConstIndexIterator p_table_id, \
 									const id_type id_table) const {
 
 	return p_table_id != tables_index_id.end() && \
 		(id_table == tables[*p_table_id].id);
-}
-
-bool CMetaInfo::IsFieldRecordFound(const CMetaInfo::ConstIndexIterator p_field_id, \
-									const id_type id_field) const {
-
-	return p_field_id != fields_index_id.end() && \
-		(id_field == fields[*p_field_id].id);
 }
 
 size_t CMetaInfo::getFieldsCount() const {
@@ -183,38 +219,4 @@ size_t CMetaInfo::getFieldsCount() const {
 bool CMetaInfo::empty() const {
 
 	return fields.empty();
-}
-
-void CMetaInfo::getUpdateStr(const size_t updated_field, Tstring &str) {
-
-}
-
-void CMetaInfo::getDeleteStr(std::string &str) {
-
-	str.clear();
-	str = "DELETE FROM ";
-}
-
-template <class FieldPredicate> \
-void CMetaInfo::enumeratePrimKey(const size_t updated_field, FieldPredicate field_pred) {
-	auto p_field_index = FindFieldRecord(updated_field);
-	int table_id = fields[*p_field_index].id_table;
-	auto table_prim_keys = FindTableKeysRecords(table_id);
-
-	size_t counter = 0;
-	while (table_prim_keys.first != table_prim_keys.second) {
-		id_type id = keys[*(table_prim_keys.first)].id_field;
-
-		auto p_id_key = FindFieldRecord(id);
-		assert(IsFieldRecordFound(p_id_key, id));
-
-		auto rec = &fields[*p_id_key];
-		field_pred(rec.order);
-
-		++table_prim_keys.first;
-		++counter;
-	}
-	if (!counter)
-		throw CMetaInfoException(CMetaInfoException::E_NO_FKEY, \
-			_T("There are no foreign keys for the table the id field belongs to"));
 }

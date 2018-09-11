@@ -37,3 +37,24 @@ const char *UCS16_ToUTF8(const In &in, Out &out) {
 
 	return UCS16_ToUTF8(&in[0], (int)in.size(), out);
 }
+
+template <class Out, class addCharPred> \
+const char *UCS16_ToDefEnc(const wchar_t *in, const int len, Out &out, addCharPred addChar) {
+	mbstate_t state;
+	char ch = '\0';
+	size_t len_in = len == -1 ? DEF_MAX_STR_LEN : (size_t)len;
+	
+	memset(&state, 0, sizeof state);
+	out.reserve(len_in + 1);
+	
+	const wchar_t *p_in = in;
+	size_t rc = wcrtomb(&ch, *p_in, &state);
+	while(rc && rc != (size_t)-1 && rc != (size_t)-2){
+		addChar(out, ch);
+		p_in += rc;
+		rc = wcrtomb(&ch, *p_in, &state);
+	}
+	
+	assert(!len_in || (len_in && !rc));
+	return out.size() ? &out[0] : nullptr;
+}
