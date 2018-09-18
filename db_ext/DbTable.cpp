@@ -1,51 +1,20 @@
 #include "DbTable.h"
 
-class CFieldsProperties : public IFieldsProperties {
-	const CMetaInfo &meta_info;
-	std::vector<int> sizes;
-	int sizes_summ;
-public:
-	CFieldsProperties(const CMetaInfo &meta_info_) : meta_info(meta_info_){
-       
-		sizes.reserve(meta_info.getFieldsCount());
-		sizes_summ = 0;
-		for(size_t i = 0; i < meta_info.getFieldsCount(); ++i){
-			int sz = (int)meta_info.getFieldProperties(i).field_size;
+inline void bindValueAsTString(std::shared_ptr<const IDbField> field, \
+								std::shared_ptr<IDbBindingTarget> binding_target, \
+								const size_t param_no, \
+								const char *value) {
 
-			sizes.push_back(sz);
-			sizes_summ += sz;
-		}
-	}
+	field->bindValueAsString(binding_target, param_no, value);
+}
 
-	int GetWidth(const size_t index) const override{
+inline void bindValueAsTString(std::shared_ptr<const IDbField> field, \
+								std::shared_ptr<IDbBindingTarget> binding_target, \
+								const size_t param_no, \
+								const wchar_t *value) {
 
-		assert(index < sizes.size());
-		return sizes[index];
-	}
-
-	inline void SetWidth(const size_t index, const int width){
-
-		assert(index < sizes.size());
-		sizes[index] = width;
-	}
-
-	ImmutableString<Tchar> GetName(const size_t index) const override{
-
-		return meta_info.getFieldProperties(index).field_name;
-	}
-
-	size_t size() const override{
-
-		return meta_info.getFieldsCount();
-	}
-
-	int GetSizesSumm() const override{
-
-		return sizes_summ;
-	}
-
-	virtual ~CFieldsProperties();
-};
+	field->bindValueAsWString(binding_target, param_no, value);
+}
 
 //****************************************************
 
@@ -109,7 +78,7 @@ void CDbTable::SetCell(const size_t field, const size_t record, const Tchar *val
 	auto update_stmt = query.getUpdateStmt(field, result_set);
 
 	auto updated_field_ptr = query.getMetaInfo().getField(field);
-	updated_field_ptr->bindValueAsString(update_stmt, 0, value);
+	bindValueAsTString(updated_field_ptr, update_stmt, 0, value);
 	update_stmt->execScalar();
 
 	reload();

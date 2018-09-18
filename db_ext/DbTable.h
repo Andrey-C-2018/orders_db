@@ -11,7 +11,52 @@ class CDbTable : public ITable{
 
 	size_t curr_record;
 
-	class CFieldsProperties;
+	class CFieldsProperties : public IFieldsProperties {
+		const CMetaInfo &meta_info;
+		std::vector<int> sizes;
+		int sizes_summ;
+	public:
+		CFieldsProperties(const CMetaInfo &meta_info_) : meta_info(meta_info_) {
+
+			sizes.reserve(meta_info.getFieldsCount());
+			sizes_summ = 0;
+			for (size_t i = 0; i < meta_info.getFieldsCount(); ++i) {
+				int sz = (int)meta_info.getFieldProperties(i).field_size;
+
+				sizes.push_back(sz);
+				sizes_summ += sz;
+			}
+		}
+
+		int GetWidth(const size_t index) const override {
+
+			assert(index < sizes.size());
+			return sizes[index];
+		}
+
+		inline void SetWidth(const size_t index, const int width) {
+
+			assert(index < sizes.size());
+			sizes[index] = width;
+		}
+
+		ImmutableString<Tchar> GetName(const size_t index) const override {
+
+			return meta_info.getFieldProperties(index).field_name;
+		}
+
+		size_t size() const override {
+
+			return meta_info.getFieldsCount();
+		}
+
+		int GetSizesSumm() const override {
+
+			return sizes_summ;
+		}
+
+		virtual ~CFieldsProperties(){ }
+	};
 
 	std::shared_ptr<CFieldsProperties> fields_props;
 

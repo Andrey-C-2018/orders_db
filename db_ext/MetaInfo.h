@@ -105,7 +105,7 @@ private:
 
 	struct CGetFieldNameByIndex {
 		inline const Tstring &operator()(std::vector<CFieldRecord> &fields, \
-											const size_t index) const;
+									const size_t index) const;
 	};
 	struct CGetFieldIdByIndex {
 		inline id_type operator()(std::vector<CFieldRecord> &fields, \
@@ -116,11 +116,11 @@ private:
 									const size_t index) const;
 	};
 	struct CGetTableNameByIndex {
-		inline const Tstring &operator()(std::vector<CFieldRecord> &tables, \
+		inline const std::string &operator()(std::vector<CTableRecord> &tables, \
 									const size_t index) const;
 	};
 	struct CGetTableIdByIndex {
-		inline id_type operator()(std::vector<CFieldRecord> &tables, \
+		inline id_type operator()(std::vector<CTableRecord> &tables, \
 									const size_t index) const;
 	};
 	struct CGetTableIdFromKeysByIndex {
@@ -142,7 +142,7 @@ private:
 									const Tchar *field_name) const;
 	inline bool isFieldRecordFound(const ConstIndexIterator p_field_id, \
 									const id_type id_field) const;
-	inline bool isFieldRecordFound(const ConstIndexIterator p_field_id, \
+	inline bool isFieldRecordFound(const ConstIndexIterator p_field_order, \
 									const size_t field_order) const;
 	inline bool isTableRecordFound(const ConstIndexIterator p_table_name, \
 									const char *table_name) const;
@@ -307,6 +307,13 @@ bool CMetaInfo::isFieldRecordFound(const ConstIndexIterator p_field_id, \
 			(id_field == fields[*p_field_id].id);
 }
 
+bool CMetaInfo::isFieldRecordFound(const ConstIndexIterator p_field_order, \
+									const size_t field_order) const {
+
+	return p_field_order != fields_index_order.end() && \
+			(field_order == fields[*p_field_order].order);
+}
+
 bool CMetaInfo::isTableRecordFound(const CMetaInfo::ConstIndexIterator p_table_name, \
 									const char *table_name) const {
 
@@ -329,4 +336,39 @@ size_t CMetaInfo::getFieldsCount() const {
 bool CMetaInfo::empty() const {
 
 	return fields.empty();
+}
+
+const Tstring &CMetaInfo::CGetFieldNameByIndex::operator()(std::vector<CFieldRecord> &fields, \
+															const size_t index) const {
+	return fields[index].field_props.field_name;
+}
+
+CMetaInfo::id_type CMetaInfo::CGetFieldIdByIndex::operator()(std::vector<CFieldRecord> &fields, \
+															const size_t index) const {
+
+	return fields[index].id;
+}
+
+size_t CMetaInfo::CGetFieldOrderByIndex::operator()(std::vector<CFieldRecord> &fields, \
+															const size_t index) const {
+
+	return fields[index].order;
+}
+
+const std::string &CMetaInfo::CGetTableNameByIndex::operator()(std::vector<CTableRecord> &tables, \
+															const size_t index) const {
+
+	return tables[index].table_name;
+}
+
+CMetaInfo::id_type CMetaInfo::CGetTableIdByIndex::operator()(std::vector<CTableRecord> &tables, \
+															const size_t index) const {
+
+	return tables[index].id;
+}
+
+CMetaInfo::id_type CMetaInfo::CGetTableIdFromKeysByIndex::operator()(std::vector<CKeyRecord> &keys, \
+															const size_t index) const {
+
+	return keys[index].id_table;
 }
