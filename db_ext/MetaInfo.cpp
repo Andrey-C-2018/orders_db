@@ -7,10 +7,9 @@ inline void appendAndConvIfNecessary(std::string &str1, const char *str2) {
 }
 
 inline void appendAndConvIfNecessary(std::string &str1, const wchar_t *str2) {
-	std::string &str1_ref = str1;
 
 	UCS16_ToDefEnc(str2, -1, str1, \
-					[&str1_ref](const char ch) { str1_ref += ch; });
+					[](std::string &str, const char ch) { str += ch; });
 }
 
 inline const char *convIfNecessary(const char *str, std::vector<char> &buffer) {
@@ -21,7 +20,7 @@ inline const char *convIfNecessary(const char *str, std::vector<char> &buffer) {
 inline const char *convIfNecessary(const wchar_t *str, std::vector<char> &buffer) {
 	
 	UCS16_ToDefEnc(str, -1, buffer, \
-					[&buffer](const char ch) {
+					[](std::vector<char> &buffer, const char ch) {
 
 						buffer.push_back(ch);
 					});
@@ -61,7 +60,7 @@ public:
 
 //*************************************************************
 
-CMetaInfo::CMetaInfo() : primary_table_id(1){ }
+CMetaInfo::CMetaInfo() : primary_table_id(-1){ }
 
 std::shared_ptr<const IDbField> CMetaInfo::getField(const size_t field_order) const {
 
@@ -78,8 +77,22 @@ const CDbFieldProperties<Tstring> &CMetaInfo::getFieldProperties(const size_t fi
 void CMetaInfo::setPrimaryTable(const Tchar *table_name) {
 
 	assert(table_name);
-	auto p_table = std::find(fields.cbegin(), fields.cend(), table_name);
-	primary_table_id = std::distance(fields.cbegin(), p_table);
+	std::vector<char> conv_buffer;
+	const char *table_name_conv = convIfNecessary(table_name, conv_buffer);
+
+	auto p_table = std::find_if(tables.cbegin(), tables.cend(), \
+		[table_name_conv](const CTableRecord &rec) { 
+			return !rec.table_name.compare(table_name_conv);
+		});
+
+	if (p_table == tables.cend()) {
+		XException e(0, _T("the query does not refer to such table: "));
+		e << table_name;
+		throw e;
+	}
+
+	primary_table_name = table_name_conv;
+	primary_table_id = p_table->id;
 }
 
 CMetaInfo::id_type CMetaInfo::addTableRecord(const char *table_name) {
@@ -148,6 +161,7 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const int field_order)
 void CMetaInfo::getUpdateQueryForField(const size_t field_order, std::string &query) {
 	
 	assert(field_order < fields.size());
+	assert(primary_table_id != -1);
 	CFieldRecord &field_rec = fields[fields_index_order[field_order]];
 	id_type updated_table_id = field_rec.id_table;
 

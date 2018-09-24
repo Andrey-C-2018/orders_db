@@ -58,6 +58,24 @@ const wchar_t *CMySQLDateField::getValueAsWString(const std::shared_ptr<const ID
 	return buffer;
 }
 
+ImmutableString<char> CMySQLDateField::getValueAsImmutableString(\
+										const std::shared_ptr<const IDbResultSet> result_set) const {
+	char *p = (char *)buffer;
+
+	CDate date_value = result_set->getDate(field);
+	date_value.ToStringGerman(p);
+
+	return ImmutableString<char>(p, CDate::GERMAN_FORMAT_LEN);
+}
+
+ImmutableString<wchar_t> CMySQLDateField::getValueAsImmutableWString(\
+										const std::shared_ptr<const IDbResultSet> result_set) const {
+	CDate date_value = result_set->getDate(field);
+	date_value.ToStringGerman(buffer);
+
+	return ImmutableString<wchar_t>(buffer, CDate::GERMAN_FORMAT_LEN);
+}
+
 void CMySQLDateField::bindValueAsString(std::shared_ptr<IDbBindingTarget> binding_target, \
 										const size_t param_no, \
 										const char *value) const {
@@ -99,6 +117,18 @@ const char *CMySQLStringField::getValueAsString(const std::shared_ptr<const IDbR
 const wchar_t *CMySQLStringField::getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const {
 	
 	return result_set->getWString(field);
+}
+
+ImmutableString<char> CMySQLStringField::getValueAsImmutableString(\
+											const std::shared_ptr<const IDbResultSet> result_set) const {
+
+	return result_set->getImmutableString(field);
+}
+
+ImmutableString<wchar_t> CMySQLStringField::getValueAsImmutableWString(\
+											const std::shared_ptr<const IDbResultSet> result_set) const {
+
+	return result_set->getImmutableWString(field);
 }
 
 void CMySQLStringField::bindValueAsString(std::shared_ptr<IDbBindingTarget> binding_target, \

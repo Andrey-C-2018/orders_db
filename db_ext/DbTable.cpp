@@ -20,15 +20,9 @@ inline void bindValueAsTString(std::shared_ptr<const IDbField> field, \
 
 CDbTable::CDbTable(CQuery query_) : curr_record(0), query(std::move(query_)){
 
-	fields_props = std::make_shared<CFieldsProperties>(query.getMetaInfo());
 	result_set = query.exec();
 
 	on_size_changed_handlers.reserve(DEF_ON_CHANGE_HANDLERS_COUNT);
-}
-
-std::shared_ptr<const IFieldsProperties> CDbTable::GetFieldsProperties() const{
-
-	return fields_props;
 }
 
 bool CDbTable::empty() const {
@@ -63,6 +57,19 @@ void CDbTable::AddRecord(){
 	for (auto &handler : on_size_changed_handlers)
 		handler->OnSizeChanged(query.getMetaInfo().getFieldsCount(), \
 					records_count);
+}
+
+int CDbTable::GetSizesSumm() const {
+	int sizes_summ = 0;
+	auto &meta_info = query.getMetaInfo();
+
+	for (size_t i = 0; i < meta_info.getFieldsCount(); ++i) {
+		int sz = (int)meta_info.getFieldProperties(i).field_size;
+
+		sizes_summ += sz;
+	}
+
+	return sizes_summ;
 }
 
 ImmutableString<Tchar> CDbTable::GetCellAsString(const size_t field, const size_t record) const{

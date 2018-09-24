@@ -16,12 +16,13 @@ protected:
 	template <class Tstring_> \
 		inline void TgetField(CDbFieldProperties<Tstring_> &field_props) const;
 
+	//inline int getCellValueOfType(const size_t field, int type_hint) const;
 public:
 	CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
 
 	CDbFieldProperties<std::string> getFieldProperties() const override;
 	CDbFieldProperties<std::wstring> getFieldPropertiesW() const override;
-
+	
 	virtual ~CMySQLField();
 };
 
@@ -36,6 +37,10 @@ public:
 
 	const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const override;
 	const wchar_t *getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const override;
+	ImmutableString<char> getValueAsImmutableString(\
+									const std::shared_ptr<const IDbResultSet> result_set) const override;
+	ImmutableString<wchar_t> getValueAsImmutableWString(\
+									const std::shared_ptr<const IDbResultSet> result_set) const override;
 
 	void bindValueAsString(std::shared_ptr<IDbBindingTarget> binding_target, \
 							const size_t param_no, \
@@ -61,6 +66,10 @@ public:
 
 	const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const override;
 	const wchar_t *getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const override;
+	ImmutableString<char> getValueAsImmutableString(\
+									const std::shared_ptr<const IDbResultSet> result_set) const override;
+	ImmutableString<wchar_t> getValueAsImmutableWString(\
+									const std::shared_ptr<const IDbResultSet> result_set) const override;
 
 	void bindValueAsString(std::shared_ptr<IDbBindingTarget> binding_target, \
 							const size_t param_no, \
@@ -83,6 +92,10 @@ public:
 
 	const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const override;
 	const wchar_t *getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const override;
+	ImmutableString<char> getValueAsImmutableString(\
+									const std::shared_ptr<const IDbResultSet> result_set) const override;
+	ImmutableString<wchar_t> getValueAsImmutableWString(\
+									const std::shared_ptr<const IDbResultSet> result_set) const override;
 
 	void bindValueAsString(std::shared_ptr<IDbBindingTarget> binding_target, \
 							const size_t param_no, \
@@ -158,6 +171,25 @@ template <typename Tint> \
 const wchar_t *CMySQLIntegerField<Tint>::getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const {
 
 	return XConv::ToString(result_set->getInt(field), buffer);
+}
+
+template <typename Tint> \
+ImmutableString<char> CMySQLIntegerField<Tint>::getValueAsImmutableString(\
+											const std::shared_ptr<const IDbResultSet> result_set) const {
+	char *p = (char *)buffer;
+	size_t size = 0;
+
+	auto str = XConv::ToString(result_set->getInt(field), p, size);
+	return ImmutableString<char>(str, size);
+}
+
+template <typename Tint> \
+ImmutableString<wchar_t> CMySQLIntegerField<Tint>::getValueAsImmutableWString(\
+											const std::shared_ptr<const IDbResultSet> result_set) const {
+	size_t size = 0;
+
+	auto str = XConv::ToString(result_set->getInt(field), buffer, size);
+	return ImmutableString<wchar_t>(str, size);
 }
 
 template <typename Tint> \

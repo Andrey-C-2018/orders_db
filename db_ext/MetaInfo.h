@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <basic/Exception.h>
+#include <basic/NumericTypeWrapper.h>
 #include <db/IDbResultSetMetadata.h>
 #include <db/IDbField.h>
 
@@ -59,27 +60,30 @@ private:
 	std::vector<IndexType> keys_index_table;
 	std::vector<IndexType> tables_index_id, tables_index_name;
 
-	template <class TRegistry, class GetStrByIndex> \
+	template <typename Tchar_, class Tstring_, \
+				class TRegistry, class GetStrByIndex> \
 	struct CIndexedTextSearchPredicate {
-		TRegistry &reg;
+		const TRegistry &reg;
+		GetStrByIndex getStrByIndex;
 
+		inline CIndexedTextSearchPredicate(const TRegistry &reg_) : reg(reg_) { }
 		inline bool operator()(IndexType l, IndexType r) const {
 
 			return getStrByIndex(reg, l).compare(getStrByIndex(reg, r)) < 0;
 		}
-		inline bool operator()(IndexType l, const std::string &r) const {
+		inline bool operator()(IndexType l, const Tstring_ &r) const {
 
 			return getStrByIndex(reg, l).compare(r) < 0;
 		}
-		inline bool operator()(IndexType l, const char *r) const {
+		inline bool operator()(IndexType l, const Tchar_ *r) const {
 
 			return getStrByIndex(reg, l).compare(r) < 0;
 		}
-		inline bool operator()(const std::string &l, IndexType r) const {
+		inline bool operator()(const Tstring_ &l, IndexType r) const {
 
 			return l.compare(getStrByIndex(reg, r)) < 0;
 		}
-		inline bool operator()(const char *l, IndexType r) const {
+		inline bool operator()(const Tchar_ *l, IndexType r) const {
 
 			return getStrByIndex(reg, r).compare(l) > 0;
 		}
@@ -87,56 +91,59 @@ private:
 
 	template <typename TInt, class TRegistry, class GetIntValueByIndex> \
 	struct CIndexedIntValueSearchPredicate {
-		TRegistry &reg;
+		const TRegistry &reg;
+		GetIntValueByIndex getIntValueByIndex;
 
+		inline CIndexedIntValueSearchPredicate(const TRegistry &reg_) : reg(reg_) { }
 		inline bool operator()(IndexType l, IndexType r) const {
 
-			return getStrByIndex(reg, l) < getIntValueByIndex[r];
+			return getIntValueByIndex(reg, l) < getIntValueByIndex(reg, r);
 		}
 		inline bool operator()(IndexType l, TInt r) const {
 
-			return getStrByIndex(reg, l) < r;
+			return getIntValueByIndex(reg, l) < r;
 		}
 		inline bool operator()(TInt l, IndexType r) const {
 
-			return l < getStrByIndex(reg, r);
+			return l < getIntValueByIndex(reg, r);
 		}
 	};
 
 	struct CGetFieldNameByIndex {
-		inline const Tstring &operator()(std::vector<CFieldRecord> &fields, \
-									const size_t index) const;
+		inline const Tstring &operator()(const std::vector<CFieldRecord> &fields, \
+						const size_t index) const { return fields[index].field_props.field_name; }
 	};
 	struct CGetFieldIdByIndex {
-		inline id_type operator()(std::vector<CFieldRecord> &fields, \
-									const size_t index) const;
+		inline id_type operator()(const std::vector<CFieldRecord> &fields, \
+						const size_t index) const {	return fields[index].id; }
 	};
 	struct CGetFieldOrderByIndex {
-		inline size_t operator()(std::vector<CFieldRecord> &fields, \
-									const size_t index) const;
+		inline size_t operator()(const std::vector<CFieldRecord> &fields, \
+						const size_t index) const { return fields[index].order;	}
 	};
 	struct CGetTableNameByIndex {
-		inline const std::string &operator()(std::vector<CTableRecord> &tables, \
-									const size_t index) const;
+		inline const std::string &operator()(const std::vector<CTableRecord> &tables, \
+						const size_t index) const {	return tables[index].table_name; }
 	};
 	struct CGetTableIdByIndex {
-		inline id_type operator()(std::vector<CTableRecord> &tables, \
-									const size_t index) const;
+		inline id_type operator()(const std::vector<CTableRecord> &tables, \
+						const size_t index) const {	return tables[index].id; }
 	};
 	struct CGetTableIdFromKeysByIndex {
-		inline id_type operator()(std::vector<CKeyRecord> &keys, \
-									const size_t index) const;
+		inline id_type operator()(const std::vector<CKeyRecord> &keys, \
+						const size_t index) const {	return keys[index].id_table; }
 	};
 
 	id_type primary_table_id;
 	std::string primary_table_name;
 
-	inline IndexIterator findFieldRecord(const Tchar *field_name);
-	inline IndexIterator findFieldRecord(const id_type id_field);
-	inline IndexIterator findFieldRecord(const size_t field_order);
-	inline IndexIterator findTableRecord(const char *table_name);
-	inline IndexIterator findTableRecord(const id_type id_table);
-	inline std::pair<IndexIterator, IndexIterator> findTableKeysRecords(const id_type id_table);
+	inline ConstIndexIterator findFieldRecord(const Tchar *field_name) const;
+	inline ConstIndexIterator findFieldRecord(const id_type id_field) const;
+	inline ConstIndexIterator findFieldRecord(const size_t field_order) const;
+	inline ConstIndexIterator findTableRecord(const char *table_name) const;
+	inline ConstIndexIterator findTableRecord(const id_type id_table) const;
+	inline std::pair<ConstIndexIterator, ConstIndexIterator> \
+					findTableKeysRecords(const id_type id_table) const;
 
 	inline bool isFieldRecordFound(const ConstIndexIterator p_field_name, \
 									const Tchar *field_name) const;
@@ -188,17 +195,17 @@ void CMetaInfo::enumeratePrimKey(const id_type table_id, \
 	while (table_prim_keys.first != table_prim_keys.second) {
 		id_type id = keys[*(table_prim_keys.first)].id_field;
 
-		auto p_id_key = findFieldRecord(id);
+		ConstIndexIterator p_id_key = findFieldRecord(id);
 		assert(isFieldRecordFound(p_id_key, id));
 
-		auto rec = &fields[*p_id_key];
+		const CFieldRecord &rec = fields[*p_id_key];
 		field_pred(rec.order);
 
 		++table_prim_keys.first;
 		++counter;
 	}
 	if (!counter)
-		throw CMetaInfoException(CMetaInfoException::E_NO_FKEY, \
+		throw XException(0, \
 			_T("There are no foreign keys for the table the id field belongs to"));
 }
 
@@ -232,64 +239,67 @@ bool CMetaInfo::CTableRecord::operator<(const CMetaInfo::CTableRecord &obj) cons
 	return this->id < obj.id;
 }
 
-CMetaInfo::IndexIterator CMetaInfo::findFieldRecord(const Tchar *field_name) {
-	typedef CIndexedTextSearchPredicate<std::vector<CFieldRecord>, \
+CMetaInfo::ConstIndexIterator CMetaInfo::findFieldRecord(const Tchar *field_name) const {
+	typedef CIndexedTextSearchPredicate<Tchar, Tstring, \
+										std::vector<CFieldRecord>, \
 										CGetFieldNameByIndex> Pred;
-	Pred predFieldName{ fields };
+	Pred predFieldName( fields );
 
-	return std::lower_bound(fields_index_name.begin(), \
-							fields_index_name.end(), \
+	return std::lower_bound(fields_index_name.cbegin(), \
+							fields_index_name.cend(), \
 							field_name, predFieldName);
 }
 
-CMetaInfo::IndexIterator CMetaInfo::findFieldRecord(const id_type id_field) {
+CMetaInfo::ConstIndexIterator CMetaInfo::findFieldRecord(const id_type id_field) const {
 	typedef CIndexedIntValueSearchPredicate<id_type, std::vector<CFieldRecord>, \
 											CGetFieldIdByIndex> Pred;
-	Pred predFieldId{ fields };
+	Pred predFieldId( fields );
 
-	return std::lower_bound(fields_index_id.begin(), \
-							fields_index_id.end(), \
+	return std::lower_bound(fields_index_id.cbegin(), \
+							fields_index_id.cend(), \
 							id_field, predFieldId);
 }
 
-CMetaInfo::IndexIterator CMetaInfo::findFieldRecord(const size_t field_order) {
-	typedef CIndexedIntValueSearchPredicate<size_t, std::vector<CFieldRecord>, \
+CMetaInfo::ConstIndexIterator CMetaInfo::findFieldRecord(const size_t field_order) const {
+	typedef CIndexedIntValueSearchPredicate<CNumericTypeWrapper<size_t>, \
+											std::vector<CFieldRecord>, \
 											CGetFieldOrderByIndex> Pred;
-	Pred predFieldOrder{ fields };
+	Pred predFieldOrder( fields );
 
-	return std::lower_bound(fields_index_id.begin(), \
-							fields_index_id.end(), \
-							field_order, predFieldOrder);
+	return std::lower_bound(fields_index_id.cbegin(), \
+							fields_index_id.cend(), \
+							CNumericTypeWrapper<size_t>(field_order), predFieldOrder);
 }
 
-CMetaInfo::IndexIterator CMetaInfo::findTableRecord(const char *table_name) {
-	typedef CIndexedTextSearchPredicate<std::vector<CTableRecord>, \
+CMetaInfo::ConstIndexIterator CMetaInfo::findTableRecord(const char *table_name) const {
+	typedef CIndexedTextSearchPredicate<char, std::string, \
+										std::vector<CTableRecord>, \
 										CGetTableNameByIndex> Pred;
-	Pred predTableName{ tables };
+	Pred predTableName( tables );
 
-	return std::lower_bound(tables_index_name.begin(), \
-							tables_index_name.end(), \
+	return std::lower_bound(tables_index_name.cbegin(), \
+							tables_index_name.cend(), \
 							table_name, predTableName);
 }
 
-CMetaInfo::IndexIterator CMetaInfo::findTableRecord(const id_type id_table) {
+CMetaInfo::ConstIndexIterator CMetaInfo::findTableRecord(const id_type id_table) const {
 	typedef CIndexedIntValueSearchPredicate<id_type, std::vector<CTableRecord>, \
 											CGetTableIdByIndex> Pred;
-	Pred predTableId{ tables };
+	Pred predTableId( tables );
 
-	return std::lower_bound(tables_index_id.begin(), \
-							tables_index_id.end(), \
+	return std::lower_bound(tables_index_id.cbegin(), \
+							tables_index_id.cend(), \
 							id_table, predTableId);
 }
 
-std::pair<CMetaInfo::IndexIterator, CMetaInfo::IndexIterator> \
-	CMetaInfo::findTableKeysRecords(const id_type id_table) {
+std::pair<CMetaInfo::ConstIndexIterator, CMetaInfo::ConstIndexIterator> \
+	CMetaInfo::findTableKeysRecords(const id_type id_table) const {
 	typedef CIndexedIntValueSearchPredicate<id_type, std::vector<CKeyRecord>, \
 											CGetTableIdFromKeysByIndex> Pred;
-	Pred predKeyTableId{ keys };
+	Pred predKeyTableId( keys );
 
-	return std::equal_range(keys_index_table.begin(), \
-							keys_index_table.end(), \
+	return std::equal_range(keys_index_table.cbegin(), \
+							keys_index_table.cend(), \
 							id_table, predKeyTableId);
 }
 
@@ -336,39 +346,4 @@ size_t CMetaInfo::getFieldsCount() const {
 bool CMetaInfo::empty() const {
 
 	return fields.empty();
-}
-
-const Tstring &CMetaInfo::CGetFieldNameByIndex::operator()(std::vector<CFieldRecord> &fields, \
-															const size_t index) const {
-	return fields[index].field_props.field_name;
-}
-
-CMetaInfo::id_type CMetaInfo::CGetFieldIdByIndex::operator()(std::vector<CFieldRecord> &fields, \
-															const size_t index) const {
-
-	return fields[index].id;
-}
-
-size_t CMetaInfo::CGetFieldOrderByIndex::operator()(std::vector<CFieldRecord> &fields, \
-															const size_t index) const {
-
-	return fields[index].order;
-}
-
-const std::string &CMetaInfo::CGetTableNameByIndex::operator()(std::vector<CTableRecord> &tables, \
-															const size_t index) const {
-
-	return tables[index].table_name;
-}
-
-CMetaInfo::id_type CMetaInfo::CGetTableIdByIndex::operator()(std::vector<CTableRecord> &tables, \
-															const size_t index) const {
-
-	return tables[index].id;
-}
-
-CMetaInfo::id_type CMetaInfo::CGetTableIdFromKeysByIndex::operator()(std::vector<CKeyRecord> &keys, \
-															const size_t index) const {
-
-	return keys[index].id_table;
 }

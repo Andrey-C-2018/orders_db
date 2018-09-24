@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <basic/tstring.h>
-#include "IFieldsProperties.h"
+#include <basic/ImmutableString.h>
 
 struct ITableOnSizeChangedHandler {
 	virtual void OnSizeChanged(const size_t new_fields_count, \
@@ -12,8 +12,6 @@ struct ITableOnSizeChangedHandler {
 typedef std::shared_ptr<ITableOnSizeChangedHandler> ITableOnSizeChangedHandlerPtr;
 
 struct ITable {
-	virtual std::shared_ptr<const IFieldsProperties> GetFieldsProperties() const = 0;
-
 	virtual bool empty() const = 0;
 	virtual size_t GetFieldsCount() const = 0;
 	virtual size_t GetRecordsCount() const = 0;
@@ -21,7 +19,10 @@ struct ITable {
 
 	virtual void AddField(const int field_size, const Tchar *field_name) = 0;
 	virtual void AddRecord() = 0;
-	virtual void SetFieldSize(const size_t field, const int field_size) = 0;
+
+	virtual size_t GetFieldSize(const size_t field) const = 0;
+	virtual int GetSizesSumm() const = 0;
+	virtual size_t GetFieldName(const size_t field) const = 0;
 
 	virtual ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const = 0;
 	virtual void SetCell(const size_t field, const size_t record, \

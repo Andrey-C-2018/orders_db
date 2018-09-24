@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <basic/ImmutableString.h>
 
 template <typename Tstring_> \
 struct CDbFieldProperties {
@@ -27,6 +28,8 @@ struct IDbField {
 
 	virtual const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const = 0;
 	virtual const wchar_t *getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const = 0;
+	virtual ImmutableString<char> getValueAsImmutableString(const std::shared_ptr<const IDbResultSet> result_set) const = 0;
+	virtual ImmutableString<wchar_t> getValueAsImmutableWString(const std::shared_ptr<const IDbResultSet> result_set) const = 0;
 
 	virtual void bindValueAsString(std::shared_ptr<IDbBindingTarget> binding_target, \
 									const size_t param_no, \

@@ -1,4 +1,5 @@
 #pragma once
+#include <assert.h>
 #include <Windows.h>
 
 template <class Out> \
@@ -38,10 +39,16 @@ const char *UCS16_ToUTF8(const In &in, Out &out) {
 	return UCS16_ToUTF8(&in[0], (int)in.size(), out);
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
+
 template <class Out, class addCharPred> \
 const char *UCS16_ToDefEnc(const wchar_t *in, const int len, Out &out, addCharPred addChar) {
 	mbstate_t state;
 	char ch = '\0';
+	const size_t DEF_MAX_STR_LEN = 32;
 	size_t len_in = len == -1 ? DEF_MAX_STR_LEN : (size_t)len;
 	
 	memset(&state, 0, sizeof state);
@@ -58,3 +65,7 @@ const char *UCS16_ToDefEnc(const wchar_t *in, const int len, Out &out, addCharPr
 	assert(!len_in || (len_in && !rc));
 	return out.size() ? &out[0] : nullptr;
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif

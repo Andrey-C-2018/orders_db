@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <basic/Exception.h>
+#include <db_ext/DbTable.h>
 
 class CDbTableDispatcherException : public XException {
 public:
