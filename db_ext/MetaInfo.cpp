@@ -1,47 +1,6 @@
 #include <basic/TextConv.h>
 #include "MetaInfo.h"
 
-inline void appendAndConvIfNecessary(std::string &str1, const char *str2) { 
-
-	str1 += str2;
-}
-
-inline void appendAndConvIfNecessary(std::string &str1, const wchar_t *str2) {
-
-	UCS16_ToDefEnc(str2, -1, str1, \
-					[](std::string &str, const char ch) { str += ch; });
-}
-
-inline const char *convIfNecessary(const char *str, std::vector<char> &buffer) {
-
-	return str;
-}
-
-inline const char *convIfNecessary(const wchar_t *str, std::vector<char> &buffer) {
-	
-	UCS16_ToDefEnc(str, -1, buffer, \
-					[](std::vector<char> &buffer, const char ch) {
-
-						buffer.push_back(ch);
-					});
-	buffer.push_back(0);
-	return &buffer[0];
-}
-
-inline CDbFieldProperties<std::string> \
-	getFieldPropertiesT(std::shared_ptr<IDbField> field, char type_hint){
-
-	return field->getFieldProperties();
-}
-
-inline CDbFieldProperties<std::wstring> \
-	getFieldPropertiesT(std::shared_ptr<IDbField> field, wchar_t type_hint) {
-
-	return field->getFieldPropertiesW();
-}
-
-//*************************************************************
-
 class AddPrimKeyToWhereStmt {
 	const CMetaInfo &meta_info;
 	std::string &query;
@@ -50,11 +9,10 @@ public:
 	AddPrimKeyToWhereStmt(const CMetaInfo &meta_info_, std::string &query_) : \
 							meta_info(meta_info_), query(query_){ }
 
-	inline void operator()(const CMetaInfo::id_type field_order) {
-		auto field_props = meta_info.getFieldProperties(field_order);
+	inline void operator()(const size_t field) {
 		
-		appendAndConvIfNecessary(query, field_props.field_name.c_str());
 		query += " = ? AND ";
+		query += meta_info.getFieldName(field).str;
 	}
 };
 
@@ -62,27 +20,14 @@ public:
 
 CMetaInfo::CMetaInfo() : primary_table_id(-1){ }
 
-std::shared_ptr<const IDbField> CMetaInfo::getField(const size_t field_order) const {
-
-	assert(field_order < fields.size());
-	return fields[fields_index_order[field_order]].field;
-}
-
-const CDbFieldProperties<Tstring> &CMetaInfo::getFieldProperties(const size_t field_order) const {
-
-	assert(field_order < fields.size());
-	return fields[fields_index_order[field_order]].field_props;
-}
-
-void CMetaInfo::setPrimaryTable(const Tchar *table_name) {
+void CMetaInfo::setPrimaryTable(const char *table_name) {
 
 	assert(table_name);
-	std::vector<char> conv_buffer;
-	const char *table_name_conv = convIfNecessary(table_name, conv_buffer);
 
 	auto p_table = std::find_if(tables.cbegin(), tables.cend(), \
-		[table_name_conv](const CTableRecord &rec) { 
-			return !rec.table_name.compare(table_name_conv);
+		[table_name](const CTableRecord &rec) {
+
+			return !strcmp(rec.table_name.str, table_name);
 		});
 
 	if (p_table == tables.cend()) {
@@ -91,7 +36,7 @@ void CMetaInfo::setPrimaryTable(const Tchar *table_name) {
 		throw e;
 	}
 
-	primary_table_name = table_name_conv;
+	primary_table_name = p_table->table_name.str;
 	primary_table_id = p_table->id;
 }
 
@@ -117,52 +62,61 @@ CMetaInfo::id_type CMetaInfo::addTableRecord(const char *table_name) {
 	return table_id;
 }
 
-void CMetaInfo::addField(std::shared_ptr<IDbField> field, const int field_order) {
+void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field_index) {
 	CFieldRecord rec;
-	std::vector<char> conv_buffer;
+	ImmutableString<char> new_field_name = field->getFieldName();
 
-	auto p_field_order = findFieldRecord(field_order);
-	if (isFieldRecordFound(p_field_order, field_order)) {
-		XException e(0, _T("this field is already added at position "));
+	assert(new_field_index <= fields.size());
 
-		e << field_order << _T(": '") << fields[*p_field_order].field_props.field_name;
-		e << _T("'. The new one ('") << rec.field_props.field_name;
-		e << _T("') cannot be added");
-		throw e;
-	}
-
-	const Tchar *field_name = rec.field_props.field_name.c_str();
-
-	auto p_field = findFieldRecord(field_name);
-	if (isFieldRecordFound(p_field, field_name)) {
+	ConstIndexIterator p_field = findFieldRecord(new_field_name.str);
+	if (isFieldRecordFound(p_field, new_field_name.str)) {
 		XException e(0, _T("the field '"));
 
-		e << field_name << _T("' is already added. Table: '");
-		e << rec.field_props.table_name << _T("'");
+		e << fields[*p_field].field_name.str << _T("' is already added. Table: '");
+		e << field->getTableName().str << _T("'");
 		throw e;
 	}
 
 	rec.id = fields.size();
-		
-	const Tchar *table_name_t = rec.field_props.table_name.c_str();
-	const char *table_name = convIfNecessary(table_name_t, conv_buffer);
-	rec.id_table = addTableRecord(table_name);
-
-	rec.order = field_order;
 	rec.field = field;
-	rec.field_props = getFieldPropertiesT(field, Tchar());
-	fields.emplace_back(rec);
+	rec.field_name = new_field_name;
+			
+	ImmutableString<char> table_name = field->getTableName();
+	rec.id_table = addTableRecord(table_name.str);
 
-	size_t new_index = fields.size();
-	fields_index_order.insert(p_field_order, new_index);
-	fields_index_name.insert(p_field, new_index);
+	rec.is_primary_key = field->isPrimaryKey();
+	fields.insert(fields.begin() + new_field_index, rec);
+
+	if (new_field_index == fields.size() - 1) {
+		fields_index_id.insert(p_field, fields.size());
+		fields_index_name.insert(p_field, fields.size());
+	}
+	else {
+		typedef CIndexedValueSearchPredicate<id_type, std::vector<CFieldRecord>, \
+												CGetFieldIdByIndex> PredId;
+		typedef CIndexedTextSearchPredicate<Tchar, std::vector<CFieldRecord>, \
+												CGetFieldNameByIndex> PredName;
+		PredId predFieldId(fields);
+		PredName predFieldName(fields);
+
+		std::sort(fields_index_id.begin(), fields_index_id.end(), predFieldId);
+		std::sort(fields_index_name.begin(), fields_index_name.end(), predFieldName);
+	}
+
+	if (rec.is_primary_key) {
+		auto p_keys = findTableKeysRecords(rec.id_table);
+		auto p_new_key = p_keys.second == keys_index_table.cend() ? \
+						keys_index_table.cend() : p_keys.second + 1;
+
+		keys_index_table.insert(p_new_key, new_field_index);
+	}
 }
 
-void CMetaInfo::getUpdateQueryForField(const size_t field_order, std::string &query) {
+void CMetaInfo::getUpdateQueryForField(const size_t field, std::string &query) {
 	
-	assert(field_order < fields.size());
+	assert(field < fields.size());
 	assert(primary_table_id != -1);
-	CFieldRecord &field_rec = fields[fields_index_order[field_order]];
+	CFieldRecord &field_rec = fields[field];
 	id_type updated_table_id = field_rec.id_table;
 
 	auto p_table = findTableRecord(updated_table_id);
@@ -170,11 +124,10 @@ void CMetaInfo::getUpdateQueryForField(const size_t field_order, std::string &qu
 
 	query.clear();
 	query = "UPDATE ";
-	query += tables[*p_table].table_name;
+	query += tables[*p_table].table_name.str;
 	
 	query += " SET ";
-	const Tchar *field_name = field_rec.field_props.field_name.c_str();
-	appendAndConvIfNecessary(query, field_name);
+	query += fields[field].field_name.str;
 	query += " = ? ";
 
 	query += " WHERE ";

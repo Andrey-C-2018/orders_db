@@ -1,49 +1,7 @@
 #include <algorithm>
 #include "StringTable.h"
 
-CFieldsProperties::CFieldsProperties() { }
-
-void CFieldsProperties::AddField(const int field_size, const Tchar *field_name) {
-
-	assert(field_name);
-	fields_props.push_back(FieldProps{ field_size, field_name });
-}
-
-int CFieldsProperties::GetWidth(const size_t index) const {
-
-	assert(index < fields_props.size());
-	return fields_props[index].field_size;
-}
-
-ImmutableString<Tchar> CFieldsProperties::GetName(const size_t index) const {
-
-	assert(index < fields_props.size());
-
-	ImmutableString<Tchar> field_name(fields_props[index].field_name.c_str(), \
-								fields_props[index].field_name.size());
-	return field_name;
-}
-
-size_t CFieldsProperties::size() const {
-	
-	return fields_props.size();
-}
-
-int CFieldsProperties::GetSizesSumm() const {
-	int summ = 0;
-
-	std::for_each(fields_props.begin(), fields_props.end(), \
-					[&summ](const FieldProps &props) {
-					summ += props.field_size;
-				});
-	return summ;
-}
-
-CFieldsProperties::~CFieldsProperties() { }
-
-//**************************************************************
-
-CStringTable::CStringTable() : fields_props(std::make_shared<CFieldsProperties>()){
+CStringTable::CStringTable() {
 
 	on_size_changed_handlers.reserve(DEF_ON_CHANGE_HANDLERS_COUNT);
 }
@@ -63,17 +21,12 @@ size_t CStringTable::GetRecordsCount() const {
 	return text_table.empty() ? 0 : text_table[0].size();
 }
 
-std::shared_ptr<const IFieldsProperties> CStringTable::GetFieldsProperties() const {
-
-	return fields_props;
-}
-
 void CStringTable::ConnectOnSizeChangedHandler(ITableOnSizeChangedHandlerPtr handler) {
 
 	on_size_changed_handlers.push_back(handler);
 }
 
-void CStringTable::AddField(const int field_size, const Tchar *field_name) {
+void CStringTable::AddField(const size_t max_field_len, const Tchar *field_name) {
 	CTextVector new_field;
 
 	size_t records_count = 0;
@@ -83,7 +36,7 @@ void CStringTable::AddField(const int field_size, const Tchar *field_name) {
 		new_field.resize(records_count);
 	}
 	text_table.push_back(new_field);
-	fields_props->AddField(field_size, field_name);
+	fields_lengthes.push_back(max_field_len);
 
 	for (auto & handler : on_size_changed_handlers)
 		handler->OnSizeChanged(text_table.size(), records_count);

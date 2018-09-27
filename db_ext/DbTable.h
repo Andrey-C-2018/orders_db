@@ -2,21 +2,24 @@
 #include <vector>
 #include <basic/Exception.h>
 #include <table/ITable.h>
+#include <db/IDbConnection.h>
 #include <db/IDbResultSet.h>
 #include "Query.h"
 
 class CDbTable : public ITable{
+	std::shared_ptr<IDbConnection> conn;
 	CQuery query;
 	std::shared_ptr<IDbResultSet> result_set;
 
 	size_t curr_record;
+	Tstring insert_str;
 
 	enum Defaults {
 		DEF_ON_CHANGE_HANDLERS_COUNT = 5
 	};
 	std::vector<ITableOnSizeChangedHandlerPtr> on_size_changed_handlers;
 public:
-	CDbTable(CQuery query_);
+	CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_);
 
 	inline size_t getCurrentRecordNo() const;
 
@@ -28,12 +31,11 @@ public:
 	void ConnectOnSizeChangedHandler(ITableOnSizeChangedHandlerPtr handler) override;
 
 	void SetInsertString(const Tchar *insert_str);
-	void AddField(const int field_size, const Tchar *field_name) override;
+	void AddField(const size_t max_field_len, const Tchar *field_name) override;
 	void AddRecord() override;
 
-	size_t GetFieldSize(const size_t field) const override;
-	int GetSizesSumm() const override;
-	size_t GetFieldName(const size_t field) const override;
+	size_t GetFieldMaxLengthInChars(const size_t field) const override;
+	const Tchar *GetFieldName(const size_t field) const override;
 
 	ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const override;
 	void SetCell(const size_t field, const size_t record, const Tchar *value) override;

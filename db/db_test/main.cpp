@@ -14,14 +14,13 @@ int main() {
 		auto m = stmt->getResultSetMetadata();
 
 		size_t fields_count = m->getFieldsCount();
-		for (size_t i = 9; i < fields_count; ++i) {
+		for (size_t i = 0; i < fields_count; ++i) {
 			auto field = m->getField(i);
-			auto field_props = field->getFieldPropertiesW();
-
-			std::wcout << field_props.field_name << L' ';
-			std::wcout << field_props.table_name << L' ';
-			std::wcout << field_props.field_size << L' ';
-			std::wcout << field_props.is_primary_key << L' '<< std::endl;
+			
+			std::wcout << field->getFieldNameW().str << L' ';
+			std::wcout << field->getTableNameW().str << L' ';
+			std::wcout << field->getFieldMaxLength() << L' ';
+			std::wcout << field->isPrimaryKey() << L' '<< std::endl;
 		}
 		auto result_set = stmt->exec();
 		size_t records_count = result_set->getRecordsCount();

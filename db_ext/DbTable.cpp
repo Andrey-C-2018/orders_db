@@ -46,7 +46,7 @@ void CDbTable::ConnectOnSizeChangedHandler(ITableOnSizeChangedHandlerPtr handler
 	on_size_changed_handlers.push_back(handler);
 }
 
-void CDbTable::AddField(const int field_size, const Tchar *field_name){
+void CDbTable::AddField(const size_t max_field_len, const Tchar *field_name){
 
 	throw XException(0, _T("Not supported"));
 }
@@ -54,22 +54,12 @@ void CDbTable::AddField(const int field_size, const Tchar *field_name){
 void CDbTable::AddRecord(){
 	size_t records_count = result_set->getRecordsCount();
 
+	conn->ExecScalarQuery(insert_str.c_str());
+	reload();
+
 	for (auto &handler : on_size_changed_handlers)
 		handler->OnSizeChanged(query.getMetaInfo().getFieldsCount(), \
 					records_count);
-}
-
-int CDbTable::GetSizesSumm() const {
-	int sizes_summ = 0;
-	auto &meta_info = query.getMetaInfo();
-
-	for (size_t i = 0; i < meta_info.getFieldsCount(); ++i) {
-		int sz = (int)meta_info.getFieldProperties(i).field_size;
-
-		sizes_summ += sz;
-	}
-
-	return sizes_summ;
 }
 
 ImmutableString<Tchar> CDbTable::GetCellAsString(const size_t field, const size_t record) const{

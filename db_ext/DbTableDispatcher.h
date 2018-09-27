@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <basic/Exception.h>
 #include <db_ext/DbTable.h>
+#include "IDbCustomer.h"
 
 class CDbTableDispatcherException : public XException {
 public:
@@ -23,7 +24,7 @@ class CDbTableDispatcher final {
 
 	struct CDbTableRecord {
 		id_type id;
-		std::shared_ptr<IDbTable> db_table;
+		std::shared_ptr<CDbTable> db_table;
 	};
 
 	struct CCustomerRecord {
@@ -50,7 +51,7 @@ public:
 
 	CDbTableDispatcher();
 
-	id_type AddDbTable(std::shared_ptr<IDbTable> table, const int attribs);
+	id_type AddDbTable(std::shared_ptr<CDbTable> table, const int attribs);
 
 	id_type AddCustomer(std::shared_ptr<IDbCustomer> obj, const id_type id_query);
 	void DelCustomer(const id_type id_customer);

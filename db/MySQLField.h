@@ -6,22 +6,28 @@
 
 class CMySQLField : public IDbField{
 	std::shared_ptr<MYSQL_RES> metadata;
-	
-	mutable XString<wchar_t> conv_buffer;
-	inline const char *ConvertIfNecessary(const char *str, char type_hint) const;
-	inline const wchar_t *ConvertIfNecessary(const char *str, wchar_t type_hint) const;
 
+	mutable std::vector<char> field_name, table_name;
+	mutable std::vector<wchar_t> field_name_w, table_name_w;
+
+	bool is_primary_key;
+	size_t max_size;
+
+	inline MYSQL_FIELD *getMySQLFieldHandle() const;
 protected:
 	const size_t field;
-	template <class Tstring_> \
-		inline void TgetField(CDbFieldProperties<Tstring_> &field_props) const;
 
-	//inline int getCellValueOfType(const size_t field, int type_hint) const;
+	CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
+				const size_t field_, const size_t max_field_size);
 public:
 	CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
 
-	CDbFieldProperties<std::string> getFieldProperties() const override;
-	CDbFieldProperties<std::wstring> getFieldPropertiesW() const override;
+	ImmutableString<char> getFieldName() const override;
+	ImmutableString<wchar_t> getFieldNameW() const override;
+	size_t getFieldMaxLength() const override;
+	ImmutableString<char> getTableName() const override;
+	ImmutableString<wchar_t> getTableNameW() const override;
+	bool isPrimaryKey() const override;
 	
 	virtual ~CMySQLField();
 };
@@ -31,9 +37,6 @@ class CMySQLIntegerField : public CMySQLField {
 	mutable wchar_t buffer[getDigitsCountOfType<Tint>() + 1];
 public:
 	CMySQLIntegerField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
-
-	CDbFieldProperties<std::string> getFieldProperties() const override;
-	CDbFieldProperties<std::wstring> getFieldPropertiesW() const override;
 
 	const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const override;
 	const wchar_t *getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const override;
@@ -60,9 +63,6 @@ class CMySQLDateField : public CMySQLField {
 	mutable wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1];
 public:
 	CMySQLDateField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
-
-	CDbFieldProperties<std::string> getFieldProperties() const override;
-	CDbFieldProperties<std::wstring> getFieldPropertiesW() const override;
 
 	const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const override;
 	const wchar_t *getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const override;
@@ -113,52 +113,17 @@ public:
 
 //**************************************************
 
-const char *CMySQLField::ConvertIfNecessary(const char *str, char type_hint) const {
+MYSQL_FIELD *CMySQLField::getMySQLFieldHandle() const {
 
-	return str;
-}
-
-const wchar_t *CMySQLField::ConvertIfNecessary(const char *str, wchar_t type_hint) const {
-
-	return UTF8_ToUCS16(str, -1, conv_buffer);
-}
-
-template <class Tstring_> void CMySQLField::TgetField(CDbFieldProperties<Tstring_> &field_props) const {
-	
 	mysql_field_seek(metadata.get(), field);
-
-	MYSQL_FIELD *mysql_field = mysql_fetch_field(metadata.get());
-	field_props.field_name = ConvertIfNecessary(mysql_field->name, Tstring_::value_type());
-	field_props.table_name = ConvertIfNecessary(mysql_field->table, Tstring_::value_type());
-	field_props.field_size = mysql_field->length;
-	field_props.is_primary_key = (mysql_field->flags & PRI_KEY_FLAG) > 0;
+	return mysql_fetch_field(metadata.get());
 }
 
 //**************************************************
 
 template <typename Tint> \
 CMySQLIntegerField<Tint>::CMySQLIntegerField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
-												CMySQLField(metadata_, field_) { }
-
-template <typename Tint> \
-CDbFieldProperties<std::string> CMySQLIntegerField<Tint>::getFieldProperties() const {
-	CDbFieldProperties<std::string> field_props_item;
-
-	TgetField<std::string>(field_props_item);
-	field_props_item.field_size = getDigitsCountOfType<Tint>();
-
-	return field_props_item;
-}
-
-template <typename Tint> \
-CDbFieldProperties<std::wstring> CMySQLIntegerField<Tint>::getFieldPropertiesW() const {
-	CDbFieldProperties<std::wstring> field_props_item;
-
-	TgetField<std::wstring>(field_props_item);
-	field_props_item.field_size = getDigitsCountOfType<Tint>();
-
-	return field_props_item;
-}
+											CMySQLField(metadata_, field_, getDigitsCountOfType<Tint>()) { }
 
 template <typename Tint> \
 const char *CMySQLIntegerField<Tint>::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
@@ -175,7 +140,7 @@ const wchar_t *CMySQLIntegerField<Tint>::getValueAsWString(const std::shared_ptr
 
 template <typename Tint> \
 ImmutableString<char> CMySQLIntegerField<Tint>::getValueAsImmutableString(\
-											const std::shared_ptr<const IDbResultSet> result_set) const {
+										const std::shared_ptr<const IDbResultSet> result_set) const {
 	char *p = (char *)buffer;
 	size_t size = 0;
 
@@ -185,7 +150,7 @@ ImmutableString<char> CMySQLIntegerField<Tint>::getValueAsImmutableString(\
 
 template <typename Tint> \
 ImmutableString<wchar_t> CMySQLIntegerField<Tint>::getValueAsImmutableWString(\
-											const std::shared_ptr<const IDbResultSet> result_set) const {
+										const std::shared_ptr<const IDbResultSet> result_set) const {
 	size_t size = 0;
 
 	auto str = XConv::ToString(result_set->getInt(field), buffer, size);

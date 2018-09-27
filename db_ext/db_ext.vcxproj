@@ -163,6 +163,7 @@
     <ClInclude Include="DbTable.h" />
     <ClInclude Include="DbTableDispatcher.h" />
     <ClInclude Include="IDbCustomer.h" />
+    <ClInclude Include="IndexedSearchPredicates.h" />
     <ClInclude Include="MetaInfo.h" />
     <ClInclude Include="Query.h" />
   </ItemGroup>

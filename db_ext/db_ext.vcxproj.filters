@@ -47,5 +47,8 @@
     <ClInclude Include="IDbCustomer.h">
       <Filter>interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="IndexedSearchPredicates.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

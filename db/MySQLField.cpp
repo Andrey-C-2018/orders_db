@@ -1,46 +1,79 @@
 #include "MySQLField.h"
 
-CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
-							metadata(metadata_), field(field_) { }
+CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
+							const size_t field_, const size_t max_field_size) : \
+							metadata(metadata_), field(field_), \
+							max_size(max_field_size) {
 
-CDbFieldProperties<std::string> CMySQLField::getFieldProperties() const {
-	CDbFieldProperties<std::string> field_props_item;
-
-	TgetField<std::string>(field_props_item);
-	return field_props_item;
+	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+	is_primary_key = (mysql_field->flags & PRI_KEY_FLAG) > 0;
 }
 
-CDbFieldProperties<std::wstring> CMySQLField::getFieldPropertiesW() const {
-	CDbFieldProperties<std::wstring> field_props_item;
+CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
+							const size_t field_) : \
+							metadata(metadata_), field(field_) {
 
-	TgetField<std::wstring>(field_props_item);
-	return field_props_item;
+	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+	max_size = mysql_field->length;
+	is_primary_key = (mysql_field->flags & PRI_KEY_FLAG) > 0;
+}
+
+ImmutableString<char> CMySQLField::getFieldName() const {
+
+	if (field_name.empty()) {
+		MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+		field_name.resize(mysql_field->name_length + 1);
+		strncpy(&field_name[0], mysql_field->name, mysql_field->name_length);
+	}
+	return ImmutableString<char>(&field_name[0], field_name.size() - 1);
+}
+
+ImmutableString<wchar_t> CMySQLField::getFieldNameW() const {
+
+	if (field_name.empty()) {
+		MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+		UTF8_ToUCS16(mysql_field->name, mysql_field->name_length, field_name_w);
+		field_name_w.push_back(0);
+	}
+	return ImmutableString<wchar_t>(&field_name_w[0], field_name_w.size() - 1);
+}
+
+size_t CMySQLField::getFieldMaxLength() const {
+
+	return max_size;
+}
+
+ImmutableString<char> CMySQLField::getTableName() const {
+
+	if (table_name.empty()) {
+		MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+		table_name.resize(mysql_field->table_length + 1);
+		strncpy(&table_name[0], mysql_field->table, mysql_field->table_length);
+	}
+	return ImmutableString<char>(&table_name[0], table_name.size() - 1);
+}
+
+ImmutableString<wchar_t> CMySQLField::getTableNameW() const {
+
+	if (table_name.empty()) {
+		MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+		UTF8_ToUCS16(mysql_field->table, mysql_field->table_length, table_name_w);
+		table_name_w.push_back(0);
+	}
+	return ImmutableString<wchar_t>(&table_name_w[0], table_name_w.size() - 1);
+}
+
+bool CMySQLField::isPrimaryKey() const {
+
+	return is_primary_key;
 }
 
 CMySQLField::~CMySQLField() { }
 
 //**************************************************
 
-CDbFieldProperties<std::string> CMySQLDateField::getFieldProperties() const {
-	CDbFieldProperties<std::string> field_props_item;
-
-	TgetField<std::string>(field_props_item);
-	field_props_item.field_size = CDate::GERMAN_FORMAT_LEN;
-
-	return field_props_item;
-}
-
-CDbFieldProperties<std::wstring> CMySQLDateField::getFieldPropertiesW() const {
-	CDbFieldProperties<std::wstring> field_props_item;
-
-	TgetField<std::wstring>(field_props_item);
-	field_props_item.field_size = CDate::GERMAN_FORMAT_LEN;
-
-	return field_props_item;
-}
-
 CMySQLDateField::CMySQLDateField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
-								CMySQLField(metadata_, field_) { }
+								CMySQLField(metadata_, field_, CDate::GERMAN_FORMAT_LEN) { }
 
 const char *CMySQLDateField::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
 	char *p = (char *)buffer;
