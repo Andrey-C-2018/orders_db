@@ -1,7 +1,7 @@
 #pragma once
 #include <string.h>
 
-template <typename Tchar_, class TRegistry, class GetStrByIndex> \
+template <typename Tchar_, typename IndexType, class TRegistry, class GetStrByIndex> \
 	struct CIndexedTextSearchPredicate {
 	const TRegistry &reg;
 	GetStrByIndex getStrByIndex;
@@ -10,7 +10,7 @@ template <typename Tchar_, class TRegistry, class GetStrByIndex> \
 
 	inline bool operator()(IndexType l, IndexType r) const {
 
-		return strcmp(getStrByIndex(reg, l), (getStrByIndex(reg, r)) < 0;
+		return strcmp(getStrByIndex(reg, l), (getStrByIndex(reg, r))) < 0;
 	}
 
 	inline bool operator()(IndexType l, const Tchar_ *r) const {
@@ -24,7 +24,7 @@ template <typename Tchar_, class TRegistry, class GetStrByIndex> \
 	}
 };
 
-template <typename TInt, class TRegistry, class GetValueByIndex> \
+template <typename TInt, typename IndexType, class TRegistry, class GetValueByIndex> \
 struct CIndexedValueSearchPredicate {
 	const TRegistry &reg;
 	GetValueByIndex getValueByIndex;

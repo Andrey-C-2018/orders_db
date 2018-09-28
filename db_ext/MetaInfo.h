@@ -30,6 +30,9 @@ private:
 								is_primary_key(true), id_table(-1){ }
 		CFieldRecord(const CFieldRecord &obj) = default;
 		CFieldRecord(CFieldRecord &&obj) = default;
+
+		CFieldRecord &operator=(const CFieldRecord &obj) = default;
+		CFieldRecord &operator=(CFieldRecord &&obj) = default;
 		inline bool operator==(const CFieldRecord &obj) const;
 		inline bool operator<(const CFieldRecord &obj) const;
 	};
@@ -43,6 +46,9 @@ private:
 								table_name_w(nullptr, 0) { }
 		CTableRecord(const CTableRecord &obj) = default;
 		CTableRecord(CTableRecord &&obj) = default;
+
+		CTableRecord &operator=(const CTableRecord &obj) = default;
+		CTableRecord &operator=(CTableRecord &&obj) = default;
 		inline bool operator==(const CTableRecord &obj) const;
 		inline bool operator<(const CTableRecord &obj) const;
 	};
@@ -55,16 +61,16 @@ private:
 	std::vector<IndexType> tables_index_id, tables_index_name;
 
 	struct CGetFieldNameByIndex {
-		inline ImmutableString<char> operator()(const std::vector<CFieldRecord> &fields, \
-						const size_t index) const { return fields[index].field_name; }
+		inline const char *operator()(const std::vector<CFieldRecord> &fields, \
+						const size_t index) const { return fields[index].field_name.str; }
 	};
 	struct CGetFieldIdByIndex {
 		inline id_type operator()(const std::vector<CFieldRecord> &fields, \
 						const size_t index) const {	return fields[index].id; }
 	};
 	struct CGetTableNameByIndex {
-		inline ImmutableString<char> operator()(const std::vector<CTableRecord> &tables, \
-						const size_t index) const {	return tables[index].table_name; }
+		inline const char *operator()(const std::vector<CTableRecord> &tables, \
+						const size_t index) const {	return tables[index].table_name.str; }
 	};
 	struct CGetTableIdByIndex {
 		inline id_type operator()(const std::vector<CTableRecord> &tables, \
@@ -83,7 +89,7 @@ private:
 	inline ConstIndexIterator findTableRecord(const char *table_name) const;
 	inline ConstIndexIterator findTableRecord(const id_type id_table) const;
 	inline std::pair<ConstIndexIterator, ConstIndexIterator> \
-							findTableKeysRecords(const id_type id_table) const;
+							findTableKeys(const id_type id_table) const;
 
 	inline bool isFieldRecordFound(const ConstIndexIterator p_field_name, \
 									const char *field_name) const;
@@ -94,7 +100,7 @@ private:
 	inline bool isTableRecordFound(const ConstIndexIterator p_table_id, \
 									const id_type id_table) const;
 
-	id_type addTableRecord(const char *table_name);
+	id_type addTableRecord(ImmutableString<char> table_name);
 
 	template <class FieldPredicate> \
 		void enumeratePrimKey(const id_type table_id, \
@@ -174,17 +180,12 @@ bool CMetaInfo::isPrimaryKey(const size_t field) const {
 template <class FieldPredicate> \
 void CMetaInfo::enumeratePrimKey(const id_type table_id, \
 									FieldPredicate field_pred) const {
-	auto table_prim_keys = findTableKeysRecords(table_id);
+	auto table_prim_keys = findTableKeys(table_id);
 
 	size_t counter = 0;
 	while (table_prim_keys.first != table_prim_keys.second) {
-		id_type id = keys[*(table_prim_keys.first)].id_field;
-
-		ConstIndexIterator p_id_key = findFieldRecord(id);
-		assert(isFieldRecordFound(p_id_key, id));
-
-		const CFieldRecord &rec = fields[*p_id_key];
-		field_pred(std::distance(fields.cbegin(), p_id_key));
+		
+		field_pred(*(table_prim_keys.first));
 
 		++table_prim_keys.first;
 		++counter;
@@ -215,7 +216,7 @@ bool CMetaInfo::CTableRecord::operator<(const CMetaInfo::CTableRecord &obj) cons
 }
 
 CMetaInfo::ConstIndexIterator CMetaInfo::findFieldRecord(const char *field_name) const {
-	typedef CIndexedTextSearchPredicate<Tchar, std::vector<CFieldRecord>, \
+	typedef CIndexedTextSearchPredicate<char, IndexType, std::vector<CFieldRecord>, \
 										CGetFieldNameByIndex> Pred;
 	Pred predFieldName( fields );
 
@@ -225,7 +226,7 @@ CMetaInfo::ConstIndexIterator CMetaInfo::findFieldRecord(const char *field_name)
 }
 
 CMetaInfo::ConstIndexIterator CMetaInfo::findFieldRecord(const id_type id_field) const {
-	typedef CIndexedValueSearchPredicate<id_type, std::vector<CFieldRecord>, \
+	typedef CIndexedValueSearchPredicate<id_type, IndexType, std::vector<CFieldRecord>, \
 											CGetFieldIdByIndex> Pred;
 	Pred predFieldId( fields );
 
@@ -235,7 +236,7 @@ CMetaInfo::ConstIndexIterator CMetaInfo::findFieldRecord(const id_type id_field)
 }
 
 CMetaInfo::ConstIndexIterator CMetaInfo::findTableRecord(const char *table_name) const {
-	typedef CIndexedTextSearchPredicate<char, std::vector<CTableRecord>, \
+	typedef CIndexedTextSearchPredicate<char, IndexType, std::vector<CTableRecord>, \
 										CGetTableNameByIndex> Pred;
 	Pred predTableName( tables );
 
@@ -245,7 +246,7 @@ CMetaInfo::ConstIndexIterator CMetaInfo::findTableRecord(const char *table_name)
 }
 
 CMetaInfo::ConstIndexIterator CMetaInfo::findTableRecord(const id_type id_table) const {
-	typedef CIndexedValueSearchPredicate<id_type, std::vector<CTableRecord>, \
+	typedef CIndexedValueSearchPredicate<id_type, IndexType, std::vector<CTableRecord>, \
 											CGetTableIdByIndex> Pred;
 	Pred predTableId( tables );
 
@@ -255,8 +256,9 @@ CMetaInfo::ConstIndexIterator CMetaInfo::findTableRecord(const id_type id_table)
 }
 
 std::pair<CMetaInfo::ConstIndexIterator, CMetaInfo::ConstIndexIterator> \
-	CMetaInfo::findTableKeysRecords(const id_type id_table) const {
-	typedef CIndexedValueSearchPredicate<id_type, std::vector<CFieldRecord>, \
+	CMetaInfo::findTableKeys(const id_type id_table) const {
+	typedef CIndexedValueSearchPredicate<id_type, IndexType, \
+											std::vector<CFieldRecord>, \
 											CGetTableIdFromKeysByIndex> Pred;
 	Pred predKeyTableId( fields );
 

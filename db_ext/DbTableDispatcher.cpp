@@ -14,8 +14,8 @@ CDbTableDispatcher::CDbTableDispatcher() { }
 
 id_type CDbTableDispatcher::AddCustomer(std::shared_ptr<IDbCustomer> obj, \
 										const id_type id_table) {
-	CustomerIterator p_cust;
-	TableIterator p_table;
+	CustomerConstIterator p_cust;
+	TableConstIterator p_table;
 
 	p_table = FindTable(id_table);
 	
@@ -29,7 +29,6 @@ id_type CDbTableDispatcher::AddCustomer(std::shared_ptr<IDbCustomer> obj, \
 
 	id_type new_id = customers.size();
 	customers.emplace_back(CCustomerRecord{ new_id, id_table, obj });
-	std::sort(customers.begin(), customers.end());
 
 	obj->OnCustomerInitialized(p_table->db_table);
 
@@ -37,7 +36,7 @@ id_type CDbTableDispatcher::AddCustomer(std::shared_ptr<IDbCustomer> obj, \
 }
 
 void CDbTableDispatcher::DelCustomer(const id_type id_customer) {
-	CustomerIterator p_cust = FindCustomer(id_customer);
+	CustomerConstIterator p_cust = FindCustomer(id_customer);
 
 	customers.erase(p_cust);
 }

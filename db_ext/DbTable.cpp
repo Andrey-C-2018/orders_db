@@ -16,9 +16,24 @@ inline void bindValueAsTString(std::shared_ptr<const IDbField> field, \
 	field->bindValueAsWString(binding_target, param_no, value);
 }
 
+inline ImmutableString<char> getCellAsString(std::shared_ptr<IDbResultSet> result_set, \
+												std::shared_ptr<const IDbField> field, \
+												char type_hint) {
+
+	return field->getValueAsImmutableString(result_set);
+}
+
+inline ImmutableString<wchar_t> getCellAsString(std::shared_ptr<IDbResultSet> result_set, \
+												std::shared_ptr<const IDbField> field, \
+												wchar_t type_hint) {
+
+	return field->getValueAsImmutableWString(result_set);
+}
+
 //****************************************************
 
-CDbTable::CDbTable(CQuery query_) : curr_record(0), query(std::move(query_)){
+CDbTable::CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_) : \
+					conn(conn_), curr_record(0), query(std::move(query_)){
 
 	result_set = query.exec();
 
@@ -66,7 +81,7 @@ ImmutableString<Tchar> CDbTable::GetCellAsString(const size_t field, const size_
 
 	result_set->gotoRecord(record);
 	auto field_ptr = query.getMetaInfo().getField(field);
-	return field_ptr->getValueAsImmutableString(result_set);
+	return getCellAsString(result_set, field_ptr, Tchar());
 }
 
 void CDbTable::SetCell(const size_t field, const size_t record, const Tchar *value){

@@ -12,7 +12,7 @@ class CDbTable : public ITable{
 	std::shared_ptr<IDbResultSet> result_set;
 
 	size_t curr_record;
-	Tstring insert_str;
+	std::string insert_str;
 
 	enum Defaults {
 		DEF_ON_CHANGE_HANDLERS_COUNT = 5

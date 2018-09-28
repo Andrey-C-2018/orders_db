@@ -18,6 +18,10 @@ CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
 	is_primary_key = (mysql_field->flags & PRI_KEY_FLAG) > 0;
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
 ImmutableString<char> CMySQLField::getFieldName() const {
 
 	if (field_name.empty()) {
@@ -27,6 +31,9 @@ ImmutableString<char> CMySQLField::getFieldName() const {
 	}
 	return ImmutableString<char>(&field_name[0], field_name.size() - 1);
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 ImmutableString<wchar_t> CMySQLField::getFieldNameW() const {
 
@@ -43,6 +50,10 @@ size_t CMySQLField::getFieldMaxLength() const {
 	return max_size;
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
 ImmutableString<char> CMySQLField::getTableName() const {
 
 	if (table_name.empty()) {
@@ -52,6 +63,9 @@ ImmutableString<char> CMySQLField::getTableName() const {
 	}
 	return ImmutableString<char>(&table_name[0], table_name.size() - 1);
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 ImmutableString<wchar_t> CMySQLField::getTableNameW() const {
 

@@ -115,7 +115,7 @@ public:
 
 MYSQL_FIELD *CMySQLField::getMySQLFieldHandle() const {
 
-	mysql_field_seek(metadata.get(), field);
+	mysql_field_seek(metadata.get(), (MYSQL_FIELD_OFFSET)field);
 	return mysql_fetch_field(metadata.get());
 }
 

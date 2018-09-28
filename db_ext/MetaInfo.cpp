@@ -40,11 +40,11 @@ void CMetaInfo::setPrimaryTable(const char *table_name) {
 	primary_table_id = p_table->id;
 }
 
-CMetaInfo::id_type CMetaInfo::addTableRecord(const char *table_name) {
-	auto p_table_name = findTableRecord(table_name);
+CMetaInfo::id_type CMetaInfo::addTableRecord(ImmutableString<char> table_name) {
+	auto p_table_name = findTableRecord(table_name.str);
 	id_type table_id = 0;
 	
-	if (!isTableRecordFound(p_table_name, table_name)) {
+	if (!isTableRecordFound(p_table_name, table_name.str)) {
 		CTableRecord rec;
 
 		rec.id = table_id = tables.size();
@@ -82,7 +82,7 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 	rec.field_name = new_field_name;
 			
 	ImmutableString<char> table_name = field->getTableName();
-	rec.id_table = addTableRecord(table_name.str);
+	rec.id_table = addTableRecord(table_name);
 
 	rec.is_primary_key = field->isPrimaryKey();
 	fields.insert(fields.begin() + new_field_index, rec);
@@ -92,9 +92,11 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 		fields_index_name.insert(p_field, fields.size());
 	}
 	else {
-		typedef CIndexedValueSearchPredicate<id_type, std::vector<CFieldRecord>, \
+		typedef CIndexedValueSearchPredicate<id_type, IndexType, \
+												std::vector<CFieldRecord>, \
 												CGetFieldIdByIndex> PredId;
-		typedef CIndexedTextSearchPredicate<Tchar, std::vector<CFieldRecord>, \
+		typedef CIndexedTextSearchPredicate<Tchar, IndexType, \
+												std::vector<CFieldRecord>, \
 												CGetFieldNameByIndex> PredName;
 		PredId predFieldId(fields);
 		PredName predFieldName(fields);
@@ -104,7 +106,7 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 	}
 
 	if (rec.is_primary_key) {
-		auto p_keys = findTableKeysRecords(rec.id_table);
+		auto p_keys = findTableKeys(rec.id_table);
 		auto p_new_key = p_keys.second == keys_index_table.cend() ? \
 						keys_index_table.cend() : p_keys.second + 1;
 

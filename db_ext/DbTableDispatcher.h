@@ -21,31 +21,47 @@ public:
 };
 
 class CDbTableDispatcher final {
+public:
+	typedef int id_type;
+private:
 
 	struct CDbTableRecord {
 		id_type id;
 		std::shared_ptr<CDbTable> db_table;
+
+		inline bool operator==(const CDbTableRecord &obj) const {
+
+			return id == obj.id;
+		}
 	};
 
 	struct CCustomerRecord {
 		id_type id;
 		id_type id_table;
 		std::shared_ptr<IDbCustomer> customer;
+
+		inline bool operator==(const CCustomerRecord &obj) const {
+
+			return id == obj.id;
+		}
+		inline bool operator==(const id_type id) const {
+
+			return id == this->id;
+		}
 	};
 
 	std::vector<CDbTableRecord> tables;
 	std::vector<CCustomerRecord> customers;
 
-	typedef std::vector<CDbTableRecord>::iterator TableIterator;
+	typedef std::vector<CDbTableRecord>::const_iterator TableConstIterator;
 	typedef std::vector<CCustomerRecord>::iterator CustomerIterator;
 	typedef std::vector<CCustomerRecord>::const_iterator CustomerConstIterator;
 
-	template <typename Iter> \
-		static inline Iter FindCustomer(const id_type id, Iter p_begin, Iter p_end);
-	inline CustomerIterator FindCustomer(const id_type id);
 	inline CustomerConstIterator FindCustomer(const id_type id) const;
-	inline CustomerIterator FindCustomer(std::shared_ptr<IDbCustomer> obj) noexcept;
+	inline CustomerConstIterator \
+		FindCustomer(std::shared_ptr<IDbCustomer> obj) const noexcept;
 
+	inline TableConstIterator FindTable(const id_type id) const;
 public:
 	typedef int id_type;
 
@@ -62,40 +78,26 @@ public:
 
 //****************************************************************************
 
-template <typename Iter> \
-Iter CDbTableDispatcher::FindCustomer(const id_type id, Iter p_begin, Iter p_end){
+CDbTableDispatcher::CustomerConstIterator \
+CDbTableDispatcher::FindCustomer(const id_type id) const{
 
-	Iter p_cust;
-
-	p_cust = std::find(p_begin, p_end, id);
-	if (p_cust == customers.end()) {
-		CDatabaseException e(CDatabaseException::E_CUSTOMER_ISNT_CONNECTED, \
-			_T("no such customer: id = "));
+	CustomerConstIterator p_cust = std::find(customers.cbegin(), customers.cend(), id);
+	if (p_cust == customers.cend()) {
+		CDbTableDispatcherException e(CDbTableDispatcherException::E_CUSTOMER_ISNT_CONNECTED, \
+									_T("no such customer: id = "));
 		e << id;
 		throw e;
 	}
-}
-
-CDbTableDispatcher::CustomerIterator CDbTableDispatcher::FindCustomer(const id_type id) {
-
-	return FindCustomer<CustomerIterator>(id, \
-											customers.begin(), customers.end());
+	return p_cust;
 }
 
 CDbTableDispatcher::CustomerConstIterator \
-CDbTableDispatcher::FindCustomer(const id_type id) const {
+	CDbTableDispatcher::FindCustomer(std::shared_ptr<IDbCustomer> obj) const noexcept {
+	CustomerConstIterator p_cust;
 
-	return FindCustomer<CustomerConstIterator>(id, \
-											customers.cbegin(), customers.cend());
-}
-
-CDbTableDispatcher::CustomerIterator \
-CDbTableDispatcher::FindCustomer(std::shared_ptr<IDbCustomer> obj) noexcept {
-	CustomerIterator p_cust;
-
-	p_cust = std::find_if(customers.begin(), customers.end(), \
+	p_cust = std::find_if(customers.cbegin(), customers.cend(), \
 		[&obj](const CCustomerRecord &rec) {
-			
+
 			return obj == rec.customer;
 		});
 

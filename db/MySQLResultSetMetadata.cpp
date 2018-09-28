@@ -17,7 +17,7 @@ std::shared_ptr<IDbField> CMySQLResultSetMetadata::getField(const size_t field) 
 
 	assert(field < fields_count);
 
-	mysql_field_seek(metadata.get(), field);
+	mysql_field_seek(metadata.get(), (MYSQL_FIELD_OFFSET)field);
 	MYSQL_FIELD *mysql_field = mysql_fetch_field(metadata.get());
 
 	if (CMySQLVariant::IsDate(mysql_field->type)) 		
