@@ -6,9 +6,10 @@
 int main() {
 	CMySQLConnection conn;
 
-	setlocale(LC_ALL, "ukr_ukr.1251");
+	//setlocale(LC_ALL, "ukr_ukr.1251");
+	setlocale(LC_ALL, "uk_UA.UTF-8");
 	try {
-		conn.Connect("127.0.0.1", 3310, "orders_stat_user", "123", "orders");
+		conn.Connect("127.0.0.1", 3306, "orders_stat_user", "123", "orders");
 
 		auto stmt = conn.PrepareQuery("SELECT t.id_type, t.type_name, a.* FROM orders a INNER JOIN order_types t ON a.id_order_type = t.id_type WHERE id = 1212");
 		auto m = stmt->getResultSetMetadata();
@@ -17,19 +18,19 @@ int main() {
 		for (size_t i = 0; i < fields_count; ++i) {
 			auto field = m->getField(i);
 			
-			std::wcout << field->getFieldNameW().str << L' ';
-			std::wcout << field->getTableNameW().str << L' ';
-			std::wcout << field->getFieldMaxLength() << L' ';
-			std::wcout << field->isPrimaryKey() << L' '<< std::endl;
+			std::cout << field->getFieldName().str << ' ';
+			std::cout << field->getTableName().str << ' ';
+			std::cout << field->getFieldMaxLength() << ' ';
+			std::cout << field->isPrimaryKey() << ' '<< std::endl;
 		}
 		auto result_set = stmt->exec();
 		size_t records_count = result_set->getRecordsCount();
 		for (size_t i = 0; i < records_count; ++i) {
 			result_set->gotoRecord(i);
-			std::wcout << result_set->getInt(0);
-			std::wcout << result_set->getWString(1);
-			std::wcout << result_set->getInt(2);
-			std::wcout << std::endl;
+			std::cout << result_set->getInt(0);
+			std::cout << result_set->getString(1);
+			std::cout << result_set->getInt(2);
+			std::cout << std::endl;
 		}
 		result_set->gotoRecord(3);
 
@@ -43,15 +44,15 @@ int main() {
 		records_count = result_set->getRecordsCount();
 		for (size_t i = 0; i < records_count; ++i) {
 			result_set->gotoRecord(i);
-			std::wcout << result_set->getInt(0);
-			std::wcout << result_set->getWString(1);
-			std::wcout << std::endl;
+			std::cout << result_set->getInt(0);
+			std::cout << result_set->getString(1);
+			std::cout << std::endl;
 		}
 	}
 	catch (XException &e) {
-		std::wcout << e.what()<< std::endl;
+		std::cout << e.what()<< std::endl;
 	}
 
-	std::wcin.get();
+	std::cin.get();
 	return 0;
 }

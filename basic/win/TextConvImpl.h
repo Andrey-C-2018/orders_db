@@ -52,6 +52,7 @@ const char *UCS16_ToDefEnc(const wchar_t *in, const int len, Out &out, addCharPr
 	size_t len_in = len == -1 ? DEF_MAX_STR_LEN : (size_t)len;
 	
 	memset(&state, 0, sizeof state);
+        out.clear();
 	out.reserve(len_in + 1);
 	
 	const wchar_t *p_in = in;
