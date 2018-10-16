@@ -4,6 +4,7 @@
 CStringTable::CStringTable() {
 
 	on_size_changed_handlers.reserve(DEF_ON_CHANGE_HANDLERS_COUNT);
+	fields.reserve(DEF_FIELDS_COUNT);
 }
 
 bool CStringTable::empty() const {
@@ -36,7 +37,11 @@ void CStringTable::AddField(const size_t max_field_len, const Tchar *field_name)
 		new_field.resize(records_count);
 	}
 	text_table.push_back(new_field);
-	fields_lengthes.push_back(max_field_len);
+
+	CField rec;
+	rec.field_name = field_name;
+	rec.max_size_in_chars = max_field_len;
+	fields.emplace_back(rec);
 
 	for (auto & handler : on_size_changed_handlers)
 		handler->OnSizeChanged(text_table.size(), records_count);
@@ -54,6 +59,18 @@ void CStringTable::AddRecord() {
 
 	for (auto & handler : on_size_changed_handlers)
 		handler->OnSizeChanged(text_table.size(), records_count);
+}
+
+size_t CStringTable::GetFieldMaxLengthInChars(const size_t field) const {
+
+	assert(field < fields.size());
+	return fields[field].max_size_in_chars;
+}
+
+const Tchar *CStringTable::GetFieldName(const size_t field) const {
+
+	assert(field < fields.size());
+	return fields[field].field_name.c_str();
 }
 
 ImmutableString<Tchar> CStringTable::GetCellAsString(const size_t field, \

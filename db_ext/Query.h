@@ -8,11 +8,14 @@ class CQuery{
 	CMetaInfo meta_info;
 	std::shared_ptr<IDbStatement> stmt;
 	
-	class CDbStatementPool;
+	struct CUpdateStatementPool {
+		size_t field;
+		std::shared_ptr<IDbStatement> stmt;
+	};
 public:
 	CQuery(std::shared_ptr<IDbStatement> stmt_);
 	
-	const CMetaInfo &getMetaInfo() const;
+	inline const CMetaInfo &getMetaInfo() const;
 
 	std::shared_ptr<IDbStatement> \
 		getUpdateStmt(const size_t updated_field, \
@@ -23,4 +26,13 @@ public:
 
 	std::shared_ptr<IDbBindingTarget> getBindingTarget();
 	std::shared_ptr<IDbResultSet> exec();
+
+	~CQuery();
 };
+
+//*****************************************************
+
+const CMetaInfo &CQuery::getMetaInfo() const {
+
+	return meta_info;
+}

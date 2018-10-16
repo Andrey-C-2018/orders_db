@@ -80,6 +80,7 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 	rec.id = fields.size();
 	rec.field = field;
 	rec.field_name = new_field_name;
+	rec.field_size = field->getFieldMaxLength();
 			
 	ImmutableString<char> table_name = field->getTableName();
 	rec.id_table = addTableRecord(table_name);

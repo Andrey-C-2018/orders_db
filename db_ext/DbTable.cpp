@@ -30,6 +30,18 @@ inline ImmutableString<wchar_t> getCellAsString(std::shared_ptr<IDbResultSet> re
 	return field->getValueAsImmutableWString(result_set);
 }
 
+inline const char *getFieldName(const CMetaInfo &meta_info, \
+								const size_t field, char type_hint) {
+
+	return meta_info.getTableName(field).str;
+}
+
+inline const wchar_t *getFieldName(const CMetaInfo &meta_info, \
+									const size_t field, wchar_t type_hint) {
+
+	return meta_info.getTableNameW(field).str;
+}
+
 //****************************************************
 
 CDbTable::CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_) : \
@@ -75,6 +87,16 @@ void CDbTable::AddRecord(){
 	for (auto &handler : on_size_changed_handlers)
 		handler->OnSizeChanged(query.getMetaInfo().getFieldsCount(), \
 					records_count);
+}
+
+size_t CDbTable::GetFieldMaxLengthInChars(const size_t field) const {
+
+	return query.getMetaInfo().getFieldSize(field);
+}
+
+const Tchar *CDbTable::GetFieldName(const size_t field) const {
+
+	return getFieldName(query.getMetaInfo(), field, Tchar());
 }
 
 ImmutableString<Tchar> CDbTable::GetCellAsString(const size_t field, const size_t record) const{

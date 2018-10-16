@@ -22,6 +22,7 @@ private:
 		std::shared_ptr<IDbField> field;
 		ImmutableString<char> field_name;
 		mutable ImmutableString<wchar_t> field_name_w;
+		size_t field_size;
 		bool is_primary_key;
 		id_type id_table;
 
@@ -121,6 +122,7 @@ public:
 	inline ImmutableString<wchar_t> getFieldNameW(const size_t field) const;
 	inline ImmutableString<char> getTableName(const size_t field) const;
 	inline ImmutableString<wchar_t> getTableNameW(const size_t field) const;
+	inline size_t getFieldSize(const size_t field) const;
 	inline bool isPrimaryKey(const size_t field) const;
 
 	void setPrimaryTable(const char *table_name);
@@ -153,6 +155,12 @@ ImmutableString<wchar_t> CMetaInfo::getFieldNameW(const size_t field) const {
 	if (fields[field].field_name_w.isNull())
 		fields[field].field_name_w = fields[field].field->getFieldNameW();
 	return fields[field].field_name_w;
+}
+
+size_t CMetaInfo::getFieldSize(const size_t field) const {
+
+	assert(field < fields.size());
+	return fields[field].field_size;
 }
 
 ImmutableString<char> CMetaInfo::getTableName(const size_t field) const {

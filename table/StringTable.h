@@ -5,13 +5,19 @@
 
 class CStringTable : public ITable {
 	enum Defaults {
-		DEF_ON_CHANGE_HANDLERS_COUNT = 5
+		DEF_ON_CHANGE_HANDLERS_COUNT = 5, \
+		DEF_FIELDS_COUNT = 10
 	};
 	typedef std::vector<Tstring> CTextVector;
 	typedef std::vector<CTextVector> CTextTable;
 
 	CTextTable text_table;
-	std::vector<size_t> fields_lengthes;
+
+	struct CField {
+		size_t max_size_in_chars;
+		Tstring field_name;
+	};
+	std::vector<CField> fields;
 	std::vector<ITableOnSizeChangedHandlerPtr> on_size_changed_handlers;
 public:
 	CStringTable();
