@@ -17,6 +17,12 @@ private:
 	typedef std::vector<IndexType>::iterator IndexIterator;
 	typedef std::vector<IndexType>::const_iterator ConstIndexIterator;
 
+	enum {
+		DEF_FIELDS_COUNT = 10, \
+		DEF_TABLES_COUNT = 3, \
+		DEF_TABLE_KEY_SIZE = 5
+	};
+
 	struct CFieldRecord {
 		id_type id;
 		std::shared_ptr<IDbField> field;
@@ -102,6 +108,8 @@ private:
 									const id_type id_table) const;
 
 	id_type addTableRecord(ImmutableString<char> table_name);
+	void addKeyIndex(const id_type id_table, const id_type id_field);
+	void refreshFieldIndexes();
 
 	template <class FieldPredicate> \
 		void enumeratePrimKey(const id_type table_id, \
@@ -128,9 +136,15 @@ public:
 	void setPrimaryTable(const char *table_name);
 
 	void addField(std::shared_ptr<IDbField> field, const size_t new_field_index);
+	void clearAndAddFields(std::shared_ptr<IDbResultSetMetadata> fields);
 
-	void getUpdateQueryForField(const size_t field, std::string &query);
-	void getDeleteQuery(std::string &query);
+	void getUpdateQueryForField(const size_t field, std::string &query) const;
+	void getDeleteQuery(std::string &query) const;
+	void bindPrimaryKeyValues(const size_t field, \
+								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+								std::shared_ptr<IDbBindingTarget> binding_target) const;
+	void bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+								std::shared_ptr<IDbBindingTarget> binding_target) const;
 
 	virtual ~CMetaInfo();
 };
@@ -190,7 +204,7 @@ void CMetaInfo::enumeratePrimKey(const id_type table_id, \
 									FieldPredicate field_pred) const {
 	auto table_prim_keys = findTableKeys(table_id);
 
-	size_t counter = 0;
+	size_t keys_counter = 0;
 	while (table_prim_keys.first != table_prim_keys.second) {
 		
 		field_pred(*(table_prim_keys.first));
@@ -198,7 +212,7 @@ void CMetaInfo::enumeratePrimKey(const id_type table_id, \
 		++table_prim_keys.first;
 		++counter;
 	}
-	if (!counter)
+	if (!keys_counter)
 		throw XException(0, \
 			_T("There are no foreign keys for the table the id field belongs to"));
 }

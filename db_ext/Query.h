@@ -1,19 +1,20 @@
 #pragma once
 #include <memory>
+#include <map>
+#include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
 #include "MetaInfo.h"
 
 class CQuery{
 	CMetaInfo meta_info;
+	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<IDbStatement> stmt;
 	
-	struct CUpdateStatementPool {
-		size_t field;
-		std::shared_ptr<IDbStatement> stmt;
-	};
+	mutable std::map<size_t, std::shared_ptr<IDbStatement> > update_stmts;
 public:
-	CQuery(std::shared_ptr<IDbStatement> stmt_);
+	CQuery(std::shared_ptr<IDbConnection> conn_, \
+			std::shared_ptr<IDbStatement> stmt_);
 	
 	inline const CMetaInfo &getMetaInfo() const;
 
