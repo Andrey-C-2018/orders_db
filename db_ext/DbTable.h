@@ -23,7 +23,7 @@ public:
 
 	inline size_t getCurrentRecordNo() const;
 
-	const CQuery &getQuery() const;
+	inline const CQuery &getQuery() const;
 
 	bool empty() const override;
 	size_t GetFieldsCount() const override;

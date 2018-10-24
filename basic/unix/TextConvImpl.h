@@ -2,6 +2,7 @@
 #include <string.h>
 #include <wchar.h>
 #include <vector>
+#include <assert.h>
 
 enum{
 	DEF_MAX_STR_LEN = 32

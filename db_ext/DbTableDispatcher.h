@@ -29,9 +29,9 @@ private:
 		id_type id;
 		std::shared_ptr<CDbTable> db_table;
 
-		inline bool operator==(const CDbTableRecord &obj) const {
+		inline bool operator==(const id_type id) const {
 
-			return id == obj.id;
+			return this->id == id;
 		}
 	};
 
@@ -63,8 +63,6 @@ private:
 
 	inline TableConstIterator FindTable(const id_type id) const;
 public:
-	typedef int id_type;
-
 	CDbTableDispatcher();
 
 	id_type AddDbTable(std::shared_ptr<CDbTable> table, const int attribs);
@@ -102,4 +100,18 @@ CDbTableDispatcher::CustomerConstIterator \
 		});
 
 	return p_cust;
+}
+
+CDbTableDispatcher::TableConstIterator \
+	CDbTableDispatcher::FindTable(const id_type id) const {
+	CDbTableDispatcher::TableConstIterator p_table;
+
+	p_table = std::find(tables.cbegin(), tables.cend(), id);
+	if (p_table == tables.cend()) {
+		CDbTableDispatcherException e(CDbTableDispatcherException::E_NO_SUCH_TABLE_ID, \
+										_T("no such table: id = "));
+		e << id;
+		throw e;
+	}
+	return p_table;
 }

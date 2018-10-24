@@ -1,1 +1,1 @@
-../0libs/Debug/MySQLCommon.cpp.o ../0libs/Debug/MySQLConnection.cpp.o ../0libs/Debug/MySQLResultSet.cpp.o ../0libs/Debug/MySQLStatement.cpp.o ../0libs/Debug/MySQLVariant.cpp.o ../0libs/Debug/DbException.cpp.o ../0libs/Debug/MySQLField.cpp.o ../0libs/Debug/MySQLResultSetMetadata.cpp.o
+./Release/MySQLCommon.cpp.o ./Release/MySQLConnection.cpp.o ./Release/MySQLResultSet.cpp.o ./Release/MySQLStatement.cpp.o ./Release/MySQLVariant.cpp.o ./Release/DbException.cpp.o ./Release/MySQLField.cpp.o ./Release/MySQLResultSetMetadata.cpp.o ./Release/DbConnectionFactory.cpp.o

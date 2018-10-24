@@ -45,7 +45,7 @@ inline const wchar_t *getFieldName(const CMetaInfo &meta_info, \
 //****************************************************
 
 CDbTable::CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_) : \
-					conn(conn_), curr_record(0), query(std::move(query_)){
+					conn(conn_), query(std::move(query_)), curr_record(0){
 
 	result_set = query.exec();
 

@@ -1,0 +1,1 @@
+./Release/main.cpp.o ./Release/DbTable.cpp.o ./Release/DbTableDispatcher.cpp.o ./Release/MetaInfo.cpp.o ./Release/Query.cpp.o

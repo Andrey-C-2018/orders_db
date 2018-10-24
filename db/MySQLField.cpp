@@ -2,8 +2,8 @@
 
 CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
 							const size_t field_, const size_t max_field_size) : \
-							metadata(metadata_), field(field_), \
-							max_size(max_field_size) {
+							metadata(metadata_), max_size(max_field_size), \
+							field(field_) {
 
 	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
 	is_primary_key = (mysql_field->flags & PRI_KEY_FLAG) > 0;

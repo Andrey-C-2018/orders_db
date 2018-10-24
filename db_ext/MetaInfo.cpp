@@ -11,8 +11,8 @@ public:
 
 	inline void operator()(const size_t field) {
 		
-		query += " = ? AND ";
 		query += meta_info.getFieldName(field).str;
+		query += " = ? AND ";
 	}
 };
 
@@ -45,6 +45,13 @@ CMetaInfo::CMetaInfo() : primary_table_id(-1){
 
 	fields.reserve(DEF_FIELDS_COUNT);
 	tables.reserve(DEF_TABLES_COUNT);
+	
+	fields_index_id.reserve(DEF_FIELDS_COUNT);
+	fields_index_name.reserve(DEF_FIELDS_COUNT);
+	
+	tables_index_id.reserve(DEF_TABLES_COUNT);
+	tables_index_name.reserve(DEF_TABLES_COUNT);
+	
 	keys_index_table.reserve(DEF_TABLE_KEY_SIZE);
 }
 
@@ -74,13 +81,13 @@ CMetaInfo::id_type CMetaInfo::addTableRecord(ImmutableString<char> table_name) {
 	
 	if (!isTableRecordFound(p_table_name, table_name.str)) {
 		CTableRecord rec;
+		size_t new_index = tables.size();
 
-		rec.id = table_id = tables.size();
+		rec.id = table_id = (id_type)new_index;
 		rec.table_name = table_name;
 
 		tables.emplace_back(rec);
-
-		size_t new_index = tables.size();
+		
 		tables_index_name.insert(p_table_name, new_index);
 		tables_index_id.insert(findTableRecord(table_id), new_index);
 	}
@@ -114,7 +121,8 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 		throw e;
 	}
 
-	rec.id = fields.size();
+	size_t fields_old_count = fields.size();
+	rec.id = (id_type)fields_old_count;
 	rec.field = field;
 	rec.field_name = new_field_name;
 	rec.field_size = field->getFieldMaxLength();
@@ -126,14 +134,17 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 	fields.insert(fields.begin() + new_field_index, rec);
 
 	if (new_field_index == fields.size() - 1) {
-		fields_index_id.insert(p_field, fields.size());
-		fields_index_name.insert(p_field, fields.size());
+		fields_index_id.insert(p_field, fields_old_count);
+		fields_index_name.insert(p_field, fields_old_count);
 	}
-	else
+	else{
+		fields_index_id.push_back(fields_old_count);
+		fields_index_name.push_back(fields_old_count);
 		refreshFieldIndexes();
+	}
 
 	if (rec.is_primary_key) 
-		addKeyIndex(rec.id_table, new_field_index);
+		addKeyIndex(rec.id_table, (id_type)new_field_index);
 }
 
 void CMetaInfo::refreshFieldIndexes() {
@@ -154,25 +165,30 @@ void CMetaInfo::refreshFieldIndexes() {
 void CMetaInfo::clearAndAddFields(std::shared_ptr<IDbResultSetMetadata> fields) {
 	size_t fields_count = fields->getFieldsCount();
 
-	this->fields.clear();
-	this->tables.clear();
+	clear();
+
 	this->fields.reserve(fields_count);
+	this->fields_index_id.reserve(fields_count);
+	this->fields_index_name.reserve(fields_count);
 
 	for (size_t i = 0; i < fields_count; ++i) {
 		CFieldRecord rec;
 		rec.field = fields->getField(i);
 		ImmutableString<char> table_name = rec.field->getTableName();
 
-		rec.id = i;
+		rec.id = (id_type)i;
 		rec.id_table = addTableRecord(table_name);
-		rec.field_name = rec.field->getFieldName();
+		rec.field_name = rec.field->getFieldName(); // TO DO: add name check
 		rec.field_size = rec.field->getFieldMaxLength();
 		rec.is_primary_key = rec.field->isPrimaryKey();
 	
 		if (rec.is_primary_key)
-			addKeyIndex(rec.id_table, i);
+			addKeyIndex(rec.id_table, (id_type)i);
 
 		this->fields.emplace_back(rec);
+		
+		fields_index_id.push_back(i);
+		fields_index_name.push_back(i);
 	}
 
 	refreshFieldIndexes();
@@ -193,13 +209,11 @@ void CMetaInfo::getUpdateQueryForField(const size_t field, std::string &query) c
 	
 	query += " SET ";
 	query += fields[field].field_name.str;
-	query += " = ? ";
+	query += " = ? WHERE ";
 
-	query += " WHERE ";
 	enumeratePrimKey(tables[*p_table].id, AddPrimKeyToWhereStmt(*this, query));
 
-	size_t count = query.size() - sizeof("AND ") / sizeof(char);
-	query.erase(query.size() - count, count);
+	removeEmptyAndStmt(query);
 }
 
 void CMetaInfo::getDeleteQuery(std::string &query) const {
@@ -212,8 +226,7 @@ void CMetaInfo::getDeleteQuery(std::string &query) const {
 	query += " WHERE ";
 	enumeratePrimKey(primary_table_id, AddPrimKeyToWhereStmt(*this, query));
 
-	size_t count = query.size() - sizeof("AND ") / sizeof(char);
-	query.erase(query.size() - count, count);
+	removeEmptyAndStmt(query);
 }
 
 void CMetaInfo::bindPrimaryKeyValues(const size_t field, \

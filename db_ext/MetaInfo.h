@@ -114,6 +114,9 @@ private:
 	template <class FieldPredicate> \
 		void enumeratePrimKey(const id_type table_id, \
 								FieldPredicate field_pred) const;
+	inline void removeEmptyAndStmt(std::string &query) const;
+								
+	inline void clear();
 public:
 	CMetaInfo();
 
@@ -125,7 +128,7 @@ public:
 	inline size_t getFieldsCount() const;
 	inline bool empty() const;
 
-	std::shared_ptr<const IDbField> getField(const size_t field) const;
+	inline std::shared_ptr<const IDbField> getField(const size_t field) const;
 	inline ImmutableString<char> getFieldName(const size_t field) const;
 	inline ImmutableString<wchar_t> getFieldNameW(const size_t field) const;
 	inline ImmutableString<char> getTableName(const size_t field) const;
@@ -210,11 +213,17 @@ void CMetaInfo::enumeratePrimKey(const id_type table_id, \
 		field_pred(*(table_prim_keys.first));
 
 		++table_prim_keys.first;
-		++counter;
+		++keys_counter;
 	}
 	if (!keys_counter)
 		throw XException(0, \
 			_T("There are no foreign keys for the table the id field belongs to"));
+}
+
+void CMetaInfo::removeEmptyAndStmt(std::string &query) const {
+	size_t tail_size = sizeof(" AND ") - 1;
+	
+	query.erase(query.size() - tail_size, tail_size);
 }
 
 bool CMetaInfo::CFieldRecord::operator==(const CMetaInfo::CFieldRecord &obj) const {
@@ -320,6 +329,21 @@ bool CMetaInfo::isTableRecordFound(const CMetaInfo::ConstIndexIterator p_table_i
 size_t CMetaInfo::getFieldsCount() const {
 
 	return fields.size();
+}
+
+void CMetaInfo::clear(){
+	
+	this->fields.clear();
+	this->tables.clear();
+	
+	this->fields_index_id.clear();
+	this->fields_index_name.clear();
+	this->tables_index_id.clear();
+	this->tables_index_name.clear();
+	this->keys_index_table.clear();
+	
+	this->primary_table_id = -1;
+	this->primary_table_name.clear();
 }
 
 bool CMetaInfo::empty() const {

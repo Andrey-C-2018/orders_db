@@ -27,7 +27,7 @@ id_type CDbTableDispatcher::AddCustomer(std::shared_ptr<IDbCustomer> obj, \
 		throw e;
 	}
 
-	id_type new_id = customers.size();
+	id_type new_id = (id_type)customers.size();
 	customers.emplace_back(CCustomerRecord{ new_id, id_table, obj });
 
 	obj->OnCustomerInitialized(p_table->db_table);
@@ -50,7 +50,7 @@ std::shared_ptr<IDbCustomer> CDbTableDispatcher::GetCustomer(const id_type id) c
 id_type CDbTableDispatcher::AddDbTable(std::shared_ptr<CDbTable> table, const int attribs) {
 	CDbTableRecord rec;
 	
-	rec.id = tables.size() + 1;
+	rec.id = (id_type)(tables.size()) + 1;
 	rec.db_table = table;
 	tables.emplace_back(rec);
 

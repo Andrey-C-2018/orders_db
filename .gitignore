@@ -55,3 +55,7 @@ x64/
 *.workspace
 *.project
 *.mk
+
+# Output folders
+######################
+0libs

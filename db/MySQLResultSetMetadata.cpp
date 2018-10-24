@@ -37,6 +37,11 @@ std::shared_ptr<IDbField> CMySQLResultSetMetadata::getField(const size_t field) 
 
 		case MYSQL_TYPE_LONG:
 			return std::make_shared<CMySQLIntegerField<int> >(metadata, field);
+			
+		default:
+			XException e(0, _T("No such field type: "));
+			e << mysql_field->type;
+			throw e;
 	}
 
 	assert(false);

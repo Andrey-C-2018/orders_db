@@ -12,9 +12,13 @@ class CQuery{
 	std::shared_ptr<IDbStatement> stmt;
 	
 	mutable std::map<size_t, std::shared_ptr<IDbStatement> > update_stmts;
+	CQuery(const CQuery &obj) = delete;
+	CQuery &operator=(const CQuery &obj) = delete;
 public:
 	CQuery(std::shared_ptr<IDbConnection> conn_, \
 			std::shared_ptr<IDbStatement> stmt_);
+	CQuery(CQuery &&obj) = default;
+	CQuery &operator=(CQuery &&obj) = default;
 	
 	inline const CMetaInfo &getMetaInfo() const;
 

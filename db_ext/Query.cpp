@@ -25,16 +25,24 @@ std::shared_ptr<IDbStatement> CQuery::getUpdateStmt(const size_t updated_field, 
 }
 
 std::shared_ptr<IDbStatement> CQuery::getDeleteStmt(std::shared_ptr<IDbResultSet> result_set) const {
+	std::shared_ptr<IDbStatement> delete_stmt;
+	std::string query;
 
+	meta_info.getDeleteQuery( query );
+	delete_stmt = conn->PrepareQuery(query.c_str());
 
+	meta_info.bindPrimaryKeyValues(result_set, delete_stmt);
+	return delete_stmt;
 }
 
 std::shared_ptr<IDbBindingTarget> CQuery::getBindingTarget() {
 
+	return stmt;
 }
 
 std::shared_ptr<IDbResultSet> CQuery::exec() {
 
+	return stmt->exec();
 }
 
 CQuery::~CQuery(){ }
