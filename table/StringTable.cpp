@@ -3,7 +3,7 @@
 
 CStringTable::CStringTable() {
 
-	on_size_changed_handlers.reserve(DEF_ON_CHANGE_HANDLERS_COUNT);
+	event_handlers.reserve(DEF_EVENT_HANDLERS_COUNT);
 	fields.reserve(DEF_FIELDS_COUNT);
 }
 
@@ -22,9 +22,17 @@ size_t CStringTable::GetRecordsCount() const {
 	return text_table.empty() ? 0 : text_table[0].size();
 }
 
-void CStringTable::ConnectOnSizeChangedHandler(ITableOnSizeChangedHandlerPtr handler) {
+void CStringTable::ConnectEventsHandler(ITableEventsHandlerPtr handler) {
 
-	on_size_changed_handlers.push_back(handler);
+	event_handlers.push_back(handler);
+}
+
+void CStringTable::DisconnectEventsHandler(ITableEventsHandlerPtr handler) {
+
+	auto p = std::find(event_handlers.begin(), event_handlers.end(), handler);
+	assert(p != event_handlers.end());
+
+	event_handlers.erase(p);
 }
 
 void CStringTable::AddField(const size_t max_field_len, const Tchar *field_name) {
@@ -43,8 +51,8 @@ void CStringTable::AddField(const size_t max_field_len, const Tchar *field_name)
 	rec.max_size_in_chars = max_field_len;
 	fields.emplace_back(rec);
 
-	for (auto & handler : on_size_changed_handlers)
-		handler->OnSizeChanged(text_table.size(), records_count);
+	for (auto & handler : event_handlers)
+		handler->OnFieldsCountChanged(text_table.size());
 }
 
 void CStringTable::AddRecord() {
@@ -57,8 +65,8 @@ void CStringTable::AddRecord() {
 
 	size_t records_count = text_table.empty() ? 0 : text_table[0].size();
 
-	for (auto & handler : on_size_changed_handlers)
-		handler->OnSizeChanged(text_table.size(), records_count);
+	for (auto & handler : event_handlers)
+		handler->OnRecordsCountChanged(records_count);
 }
 
 size_t CStringTable::GetFieldMaxLengthInChars(const size_t field) const {
@@ -71,6 +79,13 @@ const Tchar *CStringTable::GetFieldName(const size_t field) const {
 
 	assert(field < fields.size());
 	return fields[field].field_name.c_str();
+}
+
+ImmutableString<Tchar> CStringTable::GetFieldNameAsImmutableStr(const size_t field) const {
+
+	assert(field < fields.size());
+	return ImmutableString<Tchar>(fields[field].field_name.c_str(), \
+									fields[field].field_name.size());
 }
 
 ImmutableString<Tchar> CStringTable::GetCellAsString(const size_t field, \

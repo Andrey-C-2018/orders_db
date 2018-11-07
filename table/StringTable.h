@@ -5,7 +5,7 @@
 
 class CStringTable : public ITable {
 	enum Defaults {
-		DEF_ON_CHANGE_HANDLERS_COUNT = 5, \
+		DEF_EVENT_HANDLERS_COUNT = 5, \
 		DEF_FIELDS_COUNT = 10
 	};
 	typedef std::vector<Tstring> CTextVector;
@@ -18,20 +18,22 @@ class CStringTable : public ITable {
 		Tstring field_name;
 	};
 	std::vector<CField> fields;
-	std::vector<ITableOnSizeChangedHandlerPtr> on_size_changed_handlers;
+	std::vector<ITableEventsHandlerPtr> event_handlers;
 public:
 	CStringTable();
 
 	bool empty() const override;
 	size_t GetFieldsCount() const override;
 	size_t GetRecordsCount() const override;
-	void ConnectOnSizeChangedHandler(ITableOnSizeChangedHandlerPtr handler) override;
+	void ConnectEventsHandler(ITableEventsHandlerPtr handler) override;
+	void DisconnectEventsHandler(ITableEventsHandlerPtr handler) override;
 
 	void AddField(const size_t max_field_len, const Tchar *field_name) override;
 	void AddRecord() override;
 
 	size_t GetFieldMaxLengthInChars(const size_t field) const override;
 	const Tchar *GetFieldName(const size_t field) const override;
+	ImmutableString<Tchar> GetFieldNameAsImmutableStr(const size_t field) const override;
 
 	ImmutableString<Tchar> GetCellAsString(const size_t field, \
 									const size_t record) const override;
