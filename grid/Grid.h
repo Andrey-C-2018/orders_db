@@ -7,10 +7,6 @@
 
 class CGridException : public XException {
 public:
-	enum Errors {
-		E_EMPTY_GRID = 1
-	};
-
 	CGridException(const int err_code, const Tchar *err_descr);
 	CGridException(const CGridException &obj);
 	CGridException(CGridException &&obj) = default;
@@ -81,6 +77,7 @@ public:
 	inline size_t GetFieldsCount() const;
 	inline size_t GetRecordsCount() const;
 
+	inline void SetFieldWidth(const size_t field, const int new_width);
 	void HideField(const size_t field_index);
 
 	void Reload() override;
@@ -103,6 +100,11 @@ template <class TCell> \
 inline LayoutObjects CGrid::CreateLayoutObjectsHelper(const int kind_of_layout) {
 
 	return data_table_proxy->CreateLayoutObjects<TCell>(kind_of_layout);
+}
+
+void CGrid::SetFieldWidth(const size_t field, const int new_width) {
+
+	data_table_proxy->SetFieldWidth(field, new_width);
 }
 
 int CGrid::GetRecordsSizesSumm() const {

@@ -2,7 +2,19 @@
 #include "EditableGrid.h"
 #include <table/StringTable.h>
 
-class CStringGrid :	public CEditableGrid{
+class CStringGridException : public XException {
+public:
+	enum Errors {
+		E_EMPTY_GRID = 1
+	};
+
+	CStringGridException(const int err_code, const Tchar *err_descr);
+	CStringGridException(const CStringGridException &obj);
+	CStringGridException(CStringGridException &&obj) = default;
+	~CStringGridException();
+};
+
+class CStringGrid :	public CEditableGrid {
 	std::shared_ptr<CStringTable> table;
 public:
 	CStringGrid();

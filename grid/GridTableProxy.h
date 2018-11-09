@@ -29,6 +29,8 @@ public:
 	inline std::shared_ptr<const IFieldsProperties> GetFieldsProperties() const;
 	inline std::shared_ptr<IFieldsProperties> GetFieldsProperties();
 
+	void SetFieldWidth(const size_t field, const int new_width);
+
 	void OnFieldsCountChanged(const size_t new_fields_count) override;
 	void OnRecordsCountChanged(const size_t new_records_count) override;
 	void OnTableReset() override;
