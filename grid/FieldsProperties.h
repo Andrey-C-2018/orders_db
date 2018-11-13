@@ -18,6 +18,8 @@ class CFieldsProperties : public IFieldsProperties {
 
 	std::shared_ptr<const ITable> data_table;
 	std::vector<FieldProps> fields_props;
+	std::vector<size_t> indexes;
+
 	int summ;
 	int multiplier;
 public:
@@ -33,12 +35,16 @@ public:
 		size_t fields_count = data_table->GetFieldsCount();
 
 		fields_props.clear();
+		indexes.clear();
 		summ = 0;
 
-		if (!fields_count)
+		if (!fields_count) {
 			fields_props.reserve(DEF_FIELDS_COUNT);
+			indexes.reserve(DEF_FIELDS_COUNT);
+		}
 		else {
 			fields_props.reserve(fields_count);
+			indexes.reserve(fields_count);
 
 			std::vector<Tchar> empty_field_name;
 			for (size_t i = 0; i < fields_count; ++i) {
@@ -47,30 +53,67 @@ public:
 				field_size *= multiplier;
 
 				fields_props.push_back(FieldProps{ field_size, empty_field_name, true });
+				indexes.push_back(i);
 				summ += field_size;
 			}
 		}
 	}
 
+	inline void OnFieldAddedToDataTable(const size_t index) {
+
+		assert(index <= fields_props.size());
+
+		int field_size = (int)data_table->GetFieldMaxLengthInChars(index);
+		std::vector<Tchar> empty_field_name;
+
+		field_size *= multiplier;
+
+		fields_props.insert(fields_props.begin() + index, \
+							FieldProps{ field_size, empty_field_name, true });
+		if (index == fields_props.size())
+			indexes.push_back(index);
+		else {
+			size_t fields_props_size = fields_props.size();
+			std::for_each(indexes.begin(), indexes.end(), \
+						[index, fields_props_size](size_t &index_item) {
+							index_item += index == fields_props_size;
+						});
+
+			indexes.insert(indexes.begin() + index, index);
+		}
+		summ += field_size;
+	}
+
+	inline size_t GetFieldIndex(const size_t index) const {
+
+		return indexes[index];
+	}
+
 	int GetWidth(const size_t index) const override {
 
-		assert(index < fields_props.size());
-		return fields_props[index].field_size;
+		assert(index < indexes.size());
+		return fields_props[GetFieldIndex(index)].field_size;
 	}
 
 	inline void SetWidth(const size_t index, const int field_width) {
 
-		assert(index < fields_props.size());
-		summ -= fields_props[index].field_size;
+		assert(index < indexes.size());
+		summ -= fields_props[GetFieldIndex(index)].field_size;
 		summ += field_width;
 
-		fields_props[index].field_size = field_width;
+		fields_props[GetFieldIndex(index)].field_size = field_width;
 	}
 
 	inline void HideField(const size_t index) {
 
 		assert(index < fields_props.size());
 
+		if (fields_props[index].visible) {
+			indexes.erase(std::remove(indexes.begin(), indexes.end(), index));
+			fields_props[index].visible = false;
+
+			summ -= fields_props[index].field_size;
+		}
 	}
 
 	void MultiplyAllSizesBy(const int multiplier) override {
@@ -91,22 +134,24 @@ public:
 
 	ImmutableString<Tchar> GetFieldName(const size_t index) const override {
 
-		assert(index < fields_props.size());
+		assert(index < indexes.size());
 		assert(data_table);
-		if (fields_props[index].field_name.size()) {
-			ImmutableString<Tchar> field_name(&fields_props[index].field_name[0], \
-												fields_props[index].field_name.size());
+		size_t exact_index = GetFieldIndex(index);
+
+		if (fields_props[exact_index].field_name.size()) {
+			ImmutableString<Tchar> field_name(&fields_props[exact_index].field_name[0], \
+												fields_props[exact_index].field_name.size());
 			return field_name;
 		}
 
-		return data_table->GetFieldNameAsImmutableStr(index);
+		return data_table->GetFieldNameAsImmutableStr(exact_index);
 	}
 
 	size_t size() const override { return GetFieldsCount(); }
 
 	inline size_t GetFieldsCount() const {
 
-		return fields_props.size();
+		return indexes.size();
 	}
 
 	int GetFieldsSizesSumm() const override {

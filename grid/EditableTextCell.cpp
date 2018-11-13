@@ -58,8 +58,10 @@ void CEditableTextCell::Draw(XGC &gc, const XPoint &initial_coords, const XSize 
 			}
 
 			assert(def_active_cell);
-			if (active_cell_hidden && scroll_ended) {
+			if (!active_cell_hidden || (active_cell_hidden && scroll_ended))
 				def_active_cell->MoveWindow(x, y, width, height);
+
+			if (active_cell_hidden && scroll_ended) {
 				def_active_cell->Show();
 				active_cell_hidden = false;
 			}

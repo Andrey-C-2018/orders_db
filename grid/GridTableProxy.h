@@ -9,13 +9,13 @@ struct IReloadable;
 class CFieldsProperties;
 
 class CGridTableProxy : public ITableEventsHandler {
-	std::shared_ptr<const ITable> table;
+	std::shared_ptr<ITable> table;
 	IReloadable *table_widget;
 	std::shared_ptr<CFieldsProperties> fields_props;
 
 	size_t records_count;
 public:
-	CGridTableProxy(std::shared_ptr<const ITable> table_, \
+	CGridTableProxy(std::shared_ptr<ITable> table_, \
 					IReloadable *table_widget_);
 	
 	template <class TCell> \
@@ -30,6 +30,7 @@ public:
 	inline std::shared_ptr<IFieldsProperties> GetFieldsProperties();
 
 	void SetFieldWidth(const size_t field, const int new_width);
+	void HideField(const size_t field);
 
 	void OnFieldsCountChanged(const size_t new_fields_count) override;
 	void OnRecordsCountChanged(const size_t new_records_count) override;
@@ -183,11 +184,12 @@ LayoutObjects CGridTableProxy::CreateLayoutObjects(const int kind_of_layout) {
 ImmutableString<Tchar> \
 CGridTableProxy::GetCellAsString(const size_t field, const size_t record) const {
 
-	return this->table->GetCellAsString(field, record);
+	return this->table->GetCellAsString(fields_props->GetFieldIndex(field), record);
 }
 
 void CGridTableProxy::SetCell(const size_t field, const size_t record, const Tchar *value) {
 
+	this->table->SetCell(fields_props->GetFieldIndex(field), record, value);
 }
 
 size_t CGridTableProxy::GetFieldsCount() const {

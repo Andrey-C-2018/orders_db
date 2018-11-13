@@ -39,7 +39,8 @@ Connect(EVT_COMMAND, button_ce->GetId(), this, &CMyFrame::OnButtonCeClick);
 void CMyFrame::OnButtonCeClick(XCommandEvent *eve) {
 
 	grid->SetFocus();
-	grid->SetFieldWidth(4, 50);
+	//grid->SetFieldWidth(4, 50);
+	grid->HideField(5);
 }
 
 void CMyFrame::OnSize(XSizeEvent *eve) {

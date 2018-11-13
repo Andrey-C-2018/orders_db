@@ -1,7 +1,7 @@
 #include "GridTableProxy.h"
 #include "IReloadable.h"
 
-CGridTableProxy::CGridTableProxy(std::shared_ptr<const ITable> table_, \
+CGridTableProxy::CGridTableProxy(std::shared_ptr<ITable> table_, \
 									IReloadable *table_widget_) : \
 										table(table_), table_widget(table_widget_), \
 										records_count(0) {
@@ -12,7 +12,12 @@ CGridTableProxy::CGridTableProxy(std::shared_ptr<const ITable> table_, \
 
 void CGridTableProxy::OnFieldsCountChanged(const size_t new_fields_count) {
 
-	fields_props->SyncWithDataTable();
+	if (new_fields_count == fields_props->GetFieldsCount() + 1) {
+		assert(new_fields_count != 0);
+		fields_props->OnFieldAddedToDataTable(new_fields_count - 1);
+	}
+	else
+		fields_props->SyncWithDataTable();
 	table_widget->Reload();
 }
 
@@ -32,6 +37,12 @@ void CGridTableProxy::OnTableReset() {
 void CGridTableProxy::SetFieldWidth(const size_t field, const int new_width) {
 
 	fields_props->SetWidth(field, new_width);
+	table_widget->Reload();
+}
+
+void CGridTableProxy::HideField(const size_t field) {
+
+	fields_props->HideField(field);
 	table_widget->Reload();
 }
 
