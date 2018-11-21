@@ -241,6 +241,21 @@ void CGrid::OnMouseLButtonClick(XMouseEvent *eve) {
 	Invalidate(nullptr, false);
 }
 
+void CGrid::HideField(const size_t field_index) {
+
+	if (data_table_proxy->IsFieldHidden(field_index))
+		return;
+
+	const size_t relative_field_index = data_table_proxy->GetRelativeFieldIndex(field_index);
+
+	hscroll.pos = cells->RemoveField(relative_field_index, \
+										hscroll.page, hscroll.max);
+	data_table_proxy->HideField(field_index);
+
+	ReevaluateHScrollMax();
+	Invalidate(nullptr, false);
+}
+
 void CGrid::Reload() {
 
 	if (IsCreated()) {
@@ -248,8 +263,6 @@ void CGrid::Reload() {
 
 		int summ = fields_props->GetFieldsSizesSumm();
 		if (hscroll.max != summ) {
-			/*if (hscroll.max > summ) 
-				hscroll.pos = summ - hscroll.page;*/
 			
 			hscroll.max = summ;
 			this->SetScrollBar(X_SCROLL_HORZ, hscroll);

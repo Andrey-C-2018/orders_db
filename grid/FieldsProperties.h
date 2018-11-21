@@ -89,6 +89,12 @@ public:
 		return indexes[index];
 	}
 
+	inline size_t GetRelativeFieldIndex(const size_t abs_index) const {
+
+		auto p = std::find(indexes.cbegin(), indexes.cend(), abs_index);
+		return p != indexes.cend() ? p - indexes.cbegin() : -1;
+	}
+
 	int GetWidth(const size_t index) const override {
 
 		assert(index < indexes.size());
@@ -102,6 +108,11 @@ public:
 		summ += field_width;
 
 		fields_props[GetFieldIndex(index)].field_size = field_width;
+	}
+
+	inline bool IsFieldHidden(const size_t index) const {
+
+		return !fields_props[index].visible;
 	}
 
 	inline void HideField(const size_t index) {

@@ -29,7 +29,7 @@ class CRecordComposer {
 	public:
 		CSizesPredicate(std::shared_ptr<const ISizes> items_sizes_) : \
 			items_sizes(items_sizes_) { }
-		inline int operator[](const size_t index) const {
+		inline int operator()(const size_t index) const {
 
 			return items_sizes->GetWidth(index);
 		}
@@ -127,6 +127,7 @@ public:
 
 	size_t GetItemIndexByCoord(const int coord) const {
 
+		assert(shvc);
 		if (onclick_evaluator < shvc->rec_evaluator)
 			onclick_evaluator = shvc->rec_evaluator;
 
@@ -141,6 +142,18 @@ public:
 		bool out_of_range = (onclick_view_params.item_index >= count);
 		return !out_of_range * onclick_view_params.item_index + \
 				out_of_range * NULL_ITEM_INDEX;
+	}
+
+	inline int RemoveField(const size_t field, const int grid_widget_width, \
+							const int total_sum) {
+		assert(shv);
+		assert(shvc);
+
+		shv->view_params = shv->rec_evaluator.RemoveItem(total_sum, grid_widget_width, \
+										items->count(), field, \
+										CSizesPredicate(shvc->items_sizes), \
+										shvc->prev_offset);
+		return shv->view_params.offset;
 	}
 
 	inline void Reset() {

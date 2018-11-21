@@ -51,6 +51,8 @@ public:
 
 	inline void OnClick(const size_t field, const size_t record) {	}
 
+	inline void OnFieldRemoved(const size_t field) { }
+
 	inline int EvalCellHeightByTextHeight(const int text_height) const{
 
 		return text_height + 2 * margin_y;

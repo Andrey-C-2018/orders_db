@@ -79,7 +79,7 @@ public:
 	inline size_t GetRecordsCount() const;
 
 	inline void SetFieldWidth(const size_t field, const int new_width);
-	inline void HideField(const size_t field_index);
+	void HideField(const size_t field_index);
 
 	void Reload() override;
 	virtual ~CGrid();
@@ -106,11 +106,6 @@ inline LayoutObjects CGrid::CreateLayoutObjectsHelper(const int kind_of_layout) 
 void CGrid::SetFieldWidth(const size_t field, const int new_width) {
 
 	data_table_proxy->SetFieldWidth(field, new_width);
-}
-
-void CGrid::HideField(const size_t field_index) {
-	
-	data_table_proxy->HideField(field_index);
 }
 
 int CGrid::GetRecordsSizesSumm() const {

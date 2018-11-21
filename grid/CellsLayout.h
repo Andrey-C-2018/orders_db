@@ -141,6 +141,12 @@ public:
 		return composer.FocusOnItem(record_index, height);
 	}
 
+	int RemoveField(const size_t field, const int grid_widget_width, \
+					const int sum) override {
+	
+		return 0;
+	}
+
 	virtual ~TSimpleFieldLayout(){ }
 };
 
@@ -233,6 +239,12 @@ public:
 	int FocusOnRecord(const size_t record_index, const int height) override {
 
 		return composer.FocusOnItem(record_index, height);
+	}
+
+	int RemoveField(const size_t field, const int grid_widget_width, \
+					const int sum) override {
+
+		return items.RemoveField(field, grid_widget_width, sum);
 	}
 
 	virtual ~TFieldOfRecordsLayout(){ }
@@ -345,6 +357,12 @@ public:
 
 	int FocusOnRecord(const size_t record_index, const int height) override { return 0; }
 
+	int RemoveField(const size_t field, const int grid_widget_width, \
+					const int sum) override {
+
+		return composer.RemoveField(field, grid_widget_width, sum);
+	}
+
 	virtual ~TSimpleRecordLayout(){ }
 };
 
@@ -441,6 +459,12 @@ public:
 	int FocusOnRecord(const size_t record_index, const int height) override {
 
 		return items.FocusOnRecord(record_index, height);
+	}
+
+	int RemoveField(const size_t field, const int grid_widget_width, \
+					const int sum) override {
+
+		return composer.RemoveField(field, grid_widget_width, sum);
 	}
 
 	virtual ~TRecordOfFieldsLayout(){ }

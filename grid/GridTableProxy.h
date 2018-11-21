@@ -30,6 +30,8 @@ public:
 	inline std::shared_ptr<IFieldsProperties> GetFieldsProperties();
 
 	void SetFieldWidth(const size_t field, const int new_width);
+	inline bool IsFieldHidden(const size_t field) const;
+	inline size_t GetRelativeFieldIndex(const size_t abs_field_index) const;
 	void HideField(const size_t field);
 
 	void OnFieldsCountChanged(const size_t new_fields_count) override;
@@ -210,4 +212,17 @@ std::shared_ptr<const IFieldsProperties> CGridTableProxy::GetFieldsProperties() 
 inline std::shared_ptr<IFieldsProperties> CGridTableProxy::GetFieldsProperties() {
 
 	return fields_props;
+}
+
+bool CGridTableProxy::IsFieldHidden(const size_t field) const {
+
+	return fields_props->IsFieldHidden(field);
+}
+
+size_t CGridTableProxy::GetRelativeFieldIndex(const size_t abs_field_index) const {
+
+	size_t rel_index = fields_props->GetRelativeFieldIndex(abs_field_index);
+	assert(rel_index != (size_t)-1);
+
+	return rel_index;
 }

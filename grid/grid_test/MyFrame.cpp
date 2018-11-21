@@ -33,14 +33,24 @@ grid->SetFocus();
 
 button_ce = new XButton(this, FL_WINDOW_VISIBLE, \
 						_T("CE"), 10, 10, 10, 10);
+button_ce2 = new XButton(this, FL_WINDOW_VISIBLE, \
+	_T("CE2"), 10, 30, 10, 10);
 Connect(EVT_COMMAND, button_ce->GetId(), this, &CMyFrame::OnButtonCeClick);
+Connect(EVT_COMMAND, button_ce2->GetId(), this, &CMyFrame::OnButtonCe2Click);
 }
 
 void CMyFrame::OnButtonCeClick(XCommandEvent *eve) {
 
 	grid->SetFocus();
 	//grid->SetFieldWidth(4, 50);
-	grid->HideField(5);
+	grid->HideField(13);
+}
+
+void CMyFrame::OnButtonCe2Click(XCommandEvent *eve) {
+
+	grid->SetFocus();
+	//grid->SetFieldWidth(4, 50);
+	grid->HideField(11);
 }
 
 void CMyFrame::OnSize(XSizeEvent *eve) {

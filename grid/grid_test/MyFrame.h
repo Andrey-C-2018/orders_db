@@ -5,7 +5,7 @@
 #include <grid/StringGrid.h>
 
 class CMyFrame : public XFrame{
-	XButton *button_ce;
+	XButton *button_ce, *button_ce2;
 	CStringGrid *grid;
 
 	Tstring label;
@@ -17,6 +17,7 @@ public:
 	void OnSize(XSizeEvent *eve);
 	void OnButtonNumberClick(XCommandEvent *eve);
 	void OnButtonCeClick(XCommandEvent *eve);
+	void OnButtonCe2Click(XCommandEvent *eve);
 	virtual ~CMyFrame();
 };
 
