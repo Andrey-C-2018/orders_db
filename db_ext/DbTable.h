@@ -1,9 +1,9 @@
 #pragma once
-#include <vector>
 #include <basic/Exception.h>
 #include <table/ITable.h>
 #include <db/IDbConnection.h>
 #include <db/IDbResultSet.h>
+#include <table/EventsHandlersContainer.h>
 #include "Query.h"
 
 class CDbTable : public ITable{
@@ -14,10 +14,7 @@ class CDbTable : public ITable{
 	size_t curr_record;
 	std::string insert_str;
 
-	enum Defaults {
-		DEF_ON_CHANGE_HANDLERS_COUNT = 5
-	};
-	std::vector<ITableOnSizeChangedHandlerPtr> on_size_changed_handlers;
+	CEventsHandlersContainer event_handlers;
 public:
 	CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_);
 
@@ -28,7 +25,8 @@ public:
 	bool empty() const override;
 	size_t GetFieldsCount() const override;
 	size_t GetRecordsCount() const override;
-	void ConnectOnSizeChangedHandler(ITableOnSizeChangedHandlerPtr handler) override;
+	void ConnectEventsHandler(ITableEventsHandlerPtr handler) override;
+	void DisconnectEventsHandler(ITableEventsHandlerPtr handler) override;
 
 	void SetInsertString(const Tchar *insert_str);
 	void AddField(const size_t max_field_len, const Tchar *field_name) override;
@@ -36,6 +34,7 @@ public:
 
 	size_t GetFieldMaxLengthInChars(const size_t field) const override;
 	const Tchar *GetFieldName(const size_t field) const override;
+	ImmutableString<Tchar> GetFieldNameAsImmutableStr(const size_t field) const override;
 
 	ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const override;
 	void SetCell(const size_t field, const size_t record, const Tchar *value) override;

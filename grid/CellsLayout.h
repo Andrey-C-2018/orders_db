@@ -144,6 +144,7 @@ public:
 	int RemoveField(const size_t field, const int grid_widget_width, \
 					const int sum) override {
 	
+		items.OnFieldRemoved(field);
 		return 0;
 	}
 
@@ -360,6 +361,7 @@ public:
 	int RemoveField(const size_t field, const int grid_widget_width, \
 					const int sum) override {
 
+		items.OnFieldRemoved(field);
 		return composer.RemoveField(field, grid_widget_width, sum);
 	}
 
@@ -464,6 +466,7 @@ public:
 	int RemoveField(const size_t field, const int grid_widget_width, \
 					const int sum) override {
 
+		items.RemoveField(field, grid_widget_width, sum);
 		return composer.RemoveField(field, grid_widget_width, sum);
 	}
 

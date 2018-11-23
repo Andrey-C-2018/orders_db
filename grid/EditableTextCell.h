@@ -29,6 +29,9 @@ class CEditableTextCell : public IDrawable {
 
 	bool update_cell_widget_text;
 	bool changes_present;
+
+	void CommitChangesIfPresent();
+	void OnActiveCellLocationChanged();
 public:
 	CEditableTextCell();
 
@@ -47,6 +50,7 @@ public:
 
 	void OnClick(const size_t field, const size_t record);
 	void OnActiveCellTextChanged(XCommandEvent *eve);
+	inline void OnFieldRemoved(const size_t field);
 
 	inline int EvalCellHeightByTextHeight(const int text_height) const;
 
@@ -110,4 +114,19 @@ void CEditableTextCell::SetFocus() {
 
 	assert(def_active_cell);
 	def_active_cell->SetFocus();
+}
+
+void CEditableTextCell::OnFieldRemoved(const size_t field) {
+
+	if (field <= active_field) {
+		
+		CommitChangesIfPresent();
+		if (field == active_field)
+			active_field = active_field ? \
+							active_field - 1 : 1;
+		else
+			--active_field;
+
+		OnActiveCellLocationChanged();
+	}
 }

@@ -22,6 +22,7 @@ public:
 		inline LayoutObjects CreateLayoutObjects(const int kind_of_layout);
 
 	inline size_t GetFieldsCount() const;
+	inline size_t GetAbsoluteFieldsCount() const;
 	inline size_t GetRecordsCount() const;
 	inline ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const;
 	inline void SetCell(const size_t field, const size_t record, const Tchar *value);
@@ -97,6 +98,7 @@ public:
 
 	inline ImmutableString<Tchar> operator[](const size_t index) const {
 
+		assert(table_proxy);
 		return table_proxy->GetCellAsString(index, record_index);
 	}
 
@@ -107,7 +109,7 @@ public:
 
 	inline size_t size() const {
 
-		return table_proxy->GetFieldsCount();
+		return table_proxy ? table_proxy->GetFieldsCount() : 0;
 	}
 };
 
@@ -197,6 +199,11 @@ void CGridTableProxy::SetCell(const size_t field, const size_t record, const Tch
 size_t CGridTableProxy::GetFieldsCount() const {
 
 	return fields_props->GetFieldsCount();
+}
+
+size_t CGridTableProxy::GetAbsoluteFieldsCount() const {
+
+	return fields_props->GetAbsoluteFieldsCount();
 }
 
 size_t CGridTableProxy::GetRecordsCount() const {

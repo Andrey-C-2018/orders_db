@@ -118,6 +118,7 @@ public:
 	inline void HideField(const size_t index) {
 
 		assert(index < fields_props.size());
+		assert(fields_props.size());
 
 		if (fields_props[index].visible) {
 			indexes.erase(std::remove(indexes.begin(), indexes.end(), index));
@@ -163,6 +164,11 @@ public:
 	inline size_t GetFieldsCount() const {
 
 		return indexes.size();
+	}
+
+	inline size_t GetAbsoluteFieldsCount() const {
+
+		return fields_props.size();
 	}
 
 	int GetFieldsSizesSumm() const override {

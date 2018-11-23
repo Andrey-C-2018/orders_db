@@ -30,16 +30,16 @@ inline ImmutableString<wchar_t> getCellAsString(std::shared_ptr<IDbResultSet> re
 	return field->getValueAsImmutableWString(result_set);
 }
 
-inline const char *getFieldName(const CMetaInfo &meta_info, \
+inline ImmutableString<char> getFieldName(const CMetaInfo &meta_info, \
 								const size_t field, char type_hint) {
 
-	return meta_info.getTableName(field).str;
+	return meta_info.getTableName(field);
 }
 
-inline const wchar_t *getFieldName(const CMetaInfo &meta_info, \
+inline ImmutableString<wchar_t> getFieldName(const CMetaInfo &meta_info, \
 									const size_t field, wchar_t type_hint) {
 
-	return meta_info.getTableNameW(field).str;
+	return meta_info.getTableNameW(field);
 }
 
 //****************************************************
@@ -48,8 +48,6 @@ CDbTable::CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_) : \
 					conn(conn_), query(std::move(query_)), curr_record(0){
 
 	result_set = query.exec();
-
-	on_size_changed_handlers.reserve(DEF_ON_CHANGE_HANDLERS_COUNT);
 }
 
 bool CDbTable::empty() const {
@@ -68,9 +66,14 @@ size_t CDbTable::GetRecordsCount() const{
 	return result_set->getRecordsCount();
 }
 
-void CDbTable::ConnectOnSizeChangedHandler(ITableOnSizeChangedHandlerPtr handler){
+void CDbTable::ConnectEventsHandler(ITableEventsHandlerPtr handler) {
 
-	on_size_changed_handlers.push_back(handler);
+	event_handlers.ConnectEventsHandler(handler);
+}
+
+void CDbTable::DisconnectEventsHandler(ITableEventsHandlerPtr handler) {
+
+	event_handlers.DisconnectEventsHandler(handler);
 }
 
 void CDbTable::AddField(const size_t max_field_len, const Tchar *field_name){
@@ -84,9 +87,7 @@ void CDbTable::AddRecord(){
 	conn->ExecScalarQuery(insert_str.c_str());
 	reload();
 
-	for (auto &handler : on_size_changed_handlers)
-		handler->OnSizeChanged(query.getMetaInfo().getFieldsCount(), \
-					records_count);
+	event_handlers.OnRecordsCountChanged(records_count);
 }
 
 size_t CDbTable::GetFieldMaxLengthInChars(const size_t field) const {
@@ -95,6 +96,11 @@ size_t CDbTable::GetFieldMaxLengthInChars(const size_t field) const {
 }
 
 const Tchar *CDbTable::GetFieldName(const size_t field) const {
+
+	return getFieldName(query.getMetaInfo(), field, Tchar()).str;
+}
+
+ImmutableString<Tchar> CDbTable::GetFieldNameAsImmutableStr(const size_t field) const {
 
 	return getFieldName(query.getMetaInfo(), field, Tchar());
 }

@@ -3,7 +3,6 @@
 
 CStringTable::CStringTable() {
 
-	event_handlers.reserve(DEF_EVENT_HANDLERS_COUNT);
 	fields.reserve(DEF_FIELDS_COUNT);
 }
 
@@ -24,15 +23,12 @@ size_t CStringTable::GetRecordsCount() const {
 
 void CStringTable::ConnectEventsHandler(ITableEventsHandlerPtr handler) {
 
-	event_handlers.push_back(handler);
+	event_handlers.ConnectEventsHandler(handler);
 }
 
 void CStringTable::DisconnectEventsHandler(ITableEventsHandlerPtr handler) {
 
-	auto p = std::find(event_handlers.begin(), event_handlers.end(), handler);
-	assert(p != event_handlers.end());
-
-	event_handlers.erase(p);
+	event_handlers.DisconnectEventsHandler(handler);
 }
 
 void CStringTable::AddField(const size_t max_field_len, const Tchar *field_name) {
@@ -51,8 +47,7 @@ void CStringTable::AddField(const size_t max_field_len, const Tchar *field_name)
 	rec.max_size_in_chars = max_field_len;
 	fields.emplace_back(rec);
 
-	for (auto & handler : event_handlers)
-		handler->OnFieldsCountChanged(text_table.size());
+	event_handlers.OnFieldsCountChanged(text_table.size());
 }
 
 void CStringTable::AddRecord() {
@@ -65,8 +60,7 @@ void CStringTable::AddRecord() {
 
 	size_t records_count = text_table.empty() ? 0 : text_table[0].size();
 
-	for (auto & handler : event_handlers)
-		handler->OnRecordsCountChanged(records_count);
+	event_handlers.OnRecordsCountChanged(records_count);
 }
 
 size_t CStringTable::GetFieldMaxLengthInChars(const size_t field) const {

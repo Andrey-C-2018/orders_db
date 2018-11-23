@@ -7,6 +7,10 @@
 
 class CGridException : public XException {
 public:
+	enum {
+		E_WRONG_FIELD = 1, \
+		E_HIDE_FIELD = 2
+	};
 	CGridException(const int err_code, const Tchar *err_descr);
 	CGridException(const CGridException &obj);
 	CGridException(CGridException &&obj) = default;
@@ -54,7 +58,8 @@ class CGrid : public XWidget, public IReloadable {
 	CGrid &operator=(const CGrid &obj) = delete;
 
 	void InitCellsAndHeaders(const int kind_of_layout);
-
+	inline void CheckWhetherAbsFieldIndexValid(const size_t abs_field_index);
+	inline void CheckWhetherFieldIndexValid(const size_t field_index);
 protected:
 	
 	CGrid();
@@ -64,6 +69,7 @@ protected:
 	virtual LayoutObjects CreateLayoutObjects(const int kind_of_layout);
 
 	virtual void OnWindowCreate() { }
+	inline void AcceptConfiguratorOnCells(IConfigurator *configurator);
 	virtual void DrawLeftPane(XGC &gc) const;
 
 	inline size_t GetVisibleRecordsCount() const;
@@ -87,24 +93,31 @@ public:
 
 //**************************************************************
 
-inline size_t CGrid::GetFieldsCount() const {
+void CGrid::AcceptConfiguratorOnCells(IConfigurator *configurator) {
+
+	assert(configurator);
+	cells->AcceptConfigurator(configurator);
+}
+
+size_t CGrid::GetFieldsCount() const {
 
 	return data_table_proxy->GetFieldsCount();
 }
 
-inline size_t CGrid::GetRecordsCount() const {
+size_t CGrid::GetRecordsCount() const {
 
 	return data_table_proxy->GetRecordsCount();
 }
 
 template <class TCell> \
-inline LayoutObjects CGrid::CreateLayoutObjectsHelper(const int kind_of_layout) {
+LayoutObjects CGrid::CreateLayoutObjectsHelper(const int kind_of_layout) {
 
 	return data_table_proxy->CreateLayoutObjects<TCell>(kind_of_layout);
 }
 
 void CGrid::SetFieldWidth(const size_t field, const int new_width) {
 
+	CheckWhetherFieldIndexValid(field);
 	data_table_proxy->SetFieldWidth(field, new_width);
 }
 
@@ -167,4 +180,26 @@ void CGrid::FocusOnRecord(const size_t record_index) {
 	vscroll.pos = cells->FocusOnRecord(record_index, height - headers_height);
 	this->SetScrollBar(X_SCROLL_VERT, vscroll);
 	Invalidate(nullptr, false);
+}
+
+void CGrid::CheckWhetherAbsFieldIndexValid(const size_t abs_field_index) {
+
+	if (abs_field_index >= data_table_proxy->GetAbsoluteFieldsCount()) {
+
+		CGridException e(CGridException::E_WRONG_FIELD, \
+						_T("No such field: absolute field index = "));
+		e << abs_field_index;
+		throw e;
+	}
+}
+
+void CGrid::CheckWhetherFieldIndexValid(const size_t field_index) {
+
+	if (field_index >= data_table_proxy->GetFieldsCount()) {
+
+		CGridException e(CGridException::E_WRONG_FIELD, \
+						_T("No such field: field index = "));
+		e << field_index;
+		throw e;
+	}
 }

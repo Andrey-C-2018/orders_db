@@ -243,8 +243,13 @@ void CGrid::OnMouseLButtonClick(XMouseEvent *eve) {
 
 void CGrid::HideField(const size_t field_index) {
 
-	if (data_table_proxy->IsFieldHidden(field_index))
-		return;
+	CheckWhetherAbsFieldIndexValid(field_index);
+
+	if (data_table_proxy->GetFieldsCount() == 1)
+		throw CGridException(CGridException::E_HIDE_FIELD, \
+							_T("There is just one field in the table left visible"));
+
+	if (data_table_proxy->IsFieldHidden(field_index)) return;
 
 	const size_t relative_field_index = data_table_proxy->GetRelativeFieldIndex(field_index);
 
@@ -252,8 +257,10 @@ void CGrid::HideField(const size_t field_index) {
 										hscroll.page, hscroll.max);
 	data_table_proxy->HideField(field_index);
 
-	ReevaluateHScrollMax();
-	Invalidate(nullptr, false);
+	if (IsCreated()) {
+		ReevaluateHScrollMax();
+		Invalidate(nullptr, false);
+	}
 }
 
 void CGrid::Reload() {

@@ -153,6 +153,8 @@ public:
 										items->count(), field, \
 										CSizesPredicate(shvc->items_sizes), \
 										shvc->prev_offset);
+		shv->prev_offset = shv->view_params.offset;
+
 		return shv->view_params.offset;
 	}
 

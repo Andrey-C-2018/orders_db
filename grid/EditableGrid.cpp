@@ -29,21 +29,20 @@ CEditableGrid::CEditableGrid() : CGrid(), editable_cell(nullptr){ }
 
 LayoutObjects CEditableGrid::CreateLayoutObjects(const int kind_of_layout) {
 	LayoutObjects obj;
-	obj = CreateLayoutObjectsHelper<CEditableTextCell>(kind_of_layout);
-
-	CEConfigurator configurator;
-	obj.first->AcceptConfigurator(&configurator);
-	editable_cell = configurator.GetEditableTextCell();
-
-	return obj;
+	return CreateLayoutObjectsHelper<CEditableTextCell>(kind_of_layout);
 }
 
 void CEditableGrid::OnWindowCreate() {
-	
+	CEConfigurator configurator;
+
+	AcceptConfiguratorOnCells(&configurator);
+	editable_cell = configurator.GetEditableTextCell();
+
 	Connect(EVT_KEYDOWN, this, &CEditableGrid::OnKeyPress);
 }
 
 void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
+	assert(editable_cell);
 	size_t visible_records_count = GetVisibleRecordsCount();
 	size_t active_record = editable_cell->GetActiveRecord();
 	size_t records_count = GetRecordsCount();

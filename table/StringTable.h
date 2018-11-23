@@ -1,11 +1,10 @@
 #pragma once
-#include <vector>
 #include <basic/Exception.h>
 #include "ITable.h"
+#include "EventsHandlersContainer.h"
 
 class CStringTable : public ITable {
 	enum Defaults {
-		DEF_EVENT_HANDLERS_COUNT = 5, \
 		DEF_FIELDS_COUNT = 10
 	};
 	typedef std::vector<Tstring> CTextVector;
@@ -18,7 +17,7 @@ class CStringTable : public ITable {
 		Tstring field_name;
 	};
 	std::vector<CField> fields;
-	std::vector<ITableEventsHandlerPtr> event_handlers;
+	CEventsHandlersContainer event_handlers;
 public:
 	CStringTable();
 

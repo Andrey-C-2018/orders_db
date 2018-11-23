@@ -20,12 +20,12 @@ Tchar buffer[30];
 for (size_t i = 0; i < size; ++i)
 	grid->AddField(XConv::ToString(sizes[i], buffer), sizes[i]);
 
-for (size_t i = 0; i < 2*size; ++i)
+/*for (size_t i = 0; i < 2*size; ++i)
 	grid->AddRecord();
 
 for(size_t i = 0; i < size; ++i)
 for (size_t j = 0; j < 2*size; ++j)
-	grid->SetCell(i, j, XConv::ToString(10 * i + j, buffer));
+	grid->SetCell(i, j, XConv::ToString(10 * i + j, buffer));*/
 
 grid->Create(this, FL_WINDOW_VISIBLE, _T(""), 20, 20, \
 				rc.right - 40, rc.bottom - 40);

@@ -90,19 +90,29 @@ void CEditableTextCell::OnActiveCellTextChanged(XCommandEvent *eve) {
 
 void CEditableTextCell::OnClick(const size_t field, const size_t record) {
 
+	CommitChangesIfPresent();
+
+	active_field = field;
+	active_record = record;
+
+	OnActiveCellLocationChanged();
+}
+
+void CEditableTextCell::CommitChangesIfPresent() {
+
 	if (changes_present) {
 		const Tchar *value = def_active_cell->GetLabel();
 
 		table_proxy->SetCell(active_field, active_record, value);
 		changes_present = false;
 	}
+}
 
-	active_field = field;
-	active_record = record;
+void CEditableTextCell::OnActiveCellLocationChanged() {
 
 	def_active_cell->Hide();
 	update_cell_widget_text = true;
-	ImmutableString<Tchar> label = table_proxy->GetCellAsString(field, record);
+	ImmutableString<Tchar> label = table_proxy->GetCellAsString(active_field, active_record);
 	def_active_cell->SetLabel(label.str ? label.str : _T(""), label.size);
 	update_cell_widget_text = false;
 
