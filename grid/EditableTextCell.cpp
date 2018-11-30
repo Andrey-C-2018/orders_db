@@ -30,7 +30,10 @@ void CEditableTextCell::SetParameters(XWindow *parent, std::shared_ptr<CGridTabl
 	assert(table_proxy);
 	this->table_proxy = table_proxy;
 
-	ImmutableString<Tchar> label = table_proxy->GetCellAsString(active_field, active_record);
+	ImmutableString<Tchar> label(nullptr, 0);
+	if (table_proxy->GetRecordsCount())
+		label = table_proxy->GetCellAsString(active_field, active_record);
+
 	def_active_cell = new XEdit(parent, flags, label.str ? label.str : _T(""), \
 									0, 0, 10, 10);
 	assert(def_active_cell);

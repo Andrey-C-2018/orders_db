@@ -33,13 +33,13 @@ inline ImmutableString<wchar_t> getCellAsString(std::shared_ptr<IDbResultSet> re
 inline ImmutableString<char> getFieldName(const CMetaInfo &meta_info, \
 								const size_t field, char type_hint) {
 
-	return meta_info.getTableName(field);
+	return meta_info.getFieldName(field);
 }
 
 inline ImmutableString<wchar_t> getFieldName(const CMetaInfo &meta_info, \
 									const size_t field, wchar_t type_hint) {
 
-	return meta_info.getTableNameW(field);
+	return meta_info.getFieldNameW(field);
 }
 
 //****************************************************
@@ -121,7 +121,9 @@ void CDbTable::SetCell(const size_t field, const size_t record, const Tchar *val
 	bindValueAsTString(updated_field_ptr, update_stmt, 0, value);
 	update_stmt->execScalar();
 
-	reload();
+	result_set = query.exec();
+	size_t records_count = result_set->getRecordsCount();
+	event_handlers.OnRecordsCountChanged(records_count);
 }
 
 void CDbTable::reload(){

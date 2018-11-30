@@ -8,6 +8,7 @@ CGridTableProxy::CGridTableProxy(std::shared_ptr<ITable> table_, \
 
 	assert(table_widget);
 	fields_props = std::make_shared<CFieldsProperties>(table);
+	records_count = table->GetRecordsCount();
 }
 
 void CGridTableProxy::OnFieldsCountChanged(const size_t new_fields_count) {

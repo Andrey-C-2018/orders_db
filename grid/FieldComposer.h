@@ -67,7 +67,7 @@ public:
 			y += record_height;
 		}
 
-		return item_coords.y + item_size.height;
+		return item_coords.y + item_size.height * (items_count != 0);
 	}
 
 	void OnScroll(const int scroll_pos) {

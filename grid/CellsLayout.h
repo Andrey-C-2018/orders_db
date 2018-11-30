@@ -200,7 +200,11 @@ public:
 
 	void Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) override {
 
-		composer.Draw(gc, initial_coords, size);
+		int y_end = composer.Draw(gc, initial_coords, size);
+
+		line.FillEmptySpace(gc, initial_coords.x, y_end, \
+							initial_coords.x + size.width, \
+							initial_coords.y + size.height);
 	}
 
 	void SetItemHeight(const int height) override {
@@ -228,7 +232,7 @@ public:
 	void OnClick(const int x, const int y) override {
 		size_t record = composer.GetItemIndexByCoord(y - upper_bound);
 
-		if(record < items.count())
+		if(record < data.size())
 			items.OnClick(x, y, record);
 	}
 
