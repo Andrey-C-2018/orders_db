@@ -59,4 +59,4 @@ x64/
 # Output folders
 ######################
 0libs
-#libs
+*#libs
