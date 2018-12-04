@@ -106,6 +106,7 @@ size_t CMySQLResultSet::getRecordsCount() const {
 
 void CMySQLResultSet::gotoRecord(const size_t record) const {
 
+	assert(record < records_count);
 	if (curr_record == record) return;
 
 	assert(stmt);

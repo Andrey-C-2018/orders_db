@@ -6,7 +6,7 @@ class CEditableGrid : public CGrid{
 
 	void OnKeyPress(XKeyboardEvent *eve);
 protected:
-	LayoutObjects CreateLayoutObjects(const int kind_of_layout) final;
+	LayoutObjects CreateLayoutObjects(const int kind_of_layout) override;
 	void OnWindowCreate() override;
 public:
 	CEditableGrid();

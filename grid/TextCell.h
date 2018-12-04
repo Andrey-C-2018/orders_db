@@ -58,5 +58,7 @@ public:
 		return text_height + 2 * margin_y;
 	}
 
+	inline void Reload() { }
+
 	virtual ~CTextCell() { }
 };

@@ -275,6 +275,7 @@ void CGrid::Reload() {
 			this->SetScrollBar(X_SCROLL_HORZ, hscroll);
 		}
 
+		cells->Reload();
 		Invalidate(nullptr, false);
 	}
 

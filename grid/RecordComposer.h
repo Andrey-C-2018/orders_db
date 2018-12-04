@@ -48,7 +48,7 @@ public:
 				
 		assert(items_);
 		assert(items_sizes_);
-		assert(items->count() == shvc->items_sizes->size());
+		assert(items->count() <= shvc->items_sizes->size());
 	}
 
 	CRecordComposer(IComposedDrawable *items_, \
@@ -59,7 +59,7 @@ public:
 					onclick_last_coord(obj.onclick_last_coord) {
 	
 		assert(items_);
-		assert(items->count() == shvc->items_sizes->size());
+		assert(items->count() <= shvc->items_sizes->size());
 		obj.onclick_last_coord = 0;
 	}
 
@@ -71,7 +71,7 @@ public:
 					onclick_last_coord(obj.onclick_last_coord) {
 	
 		assert(items_);
-		assert(items->count() == shvc->items_sizes->size());
+		assert(items->count() <= shvc->items_sizes->size());
 	}
 	
 	CRecordComposer(const CRecordComposer &obj) = default;
@@ -82,7 +82,7 @@ public:
 	inline void Init(IComposedDrawable *items) {
 
 		assert(items);
-		assert(items->count() == shvc->items_sizes->size());
+		assert(items->count() <= shvc->items_sizes->size());
 		this->items = items;
 	}
 

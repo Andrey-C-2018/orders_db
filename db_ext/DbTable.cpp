@@ -129,6 +129,8 @@ void CDbTable::SetCell(const size_t field, const size_t record, const Tchar *val
 void CDbTable::reload(){
 
 	result_set = query.exec();
+	size_t records_count = result_set->getRecordsCount();
+	event_handlers.OnRecordsCountChanged(records_count);
 }
 
 CDbTable::~CDbTable(){ }

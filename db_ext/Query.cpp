@@ -19,6 +19,8 @@ std::shared_ptr<IDbStatement> CQuery::getUpdateStmt(const size_t updated_field, 
 		update_stmt = conn->PrepareQuery(query.c_str());
 		update_stmts[updated_field] = update_stmt;
 	}
+	else
+		update_stmt = p->second;
 
 	meta_info.bindPrimaryKeyValues(updated_field, result_set, update_stmt);
 	return update_stmt;

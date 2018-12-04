@@ -29,11 +29,17 @@ class CEditableTextCell : public IDrawable {
 
 	bool update_cell_widget_text;
 	bool changes_present;
+	bool skip_reloading;
 
 	void CommitChangesIfPresent();
 	void OnActiveCellLocationChanged();
 public:
 	CEditableTextCell();
+	CEditableTextCell(const CEditableTextCell &obj) = delete;
+	CEditableTextCell(CEditableTextCell &&obj);
+
+	CEditableTextCell &operator=(const CEditableTextCell &obj) = delete;
+	CEditableTextCell &operator=(CEditableTextCell &&obj) = delete;
 
 	inline size_t GetActiveField() const;
 	inline size_t GetActiveRecord() const;
@@ -55,6 +61,7 @@ public:
 	inline int EvalCellHeightByTextHeight(const int text_height) const;
 
 	inline void SetFocus();
+	void Reload();
 
 	virtual ~CEditableTextCell(){ }
 };

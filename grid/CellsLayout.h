@@ -39,6 +39,11 @@ public:
 		items.EndScroll(scroll_pos);
 	}
 
+	void Reload() override {
+
+		items.Reload();
+	}
+
 	virtual ~TCellsLayout(){ }
 };
 
