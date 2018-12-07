@@ -71,19 +71,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\#libs\$(Configuration)\</OutDir>
+    <OutDir>..\0libs\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\#libs\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\0libs\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\#libs\$(Configuration)\</OutDir>
+    <OutDir>..\0libs\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\#libs\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\0libs\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -169,7 +169,6 @@
     <ClCompile Include="XWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\basic\stdafx.h" />
     <ClInclude Include="platform_specific.h" />
     <ClInclude Include="XApp.h" />
     <ClInclude Include="XButton.h" />

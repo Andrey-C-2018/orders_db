@@ -93,7 +93,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../#libs/Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../0libs/Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>basic.lib;csv_file.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -109,7 +109,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../#libs/x64/Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../0libs/x64/Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>basic.lib;csv_file.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -129,7 +129,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../#libs/Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../0libs/Release</AdditionalLibraryDirectories>
       <AdditionalDependencies>basic.lib;csv_file.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -149,7 +149,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../#libs/x64/Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../0libs/x64/Release</AdditionalLibraryDirectories>
       <AdditionalDependencies>basic.lib;csv_file.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

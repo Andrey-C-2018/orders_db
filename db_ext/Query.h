@@ -12,15 +12,16 @@ class CQuery{
 	std::shared_ptr<IDbStatement> stmt;
 	
 	mutable std::map<size_t, std::shared_ptr<IDbStatement> > update_stmts;
-	CQuery(const CQuery &obj) = delete;
-	CQuery &operator=(const CQuery &obj) = delete;
 public:
 	CQuery(std::shared_ptr<IDbConnection> conn_, \
 			std::shared_ptr<IDbStatement> stmt_);
+
+	CQuery(const CQuery &obj) = delete;
 	CQuery(CQuery &&obj) = default;
+	CQuery &operator=(const CQuery &obj) = delete;
 	CQuery &operator=(CQuery &&obj) = default;
 	
-	inline const CMetaInfo &getMetaInfo() const;
+	inline const CMetaInfo &getMetaInfo() const noexcept;
 
 	std::shared_ptr<IDbStatement> \
 		getUpdateStmt(const size_t updated_field, \
@@ -37,7 +38,7 @@ public:
 
 //*****************************************************
 
-const CMetaInfo &CQuery::getMetaInfo() const {
+const CMetaInfo &CQuery::getMetaInfo() const noexcept {
 
 	return meta_info;
 }

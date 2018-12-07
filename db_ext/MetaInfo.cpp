@@ -1,6 +1,17 @@
 #include <basic/TextConv.h>
 #include "MetaInfo.h"
 
+CMetaInfoException::CMetaInfoException(const int err_code, \
+										const Tchar *err_descr) : \
+										XException(err_code, err_descr) { }
+
+CMetaInfoException::CMetaInfoException(const CMetaInfoException &obj) : \
+										XException(obj) { }
+
+CMetaInfoException::~CMetaInfoException() { }
+
+//*************************************************************
+
 class AddPrimKeyToWhereStmt {
 	const CMetaInfo &meta_info;
 	std::string &query;
@@ -66,7 +77,8 @@ void CMetaInfo::setPrimaryTable(const char *table_name) {
 		});
 
 	if (p_table == tables.cend()) {
-		XException e(0, _T("the query does not refer to such table: "));
+		CMetaInfoException e(CMetaInfoException::E_TABLE, \
+							_T("the query does not refer to such table: "));
 		e << table_name;
 		throw e;
 	}
@@ -114,7 +126,8 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 
 	ConstIndexIterator p_field = findFieldRecord(new_field_name.str);
 	if (isFieldRecordFound(p_field, new_field_name.str)) {
-		XException e(0, _T("the field '"));
+		CMetaInfoException e(CMetaInfoException::E_FIELD_EXISTS, \
+							_T("the field '"));
 
 		e << fields[*p_field].field_name.str << _T("' is already added. Table: '");
 		e << field->getTableName().str << _T("'");

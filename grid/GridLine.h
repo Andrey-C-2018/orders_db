@@ -17,7 +17,9 @@ public:
 				bkgrnd_brush(nullptr){ }
 
 	CGridLine(const CGridLine &obj) = default;
+	CGridLine &operator=(const CGridLine &obj) = default;
 	CGridLine(CGridLine &&obj) = default;
+	CGridLine &operator=(CGridLine &&obj) = default;
 
 	inline int GetGridLineSize() const { return grid_line_size; }
 
@@ -44,7 +46,9 @@ public:
 	CHorizontalLine() : CGridLine() { }
 
 	CHorizontalLine(const CHorizontalLine &obj) = default;
+	CHorizontalLine &operator=(const CHorizontalLine &obj) = default;
 	CHorizontalLine(CHorizontalLine &&obj) = default;
+	CHorizontalLine &operator=(CHorizontalLine &&obj) = default;
 
 	inline XSize Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) {
 
@@ -53,10 +57,10 @@ public:
 						initial_coords.x + size.width, \
 						initial_coords.y + size.height);
 
-		return GetNewSize(size);
+		return GetSizeWithoutLine(size);
 	}
 
-	inline XSize GetNewSize(const XSize &size) const {
+	inline XSize GetSizeWithoutLine(const XSize &size) const {
 
 		return XSize(size.width, size.height - GetGridLineSize());
 	}
@@ -67,7 +71,9 @@ public:
 	CVerticalLine() : CGridLine() { }
 
 	CVerticalLine(const CVerticalLine &obj) = default;
+	CVerticalLine &operator=(const CVerticalLine &obj) = default;
 	CVerticalLine(CVerticalLine &&obj) = default;
+	CVerticalLine &operator=(CVerticalLine &&obj) = default;
 
 	inline XSize Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) {
 		
@@ -76,10 +82,10 @@ public:
 						initial_coords.x + size.width, \
 						initial_coords.y + size.height);
 
-		return GetNewSize(size);
+		return GetSizeWithoutLine(size);
 	}
 
-	inline XSize GetNewSize(const XSize &size) const {
+	inline XSize GetSizeWithoutLine(const XSize &size) const {
 
 		return XSize(size.width - GetGridLineSize(), size.height);
 	}
@@ -98,7 +104,9 @@ public:
 	inline TCellWithLine(Data data) : Cell(data){ }
 
 	TCellWithLine(const TCellWithLine &obj) = default;
+	TCellWithLine &operator=(const TCellWithLine &obj) = default;
 	TCellWithLine(TCellWithLine &&obj) = default;
+	TCellWithLine &operator=(TCellWithLine &&obj) = default;
 
 	void Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) override {
 		XSize new_size = line.Draw(gc, initial_coords, size);

@@ -9,4 +9,5 @@ enum Layouts {
 struct IGridCellsContainer;
 struct ISharedComposerContainer;
 
-typedef std::pair<IGridCellsContainer *, ISharedComposerContainer *> LayoutObjects;
+typedef std::pair<IGridCellsContainer *, \
+					ISharedComposerContainer *> LayoutObjects;

@@ -19,14 +19,14 @@ class XString {
 						const bool preserve_old_content);
 	inline void destroy();
 public:
-	inline XString();
+	inline XString() noexcept;
 	inline XString(const XString &obj);
-	inline XString(XString &&obj);
+	inline XString(XString &&obj) noexcept;
 	inline XString(const Tchar *str);
 	inline XString(const Tchar ch);
 
 	inline XString &operator=(const XString &obj);
-	inline XString &operator=(XString &&obj);
+	inline XString &operator=(XString &&obj) noexcept;
 
 	inline XString &operator=(const Tchar *str);
 	inline XString &operator=(const Tchar ch);
@@ -36,26 +36,26 @@ public:
 	inline XString &operator+=(const Tchar ch);
 	inline XString &append(const Tchar *str, const size_t chars_count);
 
-	inline Tchar &operator[](const size_t index);
-	inline const Tchar &operator[](const size_t index) const;
+	inline Tchar &operator[](const size_t index) noexcept;
+	inline const Tchar &operator[](const size_t index) const noexcept;
 
-	inline bool operator==(const XString &obj) const;
-	inline bool operator!=(const XString &obj) const;
-	inline bool operator<(const XString &obj) const;
-	inline bool operator<=(const XString &obj) const;
-	inline bool operator>(const XString &obj) const;
-	inline bool operator>=(const XString &obj) const;
+	inline bool operator==(const XString &obj) const noexcept;
+	inline bool operator!=(const XString &obj) const noexcept;
+	inline bool operator<(const XString &obj) const noexcept;
+	inline bool operator<=(const XString &obj) const noexcept;
+	inline bool operator>(const XString &obj) const noexcept;
+	inline bool operator>=(const XString &obj) const noexcept;
 
-	inline size_t capacity() const;
-	inline size_t size() const;
-	inline bool empty() const;
+	inline size_t capacity() const noexcept;
+	inline size_t size() const noexcept;
+	inline bool empty() const noexcept;
 
 	inline void reserve(const size_t size);
 	inline void resize(const size_t size);
-	inline void clear();
+	inline void clear() noexcept;
 
-	inline const Tchar *c_str() const;
-	inline Tchar *c_str_writable();
+	inline const Tchar *c_str() const noexcept;
+	inline Tchar *c_str_writable() noexcept;
 
 	virtual ~XString();
 };
@@ -63,7 +63,8 @@ public:
 //**********************************************************************
 
 template <typename Tchar> \
-XString<Tchar>::XString() : data(nullptr), str_size(0), allocated_size(0) { }
+XString<Tchar>::XString() noexcept : data(nullptr), str_size(0), \
+									allocated_size(0) { }
 
 template <typename Tchar> \
 void XString<Tchar>::resize(const size_t size_to_allocate, \
@@ -114,7 +115,7 @@ XString<Tchar>::XString(const XString &obj) : data(nullptr), str_size(0), \
 }
 
 template <typename Tchar> \
-XString<Tchar>::XString(XString &&obj) : data(obj.data), \
+XString<Tchar>::XString(XString &&obj) noexcept : data(obj.data), \
 												str_size(obj.str_size), \
 												allocated_size(obj.allocated_size) {
 
@@ -154,7 +155,7 @@ XString<Tchar> &XString<Tchar>::operator=(const XString &obj) {
 }
 
 template <typename Tchar> \
-XString<Tchar> &XString<Tchar>::operator=(XString &&obj) {
+XString<Tchar> &XString<Tchar>::operator=(XString &&obj) noexcept {
 
 	data = obj.data;
 	str_size = obj.str_size;
@@ -225,21 +226,21 @@ XString<Tchar> &XString<Tchar>::append(const Tchar *str, const size_t chars_coun
 }
 
 template <typename Tchar> \
-Tchar &XString<Tchar>::operator[](const size_t index) {
+Tchar &XString<Tchar>::operator[](const size_t index) noexcept {
 
 	assert(index < str_size);
 	return data[index];
 }
 
 template <typename Tchar> \
-const Tchar &XString<Tchar>::operator[](const size_t index) const {
+const Tchar &XString<Tchar>::operator[](const size_t index) const noexcept {
 
 	assert(index < str_size);
 	return data[index];
 }
 
 template <typename Tchar> \
-bool XString<Tchar>::operator==(const XString &obj) const {
+bool XString<Tchar>::operator==(const XString &obj) const noexcept {
 	size_t l_size = str_size;
 	size_t r_size = obj.str_size;
 
@@ -249,13 +250,13 @@ bool XString<Tchar>::operator==(const XString &obj) const {
 }
 
 template <typename Tchar> \
-bool XString<Tchar>::operator!=(const XString &obj) const {
+bool XString<Tchar>::operator!=(const XString &obj) const noexcept {
 
 	return !operator==(obj);
 }
 
 template <typename Tchar> \
-bool XString<Tchar>::operator<(const XString &obj) const {
+bool XString<Tchar>::operator<(const XString &obj) const noexcept {
 	size_t l_size = str_size;
 	size_t r_size = obj.str_size;
 
@@ -264,13 +265,13 @@ bool XString<Tchar>::operator<(const XString &obj) const {
 }
 
 template <typename Tchar> \
-bool XString<Tchar>::operator<=(const XString &obj) const {
+bool XString<Tchar>::operator<=(const XString &obj) const noexcept {
 
 	return !operator>(obj);
 }
 
 template <typename Tchar> \
-bool XString<Tchar>::operator>(const XString &obj) const {
+bool XString<Tchar>::operator>(const XString &obj) const noexcept {
 	size_t l_size = str_size;
 	size_t r_size = obj.str_size;
 
@@ -279,25 +280,25 @@ bool XString<Tchar>::operator>(const XString &obj) const {
 }
 
 template <typename Tchar> \
-bool XString<Tchar>::operator>=(const XString &obj) const {
+bool XString<Tchar>::operator>=(const XString &obj) const noexcept {
 
 	return !operator<(obj);
 }
 
 template <typename Tchar> \
-size_t XString<Tchar>::capacity() const {
+size_t XString<Tchar>::capacity() const noexcept {
 
 	return this->allocated_size;
 }
 
 template <typename Tchar> \
-size_t XString<Tchar>::size() const {
+size_t XString<Tchar>::size() const noexcept {
 
 	return str_size;
 }
 
 template <typename Tchar> \
-bool XString<Tchar>::empty() const {
+bool XString<Tchar>::empty() const noexcept {
 
 	return str_size == 0;
 }
@@ -317,20 +318,20 @@ void XString<Tchar>::resize(const size_t size) {
 }
 
 template <typename Tchar> \
-void XString<Tchar>::clear() {
+void XString<Tchar>::clear() noexcept {
 
 	if (str_size != 0) data[0] = 0;
 	str_size = 0;
 }
 
 template <typename Tchar> \
-const Tchar *XString<Tchar>::c_str() const {
+const Tchar *XString<Tchar>::c_str() const noexcept {
 
 	return data;
 }
 
 template <typename Tchar> \
-Tchar *XString<Tchar>::c_str_writable() {
+Tchar *XString<Tchar>::c_str_writable() noexcept {
 
 	return data;
 }

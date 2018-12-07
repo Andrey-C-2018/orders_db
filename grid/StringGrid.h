@@ -16,8 +16,15 @@ public:
 
 class CStringGrid :	public CEditableGrid {
 	std::shared_ptr<CStringTable> table;
+
+	CStringGrid(const CStringGrid &obj) = delete;
+	CStringGrid &operator=(const CStringGrid &obj) = delete;
 public:
 	CStringGrid();
+
+	CStringGrid(CStringGrid &&obj) = default;
+	CStringGrid &operator=(CStringGrid &&obj) = default;
+
 	void SetCell(const size_t field, const size_t record, \
 					const Tchar *value);
 

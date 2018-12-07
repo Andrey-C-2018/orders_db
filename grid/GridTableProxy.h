@@ -14,10 +14,16 @@ class CGridTableProxy : public ITableEventsHandler {
 	std::shared_ptr<CFieldsProperties> fields_props;
 
 	size_t records_count;
+
+	CGridTableProxy(const CGridTableProxy &obj) = delete;
+	CGridTableProxy &operator=(const CGridTableProxy &obj) = delete;
 public:
 	CGridTableProxy(std::shared_ptr<ITable> table_, \
 					IReloadable *table_widget_);
 	
+	CGridTableProxy(CGridTableProxy &&obj) = default;
+	CGridTableProxy &operator=(CGridTableProxy &&obj) = default;
+
 	template <class TCell> \
 		inline LayoutObjects CreateLayoutObjects(const int kind_of_layout);
 

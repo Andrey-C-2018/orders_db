@@ -22,6 +22,11 @@ protected:
 public:
 	CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
 
+	CMySQLField(const CMySQLField &obj) = delete;
+	CMySQLField(CMySQLField &&obj) = default;
+	CMySQLField &operator=(const CMySQLField &obj) = delete;
+	CMySQLField &operator=(CMySQLField &&obj) = default;
+
 	ImmutableString<char> getFieldName() const override;
 	ImmutableString<wchar_t> getFieldNameW() const override;
 	size_t getFieldMaxLength() const override;
@@ -37,6 +42,11 @@ class CMySQLIntegerField : public CMySQLField {
 	mutable wchar_t buffer[getDigitsCountOfType<Tint>() + 1];
 public:
 	CMySQLIntegerField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
+
+	CMySQLIntegerField(const CMySQLField &obj) = delete;
+	CMySQLIntegerField(CMySQLIntegerField &&obj) = default;
+	CMySQLIntegerField &operator=(const CMySQLIntegerField &obj) = delete;
+	CMySQLIntegerField &operator=(CMySQLIntegerField &&obj) = default;
 
 	const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const override;
 	const wchar_t *getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const override;
@@ -64,6 +74,11 @@ class CMySQLDateField : public CMySQLField {
 public:
 	CMySQLDateField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
 
+	CMySQLDateField(const CMySQLDateField &obj) = delete;
+	CMySQLDateField(CMySQLDateField &&obj) = default;
+	CMySQLDateField &operator=(const CMySQLDateField &obj) = delete;
+	CMySQLDateField &operator=(CMySQLDateField &&obj) = default;
+
 	const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const override;
 	const wchar_t *getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const override;
 	ImmutableString<char> getValueAsImmutableString(\
@@ -89,6 +104,11 @@ class CMySQLStringField : public CMySQLField {
 	wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1];
 public:
 	CMySQLStringField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
+
+	CMySQLStringField(const CMySQLStringField &obj) = delete;
+	CMySQLStringField(CMySQLStringField &&obj) = default;
+	CMySQLStringField &operator=(const CMySQLStringField &obj) = delete;
+	CMySQLStringField &operator=(CMySQLStringField &&obj) = default;
 
 	const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const override;
 	const wchar_t *getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const override;

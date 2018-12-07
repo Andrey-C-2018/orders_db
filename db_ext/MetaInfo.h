@@ -8,6 +8,19 @@
 #include <db/IDbField.h>
 #include "IndexedSearchPredicates.h"
 
+class CMetaInfoException : public XException {
+public:
+	enum {
+		E_FOREIGN_KEYS = 1, \
+		E_TABLE = 2, \
+		E_FIELD_EXISTS = 3
+	};
+	CMetaInfoException(const int err_code, const Tchar *err_descr);
+	CMetaInfoException(const CMetaInfoException &obj);
+	CMetaInfoException(CMetaInfoException &&obj) = default;
+	~CMetaInfoException();
+};
+
 class CMetaInfo{
 public:
 	typedef int id_type;
@@ -133,8 +146,8 @@ public:
 	inline ImmutableString<wchar_t> getFieldNameW(const size_t field) const;
 	inline ImmutableString<char> getTableName(const size_t field) const;
 	inline ImmutableString<wchar_t> getTableNameW(const size_t field) const;
-	inline size_t getFieldSize(const size_t field) const;
-	inline bool isPrimaryKey(const size_t field) const;
+	inline size_t getFieldSize(const size_t field) const noexcept;
+	inline bool isPrimaryKey(const size_t field) const noexcept;
 
 	void setPrimaryTable(const char *table_name);
 
@@ -174,7 +187,7 @@ ImmutableString<wchar_t> CMetaInfo::getFieldNameW(const size_t field) const {
 	return fields[field].field_name_w;
 }
 
-size_t CMetaInfo::getFieldSize(const size_t field) const {
+size_t CMetaInfo::getFieldSize(const size_t field) const noexcept {
 
 	assert(field < fields.size());
 	return fields[field].field_size;
@@ -196,7 +209,7 @@ ImmutableString<wchar_t> CMetaInfo::getTableNameW(const size_t field) const {
 	return tables[*p_table].table_name_w;
 }
 
-bool CMetaInfo::isPrimaryKey(const size_t field) const {
+bool CMetaInfo::isPrimaryKey(const size_t field) const noexcept {
 
 	assert(field < fields.size());
 	return fields[field].is_primary_key;

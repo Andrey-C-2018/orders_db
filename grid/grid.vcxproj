@@ -34,6 +34,7 @@
     <ClInclude Include="IDrawable.h" />
     <ClInclude Include="IFieldsProperties.h" />
     <ClInclude Include="IGridCellsContainer.h" />
+    <ClInclude Include="IGridCellWidget.h" />
     <ClInclude Include="IInteractiveObject.h" />
     <ClInclude Include="IReloadable.h" />
     <ClInclude Include="ISharedComposer.h" />
@@ -104,16 +105,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\#libs\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\0libs\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\#libs\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\0libs\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\#libs\$(Configuration)\</OutDir>
+    <OutDir>..\0libs\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>..\#libs\$(Configuration)\</OutDir>
+    <OutDir>..\0libs\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

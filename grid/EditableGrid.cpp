@@ -45,11 +45,15 @@ void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
 	assert(editable_cell);
 	size_t visible_records_count = GetVisibleRecordsCount();
 	size_t active_record = editable_cell->GetActiveRecord();
+	size_t active_field = editable_cell->GetActiveField();
+
 	size_t records_count = GetRecordsCount();
+	size_t fields_count = GetFieldsCount();
 
 	if (records_count == 0) return;
 
-	size_t new_record = 0;
+	size_t new_record = active_record;
+	size_t new_field = active_field;
 	bool Key = false;
 
 	switch (eve->GetKey()) {
@@ -70,13 +74,17 @@ void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
 			Key = true;
 		break;
 
-		/*case X_VKEY_RIGHT:
-			Key = GotoNextCol();
+		case X_VKEY_TAB:
+		case X_VKEY_RIGHT:
+			new_field = active_field + 1 >= fields_count ? \
+							fields_count - 1 : active_field + 1;
+			Key = true;
 		break;
 
 		case X_VKEY_LEFT:
-			Key = GotoPrevCol();
-		break;*/
+			new_field = active_field ? active_field - 1 : 0;
+			Key = true;
+		break;
 
 		case X_VKEY_PGDOWN:
 			new_record = (active_record + visible_records_count) >= records_count ? \
@@ -88,11 +96,17 @@ void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
 			editable_cell->SetFocus();
 	}
 
-	if (Key && new_record != active_record) {
-		size_t active_field = editable_cell->GetActiveField();
+	if (Key && (new_record != active_record || \
+				new_field != active_field)) {
+		
+		editable_cell->OnClick(new_field, new_record);
 
-		editable_cell->OnClick(active_field, new_record);
-		FocusOnRecord(new_record);
+		if(new_record != active_record)
+			FocusOnRecord(new_record);
+
+		//if (new_field != active_field)
+			//FocusOnField(new_field);
+		Invalidate(nullptr, false);
 	}
 }
 

@@ -7,7 +7,7 @@ class CGridTableProxy;
 
 class CCellConfigurator : public IConfigurator {
 	int text_height;
-	int cell_height;
+	int cell_height, cell_margins_width;
 	int char_width;
 	int grid_line_size;
 	XWindow *parent;
@@ -40,6 +40,7 @@ class CCellConfigurator : public IConfigurator {
 
 public:
 	CCellConfigurator() : text_height(-1), cell_height(-1), \
+							cell_margins_width(-1), \
 							char_width(-1), \
 							grid_line_size(-1), \
 							background_brush(nullptr), \
@@ -79,6 +80,12 @@ public:
 		assert(cell_height != -1);
 		assert(grid_line_size != -1);
 		return cell_height + grid_line_size;
+	}
+
+	inline int GetCellMarginsWidth() const {
+
+		assert(cell_margins_width != -1);
+		return cell_margins_width + grid_line_size;
 	}
 
 	inline int GetCharWidthInPixels() const {

@@ -7,6 +7,8 @@ class CDbConnectionFactory {
 	static CDbConnectionFactory instance;
 
 	CDbConnectionFactory();
+	CDbConnectionFactory(const CDbConnectionFactory &obj) = delete;
+	CDbConnectionFactory &operator=(const CDbConnectionFactory &obj) = delete;
 public:
 	enum ConnectionTypes {
 		DB_CONN_MYSQL = 1,

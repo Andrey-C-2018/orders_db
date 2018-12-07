@@ -13,15 +13,15 @@ enum {
 #endif
 
 typedef HWND _plHWND;
-inline void _plUnsetHWND(_plHWND &hwnd);
-inline bool _plIsHWNDSet(_plHWND hwnd);
+inline void _plUnsetHWND(_plHWND &hwnd) noexcept;
+inline bool _plIsHWNDSet(_plHWND hwnd) noexcept;
 
 typedef WNDPROC _plWNDPROC;
 
 typedef HDC _plHDC;
 typedef PAINTSTRUCT _plContextParams;
-inline void _plUnsetHDC(_plHDC &dc);
-inline bool _plIsHDCSet(_plHDC &dc);
+inline void _plUnsetHDC(_plHDC &dc) noexcept;
+inline bool _plIsHDCSet(_plHDC &dc) noexcept;
 
 typedef UINT _plEventId;
 typedef UINT _plNotificationCode;
@@ -104,13 +104,13 @@ inline _plCallbackFnRetValue _plCallbackFnModifier _plDefaultEventAction(_plCall
 inline _plCallbackFnRetValue _plCallbackFnModifier _plDefaultEventAction(_plWNDPROC wnd_proc, _plCallbackFnParams);
 inline _plWNDPROC _plSetWindowProc(_plHWND hwnd, _plWNDPROC new_proc);
 
-inline int _plGetWindowId(_plCallbackFnParams);
-inline _plEventId _plGetEventId(_plCallbackFnParams);
-inline _plNotificationCode _plGetNotificationCode(_plCallbackFnParams);
-inline _plHWND _plGetWindowHandle(_plCallbackFnParams);
-inline XWindow *_plCreateEventExtractWindowObject(_plCallbackFnParams);
-inline _plEventInfo _plInitEventInfo(_plCallbackFnParams);
-inline void _plSendMessage(_plHWND hwnd, const _plEventInfo &event_info);
+inline int _plGetWindowId(_plCallbackFnParams) noexcept;
+inline _plEventId _plGetEventId(_plCallbackFnParams) noexcept;
+inline _plNotificationCode _plGetNotificationCode(_plCallbackFnParams) noexcept;
+inline _plHWND _plGetWindowHandle(_plCallbackFnParams) noexcept;
+inline XWindow *_plCreateEventExtractWindowObject(_plCallbackFnParams) noexcept;
+inline _plEventInfo _plInitEventInfo(_plCallbackFnParams) noexcept;
+inline void _plSendMessage(_plHWND hwnd, const _plEventInfo &event_info) noexcept;
 
 enum SizeParams {
 	FL_MAXIMIZED = SIZE_MAXIMIZED, \
@@ -169,11 +169,11 @@ struct XPoint : public POINT {
 		obj.x = obj.y = 0;
 		return *this;
 	}
-	inline bool operator==(const XPoint &obj) const {
+	inline bool operator==(const XPoint &obj) const noexcept {
 
 		return x == obj.x && y == obj.y;
 	}
-	inline bool operator!=(const XPoint &obj) const {
+	inline bool operator!=(const XPoint &obj) const noexcept {
 
 		return !operator==(obj);
 	}
@@ -222,16 +222,16 @@ struct XRect : public RECT {
 		obj.left = obj.right = obj.top = obj.bottom = 0;
 		return *this;
 	}
-	inline bool operator==(const XRect &obj) const {
+	inline bool operator==(const XRect &obj) const noexcept {
 
 		return left == obj.left && top == obj.top && \
 			right == obj.right && bottom == obj.bottom;
 	}
-	inline bool operator!=(const XRect &obj) const {
+	inline bool operator!=(const XRect &obj) const noexcept {
 
 		return !operator==(obj);
 	}
-	inline bool is_null() const {
+	inline bool is_null() const noexcept {
 
 		return left == 0 && right == 0 && \
 				top == 0 && bottom == 0;
@@ -268,52 +268,53 @@ struct XSize {
 		obj.width = obj.height = 0;
 		return *this;
 	}
-	inline bool operator==(const XSize &obj) const {
+	inline bool operator==(const XSize &obj) const noexcept {
 
 		return width == obj.width && obj.height == 0;
 	}
-	inline bool operator!=(const XSize &obj) const {
+	inline bool operator!=(const XSize &obj) const noexcept {
 
 		return !operator==(obj);
 	}
-	inline bool is_null() const {
+	inline bool is_null() const noexcept {
 
 		return width == 0 && height == 0;
 	}
 };
 
-inline bool _plRegisterWidget(const Tchar *class_name, WNDPROC WndProc);
-inline bool _plRegisterWindow(const Tchar *class_name, WNDPROC WndProc);
+inline bool _plRegisterWidget(const Tchar *class_name, WNDPROC WndProc) noexcept;
+inline bool _plRegisterWindow(const Tchar *class_name, WNDPROC WndProc) noexcept;
 inline _plHWND _plCreateWidget(_plHWND hwnd_parent, const Tchar *class_name, \
 							const int flags, const int X, const int Y,\
 							const int width, const int height,\
 							const Tchar *label, const int id, \
-							XWindow *this_window);
+							XWindow *this_window) noexcept;
 inline _plHWND _plCreateWindow(const Tchar *class_name, \
 							   const int flags, const int X, const int Y,\
 								const int width, const int height,\
 								const Tchar *label,\
-								XWindow *this_window);
+								XWindow *this_window) noexcept;
 inline void _plWindowPostCreate(_plHWND hwnd);
-inline void _plSetFocus(_plHWND hwnd);
-inline size_t _plGetLabelSize(_plHWND hwnd);
-inline void _plGetLabel(_plHWND hwnd, Tchar *label, const size_t max_size);
-inline bool _plSetLabel(_plHWND hwnd, const Tchar *label);
-inline void _plInvalidate(_plHWND hwnd, const XRect *rect, const bool redraw);
-inline void _plEnableWindow(_plHWND hwnd, const bool enable);
-inline bool _plDestroyWindow(_plHWND hwnd);
-inline int _plGetWidth(_plCallbackFnParams);
-inline int _plGetHeight(_plCallbackFnParams);
-inline int _plGetSizeParam(_plCallbackFnParams);
-inline void _plGetClientRect(_plHWND hwnd, XRect &rc);
-inline void _plMoveWindow(_plHWND hwnd, int x, int y, int width, int height);
-inline void _plShowWindow(_plHWND hwnd, bool show);
+inline void _plSetFocus(_plHWND hwnd) noexcept;
+inline size_t _plGetLabelSize(_plHWND hwnd) noexcept;
+inline void _plGetLabel(_plHWND hwnd, Tchar *label, const size_t max_size) noexcept;
+inline bool _plSetLabel(_plHWND hwnd, const Tchar *label) noexcept;
+inline void _plInvalidate(_plHWND hwnd, const XRect *rect, const bool redraw) noexcept;
+inline void _plEnableWindow(_plHWND hwnd, const bool enable) noexcept;
+inline bool _plDestroyWindow(_plHWND hwnd) noexcept;
+inline int _plGetWidth(_plCallbackFnParams) noexcept;
+inline int _plGetHeight(_plCallbackFnParams) noexcept;
+inline int _plGetSizeParam(_plCallbackFnParams) noexcept;
+inline void _plGetClientRect(_plHWND hwnd, XRect &rc) noexcept;
+inline void _plMoveWindow(_plHWND hwnd, int x, int y, int width, int height) noexcept;
+inline void _plShowWindow(_plHWND hwnd, bool show) noexcept;
 
 enum XVirtualKeys{
 	X_VKEY_CTRL = MK_CONTROL,\
 	X_VKEY_SHIFT = MK_SHIFT,\
 	X_VKEY_ESCAPE = VK_ESCAPE,\
 	X_VKEY_ENTER = VK_RETURN,\
+	X_VKEY_TAB = VK_TAB, \
 	X_VKEY_LEFT = VK_LEFT,\
 	X_VKEY_RIGHT = VK_RIGHT,\
 	X_VKEY_UP = VK_UP,\
@@ -341,14 +342,14 @@ enum XMouseButtons{
 	X_MOUSE_RBUTTON = MK_RBUTTON
 };
 
-inline Tchar _plGetChar(_plCallbackFnParams);
-inline int _plGetKey(_plCallbackFnParams);
-inline int _plGetVKeyState(int virtual_key);
+inline Tchar _plGetChar(_plCallbackFnParams) noexcept;
+inline int _plGetKey(_plCallbackFnParams) noexcept;
+inline int _plGetVKeyState(int virtual_key) noexcept;
 
-inline int _plGetX(_plCallbackFnParams);
-inline int _plGetY(_plCallbackFnParams);
-inline int _plGetMouseVKey(_plCallbackFnParams);
-inline int _plGetMouseWheelDelta(_plCallbackFnParams);
+inline int _plGetX(_plCallbackFnParams) noexcept;
+inline int _plGetY(_plCallbackFnParams) noexcept;
+inline int _plGetMouseVKey(_plCallbackFnParams) noexcept;
+inline int _plGetMouseWheelDelta(_plCallbackFnParams) noexcept;
 
 typedef HGDIOBJ _plGCObject;
 typedef HPEN _plHPEN;
@@ -387,10 +388,10 @@ enum TextOutModes{
 class _plXTextMetric{
 	TEXTMETRIC tm;
 public:
-	inline _plXTextMetric(_plHDC dc){ GetTextMetrics(dc, &tm); }
-	inline int GetMaxCharWidth() const{ return tm.tmMaxCharWidth; }
-	inline int GetAverageCharWidth() const{ return tm.tmAveCharWidth; }
-	inline int GetCharHeight() const{ return tm.tmHeight; }
+	inline _plXTextMetric(_plHDC dc) noexcept { GetTextMetrics(dc, &tm); }
+	inline int GetMaxCharWidth() const noexcept { return tm.tmMaxCharWidth; }
+	inline int GetAverageCharWidth() const noexcept { return tm.tmAveCharWidth; }
+	inline int GetCharHeight() const noexcept { return tm.tmHeight; }
 };
 
 typedef DWORD _plFONT_CHARSET;
@@ -402,26 +403,26 @@ enum FontProperties{
 	X_BOLD = 8
 };
 
-inline _plHDC _plGetHDC(_plHWND hwnd, _plContextParams *params);
-inline void _plReleaseHDC(_plHWND hwnd, _plContextParams *params);
-inline _plHDC _plGetStandAloneHDC(_plHWND hwnd);
-inline void _plReleaseStandAloneHDC(_plHWND hwnd, _plHDC dc);
+inline _plHDC _plGetHDC(_plHWND hwnd, _plContextParams *params) noexcept;
+inline void _plReleaseHDC(_plHWND hwnd, _plContextParams *params) noexcept;
+inline _plHDC _plGetStandAloneHDC(_plHWND hwnd) noexcept;
+inline void _plReleaseStandAloneHDC(_plHWND hwnd, _plHDC dc) noexcept;
 
-inline _plCOLOR _plGetColorRGB(unsigned char red, unsigned char green, unsigned char blue);
-inline void _plTextOut(_plHDC dc, int x, int y, const Tchar *text, const size_t len);
-inline void _plTextOut(_plHDC dc, int x, int y, int options, XRect &rc, const Tchar *text, const size_t len);
-inline void _plRectangle(_plHDC dc, int left, int top, int right, int bottom);
-inline void _plPolygon(_plHDC dc, const XPoint *points, const size_t count);
-inline _plHPEN _plCreatePen(int style, int width, unsigned char red, unsigned char green, unsigned char blue);
-inline _plHPEN _plCreateSpecialPen(const int pen_id);
-inline _plHBRUSH _plCreateBrush(unsigned char red, unsigned char green, unsigned char blue);
-inline _plHBRUSH _plCreateSpecialBrush(const int brush_id);
-inline void _plReleaseObject(_plGCObject obj);
-inline _plGCObject _plSelectObject(_plHDC dc, _plGCObject obj);
-inline int _plSetBackgroundFillMode(_plHDC dc, int mode);
-inline _plCOLOR _plSetBackgroundColor(_plHDC dc, _plCOLOR color);
+inline _plCOLOR _plGetColorRGB(unsigned char red, unsigned char green, unsigned char blue) noexcept;
+inline void _plTextOut(_plHDC dc, int x, int y, const Tchar *text, const size_t len) noexcept;
+inline void _plTextOut(_plHDC dc, int x, int y, int options, XRect &rc, const Tchar *text, const size_t len) noexcept;
+inline void _plRectangle(_plHDC dc, int left, int top, int right, int bottom) noexcept;
+inline void _plPolygon(_plHDC dc, const XPoint *points, const size_t count) noexcept;
+inline _plHPEN _plCreatePen(int style, int width, unsigned char red, unsigned char green, unsigned char blue) noexcept;
+inline _plHPEN _plCreateSpecialPen(const int pen_id) noexcept;
+inline _plHBRUSH _plCreateBrush(unsigned char red, unsigned char green, unsigned char blue) noexcept;
+inline _plHBRUSH _plCreateSpecialBrush(const int brush_id) noexcept;
+inline void _plReleaseObject(_plGCObject obj) noexcept;
+inline _plGCObject _plSelectObject(_plHDC dc, _plGCObject obj) noexcept;
+inline int _plSetBackgroundFillMode(_plHDC dc, int mode) noexcept;
+inline _plCOLOR _plSetBackgroundColor(_plHDC dc, _plCOLOR color) noexcept;
 inline _plHFONT _plCreateFont(int size, int rotation_angle, int symbols_angle, \
-						int properties, _plFONT_CHARSET charset, const Tchar *lpszFace);
+						int properties, _plFONT_CHARSET charset, const Tchar *lpszFace) noexcept;
 
 enum ScrollOrientation{
 	X_SCROLL_HORZ = SB_HORZ,\
@@ -444,506 +445,514 @@ struct XScrollParams {
 	int pos;
 };
 
-inline int _plGetScrollThumbPos(_plCallbackFnParams);
-inline int _plGetScrollThumbPosLarge(_plCallbackFnParams);
-inline int _plGetScrollType(_plCallbackFnParams);
+inline int _plGetScrollThumbPos(_plCallbackFnParams) noexcept;
+inline int _plGetScrollThumbPosLarge(_plCallbackFnParams) noexcept;
+inline int _plGetScrollType(_plCallbackFnParams) noexcept;
 inline void _plSetScrollInfo(_plHWND hwnd, const int scroll_orient, const int max,\
-						   const int page, const int pos);
+						   const int page, const int pos) noexcept;
 inline void _plSetScrollInfo(_plHWND hwnd, const int scroll_orient, \
-							const XScrollParams &params);
-inline int _plGetScrollPos(_plHWND hwnd, const int scroll_orient);
+							const XScrollParams &params) noexcept;
+inline int _plGetScrollPos(_plHWND hwnd, const int scroll_orient) noexcept;
 
-inline void _plComboBoxAddItem(_plHWND hwnd, const Tchar* item);
-inline void _plComboBoxDelItem(_plHWND hwnd, const size_t index);
-inline size_t _plComboBoxGetCurrSel(_plHWND hwnd);
-inline void _plComboBoxSetSel(_plHWND hwnd, const size_t index);
-inline size_t _plComboBoxGetItemTextLen(_plHWND hwnd, const size_t index);
-inline void _plComboBoxGetItemText(_plHWND hwnd, const size_t index, Tchar *text);
-inline void _plComboBoxReset(_plHWND hwnd);
+inline void _plComboBoxAddItem(_plHWND hwnd, const Tchar* item) noexcept;
+inline void _plComboBoxDelItem(_plHWND hwnd, const size_t index) noexcept;
+inline size_t _plComboBoxGetCurrSel(_plHWND hwnd) noexcept;
+inline void _plComboBoxSetSel(_plHWND hwnd, const size_t index) noexcept;
+inline size_t _plComboBoxGetItemTextLen(_plHWND hwnd, const size_t index) noexcept;
+inline void _plComboBoxGetItemText(_plHWND hwnd, const size_t index, Tchar *text) noexcept;
+inline void _plComboBoxReset(_plHWND hwnd) noexcept;
 
-inline void _plMessageBox(const Tchar *message);
-inline void _plMessageBoxANSI(const char *message);
-inline void ErrorBox(const Tchar *message);
-inline void ErrorBoxANSI(const char *message);
+inline void _plMessageBox(const Tchar *message) noexcept;
+inline void _plMessageBoxANSI(const char *message) noexcept;
+inline void ErrorBox(const Tchar *message) noexcept;
+inline void ErrorBoxANSI(const char *message) noexcept;
 
-inline const Tchar *GetExecutableFullPath(Tchar *buffer);
+inline const Tchar *GetExecutableFullPath(Tchar *buffer) noexcept;
 
 //****************************************************************************
 
-void _plUnsetHWND(_plHWND &hwnd){
+void _plUnsetHWND(_plHWND &hwnd) noexcept {
 
-hwnd = 0;
+	hwnd = 0;
 }
 
-bool _plIsHWNDSet(_plHWND hwnd){
+bool _plIsHWNDSet(_plHWND hwnd) noexcept {
 
-return (hwnd != 0);
+	return (hwnd != 0);
 }
 
-void _plUnsetHDC(_plHDC &dc) {
+void _plUnsetHDC(_plHDC &dc) noexcept {
 
-dc = 0;
+	dc = 0;
 }
 
-bool _plIsHDCSet(_plHDC &dc) {
+bool _plIsHDCSet(_plHDC &dc) noexcept {
 
-return (dc != 0);
+	return (dc != 0);
 }
 
 void _plInit(_plMainFnParams){
 
-CGlobalParams::GetInstance()->SetHInstance(hInstance);
+	CGlobalParams::GetInstance()->SetHInstance(hInstance);
 }
 
 void _plPlatformSpecificCleanup(){ }
 
-int _plLaunchMessageLoop(){
-MSG msg;
+	int _plLaunchMessageLoop(){
+	MSG msg;
 
-while(GetMessage(&msg, 0, 0, 0)){
-	TranslateMessage(&msg);
-	DispatchMessage(&msg);
-}
+	while(GetMessage(&msg, 0, 0, 0)){
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 
-return (int)msg.wParam;
+	return (int)msg.wParam;
 }
 
 _plCallbackFnRetValue _plCallbackFnModifier _plDefaultEventAction(_plCallbackFnParams){
 
-return DefWindowProc(_plCallbackFnParamsList);
+	return DefWindowProc(_plCallbackFnParamsList);
 }
 
 _plCallbackFnRetValue _plCallbackFnModifier _plDefaultEventAction(_plWNDPROC wnd_proc, _plCallbackFnParams){
 
-return CallWindowProc(wnd_proc, _plCallbackFnParamsList);
+	return CallWindowProc(wnd_proc, _plCallbackFnParamsList);
 }
 
 _plWNDPROC _plSetWindowProc(_plHWND hwnd, _plWNDPROC new_proc){
 
-return (_plWNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)new_proc);
+	return (_plWNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)new_proc);
 }
 
-int _plGetWindowId(_plCallbackFnParams){
+int _plGetWindowId(_plCallbackFnParams) noexcept {
 
-return ((int)(message == WM_COMMAND) * LOWORD(wParam));
+	return ((int)(message == WM_COMMAND) * LOWORD(wParam));
 }
 
-_plEventId _plGetEventId(_plCallbackFnParams){
+_plEventId _plGetEventId(_plCallbackFnParams) noexcept {
 
-return message;
+	return message;
 }
 
-_plNotificationCode _plGetNotificationCode(_plCallbackFnParams){
+_plNotificationCode _plGetNotificationCode(_plCallbackFnParams) noexcept {
 
-return ((int)(message == WM_COMMAND) * HIWORD(wParam));
+	return ((int)(message == WM_COMMAND) * HIWORD(wParam));
 }
 
-_plHWND _plGetWindowHandle(_plCallbackFnParams){
+_plHWND _plGetWindowHandle(_plCallbackFnParams) noexcept {
 
-return hWnd;
+	return hWnd;
 }
 
-XWindow *_plCreateEventExtractWindowObject(_plCallbackFnParams){
-CREATESTRUCT *cr;
+XWindow *_plCreateEventExtractWindowObject(_plCallbackFnParams) noexcept {
+	CREATESTRUCT *cr;
 
-cr = (CREATESTRUCT *)lParam;
-return (XWindow *)cr->lpCreateParams;
+	cr = (CREATESTRUCT *)lParam;
+	return (XWindow *)cr->lpCreateParams;
 }
 
-_plEventInfo _plInitEventInfo(_plCallbackFnParams){
+_plEventInfo _plInitEventInfo(_plCallbackFnParams) noexcept {
 
-return _plEventInfo(message, wParam, lParam);
+	return _plEventInfo(message, wParam, lParam);
 }
 
-void _plSendMessage(_plHWND hwnd, const _plEventInfo &event_info){
+void _plSendMessage(_plHWND hwnd, const _plEventInfo &event_info) noexcept {
 
-SendMessage(hwnd, event_info.message, event_info.wParam, event_info.lParam);
+	SendMessage(hwnd, event_info.message, event_info.wParam, event_info.lParam);
 }
 
 bool _plRegisterWidget(const Tchar *class_name,\
-					   WNDPROC WndProc){
-WNDCLASS w;
-auto GlobalParams = CGlobalParams::GetInstance();
+					   WNDPROC WndProc) noexcept {
+	WNDCLASS w;
+	auto GlobalParams = CGlobalParams::GetInstance();
 
-ZeroMemory(&w, sizeof(WNDCLASS));
-w.hInstance = GlobalParams->GetHInstance();
-w.style = CS_VREDRAW | CS_HREDRAW;
-w.lpfnWndProc = WndProc;
-w.lpszClassName = class_name;
-w.lpszMenuName = 0;
-w.hIcon = LoadIcon(0, IDI_APPLICATION);
-w.hCursor = LoadCursor(0, IDC_ARROW);
-w.hbrBackground = (HBRUSH)COLOR_BTNSHADOW;
-w.cbClsExtra = 0;
-w.cbWndExtra = 0;
+	ZeroMemory(&w, sizeof(WNDCLASS));
+	w.hInstance = GlobalParams->GetHInstance();
+	w.style = CS_VREDRAW | CS_HREDRAW;
+	w.lpfnWndProc = WndProc;
+	w.lpszClassName = class_name;
+	w.lpszMenuName = 0;
+	w.hIcon = LoadIcon(0, IDI_APPLICATION);
+	w.hCursor = LoadCursor(0, IDC_ARROW);
+	w.hbrBackground = (HBRUSH)COLOR_BTNSHADOW;
+	w.cbClsExtra = 0;
+	w.cbWndExtra = 0;
 
-return (RegisterClass(&w) != 0);
+	return (RegisterClass(&w) != 0);
 }
 
 bool _plRegisterWindow(const Tchar *class_name,\
-					   WNDPROC WndProc){
-WNDCLASSEX w;
-auto GlobalParams = CGlobalParams::GetInstance();
+					   WNDPROC WndProc) noexcept {
+	WNDCLASSEX w;
+	auto GlobalParams = CGlobalParams::GetInstance();
 
-ZeroMemory(&w, sizeof(WNDCLASSEX));
-w.cbSize = sizeof(WNDCLASSEX);
-w.hInstance = GlobalParams->GetHInstance();
-w.style = CS_OWNDC | CS_DBLCLKS | CS_VREDRAW | CS_HREDRAW;
-w.lpfnWndProc = WndProc;
-w.lpszClassName = class_name;
-w.lpszMenuName = 0;
-w.hIcon = LoadIcon(0, IDI_APPLICATION);
-w.hIconSm = LoadIcon(0, IDI_APPLICATION);
-w.hCursor = LoadCursor(0, IDC_ARROW);
-w.hbrBackground = (HBRUSH)COLOR_BTNSHADOW;
-w.cbClsExtra = 0;
-w.cbWndExtra = 0;
+	ZeroMemory(&w, sizeof(WNDCLASSEX));
+	w.cbSize = sizeof(WNDCLASSEX);
+	w.hInstance = GlobalParams->GetHInstance();
+	w.style = CS_OWNDC | CS_DBLCLKS | CS_VREDRAW | CS_HREDRAW;
+	w.lpfnWndProc = WndProc;
+	w.lpszClassName = class_name;
+	w.lpszMenuName = 0;
+	w.hIcon = LoadIcon(0, IDI_APPLICATION);
+	w.hIconSm = LoadIcon(0, IDI_APPLICATION);
+	w.hCursor = LoadCursor(0, IDC_ARROW);
+	w.hbrBackground = (HBRUSH)COLOR_BTNSHADOW;
+	w.cbClsExtra = 0;
+	w.cbWndExtra = 0;
 
-return (RegisterClassEx(&w) != 0);
+	return (RegisterClassEx(&w) != 0);
 }
 
 _plHWND _plCreateWidget(_plHWND hwnd_parent, const Tchar *class_name, \
 							const int flags, const int X, const int Y,\
 							const int width, const int height,\
 							const Tchar *label, const int id, \
-							XWindow *this_window){
-auto GlobalParams = CGlobalParams::GetInstance();
+							XWindow *this_window) noexcept {
+	auto GlobalParams = CGlobalParams::GetInstance();
 
-#pragma warning(push)
-#pragma warning(disable: 4312)
+	#pragma warning(push)
+	#pragma warning(disable: 4312)
 
-return CreateWindow(class_name, label, WS_CHILD | flags,\
-					 X, Y, width, height, hwnd_parent, (HMENU) id,\
-					 GlobalParams->GetHInstance(), (LPVOID)this_window);
-#pragma warning(pop)
+	return CreateWindow(class_name, label, WS_CHILD | flags,\
+						 X, Y, width, height, hwnd_parent, (HMENU) id,\
+						 GlobalParams->GetHInstance(), (LPVOID)this_window);
+	#pragma warning(pop)
 }
 
 _plHWND _plCreateWindow(const Tchar *class_name, \
 							   const int flags, const int X, const int Y,\
 								const int width, const int height,\
 								const Tchar *label, \
-								XWindow *this_window){
-auto GlobalParams = CGlobalParams::GetInstance();
+								XWindow *this_window) noexcept {
+	auto GlobalParams = CGlobalParams::GetInstance();
 
-return CreateWindowEx(0, class_name, label, WS_OVERLAPPEDWINDOW | flags,
-					X, Y, width, height, 0, 0,\
-					GlobalParams->GetHInstance(), (LPVOID)this_window);
+	return CreateWindowEx(0, class_name, label, WS_OVERLAPPEDWINDOW | flags,
+						X, Y, width, height, 0, 0,\
+						GlobalParams->GetHInstance(), (LPVOID)this_window);
 }
 
-void _plWindowPostCreate(_plHWND hwnd){
+void _plWindowPostCreate(_plHWND hwnd) {
 
-ShowWindow(hwnd, SW_SHOWDEFAULT);
-UpdateWindow(hwnd);
+	ShowWindow(hwnd, SW_SHOWDEFAULT);
+	UpdateWindow(hwnd);
 }
 
-void _plSetFocus(_plHWND hwnd){
+void _plSetFocus(_plHWND hwnd) noexcept {
 
-SetFocus(hwnd);
+	SetFocus(hwnd);
 }
 
-size_t _plGetLabelSize(_plHWND hwnd){
+size_t _plGetLabelSize(_plHWND hwnd) noexcept {
 
-return GetWindowTextLength(hwnd);
+	return GetWindowTextLength(hwnd);
 }
 
-void _plGetLabel(_plHWND hwnd, Tchar *label, const size_t max_size){
+void _plGetLabel(_plHWND hwnd, Tchar *label, const size_t max_size) noexcept {
 
-GetWindowText(hwnd, label, (int)max_size);
+	GetWindowText(hwnd, label, (int)max_size);
 }
 
-bool _plSetLabel(_plHWND hwnd, const Tchar *label){
+bool _plSetLabel(_plHWND hwnd, const Tchar *label) noexcept {
 
-return (SetWindowText(hwnd, label) != 0);
+	return (SetWindowText(hwnd, label) != 0);
 }
 
-void _plInvalidate(_plHWND hwnd, const XRect *rect, const bool redraw){
+void _plInvalidate(_plHWND hwnd, const XRect *rect, const bool redraw) noexcept {
 
-InvalidateRect(hwnd, rect, redraw);
+	InvalidateRect(hwnd, rect, redraw);
 }
 
-void _plEnableWindow(_plHWND hwnd, const bool enable) {
+void _plEnableWindow(_plHWND hwnd, const bool enable) noexcept {
 
-EnableWindow(hwnd, enable);
+	EnableWindow(hwnd, enable);
 }
 
-bool _plDestroyWindow(_plHWND hwnd){
+bool _plDestroyWindow(_plHWND hwnd) noexcept {
 
-return (DestroyWindow(hwnd) != 0);
+	return (DestroyWindow(hwnd) != 0);
 }
 
-int _plGetWidth(_plCallbackFnParams){
+int _plGetWidth(_plCallbackFnParams) noexcept {
 
-return LOWORD(lParam);
+	return LOWORD(lParam);
 }
 
-int _plGetHeight(_plCallbackFnParams){
+int _plGetHeight(_plCallbackFnParams) noexcept {
 
-return HIWORD(lParam);
+	return HIWORD(lParam);
 }
 
-int _plGetSizeParam(_plCallbackFnParams) {
+int _plGetSizeParam(_plCallbackFnParams) noexcept {
 
-return (int)wParam;
+	return (int)wParam;
 }
 
-void _plGetClientRect(_plHWND hwnd, XRect &rc){
+void _plGetClientRect(_plHWND hwnd, XRect &rc) noexcept {
 
-GetClientRect(hwnd, &rc);
+	GetClientRect(hwnd, &rc);
 }
 
-void _plMoveWindow(_plHWND hwnd, int x, int y, int width, int height){
+void _plMoveWindow(_plHWND hwnd, int x, int y, int width, int height) noexcept {
 
-MoveWindow(hwnd, x, y, width, height, FALSE);
+	MoveWindow(hwnd, x, y, width, height, FALSE);
 }
 
-void _plShowWindow(_plHWND hwnd, bool show){
+void _plShowWindow(_plHWND hwnd, bool show) noexcept {
 
-ShowWindow(hwnd, (!show && SW_HIDE) || (show && SW_SHOW));
+	ShowWindow(hwnd, (!show && SW_HIDE) || (show && SW_SHOW));
 }
 
-int _plGetX(_plCallbackFnParams){
+int _plGetX(_plCallbackFnParams) noexcept {
 
-return LOWORD(lParam);
+	return LOWORD(lParam);
 }
 
-int _plGetY(_plCallbackFnParams){
+int _plGetY(_plCallbackFnParams) noexcept {
 
-return HIWORD(lParam);
+	return HIWORD(lParam);
 }
 
-int _plGetMouseVKey(_plCallbackFnParams){
+int _plGetMouseVKey(_plCallbackFnParams) noexcept {
 
-return GET_KEYSTATE_WPARAM(wParam);
+	return GET_KEYSTATE_WPARAM(wParam);
 }
 
-Tchar _plGetChar(_plCallbackFnParams){
+Tchar _plGetChar(_plCallbackFnParams) noexcept {
 
-return (Tchar) wParam;
+	return (Tchar) wParam;
 }
 
-int _plGetKey(_plCallbackFnParams){
+int _plGetKey(_plCallbackFnParams) noexcept {
 
-return (Tchar) wParam;
+	return (Tchar) wParam;
 }
 
-int _plGetVKeyState(int virtual_key){
+int _plGetVKeyState(int virtual_key) noexcept {
 
-return GetKeyState(virtual_key);
+	return GetKeyState(virtual_key);
 }
 
-int _plGetMouseWheelDelta(_plCallbackFnParams){
+int _plGetMouseWheelDelta(_plCallbackFnParams) noexcept {
 
-return GET_WHEEL_DELTA_WPARAM(wParam);
+	return GET_WHEEL_DELTA_WPARAM(wParam);
 }
 
-_plHDC _plGetHDC(_plHWND hwnd, _plContextParams *params){
+_plHDC _plGetHDC(_plHWND hwnd, _plContextParams *params) noexcept {
 
-return BeginPaint(hwnd, params);
+	return BeginPaint(hwnd, params);
 }
 
-void _plReleaseHDC(_plHWND hwnd, _plContextParams *params){
+void _plReleaseHDC(_plHWND hwnd, _plContextParams *params) noexcept {
 
-EndPaint(hwnd, params);
+	EndPaint(hwnd, params);
 }
 
-_plHDC _plGetStandAloneHDC(_plHWND hwnd){
+_plHDC _plGetStandAloneHDC(_plHWND hwnd) noexcept {
 
-return GetDC(hwnd);
+	return GetDC(hwnd);
 }
 
-void _plReleaseStandAloneHDC(_plHWND hwnd, _plHDC dc){
+void _plReleaseStandAloneHDC(_plHWND hwnd, _plHDC dc) noexcept {
 
-ReleaseDC(hwnd, dc);
+	ReleaseDC(hwnd, dc);
 }
 
-_plCOLOR _plGetColorRGB(unsigned char red, unsigned char green, unsigned char blue){
+_plCOLOR _plGetColorRGB(unsigned char red, unsigned char green, \
+						unsigned char blue) noexcept {
 
-return RGB(red, green, blue);
+	return RGB(red, green, blue);
 }
 
-void _plTextOut(_plHDC dc, int x, int y, const Tchar *text, const size_t len){
+void _plTextOut(_plHDC dc, int x, int y, \
+				const Tchar *text, const size_t len) noexcept {
 
-TextOut(dc, x, y, text, (int)len);
+	TextOut(dc, x, y, text, (int)len);
 }
 
-void _plTextOut(_plHDC dc, int x, int y, int options, XRect &rc, const Tchar *text, const size_t len){
+void _plTextOut(_plHDC dc, int x, int y, \
+				int options, XRect &rc, \
+				const Tchar *text, const size_t len) noexcept {
 
-ExtTextOut(dc, x, y, options, &rc, text, (int)len, 0);
+	ExtTextOut(dc, x, y, options, &rc, text, (int)len, 0);
 }
 
-void _plRectangle(_plHDC dc, int left, int top, int right, int bottom){
+void _plRectangle(_plHDC dc, int left, int top, int right, int bottom) noexcept {
 
-Rectangle(dc ,left, top, right, bottom);
+	Rectangle(dc ,left, top, right, bottom);
 }
 
-void _plPolygon(_plHDC dc, const XPoint *points, const size_t count){
+void _plPolygon(_plHDC dc, const XPoint *points, const size_t count) noexcept {
 
-Polygon(dc, points, (int)count);
+	Polygon(dc, points, (int)count);
 }
 
-_plHPEN _plCreatePen(int style, int width, unsigned char red, unsigned char green, unsigned char blue){
+_plHPEN _plCreatePen(int style, int width, \
+					unsigned char red, \
+					unsigned char green, unsigned char blue) noexcept {
 
-return CreatePen(style, width, RGB(red, green, blue));
+	return CreatePen(style, width, RGB(red, green, blue));
 }
 
-_plHPEN _plCreateSpecialPen(const int pen_id){
+_plHPEN _plCreateSpecialPen(const int pen_id) noexcept {
 
-return (_plHPEN)GetStockObject(pen_id);
+	return (_plHPEN)GetStockObject(pen_id);
 }
 
-_plHBRUSH _plCreateBrush(unsigned char red, unsigned char green, unsigned char blue){
+_plHBRUSH _plCreateBrush(unsigned char red, \
+						unsigned char green, unsigned char blue) noexcept {
 
-return CreateSolidBrush(RGB(red, green, blue));
+	return CreateSolidBrush(RGB(red, green, blue));
 }
 
-_plHBRUSH _plCreateSpecialBrush(const int brush_id){
+_plHBRUSH _plCreateSpecialBrush(const int brush_id) noexcept {
 
-return (_plHBRUSH)GetStockObject(brush_id);
+	return (_plHBRUSH)GetStockObject(brush_id);
 }
 
-_plGCObject _plSelectObject(_plHDC dc, _plGCObject obj){
+_plGCObject _plSelectObject(_plHDC dc, _plGCObject obj) noexcept {
 
-return SelectObject(dc, obj);
+	return SelectObject(dc, obj);
 }
 
-void _plReleaseObject(_plGCObject obj){
+void _plReleaseObject(_plGCObject obj) noexcept {
 
-DeleteObject(obj);
+	DeleteObject(obj);
 }
 
-int _plSetBackgroundFillMode(_plHDC dc, int mode){
+int _plSetBackgroundFillMode(_plHDC dc, int mode) noexcept {
 
-return SetBkMode(dc, mode);
+	return SetBkMode(dc, mode);
 }
 
-_plCOLOR _plSetBackgroundColor(_plHDC dc, _plCOLOR color){
+_plCOLOR _plSetBackgroundColor(_plHDC dc, _plCOLOR color) noexcept {
 
-return SetBkColor(dc, color);
+	return SetBkColor(dc, color);
 }
 
-int _plGetScrollThumbPos(_plCallbackFnParams){
+int _plGetScrollThumbPos(_plCallbackFnParams) noexcept {
 
-return HIWORD(wParam);
+	return HIWORD(wParam);
 }
 
-int _plGetScrollThumbPosLarge(_plCallbackFnParams) {
-_plSCROLLINFO si;
+int _plGetScrollThumbPosLarge(_plCallbackFnParams) noexcept {
+	_plSCROLLINFO si;
 
-si.cbSize = sizeof(_plSCROLLINFO);
-si.fMask = SIF_TRACKPOS;
-si.nMin = 0;
-si.nMax = 0;
-si.nPage = 0;
-si.nPos = 0;
-si.nTrackPos = 0;
+	si.cbSize = sizeof(_plSCROLLINFO);
+	si.fMask = SIF_TRACKPOS;
+	si.nMin = 0;
+	si.nMax = 0;
+	si.nPage = 0;
+	si.nPos = 0;
+	si.nTrackPos = 0;
 	
-int scroll_orient = (message == WM_VSCROLL) ? SB_VERT : SB_HORZ;
-GetScrollInfo(hWnd, scroll_orient, &si);
+	int scroll_orient = (message == WM_VSCROLL) ? SB_VERT : SB_HORZ;
+	GetScrollInfo(hWnd, scroll_orient, &si);
 
-return si.nTrackPos;
+	return si.nTrackPos;
 }
 
-int _plGetScrollType(_plCallbackFnParams){
+int _plGetScrollType(_plCallbackFnParams) noexcept {
 
-return LOWORD(wParam);
+	return LOWORD(wParam);
 }
 
 void _plSetScrollInfo(_plHWND hwnd, const int scroll_orient, const int max,\
-				   const int page, const int pos){
-_plSCROLLINFO si;
+				   const int page, const int pos) noexcept {
+	_plSCROLLINFO si;
 
-si.cbSize = sizeof(_plSCROLLINFO);
-si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS; 
-si.nMin = 0; 
-si.nMax = max; 
-si.nPage = page; 
-si.nPos = pos; 
-SetScrollInfo(hwnd, scroll_orient, &si, TRUE); 
+	si.cbSize = sizeof(_plSCROLLINFO);
+	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS; 
+	si.nMin = 0; 
+	si.nMax = max; 
+	si.nPage = page; 
+	si.nPos = pos; 
+	SetScrollInfo(hwnd, scroll_orient, &si, TRUE); 
 }
 
 void _plSetScrollInfo(_plHWND hwnd, const int scroll_orient, \
-						const XScrollParams &params) {
+						const XScrollParams &params) noexcept {
 
-_plSetScrollInfo(hwnd, scroll_orient, \
+	_plSetScrollInfo(hwnd, scroll_orient, \
 					params.max, params.page, params.pos);
 }
 
-int _plGetScrollPos(_plHWND hwnd, const int scroll_orient){
+int _plGetScrollPos(_plHWND hwnd, const int scroll_orient) noexcept {
 
-return GetScrollPos(hwnd, scroll_orient);
+	return GetScrollPos(hwnd, scroll_orient);
 }
 
-void _plComboBoxAddItem(_plHWND hwnd, const Tchar* item){
+void _plComboBoxAddItem(_plHWND hwnd, const Tchar* item) noexcept {
 
-SendMessage(hwnd,(UINT) CB_ADDSTRING,(WPARAM) 0,(LPARAM) item);
+	SendMessage(hwnd,(UINT) CB_ADDSTRING,(WPARAM) 0,(LPARAM) item);
 }
 
-void _plComboBoxDelItem(_plHWND hwnd, const size_t index) {
+void _plComboBoxDelItem(_plHWND hwnd, const size_t index) noexcept {
 
-SendMessage(hwnd, (UINT) CB_DELETESTRING, (WPARAM)index, (LPARAM)0);
+	SendMessage(hwnd, (UINT) CB_DELETESTRING, (WPARAM)index, (LPARAM)0);
 }
 
-size_t _plComboBoxGetCurrSel(_plHWND hwnd){
+size_t _plComboBoxGetCurrSel(_plHWND hwnd) noexcept {
 
-// returns -1 if no selection made
-return SendMessage(hwnd, (UINT) CB_GETCURSEL, (WPARAM) 0, (LPARAM) 0);
+	// returns -1 if no selection made
+	return SendMessage(hwnd, (UINT) CB_GETCURSEL, (WPARAM) 0, (LPARAM) 0);
 }
 
-size_t _plComboBoxGetItemTextLen(_plHWND hwnd, const size_t index){
+size_t _plComboBoxGetItemTextLen(_plHWND hwnd, const size_t index) noexcept {
 
-return SendMessage(hwnd, (UINT) CB_GETLBTEXTLEN, \
-                (WPARAM) index, (LPARAM) 0);
+	return SendMessage(hwnd, (UINT) CB_GETLBTEXTLEN, \
+					   (WPARAM) index, (LPARAM) 0);
 }
 
-void _plComboBoxSetSel(_plHWND hwnd, const size_t index) {
+void _plComboBoxSetSel(_plHWND hwnd, const size_t index) noexcept {
 
-SendMessage(hwnd, (UINT)CB_SETCURSEL, (WPARAM)index, (LPARAM)0);
+	SendMessage(hwnd, (UINT)CB_SETCURSEL, (WPARAM)index, (LPARAM)0);
 }
 
 void _plComboBoxGetItemText(_plHWND hwnd, const size_t index,\
-							Tchar *text){
+							Tchar *text) noexcept {
 
-SendMessage(hwnd, (UINT) CB_GETLBTEXT, \
+	SendMessage(hwnd, (UINT) CB_GETLBTEXT, \
                 (WPARAM) index, (LPARAM) text);
 }
 
-void _plComboBoxReset(_plHWND hwnd){
+void _plComboBoxReset(_plHWND hwnd) noexcept {
 
-SendMessage(hwnd, (UINT) CB_RESETCONTENT, (WPARAM) 0, (LPARAM) 0);
+	SendMessage(hwnd, (UINT) CB_RESETCONTENT, (WPARAM) 0, (LPARAM) 0);
 }
 
-void _plMessageBox(const Tchar *message){
+void _plMessageBox(const Tchar *message) noexcept {
 
-MessageBox(0, message, _T("Info"), MB_OK);
+	MessageBox(0, message, _T("Info"), MB_OK);
 }
 
-void _plMessageBoxANSI(const char *message){
+void _plMessageBoxANSI(const char *message) noexcept {
 
-MessageBoxA(0, message, "Info", MB_OK);
+	MessageBoxA(0, message, "Info", MB_OK);
 }
 
-void ErrorBox(const Tchar *message) {
+void ErrorBox(const Tchar *message) noexcept {
 
-MessageBox(0, message, _T("Error"), MB_OK | MB_ICONERROR);
+	MessageBox(0, message, _T("Error"), MB_OK | MB_ICONERROR);
 }
 
-void ErrorBoxANSI(const char *message) {
+void ErrorBoxANSI(const char *message) noexcept {
 
-MessageBoxA(0, message, "Error", MB_OK | MB_ICONERROR);
+	MessageBoxA(0, message, "Error", MB_OK | MB_ICONERROR);
 }
 
 _plHFONT _plCreateFont(int size, int rotation_angle, int symbols_angle, \
-					int properties, _plFONT_CHARSET charset, const Tchar *lpszFace){
+					int properties, _plFONT_CHARSET charset, \
+					const Tchar *lpszFace) noexcept {
 
-return CreateFont(size, 0, rotation_angle, symbols_angle, 400 + 300*(properties & X_BOLD),\
+	return CreateFont(size, 0, rotation_angle, symbols_angle, 400 + 300*(properties & X_BOLD),\
 				 properties & X_ITALIC, properties & X_UNDERLINE, properties & X_STRIKEOUT,\
 				charset, OUT_TT_ONLY_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, 0, lpszFace);
 }
 
-const Tchar *GetExecutableFullPath(Tchar *buffer) {
+const Tchar *GetExecutableFullPath(Tchar *buffer) noexcept {
 
-if (GetModuleFileName(0, buffer, MAX_PATH + 1))
-	return buffer;
-else
-	return nullptr;
+	if (GetModuleFileName(0, buffer, MAX_PATH + 1))
+		return buffer;
+	else
+		return nullptr;
 }

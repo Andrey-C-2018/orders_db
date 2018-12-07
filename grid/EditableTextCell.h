@@ -59,6 +59,7 @@ public:
 	inline void OnFieldRemoved(const size_t field);
 
 	inline int EvalCellHeightByTextHeight(const int text_height) const;
+	inline int GetMarginsWidth() const;
 
 	inline void SetFocus();
 	void Reload();
@@ -71,6 +72,11 @@ public:
 int CEditableTextCell::EvalCellHeightByTextHeight(const int text_height) const {
 
 	return unactive_cell.EvalCellHeightByTextHeight(text_height);
+}
+
+int CEditableTextCell::GetMarginsWidth() const {
+
+	return unactive_cell.GetMarginsWidth();
 }
 
 size_t CEditableTextCell::GetActiveField() const {

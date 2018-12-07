@@ -10,6 +10,12 @@ class CMySQLResultSetMetadata :	public IDbResultSetMetadata{
 
 public:
 	CMySQLResultSetMetadata(std::shared_ptr<MYSQL_RES> metadata_);
+
+	CMySQLResultSetMetadata(const CMySQLResultSetMetadata &obj) = delete;
+	CMySQLResultSetMetadata(CMySQLResultSetMetadata &&obj) = default;
+	CMySQLResultSetMetadata &operator=(const CMySQLResultSetMetadata &obj) = delete;
+	CMySQLResultSetMetadata &operator=(CMySQLResultSetMetadata &&obj) = default;
+
 	size_t getFieldsCount() const override;
 	std::shared_ptr<IDbField> getField(const size_t field) const override;
 

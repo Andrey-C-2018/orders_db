@@ -2,11 +2,11 @@
 #include <string.h>
 
 template <typename Tchar_, typename IndexType, class TRegistry, class GetStrByIndex> \
-	struct CIndexedTextSearchPredicate {
+struct CIndexedTextSearchPredicate {
 	const TRegistry &reg;
 	GetStrByIndex getStrByIndex;
 
-	inline CIndexedTextSearchPredicate(const TRegistry &reg_) : reg(reg_) { }
+	inline CIndexedTextSearchPredicate(const TRegistry &reg_) noexcept : reg(reg_) { }
 
 	inline bool operator()(IndexType l, IndexType r) const {
 

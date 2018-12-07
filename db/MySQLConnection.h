@@ -7,7 +7,8 @@ public:
 	enum {
 		E_INIT = 1, \
 		E_OUT_OF_MEMORY = 2, \
-		E_WRONG_QUERY = 3
+		E_WRONG_QUERY = 3, \
+		E_CONNECTED = 4
 	};
 
 	CMySQLConnectionException(const int err_code, const Tchar *err_descr);
@@ -53,5 +54,7 @@ public:
 
 void CMySQLConnection::CheckConnected() const {
 
-	//if (!connected)	throw XException(0, "No connection to a MySQL database");
+	if (!connected)	
+		throw CMySQLConnectionException(CMySQLConnectionException::E_CONNECTED, \
+										_T("No connection to a MySQL database"));
 }

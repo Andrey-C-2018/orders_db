@@ -92,9 +92,6 @@
     <ClInclude Include="XWindow.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="..\basic\stdafx.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="XPanel.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>

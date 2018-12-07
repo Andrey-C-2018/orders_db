@@ -147,7 +147,7 @@ public:
 		container = new CContainerSimple< Callable >(callable);
 	}
 
-	inline bool empty() const{
+	inline bool empty() const noexcept {
 
 		return container == nullptr;
 	}

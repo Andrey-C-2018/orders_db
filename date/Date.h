@@ -29,9 +29,11 @@ public:
 	CDate() noexcept;
 	CDate(const CDate &obj) noexcept;
 	CDate(CDate &&obj) = default;
+
 	CDate(const unsigned day, \
 			const unsigned month, \
 			const unsigned year) noexcept;
+
 	template <typename Tchar> \
 		CDate(const Tchar *date_str, const int format) noexcept;
 	CDate &operator=(const CDate &obj) noexcept;

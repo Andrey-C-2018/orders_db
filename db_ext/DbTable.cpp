@@ -1,5 +1,16 @@
 #include "DbTable.h"
 
+CDbTableException::CDbTableException(const int err_code, \
+										const Tchar *err_descr) : \
+										XException(err_code, err_descr) { }
+
+CDbTableException::CDbTableException(const CDbTableException &obj) : \
+										XException(obj) { }
+
+CDbTableException::~CDbTableException() { }
+
+//****************************************************************************
+
 inline void bindValueAsTString(std::shared_ptr<const IDbField> field, \
 								std::shared_ptr<IDbBindingTarget> binding_target, \
 								const size_t param_no, \
@@ -78,16 +89,14 @@ void CDbTable::DisconnectEventsHandler(ITableEventsHandlerPtr handler) {
 
 void CDbTable::AddField(const size_t max_field_len, const Tchar *field_name){
 
-	throw XException(0, _T("Not supported"));
+	throw CDbTableException(CDbTableException::E_WRONG_OPERATION, \
+							_T("Adding fields using CDbTable is not supported"));
 }
 
 void CDbTable::AddRecord(){
-	size_t records_count = result_set->getRecordsCount();
 
-	conn->ExecScalarQuery(insert_str.c_str());
-	reload();
-
-	event_handlers.OnRecordsCountChanged(records_count);
+	throw CDbTableException(CDbTableException::E_WRONG_OPERATION, \
+							_T("Adding records using CDbTable is not supported"));
 }
 
 size_t CDbTable::GetFieldMaxLengthInChars(const size_t field) const {

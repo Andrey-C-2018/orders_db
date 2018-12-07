@@ -20,7 +20,9 @@ public:
 					margin_y(DEF_MARGIN_Y) { }
 
 	CTextCell(const CTextCell &obj) = default;
+	CTextCell &operator=(const CTextCell &obj) = default;
 	CTextCell(CTextCell &&obj) = default;
+	CTextCell &operator=(CTextCell &&obj) = default;
 
 	inline void Init(const ImmutableString<Tchar> str, \
 						const size_t field, const size_t record) {
@@ -56,6 +58,11 @@ public:
 	inline int EvalCellHeightByTextHeight(const int text_height) const{
 
 		return text_height + 2 * margin_y;
+	}
+
+	inline int GetMarginsWidth() const {
+
+		return 2 * margin_x;
 	}
 
 	inline void Reload() { }

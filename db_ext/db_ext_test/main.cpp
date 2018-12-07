@@ -9,8 +9,8 @@ int main() {
 
 	conn = factory.createConnection(CDbConnectionFactory::DB_CONN_MYSQL);
 
-	//setlocale(LC_ALL, "ukr_ukr.1251");
-	setlocale(LC_ALL, "uk_UA.UTF-8");
+	setlocale(LC_ALL, "ukr_ukr.1251");
+	//setlocale(LC_ALL, "uk_UA.UTF-8");
 	try {
 		conn->Connect("127.0.0.1", 3306, "orders_stat_user", "123", "orders");
 

@@ -93,7 +93,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../#libs/Debug;D:\Apps\MySQL Connector C x86\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../0libs/Debug;D:\Apps\MySQL Connector C x86\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>basic.lib;date.lib;db.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

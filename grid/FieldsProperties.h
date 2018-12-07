@@ -21,12 +21,15 @@ class CFieldsProperties : public IFieldsProperties {
 	std::vector<size_t> indexes;
 
 	int summ;
+
+	int addition;
 	int multiplier;
 public:
-	CFieldsProperties() : summ(0), multiplier(1) { }
+	CFieldsProperties() : summ(0), addition(0), multiplier(1) { }
 
-	CFieldsProperties(std::shared_ptr<const ITable> data_table_) : summ(0), multiplier(1), \
-													data_table(data_table_) {
+	CFieldsProperties(std::shared_ptr<const ITable> data_table_) : \
+							summ(0), addition(0), multiplier(1), \
+							data_table(data_table_) {
 
 		SyncWithDataTable();
 	}
@@ -51,6 +54,7 @@ public:
 				int field_size = (int)data_table->GetFieldMaxLengthInChars(i);
 
 				field_size *= multiplier;
+				field_size += addition;
 
 				fields_props.push_back(FieldProps{ field_size, empty_field_name, true });
 				indexes.push_back(i);
@@ -67,6 +71,7 @@ public:
 		std::vector<Tchar> empty_field_name;
 
 		field_size *= multiplier;
+		field_size += addition;
 
 		fields_props.insert(fields_props.begin() + index, \
 							FieldProps{ field_size, empty_field_name, true });
@@ -128,19 +133,23 @@ public:
 		}
 	}
 
-	void MultiplyAllSizesBy(const int multiplier) override {
+	void TransformAllSizes(const int addition, const int multiplier) override {
 
-		std::for_each(fields_props.begin(), fields_props.end(), \
-			[multiplier](FieldProps &field_item) {
+		for (auto p = fields_props.begin(); p != fields_props.end(); ++p) {
 
-			field_item.field_size *= multiplier;
-		});
+			p->field_size -= this->addition;
+			p->field_size /= this->multiplier;
 
+			p->field_size *= multiplier;
+			p->field_size += addition;
+		};
+
+		summ -= this->addition * (int)fields_props.size();
+		summ /= this->multiplier;
 		summ *= multiplier;
-	}
+		summ += addition * (int)fields_props.size();
 
-	void SetNewFieldMultiplier(const int multiplier) override {
-
+		this->addition = addition;
 		this->multiplier = multiplier;
 	}
 

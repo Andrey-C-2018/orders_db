@@ -6,13 +6,23 @@
 #include <table/EventsHandlersContainer.h>
 #include "Query.h"
 
+class CDbTableException : public XException {
+public:
+	enum {
+		E_WRONG_OPERATION = 1
+	};
+	CDbTableException(const int err_code, const Tchar *err_descr);
+	CDbTableException(const CDbTableException &obj);
+	CDbTableException(CDbTableException &&obj) = default;
+	~CDbTableException();
+};
+
 class CDbTable : public ITable{
 	std::shared_ptr<IDbConnection> conn;
 	CQuery query;
 	std::shared_ptr<IDbResultSet> result_set;
 
 	size_t curr_record;
-	std::string insert_str;
 
 	CEventsHandlersContainer event_handlers;
 public:
@@ -28,7 +38,6 @@ public:
 	void ConnectEventsHandler(ITableEventsHandlerPtr handler) override;
 	void DisconnectEventsHandler(ITableEventsHandlerPtr handler) override;
 
-	void SetInsertString(const Tchar *insert_str);
 	void AddField(const size_t max_field_len, const Tchar *field_name) override;
 	void AddRecord() override;
 

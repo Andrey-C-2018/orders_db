@@ -125,9 +125,10 @@ void CGrid::OnCreate(XEvent *eve) {
 	cells->SetBounds(left_pane_width, headers_height);
 
 	int single_char_width = configurator.GetCharWidthInPixels();
+	int cell_margins_width = configurator.GetCellMarginsWidth();
+
 	auto fields_props = data_table_proxy->GetFieldsProperties();
-	fields_props->MultiplyAllSizesBy(single_char_width);
-	fields_props->SetNewFieldMultiplier(single_char_width);
+	fields_props->TransformAllSizes(cell_margins_width, single_char_width);
 
 	hscroll.max = fields_props->GetFieldsSizesSumm() - 1;
 	hscroll.page = width - left_pane_width;
@@ -145,6 +146,7 @@ void CGrid::OnCreate(XEvent *eve) {
 	Connect(EVT_HSCROLL, this, &CGrid::OnHScroll);
 	Connect(EVT_VSCROLL, this, &CGrid::OnVScroll);
 	Connect(EVT_LBUTTONDOWN, this, &CGrid::OnMouseLButtonClick);
+	Connect(EVT_MOUSEWHEEL, this, &CGrid::OnMouseWheel);
 
 	OnWindowCreate();
 }
@@ -239,6 +241,29 @@ void CGrid::OnMouseLButtonClick(XMouseEvent *eve) {
 
 	cells->OnClick(x, y);
 	Invalidate(nullptr, false);
+}
+
+void CGrid::OnMouseWheel(XMouseWheelEvent *eve) {
+	auto LimitToLowerBound = [](const int value, const int lower_bound) {
+		return (value >= lower_bound) ? value : lower_bound;
+	};
+	auto LimitToUpperBound = [](const int value, const int upper_bound) {
+		return (value <= upper_bound) ? value : upper_bound;
+	};
+
+	if (vscroll.page < vscroll.max) {
+		if (eve->GetDelta() >= 0)
+			vscroll.pos = LimitToLowerBound(vscroll.pos - WHEEL_STEP, 0);
+		else
+			vscroll.pos = LimitToUpperBound(vscroll.pos + WHEEL_STEP, \
+											vscroll.max - vscroll.page + 1);
+
+		cells->BeginVScroll(vscroll.pos);
+		cells->EndScroll(vscroll.pos);
+
+		this->SetScrollBar(X_SCROLL_VERT, vscroll);
+		Invalidate(nullptr, false);
+	}
 }
 
 void CGrid::HideField(const size_t field_index) {

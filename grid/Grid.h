@@ -38,7 +38,8 @@ class CGrid : public XWidget, public IReloadable {
 	
 	enum Defaults {
 		DEF_LEFT_PANE_WIDTH = 30, \
-		DEF_HEADERS_HEIGHT = 30
+		DEF_HEADERS_HEIGHT = 30, \
+		WHEEL_STEP = 20
 	};
 
 	void OnCreate(XEvent *eve);
@@ -48,18 +49,19 @@ class CGrid : public XWidget, public IReloadable {
 	void OnHScroll(XScrollEvent *eve);
 	void OnVScroll(XScrollEventEx *eve);
 	void OnMouseLButtonClick(XMouseEvent *eve);
+	void OnMouseWheel(XMouseWheelEvent *eve);
 
 	inline int GetRecordsSizesSumm() const;
 	inline void ReevaluateHScrollMax();
 	inline void EvaluateScrollPos(const XScrollEvent *eve, \
 									XScrollParams &scroll_params) const;
 
-	CGrid(const CGrid &obj) = delete;
-	CGrid &operator=(const CGrid &obj) = delete;
-
 	void InitCellsAndHeaders(const int kind_of_layout);
 	inline void CheckWhetherAbsFieldIndexValid(const size_t abs_field_index);
 	inline void CheckWhetherFieldIndexValid(const size_t field_index);
+
+	CGrid(const CGrid &obj) = delete;
+	CGrid &operator=(const CGrid &obj) = delete;
 protected:
 	
 	CGrid();
@@ -80,6 +82,9 @@ public:
 				const Tchar *label, \
 				const int x, const int y, \
 				const int width, const int height) override;
+
+	CGrid(CGrid &&obj) = default;
+	CGrid &operator=(CGrid &&obj) = default;
 
 	inline size_t GetFieldsCount() const;
 	inline size_t GetRecordsCount() const;
@@ -179,7 +184,6 @@ void CGrid::FocusOnRecord(const size_t record_index) {
 
 	vscroll.pos = cells->FocusOnRecord(record_index, height - headers_height);
 	this->SetScrollBar(X_SCROLL_VERT, vscroll);
-	Invalidate(nullptr, false);
 }
 
 void CGrid::CheckWhetherAbsFieldIndexValid(const size_t abs_field_index) {

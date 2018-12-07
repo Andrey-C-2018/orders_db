@@ -52,7 +52,7 @@ class TSimpleFieldLayout : \
 		public TCellsLayout<Data, TCellWithLine<Cells, CHorizontalLine> > {
 	CFieldComposer composer;
 	int upper_bound;
-	CVerticalLine line;
+	CVerticalLine vertical_ending_line;
 
 	TSimpleFieldLayout(const TSimpleFieldLayout &obj) = delete;
 	TSimpleFieldLayout &operator=(const TSimpleFieldLayout &obj) = delete;
@@ -68,7 +68,7 @@ public:
 					TCellsLayout(std::move(obj)), \
 					composer(this, std::move(obj.composer)), \
 					upper_bound(obj.upper_bound), \
-					line(std::move(obj.line)) {
+			vertical_ending_line(std::move(obj.vertical_ending_line)) {
 	
 		obj.upper_bound = 0;
 	}
@@ -87,15 +87,15 @@ public:
 	}
 
 	void Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) override {
-		XSize new_size = line.GetNewSize(size);
+		XSize new_size = vertical_ending_line.GetSizeWithoutLine(size);
 
 		int y_end = composer.Draw(gc, initial_coords, new_size);
 
-		gc.RectangleWithBounds(initial_coords.x + new_size.width, \
-								initial_coords.y, \
-								initial_coords.x + size.width, y_end);
+		vertical_ending_line.Draw(gc, initial_coords, \
+									XSize(size.width, \
+											y_end - initial_coords.y));
 		
-		line.FillEmptySpace(gc, initial_coords.x, y_end, \
+		vertical_ending_line.FillEmptySpace(gc, initial_coords.x, y_end, \
 							initial_coords.x + size.width, \
 							initial_coords.y + size.height);
 	}
@@ -107,7 +107,7 @@ public:
 	
 	void AcceptConfigurator(IConfigurator *configurator) override {
 
-		configurator->Configure(line);
+		configurator->Configure(vertical_ending_line);
 		configurator->Configure(items);
 	}
 
@@ -266,7 +266,7 @@ class TSimpleRecordLayout : \
 			public ISharedComposerContainer{
 	CRecordComposer composer;
 	int left_bound;
-	CHorizontalLine line;
+	CHorizontalLine horizontal_ending_line;
 	
 	TSimpleRecordLayout(const TSimpleRecordLayout &obj) = delete;
 	TSimpleRecordLayout &operator=(const TSimpleRecordLayout &obj) = delete;
@@ -292,7 +292,7 @@ public:
 			TCellsLayout(std::move(obj)), \
 			composer(std::move(obj.composer)), \
 			left_bound(obj.left_bound), \
-			line(std::move(obj.line)) {
+			horizontal_ending_line(std::move(obj.horizontal_ending_line)) {
 	
 		obj.left_bound = 0;
 		composer.Init(this);		
@@ -317,15 +317,15 @@ public:
 	}
 
 	void Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) override {
-		XSize new_size = line.GetNewSize(size);
+		XSize new_size = horizontal_ending_line.GetSizeWithoutLine(size);
 
 		int x_end = composer.Draw(gc, initial_coords, new_size);
 
-		gc.RectangleWithBounds(initial_coords.x, \
-						initial_coords.y + new_size.height, \
-						x_end, initial_coords.y + size.height);
+		horizontal_ending_line.Draw(gc, initial_coords, \
+									XSize(x_end - initial_coords.x, \
+											size.height));
 
-		line.FillEmptySpace(gc, x_end, initial_coords.y, \
+		horizontal_ending_line.FillEmptySpace(gc, x_end, initial_coords.y, \
 								initial_coords.x + size.width, \
 								initial_coords.y + size.height);
 	}
@@ -334,7 +334,7 @@ public:
 
 	void AcceptConfigurator(IConfigurator *configurator) override {
 
-		configurator->Configure(line);
+		configurator->Configure(horizontal_ending_line);
 		configurator->Configure(items);
 	}
 
