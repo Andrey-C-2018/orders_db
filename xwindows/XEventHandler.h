@@ -26,6 +26,60 @@ public:
 
 //****************************************************************************
 
+class XEventHandlerData final {
+	CDelegate evt_handler_caller;
+	XEvent *eve;
+	IArguments *args_container;
+
+	XEventHandlerData(const XEventHandlerData &obj) = delete;
+	XEventHandlerData &operator=(const XEventHandlerData &obj) = delete;
+public:
+	template <class TObject, class TEvent> \
+		XEventHandlerData(TObject *object, \
+							void (TObject::*PFunc)(TEvent *)) {
+
+		TEvent *eve_t = new TEvent();
+		eve = dynamic_cast<XEvent*>(eve_t);
+		if (!eve) {
+			if (eve_t) delete eve_t;
+			XEventHandlerException e(XEventHandlerException::E_WRONG_EVENT_TYPE, \
+				_T("the member function pointer argument is not inherited from XEvent"));
+			throw e;
+		}
+
+		evt_handler_caller.Connect(object, PFunc);
+		args_container = new CArgumentsOne<TEvent *>(eve_t);
+	}
+
+	XEventHandlerData(XEventHandlerData &&obj) : \
+				evt_handler_caller(std::move(obj.evt_handler_caller)), \
+				eve(obj.eve), args_container(obj.args_container) {
+	
+		obj.eve = nullptr;
+		obj.args_container = nullptr;
+	}
+
+	XEventHandlerData &operator=(XEventHandlerData &&obj) {
+
+		evt_handler_caller = std::move(obj.evt_handler_caller);
+		eve = obj.eve;
+		args_container = obj.args_container;
+
+		obj.eve = nullptr;
+		obj.args_container = nullptr;
+	}
+
+	inline XEvent *MoveEventObj();
+	inline CDelegate MoveDelegate();
+	inline IArguments *MoveArgsContainer();
+
+	~XEventHandlerData() {
+
+		if (args_container) delete args_container;
+		if (eve) delete eve;
+	}
+};
+
 class XEventHandlerBasic{
 protected:
 	struct CEvtHandlerRec{
@@ -137,12 +191,16 @@ class XEventHandlerEmbedded : public XEventHandlerBasic{
 	std::vector<CEvtHandlerRec> evt_handlers;
 	XWindow *window;
 	_plWNDPROC orig_wnd_proc;
+
+	inline int ConnectImpl(const _plEventId id_event, \
+							XEventHandlerData evt_handler_data);
 public:
 	XEventHandlerEmbedded(XWindow *wnd, _plWNDPROC new_wnd_proc);
 	XEventHandlerEmbedded(const XEventHandlerEmbedded &obj) = delete;
 	XEventHandlerEmbedded(XEventHandlerEmbedded &&obj) = default;
 	XEventHandlerEmbedded &operator=(const XEventHandlerEmbedded &obj) = delete;
 	XEventHandlerEmbedded &operator=(XEventHandlerEmbedded &&obj) = default;
+
 	inline _plCallbackFnRetValue _plCallbackFnModifier \
 		WndProc(_plCallbackFnParams);
 
@@ -150,8 +208,11 @@ public:
 		int Connect(const _plEventId id_event,\
 					TObject *obj, \
 					void (TObject::*PFunc)(TEvent *));
+	int Connect(const _plEventId id_event, \
+					XEventHandlerData evt_handler_data);
 	int Disconnect(const _plEventId id_event);
 	void DisconnectAll();
+
 	virtual ~XEventHandlerEmbedded();
 };
 
@@ -172,12 +233,11 @@ protected:
 
 	static _plCallbackFnRetValue _plCallbackFnModifier \
 		MainWndProc(_plCallbackFnParams);
-	template <class TObject, class TEvent> \
-		inline int ConnectImpl(const _plEventId id_event,\
-								const _plNotificationCode id_ncode,\
-								const int id,\
-								TObject *obj, \
-								void (TObject::*PFunc)(TEvent *));
+
+	inline int ConnectImpl(const _plEventId id_event, \
+							const _plNotificationCode id_ncode, \
+							const int id, XEventHandlerData evt_handler_data);
+
 	inline void SetInternalHandle(const _plHWND hwnd) { this->hwnd = hwnd; }
 	virtual void OnWindowCreationCompleted() = 0;
 	virtual XWindow *GetThisAsXWindow() = 0;
@@ -200,6 +260,15 @@ public:
 	XEventHandler &operator=(XEventHandler &&obj);
 	inline _plHWND GetInternalHandle() const{ return hwnd; }
 	inline int GetId() const { return id; }
+
+	int Connect(const _plEventId id_event, \
+				const _plNotificationCode id_ncode, \
+				const int id, XEventHandlerData evt_handler_data);
+	int Connect(const _plEventId id_event, \
+				const int id, XEventHandlerData evt_handler_data);
+	int Connect(const _plEventId id_event, \
+				XEventHandlerData evt_handler_data);
+
 	template <class TObject, class TEvent> \
 		int Connect(const _plEventId id_event,\
 								const _plNotificationCode id_ncode,\
@@ -215,10 +284,12 @@ public:
 		int Connect(const _plEventId id_event,\
 								TObject *obj, \
 								void (TObject::*PFunc)(TEvent *));
+
 	template <class TObject, class TEvent> \
 		inline int OverrideWindowEvent(const _plEventId id_event,\
 								TObject *obj, \
 								void (TObject::*PFunc)(TEvent *));
+
 	int Disconnect(_plHWND hwnd, const _plEventId id_event, const _plNotificationCode id_ncode, \
 					const int id);
 	int Disconnect(_plHWND hwnd, const _plEventId id_event, const int id);
@@ -229,114 +300,125 @@ public:
 
 //****************************************************************************
 
-_plCallbackFnRetValue _plCallbackFnModifier \
-XEventHandlerEmbedded::WndProc(_plCallbackFnParams){
-CEvtHandlerRec rec;
-CEvtHandlerIterator p;
+XEvent *XEventHandlerData::MoveEventObj() {
 
-rec.id_event = _plGetEventId(_plCallbackFnParamsList);
-
-p = std::find(evt_handlers.begin(), evt_handlers.end(), rec);
-
-if(!(p != evt_handlers.end() && *p == rec))
-	return _plDefaultEventAction(orig_wnd_proc, _plCallbackFnParamsList);
-
-p->eve->PostInit(_plCallbackFnParamsList);
-
-p->evt_handler_caller.Call(p->eve_container);
-if(p->eve->GetDefaultActionStatus()){
-	p->eve->ExecuteDefaultEventAction(false);
-	return _plDefaultEventAction(orig_wnd_proc, _plCallbackFnParamsList);
+	XEvent *eve = this->eve;
+	this->eve = nullptr;
+	return eve;
 }
 
-return EVT_DONT_PROCESS;
+CDelegate XEventHandlerData::MoveDelegate() {
+
+	return std::move(this->evt_handler_caller);
+}
+
+IArguments *XEventHandlerData::MoveArgsContainer() {
+
+	IArguments *args = this->args_container;
+	this->args_container = nullptr;
+	return args;
+}
+
+//****************************************************************************
+
+_plCallbackFnRetValue _plCallbackFnModifier \
+XEventHandlerEmbedded::WndProc(_plCallbackFnParams){
+	CEvtHandlerRec rec;
+	CEvtHandlerIterator p;
+
+	rec.id_event = _plGetEventId(_plCallbackFnParamsList);
+
+	p = std::find(evt_handlers.begin(), evt_handlers.end(), rec);
+
+	if(!(p != evt_handlers.end() && *p == rec))
+		return _plDefaultEventAction(orig_wnd_proc, _plCallbackFnParamsList);
+
+	p->eve->PostInit(_plCallbackFnParamsList);
+
+	p->evt_handler_caller.Call(p->eve_container);
+	if(p->eve->GetDefaultActionStatus()){
+		p->eve->ExecuteDefaultEventAction(false);
+		return _plDefaultEventAction(orig_wnd_proc, _plCallbackFnParamsList);
+	}
+
+	return EVT_DONT_PROCESS;
+}
+
+int XEventHandlerEmbedded::ConnectImpl(const _plEventId id_event, \
+										XEventHandlerData evt_handler_data) {
+	CEvtHandlerRec rec;
+	CEvtHandlerConstIterator p;
+
+	if (id_event == EVT_DESTROY) {
+		throw XEventHandlerException(XEventHandlerException::E_WRONG_EVENT_TYPE, \
+			_T("the destroy event is restricted to connect. Use the dtor instead"));
+	}
+
+	rec.id_event = id_event;
+
+	p = std::find(evt_handlers.cbegin(), evt_handlers.cend(), rec);
+	if (p != evt_handlers.cend() && *p == rec)
+		return XEventHandlerException::W_DUPLICATE_HANDLER;
+
+	rec.eve = evt_handler_data.MoveEventObj();
+	rec.eve->InitEventData(id_event, 0, window, 0);
+
+	rec.evt_handler_caller = evt_handler_data.MoveDelegate();
+	rec.eve_container = evt_handler_data.MoveArgsContainer();
+
+	evt_handlers.emplace_back(std::move(rec));
+	return RESULT_SUCCESS;
 }
 
 template <class TObject, class TEvent> \
 int XEventHandlerEmbedded::Connect(const _plEventId id_event,\
 									TObject *obj, \
 									void (TObject::*PFunc)(TEvent *)){
-CEvtHandlerRec rec;
-CEvtHandlerConstIterator p;
-
-if (id_event == EVT_DESTROY) {
-	throw XEventHandlerException(XEventHandlerException::E_WRONG_EVENT_TYPE, \
-		_T("the destroy event is restricted to connect. Use the dtor instead"));
-}
-
-rec.id_event = id_event;
-
-p = std::find(evt_handlers.cbegin(), evt_handlers.cend(), rec);
-if(p != evt_handlers.cend() && *p == rec)
-	return XEventHandlerException::W_DUPLICATE_HANDLER;
-
-TEvent *eve = new TEvent(id_event, 0, window, 0);
-rec.eve = dynamic_cast<XEvent*>(eve);
-if(!rec.eve){
-	if (eve) delete eve;
-	XEventHandlerException e(XEventHandlerException::E_WRONG_EVENT_TYPE,\
-					_T("the member function pointer argument is not inherited from XEvent: ID = "));
-	e << window->GetId()<< _T(", ID_Event = ")<< id_event;
-	throw e;
-}
-rec.evt_handler_caller.Connect(obj, PFunc);
-rec.eve_container = new CArgumentsOne<TEvent>(eve);
-
-evt_handlers.emplace_back(std::move(rec));
-return RESULT_SUCCESS;
+	
+	return ConnectImpl(id_event, XEventHandlerData(obj, PFunc));
 }
 
 //****************************************************************************
 
-template <class TObject, class TEvent> 
-		int XEventHandler::ConnectImpl(const _plEventId id_event,\
-								const _plNotificationCode id_ncode,\
-								const int id,\
-								TObject *obj, \
-								void (TObject::*PFunc)(TEvent *)){
-CEvtHandlerRecEx rec;
-CEvtHandlerConstIteratorEx p;
+int XEventHandler::ConnectImpl(const _plEventId id_event, \
+							const _plNotificationCode id_ncode, \
+							const int id, XEventHandlerData evt_handler_data) {
 
-assert(id >= 0);
+	CEvtHandlerRecEx rec;
+	CEvtHandlerConstIteratorEx p;
 
-XWindow *window = this->GetThisAsXWindow();
+	assert(id >= 0);
 
-rec.hwnd = this->GetInternalHandle();
-rec.id = (id_event == EVT_CREATE) ? InitializeId() : id;
-rec.id_event = id_event;
-rec.id_ncode = id_ncode;
+	XWindow *window = this->GetThisAsXWindow();
 
-p = std::lower_bound(evt_handlers.cbegin(), evt_handlers.cend(), rec);
-if (p != evt_handlers.cend() && *p == rec) 
-	return XEventHandlerException::W_DUPLICATE_HANDLER;
+	rec.hwnd = this->GetInternalHandle();
+	rec.id = (id_event == EVT_CREATE) ? InitializeId() : id;
+	rec.id_event = id_event;
+	rec.id_ncode = id_ncode;
 
-TEvent *eve = new TEvent(id_event, id_ncode, window, rec.id);
-rec.eve = dynamic_cast<XEvent*>(eve);
-if(!rec.eve){
-	if(eve) delete eve;
+	p = std::lower_bound(evt_handlers.cbegin(), evt_handlers.cend(), rec);
+	if (p != evt_handlers.cend() && *p == rec)
+		return XEventHandlerException::W_DUPLICATE_HANDLER;
 
-	XEventHandlerException e(XEventHandlerException::E_WRONG_EVENT_TYPE,\
-					_T("the member function pointer argument is not inherited from XEvent: ID = "));
-	e << rec.id<< _T(", ID_Event = ")<< id_event<< _T(", ID_NCODE = ")<< id_ncode;
-	throw e;
-}
+	rec.eve = evt_handler_data.MoveEventObj();
+	rec.eve->InitEventData(id_event, id_ncode, window, rec.id);
 
-rec.evt_handler_caller.Connect(obj, PFunc);
-rec.eve_container = new CArgumentsOne<TEvent *>(eve);
+	rec.evt_handler_caller = evt_handler_data.MoveDelegate();
+	rec.eve_container = evt_handler_data.MoveArgsContainer();
 
-evt_handlers.emplace_back(std::move(rec));
-std::sort(evt_handlers.begin(), evt_handlers.end());
-return RESULT_SUCCESS;
+	evt_handlers.emplace_back(std::move(rec));
+	std::sort(evt_handlers.begin(), evt_handlers.end());
+	return RESULT_SUCCESS;
 }
 
 template <class TObject, class TEvent> \
-		int XEventHandler::Connect(const _plEventId id_event,\
+	int XEventHandler::Connect(const _plEventId id_event,\
 								const _plNotificationCode id_ncode,\
 								const int id,\
 								TObject *obj, \
 								void (TObject::*PFunc)(TEvent *)){
 
-return ConnectImpl(id_event, id_ncode, id, obj, PFunc);
+	return ConnectImpl(id_event, id_ncode, id, XEventHandlerData(obj, PFunc));
 }
 
 template <class TObject, class TEvent> \
@@ -345,7 +427,7 @@ template <class TObject, class TEvent> \
 								TObject *obj, \
 								void (TObject::*PFunc)(TEvent *)){
 
-return ConnectImpl(id_event, 0, id, obj, PFunc);
+	return ConnectImpl(id_event, 0, id, XEventHandlerData(obj, PFunc));
 }
 
 template <class TObject, class TEvent> \
@@ -353,7 +435,7 @@ template <class TObject, class TEvent> \
 								TObject *obj, \
 								void (TObject::*PFunc)(TEvent *)){
 
-return ConnectImpl(id_event, 0, 0, obj, PFunc);
+	return ConnectImpl(id_event, 0, 0, XEventHandlerData(obj, PFunc));
 }
 
 template <class TObject, class TEvent> \
@@ -361,7 +443,7 @@ int XEventHandler::OverrideWindowEvent(const _plEventId id_event,\
 										TObject *obj, \
 										void (TObject::*PFunc)(TEvent *)){
 
-XEventHandlerEmbedded *event_handler_embedded = InitEventHandlerEmbedded();
-return event_handler_embedded->Connect(id_event, obj, PFunc);
+	XEventHandlerEmbedded *event_handler_embedded = InitEventHandlerEmbedded();
+	return event_handler_embedded->Connect(id_event, obj, PFunc);
 }
 

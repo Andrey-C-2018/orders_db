@@ -90,8 +90,8 @@
     <ClInclude Include="IFieldsProperties.h">
       <Filter>interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="IGridCellWidget.h">
-      <Filter>interfaces</Filter>
+    <ClInclude Include="GridCellWidget.h">
+      <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

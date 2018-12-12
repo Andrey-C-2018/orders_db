@@ -34,7 +34,7 @@
     <ClInclude Include="IDrawable.h" />
     <ClInclude Include="IFieldsProperties.h" />
     <ClInclude Include="IGridCellsContainer.h" />
-    <ClInclude Include="IGridCellWidget.h" />
+    <ClInclude Include="GridCellWidget.h" />
     <ClInclude Include="IInteractiveObject.h" />
     <ClInclude Include="IReloadable.h" />
     <ClInclude Include="ISharedComposer.h" />
