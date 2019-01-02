@@ -24,7 +24,6 @@ void CCellConfigurator::Configure(CEditableTextCell &editable_cell) {
 	assert(text_height != -1);
 	assert(grid_line_size != -1);
 
-	editable_cell.SetParameters(parent, table_proxy);
 	cell_height = editable_cell.EvalCellHeightByTextHeight(text_height);
 	cell_margins_width = editable_cell.GetMarginsWidth();
 }

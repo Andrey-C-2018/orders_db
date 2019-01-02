@@ -18,8 +18,12 @@ public:
 };
 
 class CGrid : public XWidget, public IReloadable {
-	std::shared_ptr<ITable> data_table;
+protected:
 	std::shared_ptr<CGridTableProxy> data_table_proxy;
+
+private:
+	std::shared_ptr<ITable> data_table;
+
 	IGridCellsContainer *headers;
 	IGridCellsContainer *cells;
 	int width, height;

@@ -2,10 +2,9 @@
 #include "GridTableProxy.h"
 
 CEditableTextCell::CEditableTextCell() : def_active_cell(nullptr), \
-									active_field(0), active_record(0), \
+									active_field((size_t)-1), active_record((size_t)-1), \
 									active_cell_reached(false), \
-									active_cell_text(nullptr), \
-									active_cell_text_len(0), \
+									active_cell_text(nullptr, 0), \
 									active_cell_color(255, 255, 255), \
 									active_cell_hidden(true), \
 									scroll_ended(true), \
@@ -20,7 +19,6 @@ CEditableTextCell::CEditableTextCell(CEditableTextCell &&obj) : \
 									active_record(obj.active_record), \
 									active_cell_reached(obj.active_cell_reached), \
 									active_cell_text(obj.active_cell_text), \
-									active_cell_text_len(obj.active_cell_text_len), \
 									active_cell_color(255, 255, 255), \
 									active_cell_hidden(obj.active_cell_hidden), \
 									scroll_ended(obj.scroll_ended), \
@@ -31,11 +29,11 @@ CEditableTextCell::CEditableTextCell(CEditableTextCell &&obj) : \
 									skip_reloading(obj.skip_reloading) {
 
 	obj.def_active_cell = nullptr;
-	obj.active_field = 0;
-	obj.active_record = 0;
+	obj.active_field = (size_t)-1;
+	obj.active_record = (size_t)-1;
 	obj.active_cell_reached = false;
-	obj.active_cell_text = nullptr;
-	obj.active_cell_text_len = 0;
+	obj.active_cell_text.str = nullptr;
+	obj.active_cell_text.size = 0;
 	obj.active_cell_hidden = true;
 	obj.scroll_ended = true;
 	obj.old_scroll_pos = 0;
@@ -50,32 +48,46 @@ void CEditableTextCell::SetBounds(const int left_bound, const int upper_bound) {
 	bounds.top = upper_bound;
 }
 
-void CEditableTextCell::SetParameters(XWindow *parent, std::shared_ptr<CGridTableProxy> table_proxy) {
+void CEditableTextCell::SetParameters(XWindow * parent, IGridCellWidget *cell_widget, \
+										std::shared_ptr<CGridTableProxy> table_proxy) {
 
 	int flags = FL_WINDOW_CLIPSIBLINGS | FL_EDIT_AUTOHSCROLL;
 
 	assert(!def_active_cell);
+	assert(cell_widget);
+	def_active_cell = cell_widget;
+
 	assert(parent);
+	assert(cell_widget);
 
 	assert(!this->table_proxy);
 	assert(table_proxy);
 	this->table_proxy = table_proxy;
 
+	active_field = 0;
+	active_record = 0;
+
 	ImmutableString<Tchar> label(nullptr, 0);
 	if (table_proxy->GetRecordsCount())
 		label = table_proxy->GetCellAsString(active_field, active_record);
 
-	def_active_cell = new XEdit(parent, flags, label.str ? label.str : _T(""), \
-									0, 0, 10, 10);
+	try {
+		def_active_cell->CreateCellWidget(parent, flags, label.str ? label.str : _T(""), \
+											0, 0, 10, 10);
+	}
+	catch (...) {
+		delete def_active_cell;
+		throw;
+	}
 	assert(def_active_cell);
 
-	parent->Connect(EVT_COMMAND, NCODE_EDIT_CHANGED, def_active_cell->GetId(), \
-						this, &CEditableTextCell::OnActiveCellTextChanged);
+	def_active_cell->SetOnChangeHandler(XEventHandlerData(this, \
+											&CEditableTextCell::OnActiveCellTextChanged));
 }
 
 void CEditableTextCell::Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) {
 
-	if (active_cell_reached) {
+	if (active_cell_reached && def_active_cell) {
 		if (initial_coords != curr_coords || size != curr_size || \
 			(active_cell_hidden && scroll_ended)) {
 
@@ -122,6 +134,27 @@ void CEditableTextCell::OnActiveCellTextChanged(XCommandEvent *eve) {
 	changes_present = true;
 }
 
+void CEditableTextCell::OnActiveCellKeyPressed(XKeyboardEvent *eve) {
+
+	switch (eve->GetKey()) {
+	case X_VKEY_ENTER:
+		OnClick(active_field, active_record);
+
+		eve->ExecuteDefaultEventAction(false);
+		break;
+
+	case X_VKEY_ESCAPE:
+		Reload();
+
+		eve->ExecuteDefaultEventAction(false);
+	}
+}
+
+void CEditableTextCell::OnActiveCellLoosesFocus(XEvent *eve) {
+
+	OnClick(active_field, active_record);
+}
+
 void CEditableTextCell::OnClick(const size_t field, const size_t record) {
 
 	CommitChangesIfPresent();
@@ -147,10 +180,10 @@ void CEditableTextCell::OnClick(const size_t field, const size_t record) {
 void CEditableTextCell::CommitChangesIfPresent() {
 
 	if (changes_present) {
-		const Tchar *value = def_active_cell->GetLabel();
+		ImmutableString<Tchar> value = def_active_cell->GetLabel();
 
 		skip_reloading = true;
-		table_proxy->SetCell(active_field, active_record, value);
+		table_proxy->SetCell(active_field, active_record, value.str);
 		skip_reloading = false;
 
 		changes_present = false;
@@ -171,8 +204,9 @@ void CEditableTextCell::Reload() {
 	if (skip_reloading || !table_proxy->GetRecordsCount()) return;
 
 	ImmutableString<Tchar> label = table_proxy->GetCellAsString(active_field, active_record);
+	label.str = label.str ? label.str : _T("");
 
 	update_cell_widget_text = true;
-	def_active_cell->SetLabel(label.str ? label.str : _T(""), label.size);
+	def_active_cell->SetLabel(label);
 	update_cell_widget_text = false;
 }

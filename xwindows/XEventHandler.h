@@ -289,6 +289,8 @@ public:
 		inline int OverrideWindowEvent(const _plEventId id_event,\
 								TObject *obj, \
 								void (TObject::*PFunc)(TEvent *));
+	inline int OverrideWindowEvent(const _plEventId id_event, \
+									XEventHandlerData evt_handler_data);
 
 	int Disconnect(_plHWND hwnd, const _plEventId id_event, const _plNotificationCode id_ncode, \
 					const int id);
@@ -447,3 +449,9 @@ int XEventHandler::OverrideWindowEvent(const _plEventId id_event,\
 	return event_handler_embedded->Connect(id_event, obj, PFunc);
 }
 
+int XEventHandler::OverrideWindowEvent(const _plEventId id_event, \
+										XEventHandlerData evt_handler_data) {
+
+	XEventHandlerEmbedded *event_handler_embedded = InitEventHandlerEmbedded();
+	return event_handler_embedded->Connect(id_event, std::move(evt_handler_data));
+}

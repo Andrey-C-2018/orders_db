@@ -5,8 +5,15 @@ protected:
 	static XApp *instance;
 	bool msg_loop_status;
 	int return_code;
+
 	XApp() noexcept : msg_loop_status(false), \
 						return_code(-1){ }
+
+	XApp(const XApp &obj) = delete;
+	XApp(XApp &&obj) = delete;
+	XApp &operator=(const XApp &obj) = delete;
+	XApp &operator=(XApp &&obj) = delete;
+
 public:
 	static XApp *GetInstance();
 	virtual void OnInit();

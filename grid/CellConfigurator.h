@@ -10,23 +10,17 @@ class CCellConfigurator : public IConfigurator {
 	int cell_height, cell_margins_width;
 	int char_width;
 	int grid_line_size;
-	XWindow *parent;
-	std::shared_ptr<CGridTableProxy> table_proxy;
+
 	XBrush *background_brush;
 	XPen *background_pen;
 	
-	inline void InternalInit(XGC *gc, XFont *font, XWindow *parent, \
-							std::shared_ptr<CGridTableProxy> table_proxy, \
+	inline void InternalInit(XGC *gc, XFont *font, \
 							XBrush *background_brush_, \
 							XPen *background_pen_) {
 		assert(gc && font);
-		assert(parent);
-		assert(table_proxy);
 		assert(background_brush_);
 		assert(background_pen_);
 
-		this->parent = parent;
-		this->table_proxy = table_proxy;
 		this->background_brush = background_brush_;
 		this->background_pen = background_pen_;
 
@@ -51,22 +45,18 @@ public:
 	CCellConfigurator &operator=(const CCellConfigurator &obj) = delete;
 	CCellConfigurator &operator=(CCellConfigurator &&obj) = default;
 
-	CCellConfigurator(XGC *gc, XFont *font, XWindow *parent, \
-						std::shared_ptr<CGridTableProxy> table_proxy, \
+	CCellConfigurator(XGC *gc, XFont *font, \
 						XBrush *background_brush_, \
 						XPen *background_pen_) : cell_height(-1) {
 
-		InternalInit(gc, font, parent, table_proxy, \
-						background_brush_, background_pen_);
+		InternalInit(gc, font, background_brush_, background_pen_);
 	}
 
-	void Init(XGC *gc, XFont *font, XWindow *parent, \
-						std::shared_ptr<CGridTableProxy> table_proxy, \
+	void Init(XGC *gc, XFont *font, \
 						XBrush *background_brush_, \
 						XPen *background_pen_) {
 
-		InternalInit(gc, font, parent, table_proxy, \
-						background_brush_, background_pen_);
+		InternalInit(gc, font, background_brush_, background_pen_);
 	}
 
 	void Configure(CGridLine &line) override;

@@ -1,20 +1,18 @@
 #pragma once
 #include <vector>
 #include "IDrawable.h"
-#include "ICellWidget.h"
 #include "TextCell.h"
-#include "xwindows/XEdit.h"
+#include "IGridCellWidget.h"
 
 class CGridTableProxy;
 
 class CEditableTextCell : public IDrawable {
-	XEdit *def_active_cell;
+	IGridCellWidget *def_active_cell;
 	CTextCell unactive_cell;
 	size_t active_field, active_record;
 	bool active_cell_reached;
 
-	const Tchar *active_cell_text;
-	size_t active_cell_text_len;
+	ImmutableString<Tchar> active_cell_text;
 	XColor active_cell_color;
 
 	XPoint curr_coords;
@@ -45,7 +43,8 @@ public:
 	inline size_t GetActiveRecord() const;
 
 	void SetBounds(const int left_bound, const int upper_bound) override;
-	void SetParameters(XWindow *parent, std::shared_ptr<CGridTableProxy> table_procy);
+	void SetParameters(XWindow * parent, IGridCellWidget *cell_widget, \
+						std::shared_ptr<CGridTableProxy> table_procy);
 
 	inline void BeginScroll(const int scroll_pos);
 	inline void EndScroll(const int scroll_pos);
@@ -54,8 +53,11 @@ public:
 					const size_t field, const size_t record);
 	void Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) override;
 
-	void OnClick(const size_t field, const size_t record);
 	void OnActiveCellTextChanged(XCommandEvent *eve);
+	void OnClick(const size_t field, const size_t record);
+	void OnActiveCellLoosesFocus(XEvent *eve);
+	void OnActiveCellKeyPressed(XKeyboardEvent *eve);
+
 	inline void OnFieldRemoved(const size_t field);
 
 	inline int EvalCellHeightByTextHeight(const int text_height) const;
@@ -116,10 +118,8 @@ void CEditableTextCell::Init(const ImmutableString<Tchar> str, \
 
 	if (active_cell_reached && active_cell_hidden && changes_present) {
 
-		active_cell_text = def_active_cell->GetLabel(active_cell_text_len);
-		ImmutableString<Tchar> preserved_str(active_cell_text, \
-										active_cell_text_len);
-		unactive_cell.Init(preserved_str, field, record);
+		active_cell_text = def_active_cell->GetLabel();
+		unactive_cell.Init(active_cell_text, field, record);
 	}
 }
 

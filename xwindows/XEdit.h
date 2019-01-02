@@ -8,6 +8,7 @@ public:
 	XEdit();
 	XEdit(XEdit &&obj) = default;
 	XEdit &operator=(XEdit &&obj) = default;
+
 	XEdit(XWindow *parent, const int flags, \
 			const Tchar *label, \
 			const int x, const int y, \

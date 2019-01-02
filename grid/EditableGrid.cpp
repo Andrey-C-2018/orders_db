@@ -1,10 +1,17 @@
 #include "EditableGrid.h"
 #include "EditableTextCell.h"
+#include "EditableCellWidget.h"
 
 class CEConfigurator : public IConfigurator {
+	XWindow *parent;
+	std::shared_ptr<CGridTableProxy> table_proxy;
+
 	CEditableTextCell *editable_cell;
 public:
-	CEConfigurator() : editable_cell(nullptr) { }
+	CEConfigurator(XWindow *parent_, \
+					std::shared_ptr<CGridTableProxy> table_proxy_) : \
+					parent(parent_), table_proxy(table_proxy_), \
+					editable_cell(nullptr) { }
 
 	void Configure(CGridLine &line) override { }
 
@@ -13,6 +20,8 @@ public:
 	void Configure(CEditableTextCell &editable_cell_) override {
 
 		this->editable_cell = &editable_cell_;
+		IGridCellWidget *editable_cell_widget = new CEditableCellWidget();
+		this->editable_cell->SetParameters(parent, editable_cell_widget, table_proxy);
 	}
 
 	inline CEditableTextCell *GetEditableTextCell() const {
@@ -28,12 +37,12 @@ public:
 CEditableGrid::CEditableGrid() : CGrid(), editable_cell(nullptr){ }
 
 LayoutObjects CEditableGrid::CreateLayoutObjects(const int kind_of_layout) {
-	LayoutObjects obj;
+
 	return CreateLayoutObjectsHelper<CEditableTextCell>(kind_of_layout);
 }
 
 void CEditableGrid::OnWindowCreate() {
-	CEConfigurator configurator;
+	CEConfigurator configurator(this, data_table_proxy);
 
 	AcceptConfiguratorOnCells(&configurator);
 	editable_cell = configurator.GetEditableTextCell();

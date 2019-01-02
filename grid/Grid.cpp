@@ -109,7 +109,7 @@ void CGrid::OnCreate(XEvent *eve) {
 	assert(cells);
 	assert(height > 0);
 
-	configurator.Init(&gc, &headers_font, this, data_table_proxy, \
+	configurator.Init(&gc, &headers_font, \
 						&background_brush, &background_pen);
 
 	headers->AcceptConfigurator(&configurator);
@@ -117,7 +117,7 @@ void CGrid::OnCreate(XEvent *eve) {
 	headers->SetItemHeight(headers_height);
 	headers->SetBounds(left_pane_width, 0);
 
-	configurator.Init(&gc, &cells_font, this, data_table_proxy, \
+	configurator.Init(&gc, &cells_font, \
 						&background_brush, &background_pen);
 		
 	cells->AcceptConfigurator(&configurator);

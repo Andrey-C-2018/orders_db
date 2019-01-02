@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="CellConfigurator.h" />
     <ClInclude Include="CellsLayout.h" />
+    <ClInclude Include="EditableCellWidget.h" />
     <ClInclude Include="FieldsProperties.h" />
     <ClInclude Include="GridCommonDeclarations.h" />
     <ClInclude Include="GridLine.h" />
@@ -28,13 +29,12 @@
     <ClInclude Include="Grid.h" />
     <ClInclude Include="FieldComposer.h" />
     <ClInclude Include="GridTableProxy.h" />
-    <ClInclude Include="ICellWidget.h" />
     <ClInclude Include="IComposedDrawable.h" />
     <ClInclude Include="IConfigurator.h" />
     <ClInclude Include="IDrawable.h" />
     <ClInclude Include="IFieldsProperties.h" />
     <ClInclude Include="IGridCellsContainer.h" />
-    <ClInclude Include="GridCellWidget.h" />
+    <ClInclude Include="IGridCellWidget.h" />
     <ClInclude Include="IInteractiveObject.h" />
     <ClInclude Include="IReloadable.h" />
     <ClInclude Include="ISharedComposer.h" />
@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CellConfigurator.cpp" />
+    <ClCompile Include="EditableCellWidget.cpp" />
     <ClCompile Include="EditableGrid.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="EditableTextCell.cpp" />
