@@ -63,7 +63,7 @@ public:
 
 	void Configure(CTextCell &text_cell) override;
 
-	void Configure(CEditableTextCell &editable_cell) override;
+	void Configure(CDispatcherCell &disp_cell) override;
 
 	inline int GetCellHeight() const {
 

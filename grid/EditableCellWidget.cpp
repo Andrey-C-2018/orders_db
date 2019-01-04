@@ -1,5 +1,7 @@
 #include "EditableCellWidget.h"
 
+IMPLEMENT_EVENT_OVERRIDE(CEditableCellWidget)
+
 CEditableCellWidget::CEditableCellWidget() { }
 
 void CEditableCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
@@ -24,7 +26,7 @@ void CEditableCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focu
 
 void CEditableCellWidget::SetOnKeyPressHandler(XEventHandlerData on_key_press) {
 
-	//edit->OverrideWindowEvent(EVT_KEYDOWN, std::move(on_key_press));
+	OverrideWindowEvent(EVT_KEYDOWN, std::move(on_key_press));
 }
 
 void CEditableCellWidget::SetCurrentField(const size_t field) { }

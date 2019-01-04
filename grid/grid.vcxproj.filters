@@ -45,9 +45,6 @@
     <ClInclude Include="EditableGrid.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="EditableTextCell.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="GridLine.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
@@ -93,6 +90,12 @@
     <ClInclude Include="IGridCellWidget.h">
       <Filter>interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="DispatcherCell.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="MultipleCellWidget.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Grid.cpp">
@@ -114,6 +117,9 @@
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="EditableCellWidget.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="MultipleCellWidget.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>

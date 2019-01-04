@@ -35,5 +35,7 @@ public:
 	int GetId() const override;
 
 	virtual ~CEditableCellWidget();
+
+	DECLARE_EVENT_OVERRIDE
 };
 

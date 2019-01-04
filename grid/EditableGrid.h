@@ -2,7 +2,7 @@
 #include "Grid.h"
 
 class CEditableGrid : public CGrid{
-	CEditableTextCell *editable_cell;
+	CDispatcherCell *disp_cell;
 
 	void OnKeyPress(XKeyboardEvent *eve);
 protected:

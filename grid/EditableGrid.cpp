@@ -1,32 +1,32 @@
 #include "EditableGrid.h"
-#include "EditableTextCell.h"
+#include "DispatcherCell.h"
 #include "EditableCellWidget.h"
 
 class CEConfigurator : public IConfigurator {
 	XWindow *parent;
 	std::shared_ptr<CGridTableProxy> table_proxy;
 
-	CEditableTextCell *editable_cell;
+	CDispatcherCell *disp_cell;
 public:
 	CEConfigurator(XWindow *parent_, \
 					std::shared_ptr<CGridTableProxy> table_proxy_) : \
 					parent(parent_), table_proxy(table_proxy_), \
-					editable_cell(nullptr) { }
+					disp_cell(nullptr) { }
 
 	void Configure(CGridLine &line) override { }
 
 	void Configure(CTextCell &text_cell) override {	}
 
-	void Configure(CEditableTextCell &editable_cell_) override {
+	void Configure(CDispatcherCell &disp_cell_) override {
 
-		this->editable_cell = &editable_cell_;
+		this->disp_cell = &disp_cell_;
 		IGridCellWidget *editable_cell_widget = new CEditableCellWidget();
-		this->editable_cell->SetParameters(parent, editable_cell_widget, table_proxy);
+		this->disp_cell->SetParameters(parent, editable_cell_widget, table_proxy);
 	}
 
-	inline CEditableTextCell *GetEditableTextCell() const {
+	inline CDispatcherCell *GetDispatcherCell() const {
 
-		return editable_cell;
+		return disp_cell;
 	}
 
 	virtual ~CEConfigurator() { }
@@ -34,27 +34,27 @@ public:
 
 //**************************************************************
 
-CEditableGrid::CEditableGrid() : CGrid(), editable_cell(nullptr){ }
+CEditableGrid::CEditableGrid() : CGrid(), disp_cell(nullptr){ }
 
 LayoutObjects CEditableGrid::CreateLayoutObjects(const int kind_of_layout) {
 
-	return CreateLayoutObjectsHelper<CEditableTextCell>(kind_of_layout);
+	return CreateLayoutObjectsHelper<CDispatcherCell>(kind_of_layout);
 }
 
 void CEditableGrid::OnWindowCreate() {
 	CEConfigurator configurator(this, data_table_proxy);
 
 	AcceptConfiguratorOnCells(&configurator);
-	editable_cell = configurator.GetEditableTextCell();
+	disp_cell = configurator.GetDispatcherCell();
 
 	Connect(EVT_KEYDOWN, this, &CEditableGrid::OnKeyPress);
 }
 
 void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
-	assert(editable_cell);
+	assert(disp_cell);
 	size_t visible_records_count = GetVisibleRecordsCount();
-	size_t active_record = editable_cell->GetActiveRecord();
-	size_t active_field = editable_cell->GetActiveField();
+	size_t active_record = disp_cell->GetActiveRecord();
+	size_t active_field = disp_cell->GetActiveField();
 
 	size_t records_count = GetRecordsCount();
 	size_t fields_count = GetFieldsCount();
@@ -102,13 +102,13 @@ void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
 		break;
 
 		case X_VKEY_ENTER:
-			editable_cell->SetFocus();
+			disp_cell->SetFocus();
 	}
 
 	if (Key && (new_record != active_record || \
 				new_field != active_field)) {
 		
-		editable_cell->OnClick(new_field, new_record);
+		disp_cell->OnClick(new_field, new_record);
 
 		if(new_record != active_record)
 			FocusOnRecord(new_record);

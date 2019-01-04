@@ -1,7 +1,7 @@
-#include "EditableTextCell.h"
+#include "DispatcherCell.h"
 #include "GridTableProxy.h"
 
-CEditableTextCell::CEditableTextCell() : def_active_cell(nullptr), \
+CDispatcherCell::CDispatcherCell() : def_active_cell(nullptr), \
 									active_field((size_t)-1), active_record((size_t)-1), \
 									active_cell_reached(false), \
 									active_cell_text(nullptr, 0), \
@@ -13,7 +13,7 @@ CEditableTextCell::CEditableTextCell() : def_active_cell(nullptr), \
 									changes_present(false), \
 									skip_reloading(false) { }
 
-CEditableTextCell::CEditableTextCell(CEditableTextCell &&obj) : \
+CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : \
 									def_active_cell(obj.def_active_cell), \
 									active_field(obj.active_field), \
 									active_record(obj.active_record), \
@@ -42,13 +42,13 @@ CEditableTextCell::CEditableTextCell(CEditableTextCell &&obj) : \
 	obj.skip_reloading = false;
 }
 
-void CEditableTextCell::SetBounds(const int left_bound, const int upper_bound) {
+void CDispatcherCell::SetBounds(const int left_bound, const int upper_bound) {
 
 	bounds.left = left_bound;
 	bounds.top = upper_bound;
 }
 
-void CEditableTextCell::SetParameters(XWindow * parent, IGridCellWidget *cell_widget, \
+void CDispatcherCell::SetParameters(XWindow * parent, IGridCellWidget *cell_widget, \
 										std::shared_ptr<CGridTableProxy> table_proxy) {
 
 	int flags = FL_WINDOW_CLIPSIBLINGS | FL_EDIT_AUTOHSCROLL;
@@ -82,10 +82,14 @@ void CEditableTextCell::SetParameters(XWindow * parent, IGridCellWidget *cell_wi
 	assert(def_active_cell);
 
 	def_active_cell->SetOnChangeHandler(XEventHandlerData(this, \
-											&CEditableTextCell::OnActiveCellTextChanged));
+											&CDispatcherCell::OnActiveCellTextChanged));
+	def_active_cell->SetOnKeyPressHandler(XEventHandlerData(this, \
+											&CDispatcherCell::OnActiveCellKeyPressed));
+	def_active_cell->SetOnLooseFocusHandler(XEventHandlerData(this, \
+											&CDispatcherCell::OnActiveCellLoosesFocus));
 }
 
-void CEditableTextCell::Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) {
+void CDispatcherCell::Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) {
 
 	if (active_cell_reached && def_active_cell) {
 		if (initial_coords != curr_coords || size != curr_size || \
@@ -127,14 +131,14 @@ void CEditableTextCell::Draw(XGC &gc, const XPoint &initial_coords, const XSize 
 		unactive_cell.Draw(gc, initial_coords, size);
 }
 
-void CEditableTextCell::OnActiveCellTextChanged(XCommandEvent *eve) {
+void CDispatcherCell::OnActiveCellTextChanged(XCommandEvent *eve) {
 
 	if (update_cell_widget_text) return;
 	
 	changes_present = true;
 }
 
-void CEditableTextCell::OnActiveCellKeyPressed(XKeyboardEvent *eve) {
+void CDispatcherCell::OnActiveCellKeyPressed(XKeyboardEvent *eve) {
 
 	switch (eve->GetKey()) {
 	case X_VKEY_ENTER:
@@ -150,17 +154,18 @@ void CEditableTextCell::OnActiveCellKeyPressed(XKeyboardEvent *eve) {
 	}
 }
 
-void CEditableTextCell::OnActiveCellLoosesFocus(XEvent *eve) {
+void CDispatcherCell::OnActiveCellLoosesFocus(XEvent *eve) {
 
 	OnClick(active_field, active_record);
 }
 
-void CEditableTextCell::OnClick(const size_t field, const size_t record) {
+void CDispatcherCell::OnClick(const size_t field, const size_t record) {
 
 	CommitChangesIfPresent();
 	size_t new_records_count = table_proxy->GetRecordsCount();
 
 	active_field = field;
+	def_active_cell->SetCurrentField(active_field);
 
 	if (!new_records_count) {
 		def_active_cell->Hide();
@@ -177,7 +182,7 @@ void CEditableTextCell::OnClick(const size_t field, const size_t record) {
 	OnActiveCellLocationChanged();
 }
 
-void CEditableTextCell::CommitChangesIfPresent() {
+void CDispatcherCell::CommitChangesIfPresent() {
 
 	if (changes_present) {
 		ImmutableString<Tchar> value = def_active_cell->GetLabel();
@@ -190,7 +195,7 @@ void CEditableTextCell::CommitChangesIfPresent() {
 	}
 }
 
-void CEditableTextCell::OnActiveCellLocationChanged() {
+void CDispatcherCell::OnActiveCellLocationChanged() {
 
 	def_active_cell->Hide();
 	Reload();
@@ -199,7 +204,7 @@ void CEditableTextCell::OnActiveCellLocationChanged() {
 	scroll_ended = true;
 }
 
-void CEditableTextCell::Reload() {
+void CDispatcherCell::Reload() {
 
 	if (skip_reloading || !table_proxy->GetRecordsCount()) return;
 

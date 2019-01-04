@@ -6,7 +6,7 @@
 
 class CGridTableProxy;
 
-class CEditableTextCell : public IDrawable {
+class CDispatcherCell : public IDrawable {
 	IGridCellWidget *def_active_cell;
 	CTextCell unactive_cell;
 	size_t active_field, active_record;
@@ -32,12 +32,12 @@ class CEditableTextCell : public IDrawable {
 	void CommitChangesIfPresent();
 	void OnActiveCellLocationChanged();
 public:
-	CEditableTextCell();
-	CEditableTextCell(const CEditableTextCell &obj) = delete;
-	CEditableTextCell(CEditableTextCell &&obj);
+	CDispatcherCell();
+	CDispatcherCell(const CDispatcherCell &obj) = delete;
+	CDispatcherCell(CDispatcherCell &&obj);
 
-	CEditableTextCell &operator=(const CEditableTextCell &obj) = delete;
-	CEditableTextCell &operator=(CEditableTextCell &&obj) = delete;
+	CDispatcherCell &operator=(const CDispatcherCell &obj) = delete;
+	CDispatcherCell &operator=(CDispatcherCell &&obj) = delete;
 
 	inline size_t GetActiveField() const;
 	inline size_t GetActiveRecord() const;
@@ -66,32 +66,32 @@ public:
 	inline void SetFocus();
 	void Reload();
 
-	virtual ~CEditableTextCell(){ }
+	virtual ~CDispatcherCell(){ }
 };
 
 //**************************************************************
 
-int CEditableTextCell::EvalCellHeightByTextHeight(const int text_height) const {
+int CDispatcherCell::EvalCellHeightByTextHeight(const int text_height) const {
 
 	return unactive_cell.EvalCellHeightByTextHeight(text_height);
 }
 
-int CEditableTextCell::GetMarginsWidth() const {
+int CDispatcherCell::GetMarginsWidth() const {
 
 	return unactive_cell.GetMarginsWidth();
 }
 
-size_t CEditableTextCell::GetActiveField() const {
+size_t CDispatcherCell::GetActiveField() const {
 
 	return this->active_field;
 }
 
-size_t CEditableTextCell::GetActiveRecord() const {
+size_t CDispatcherCell::GetActiveRecord() const {
 
 	return this->active_record;
 }
 
-void CEditableTextCell::BeginScroll(const int scroll_pos) {
+void CDispatcherCell::BeginScroll(const int scroll_pos) {
 
 	if (scroll_pos == old_scroll_pos) return;
 	old_scroll_pos = scroll_pos;
@@ -103,12 +103,12 @@ void CEditableTextCell::BeginScroll(const int scroll_pos) {
 	scroll_ended = false;
 }
 
-void CEditableTextCell::EndScroll(const int scroll_pos) {
+void CDispatcherCell::EndScroll(const int scroll_pos) {
 
 	scroll_ended = true;
 }
 
-void CEditableTextCell::Init(const ImmutableString<Tchar> str, \
+void CDispatcherCell::Init(const ImmutableString<Tchar> str, \
 							const size_t field, const size_t record) {
 
 	active_cell_reached = (field == active_field && record == active_record);
@@ -123,13 +123,13 @@ void CEditableTextCell::Init(const ImmutableString<Tchar> str, \
 	}
 }
 
-void CEditableTextCell::SetFocus() {
+void CDispatcherCell::SetFocus() {
 
 	assert(def_active_cell);
 	def_active_cell->SetFocus();
 }
 
-void CEditableTextCell::OnFieldRemoved(const size_t field) {
+void CDispatcherCell::OnFieldRemoved(const size_t field) {
 
 	if (field <= active_field) {
 		
@@ -140,6 +140,7 @@ void CEditableTextCell::OnFieldRemoved(const size_t field) {
 		else
 			--active_field;
 
+		def_active_cell->SetCurrentField(active_field);
 		OnActiveCellLocationChanged();
 	}
 }

@@ -38,8 +38,9 @@
     <ClInclude Include="IInteractiveObject.h" />
     <ClInclude Include="IReloadable.h" />
     <ClInclude Include="ISharedComposer.h" />
-    <ClInclude Include="EditableTextCell.h" />
+    <ClInclude Include="DispatcherCell.h" />
     <ClInclude Include="ISizes.h" />
+    <ClInclude Include="MultipleCellWidget.h" />
     <ClInclude Include="RecordComposer.h" />
     <ClInclude Include="RecordEvaluator.h" />
     <ClInclude Include="StringGrid.h" />
@@ -52,6 +53,7 @@
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="EditableTextCell.cpp" />
     <ClCompile Include="GridTableProxy.cpp" />
+    <ClCompile Include="MultipleCellWidget.cpp" />
     <ClCompile Include="StringGrid.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
