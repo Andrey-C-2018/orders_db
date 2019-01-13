@@ -80,6 +80,7 @@ protected:
 
 	inline size_t GetVisibleRecordsCount() const;
 	inline void FocusOnRecord(const size_t record_index);
+	inline void FocusOnField(const size_t field_index);
 
 public:
 	void Create(XWindow *parent, const int flags,
@@ -188,6 +189,12 @@ void CGrid::FocusOnRecord(const size_t record_index) {
 
 	vscroll.pos = cells->FocusOnRecord(record_index, height - headers_height);
 	this->SetScrollBar(X_SCROLL_VERT, vscroll);
+}
+
+void CGrid::FocusOnField(const size_t field_index) {
+
+	hscroll.pos = cells->FocusOnField(field_index, hscroll.page, hscroll.max);
+	this->SetScrollBar(X_SCROLL_HORZ, hscroll);
 }
 
 void CGrid::CheckWhetherAbsFieldIndexValid(const size_t abs_field_index) {

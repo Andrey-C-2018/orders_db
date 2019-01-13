@@ -113,8 +113,9 @@ void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
 		if(new_record != active_record)
 			FocusOnRecord(new_record);
 
-		//if (new_field != active_field)
-			//FocusOnField(new_field);
+		if (new_field != active_field)
+			FocusOnField(new_field);
+
 		Invalidate(nullptr, false);
 	}
 }

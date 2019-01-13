@@ -146,6 +146,12 @@ public:
 		return composer.FocusOnItem(record_index, height);
 	}
 
+	int FocusOnField(const size_t field, const int grid_widget_width, \
+					const int sum) override {
+
+		return 0;
+	}
+
 	int RemoveField(const size_t field, const int grid_widget_width, \
 					const int sum) override {
 	
@@ -249,6 +255,12 @@ public:
 	int FocusOnRecord(const size_t record_index, const int height) override {
 
 		return composer.FocusOnItem(record_index, height);
+	}
+
+	int FocusOnField(const size_t field, const int grid_widget_width, \
+					const int sum) override {
+
+		return items.FocusOnField(field, grid_widget_width, sum);
 	}
 
 	int RemoveField(const size_t field, const int grid_widget_width, \
@@ -367,6 +379,12 @@ public:
 
 	int FocusOnRecord(const size_t record_index, const int height) override { return 0; }
 
+	int FocusOnField(const size_t field, const int grid_widget_width, \
+					const int sum) override {
+
+		return composer.FocusOnField(field, grid_widget_width, sum);
+	}
+
 	int RemoveField(const size_t field, const int grid_widget_width, \
 					const int sum) override {
 
@@ -470,6 +488,13 @@ public:
 	int FocusOnRecord(const size_t record_index, const int height) override {
 
 		return items.FocusOnRecord(record_index, height);
+	}
+
+	int FocusOnField(const size_t field, const int grid_widget_width, \
+					const int sum) override {
+
+		items.FocusOnField(field, grid_widget_width, sum);
+		return composer.FocusOnField(field, grid_widget_width, sum);
 	}
 
 	int RemoveField(const size_t field, const int grid_widget_width, \

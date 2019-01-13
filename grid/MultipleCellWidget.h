@@ -4,7 +4,7 @@
 
 class XWidget;
 
-class CMultipleCellWidget : public XEdit, public IGridCellWidget {
+class CMultipleCellWidget : public IGridCellWidget {
 	std::map<size_t, XWidget *> widgets;
 public:
 	CMultipleCellWidget();

@@ -158,6 +158,20 @@ public:
 		return shv->view_params.offset;
 	}
 
+	inline int FocusOnField(const size_t field, const int grid_widget_width, \
+							const int total_sum) {
+		assert(shv);
+		assert(shvc);
+
+		shv->view_params = shv->rec_evaluator.FocusOnItem(total_sum, grid_widget_width, \
+										items->count(), field, \
+										CSizesPredicate(shvc->items_sizes), \
+										shvc->prev_offset);
+		shv->prev_offset = shv->view_params.offset;
+
+		return shv->view_params.offset;
+	}
+
 	inline void Reset() {
 
 		items = nullptr;

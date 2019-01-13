@@ -40,11 +40,12 @@ public:
 									const int offset);
 
 	template <class GetItemSizePredicate> \
-	inline CPosition FocusOnItem(const int view_area_width, \
-								const size_t items_count, \
-								const size_t item_index, \
-								GetItemSizePredicate items_sizes, \
-								const int offset);
+	inline CPosition FocusOnItem(const int total_sum, \
+									const int view_area_width, \
+									const size_t items_count, \
+									const size_t item_index, \
+									GetItemSizePredicate items_sizes, \
+									const int offset);
 
 	template <class GetItemSizePredicate> \
 	inline CPosition RemoveItem(const int total_sum, \
@@ -123,12 +124,52 @@ CRecordEvaluator::CPosition CRecordEvaluator::EvalPosition(bool straight_directi
 }
 
 template <class GetItemSizePredicate> \
-CRecordEvaluator::CPosition CRecordEvaluator::FocusOnItem(const int view_area_width, \
+CRecordEvaluator::CPosition CRecordEvaluator::FocusOnItem(const int total_sum, \
+														const int view_area_width, \
 														const size_t items_count, \
 														const size_t item_index, \
 														GetItemSizePredicate items_sizes, \
 														const int offset) {
+	CPosition position;
+	position.offset = offset;
+	position.item_index = curr_item_index;
+	position.x = sum;
 
+	assert(item_index < items_count);
+	if (total_sum - offset == view_area_width || total_sum <= view_area_width)	
+		return position;
+	
+	if (curr_item_index < item_index) {
+		size_t i = curr_item_index;
+		int sum_t = sum;
+
+		while (sum_t <= view_area_width + offset && i <= item_index) {
+			sum_t += items_sizes(i);
+			++i;
+		}
+
+		if (sum_t <= view_area_width + offset)
+			return position;
+		
+		while (i <= item_index) {
+			sum_t += items_sizes(i);
+			++i;
+		}
+		int new_offset = sum_t - view_area_width;
+		return EvalPositionDirect(items_count, items_sizes, new_offset);
+	}
+	else {
+		size_t i = curr_item_index;
+		while (i > item_index) {
+			sum -= items_sizes(i - 1);
+			--i;
+		}
+
+		position.offset = sum;
+		position.item_index = curr_item_index = i;
+		position.x = sum;
+		return position;
+	}
 }
 
 template <class GetItemSizePredicate> \
