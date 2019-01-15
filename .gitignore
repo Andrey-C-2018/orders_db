@@ -59,3 +59,16 @@ x64/
 # Output folders
 ######################
 0libs
+
+# Rectricted
+######################
+_libs/
+_old/
+_scripts/
+advocat_duties/
+advocats_registry/
+csv_file/
+curl_test/
+diff_backup/
+matching/
+orders/
