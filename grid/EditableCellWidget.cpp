@@ -9,7 +9,8 @@ void CEditableCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 								const int x, const int y, \
 								const int width, const int height) {
 
-	XEdit::Create(parent, flags, label, x, y, width, height);
+	XEdit::Create(parent, flags | FL_WINDOW_CLIPSIBLINGS | FL_EDIT_AUTOHSCROLL, \
+					label, x, y, width, height);
 }
 
 void CEditableCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {

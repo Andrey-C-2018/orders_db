@@ -1,12 +1,22 @@
 #pragma once
 #include <map>
 #include "IGridCellWidget.h"
+#include <xwindows/XEdit.h>
 
-class CMultipleCellWidget : public IGridCellWidget {
+class CMultipleCellWidget : public XEdit, public IGridCellWidget {
+	enum {
+		NOT_CREATED = -1
+	};
 
-	IGridCellWidget *curr_widget, *default_widget;
-	bool is_created;
-	std::map<size_t, IGridCellWidget *> widgets;
+	struct CCellWidget {
+		IGridCellWidget *widget;
+		int id;
+	};
+
+	std::map<size_t, CCellWidget> widgets;
+	IGridCellWidget *curr_widget;
+	size_t curr_field;
+	int flags;
 public:
 	CMultipleCellWidget();
 
@@ -21,8 +31,9 @@ public:
 	void SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) override;
 	void SetOnKeyPressHandler(XEventHandlerData on_key_press) override;
 
+	void AddCellWidget(const size_t field, IGridCellWidget *widget);
 	void SetCurrentField(const size_t field) override;
-
+	
 	void Show() override;
 	void Hide() override;
 	void MoveWindow(const int x, const int y, \

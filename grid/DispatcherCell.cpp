@@ -51,7 +51,7 @@ void CDispatcherCell::SetBounds(const int left_bound, const int upper_bound) {
 void CDispatcherCell::SetParameters(XWindow * parent, IGridCellWidget *cell_widget, \
 										std::shared_ptr<CGridTableProxy> table_proxy) {
 
-	int flags = FL_WINDOW_CLIPSIBLINGS | FL_EDIT_AUTOHSCROLL;
+	int flags = table_proxy->GetFieldsCount() ? FL_WINDOW_VISIBLE : 0;
 
 	assert(!def_active_cell);
 	assert(cell_widget);
