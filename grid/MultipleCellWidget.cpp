@@ -1,14 +1,20 @@
 #include "MultipleCellWidget.h"
 
-CMultipleCellWidget::CMultipleCellWidget() { }
+CMultipleCellWidget::CMultipleCellWidget() : curr_widget(nullptr), default_widget(nullptr), \
+												default_widget_id(NOT_CREATED), \
+												curr_field(0), parent(nullptr), flags(0) { }
 
 void CMultipleCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 											const Tchar *label, \
 											const int x, const int y, \
 											const int width, const int height) {
 
-	assert(!XEdit::IsCreated());
-	XEdit::Create(parent, flags, label, x, y, width, height);
+	assert(default_widget);
+	assert(default_widget_id == NOT_CREATED);
+	default_widget->CreateCellWidget(parent, flags, label, x, y, width, height);
+	this->parent = parent;
+	this->default_widget_id = default_widget->GetId();
+	this->flags = flags;
 
 	for (auto &widget : widgets) {
 		if (!widget.second.id != NOT_CREATED) {
@@ -24,6 +30,8 @@ void CMultipleCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 
 void CMultipleCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 
+	assert(default_widget);
+	default_widget->SetOnChangeHandler(on_change);
 }
 
 void CMultipleCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) {
@@ -34,8 +42,39 @@ void CMultipleCellWidget::SetOnKeyPressHandler(XEventHandlerData on_key_press) {
 
 }
 
-void AddCellWidget(const size_t field, IGridCellWidget *widget) {
+void CMultipleCellWidget::SetDefaultWidget(IGridCellWidget *widget) {
 
+	assert(widget);
+	assert(widget != this);
+	if (default_widget && default_widget_id == NOT_CREATED)
+		delete default_widget;
+
+	default_widget = widget;
+	if (default_widget_id != NOT_CREATED) {
+		default_widget->CreateCellWidget(parent, flags, _T(""), 0, 0, 0, 0);
+		default_widget_id = default_widget->GetId();
+	}
+}
+
+void CMultipleCellWidget::AddCellWidget(const size_t field, IGridCellWidget *widget) {
+
+	assert(widget);
+	assert(widget != this);
+	auto p = widgets.lower_bound(field);
+	if (p != widgets.cend() && !widgets.key_comp()(field, p->first) && \
+		p->second.id == NOT_CREATED)
+		delete p->second.widget;
+	else {
+		CCellWidget widget_item;
+		widget_item.id = NOT_CREATED;
+		widget_item.widget = widget;
+		p = widgets.insert(p, std::pair<size_t, CCellWidget>(field, widget_item));
+	}
+
+	if (default_widget_id != NOT_CREATED) {
+		widget->CreateCellWidget(parent, flags, _T(""), 0, 0, 0, 0);
+		p->second.id = widget->GetId();
+	}
 }
 
 void CMultipleCellWidget::SetCurrentField(const size_t field) {
@@ -49,24 +88,55 @@ void CMultipleCellWidget::SetCurrentField(const size_t field) {
 	if (p != widgets.cend() && !widgets.key_comp()(field, p->first))
 		curr_widget = p->second.widget;
 	else 
-		curr_widget = nullptr;
+		curr_widget = default_widget;
 
 	if (curr_widget != prev_widget) {
-		Hide(prev_widget);
-		Show(curr_widget);
+		prev_widget->Hide();
+		curr_widget->Show();
 	}
 }
 
 void CMultipleCellWidget::Show() {
 
-	if(curr_widget) curr_widget->Show();
-	else XEdit::Show();
+	assert(curr_widget);
+	curr_widget->Show();
 }
 
 void CMultipleCellWidget::Hide() {
 
-	if (curr_widget) curr_widget->Hide();
-	else XEdit::Hide();
+	assert(curr_widget);
+	curr_widget->Hide();
+}
+
+void CMultipleCellWidget::MoveWindow(const int x, const int y, \
+										const int width, const int height) {
+
+	assert(curr_widget);
+	curr_widget->MoveWindow(x, y, width, height);
+}
+
+void CMultipleCellWidget::SetFocus() {
+
+	assert(curr_widget);
+	curr_widget->SetFocus();
+}
+
+ImmutableString<Tchar> CMultipleCellWidget::GetLabel() {
+
+	assert(curr_widget);
+	return curr_widget->GetLabel();
+}
+
+void CMultipleCellWidget::SetLabel(ImmutableString<Tchar> label) {
+
+	assert(curr_widget);
+	curr_widget->SetLabel(label);
+}
+
+int CMultipleCellWidget::GetId() const {
+	
+	assert(curr_widget);
+	return curr_widget->GetId();
 }
 
 CMultipleCellWidget::~CMultipleCellWidget(){
@@ -74,4 +144,7 @@ CMultipleCellWidget::~CMultipleCellWidget(){
 	for (auto &widget : widgets)
 		if(widget.second.id == NOT_CREATED)
 			delete widget.second.widget;
+
+	if (default_widget && default_widget_id == NOT_CREATED)
+		delete default_widget;
 }

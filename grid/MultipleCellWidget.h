@@ -3,7 +3,7 @@
 #include "IGridCellWidget.h"
 #include <xwindows/XEdit.h>
 
-class CMultipleCellWidget : public XEdit, public IGridCellWidget {
+class CMultipleCellWidget : public IGridCellWidget {
 	enum {
 		NOT_CREATED = -1
 	};
@@ -14,9 +14,13 @@ class CMultipleCellWidget : public XEdit, public IGridCellWidget {
 	};
 
 	std::map<size_t, CCellWidget> widgets;
-	IGridCellWidget *curr_widget;
+	IGridCellWidget *curr_widget, *default_widget;
+	int default_widget_id;
 	size_t curr_field;
+
+	XWindow *parent;
 	int flags;
+
 public:
 	CMultipleCellWidget();
 
@@ -31,6 +35,7 @@ public:
 	void SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) override;
 	void SetOnKeyPressHandler(XEventHandlerData on_key_press) override;
 
+	void SetDefaultWidget(IGridCellWidget *widget);
 	void AddCellWidget(const size_t field, IGridCellWidget *widget);
 	void SetCurrentField(const size_t field) override;
 	
