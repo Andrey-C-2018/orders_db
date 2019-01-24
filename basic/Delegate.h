@@ -1,5 +1,6 @@
 #pragma once
 #include <assert.h>
+#include <memory>
 
 struct IArguments { 
 	virtual ~IArguments() { }
@@ -113,38 +114,29 @@ public:
 };
 
 class CDelegate{
-	IContainer* container;
+	std::shared_ptr<IContainer> container;
 public:
-	CDelegate() noexcept : container(nullptr) {}
+	CDelegate() noexcept : container() {}
 
-	CDelegate(const CDelegate &obj) = delete;
-
-	CDelegate(CDelegate &&obj) noexcept : \
-				container(obj.container) { obj.container = nullptr; }
-
-	CDelegate &operator=(const CDelegate &obj) = delete;
-
-	CDelegate &operator=(CDelegate &&obj) noexcept{ 
-		
-		this->container = obj.container;
-		obj.container = nullptr;
-		return *this;
-	}
+	CDelegate(const CDelegate &obj) noexcept = default;
+	CDelegate(CDelegate &&obj) noexcept = default;
+	CDelegate &operator=(const CDelegate &obj) noexcept = default;
+	CDelegate &operator=(CDelegate &&obj) noexcept = default;
 	
 	template< class Class, typename Func > \
 		void Connect(Class* p_class, Func p_func) noexcept{
 
 		assert(p_class);
 		assert(p_func != nullptr);
-		if (container) delete container;
-		container = new CContainer< Class, Func >(p_class, p_func);
+		if (container) container.reset();
+		container = std::make_shared<CContainer< Class, Func > >(p_class, p_func);
 	}
 
 	template< typename Callable > \
 		void Connect(Callable callable) noexcept {
 
-		if (container) delete container;
-		container = new CContainerSimple< Callable >(callable);
+		if (container) container.reset();
+		container = std::make_shared<CContainerSimple< Callable > >(callable);
 	}
 
 	inline bool empty() const noexcept {
@@ -179,10 +171,7 @@ public:
 
 	inline void reset() {
 
-		if (container) {
-			delete container;
-			container = nullptr;
-		}
+		container.reset();
 	}
 
 	virtual ~CDelegate() {

@@ -37,15 +37,16 @@ int XEventHandlerEmbedded::Connect(const _plEventId id_event, \
 
 int XEventHandlerEmbedded::Disconnect(const _plEventId id_event){
 	CEvtHandlerRec rec;
-	CEvtHandlerConstIterator p;
+	CEvtHandlerIterator p;
 
 	rec.id_event = id_event;
-	p = std::find(evt_handlers.cbegin(), evt_handlers.cend(), rec);
+	p = std::find(evt_handlers.begin(), evt_handlers.end(), rec);
 	if(p == evt_handlers.cend())
 		return XEventHandlerException::W_HANDLER_NOT_FOUND;
 
-	delete p->eve_container;
-	delete p->eve;
+	p->eve_container.reset();
+	p->evt_handler_caller.reset();
+	p->eve.reset();
 	evt_handlers.erase(p);
 	return RESULT_SUCCESS;
 }
@@ -53,11 +54,13 @@ int XEventHandlerEmbedded::Disconnect(const _plEventId id_event){
 void XEventHandlerEmbedded::DisconnectAll(){
 
 	std::for_each(evt_handlers.begin(), evt_handlers.end(), \
-					[](const CEvtHandlerRec &rec) {
+					[](CEvtHandlerRec &rec) {
 						assert(rec.eve_container);
 						assert(rec.eve);
-						delete rec.eve_container;
-						delete rec.eve;
+
+						rec.eve_container.reset();
+						rec.evt_handler_caller.reset();
+						rec.eve.reset();
 					});
 	evt_handlers.clear();
 }
@@ -130,10 +133,10 @@ XEventHandler::MainWndProc(_plCallbackFnParams){
 	p->eve->PostInit(_plCallbackFnParamsList);
 
 	if (rec.id_event != EVT_CREATE) 
-		p->evt_handler_caller.Call(p->eve_container);
+		p->evt_handler_caller.Call(p->eve_container.get());
 	else{
 		try {
-			p->evt_handler_caller.Call(p->eve_container);
+			p->evt_handler_caller.Call(p->eve_container.get());
 		}
 		catch (XException &e) {
 			ErrorBox(e.what());
@@ -176,18 +179,19 @@ int XEventHandler::Disconnect(_plHWND hwnd,\
 							  const _plNotificationCode id_ncode,\
 							  const int id){
 	CEvtHandlerRecEx rec;
-	CEvtHandlerConstIteratorEx p;
+	CEvtHandlerIteratorEx p;
 
 	rec.hwnd = hwnd;
 	rec.id = id;
 	rec.id_event = id_event;
 	rec.id_ncode = id_ncode;
-	p = std::lower_bound(evt_handlers.cbegin(), evt_handlers.cend(), rec);
+	p = std::lower_bound(evt_handlers.begin(), evt_handlers.end(), rec);
 	if(!(p != evt_handlers.cend() && *p == rec))
 		return XEventHandlerException::W_HANDLER_NOT_FOUND;
 
-	delete p->eve_container;
-	delete p->eve;
+	p->eve_container.reset();
+	p->evt_handler_caller.reset();
+	p->eve.reset();
 	evt_handlers.erase(p);
 	return RESULT_SUCCESS;
 }
@@ -216,9 +220,10 @@ int XEventHandler::Disconnect(_plHWND hwnd,\
 					[](CEvtHandlerRecEx &rec) {
 						assert(rec.eve_container);
 						assert(rec.eve);
+						
+						rec.eve_container.reset();
 						rec.evt_handler_caller.reset();
-						delete rec.eve_container;
-						delete rec.eve;
+						rec.eve.reset();
 					});
 	evt_handlers.erase(p.first, p.second);
 	return RESULT_SUCCESS;
@@ -244,9 +249,10 @@ int XEventHandler::Disconnect(_plHWND hwnd){
 					[](CEvtHandlerRecEx &rec) {
 						assert(rec.eve_container);
 						assert(rec.eve);
+
+						rec.eve_container.reset();
 						rec.evt_handler_caller.reset();
-						delete rec.eve_container;
-						delete rec.eve;
+						rec.eve.reset();
 					});
 	evt_handlers.erase(p.first, p.second);
 	return RESULT_SUCCESS;
@@ -258,9 +264,10 @@ void XEventHandler::DisconnectAll(){
 					[](CEvtHandlerRecEx &rec) {
 						assert(rec.eve_container);
 						assert(rec.eve);
+
+						rec.eve_container.reset();
 						rec.evt_handler_caller.reset();
-						delete rec.eve_container;
-						delete rec.eve;
+						rec.eve.reset();
 					});
 	evt_handlers.clear();
 	evt_handlers.shrink_to_fit();

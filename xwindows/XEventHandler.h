@@ -28,55 +28,48 @@ public:
 
 class XEventHandlerData final {
 	CDelegate evt_handler_caller;
-	XEvent *eve;
-	IArguments *args_container;
+	std::shared_ptr<XEvent> eve;
+	std::shared_ptr<IArguments> args_container;
 
-	XEventHandlerData(const XEventHandlerData &obj) = delete;
-	XEventHandlerData &operator=(const XEventHandlerData &obj) = delete;
 public:
+	XEventHandlerData() { }
+
 	template <class TObject, class TEvent> \
 		XEventHandlerData(TObject *object, \
 							void (TObject::*PFunc)(TEvent *)) {
 
-		TEvent *eve_t = new TEvent();
-		eve = dynamic_cast<XEvent*>(eve_t);
-		if (!eve) {
-			if (eve_t) delete eve_t;
+		std::shared_ptr<TEvent> eve_t = std::make_shared<TEvent>();
+		if (!(dynamic_cast<XEvent*>(eve_t.get()))) {
+			eve_t.reset();
 			XEventHandlerException e(XEventHandlerException::E_WRONG_EVENT_TYPE, \
 				_T("the member function pointer argument is not inherited from XEvent"));
 			throw e;
 		}
 
 		evt_handler_caller.Connect(object, PFunc);
-		args_container = new CArgumentsOne<TEvent *>(eve_t);
+		args_container = std::make_shared<CArgumentsOne<TEvent *> >(eve_t.get());
+		eve = std::move(eve_t);
 	}
 
-	XEventHandlerData(XEventHandlerData &&obj) : \
-				evt_handler_caller(std::move(obj.evt_handler_caller)), \
-				eve(obj.eve), args_container(obj.args_container) {
-	
-		obj.eve = nullptr;
-		obj.args_container = nullptr;
+	XEventHandlerData(const XEventHandlerData &obj) noexcept = default;
+	XEventHandlerData(XEventHandlerData &&obj) noexcept = default;
+	XEventHandlerData &operator=(const XEventHandlerData &obj) noexcept = default;
+	XEventHandlerData &operator=(XEventHandlerData &&obj) noexcept = default;
+
+	inline bool empty() const {
+
+		return !eve || !args_container || evt_handler_caller.empty();
 	}
 
-	XEventHandlerData &operator=(XEventHandlerData &&obj) {
-
-		evt_handler_caller = std::move(obj.evt_handler_caller);
-		eve = obj.eve;
-		args_container = obj.args_container;
-
-		obj.eve = nullptr;
-		obj.args_container = nullptr;
-	}
-
-	inline XEvent *MoveEventObj();
-	inline CDelegate MoveDelegate();
-	inline IArguments *MoveArgsContainer();
+	inline std::shared_ptr<XEvent> getEventObj() { return eve; }
+	inline CDelegate getDelegate() { return evt_handler_caller; }
+	inline std::shared_ptr<IArguments> getArgsContainer() { return args_container; }
 
 	~XEventHandlerData() {
 
-		if (args_container) delete args_container;
-		if (eve) delete eve;
+		args_container.reset();
+		evt_handler_caller.reset();
+		eve.reset();
 	}
 };
 
@@ -85,8 +78,9 @@ protected:
 	struct CEvtHandlerRec{
 		_plEventId id_event;
 		CDelegate evt_handler_caller;
-		XEvent *eve;
-		IArguments *eve_container;
+		std::shared_ptr<XEvent> eve;
+		std::shared_ptr<IArguments> eve_container;
+
 		inline bool operator==(const CEvtHandlerRec &obj) const{
 
 			return id_event == obj.id_event;
@@ -103,8 +97,8 @@ protected:
 		CEvtHandlerRec(CEvtHandlerRec &&obj) noexcept {
 			this->id_event = obj.id_event;  obj.id_event = 0;
 			this->evt_handler_caller = std::move(obj.evt_handler_caller);
-			this->eve = obj.eve;  obj.eve = nullptr;
-			this->eve_container = obj.eve_container; obj.eve_container = nullptr;
+			this->eve = std::move(obj.eve);
+			this->eve_container = std::move(obj.eve_container);
 		}
 
 		CEvtHandlerRec &operator=(const CEvtHandlerRec &obj) = delete;
@@ -112,8 +106,8 @@ protected:
 		inline CEvtHandlerRec &operator=(CEvtHandlerRec &&obj) noexcept {
 			this->id_event = obj.id_event;  obj.id_event = 0;
 			this->evt_handler_caller = std::move(obj.evt_handler_caller);
-			this->eve = obj.eve;  obj.eve = nullptr;
-			this->eve_container = obj.eve_container; obj.eve_container = nullptr;
+			this->eve = std::move(obj.eve);
+			this->eve_container = std::move(obj.eve_container);
 			return *this;
 		}
 
@@ -208,8 +202,10 @@ public:
 		int Connect(const _plEventId id_event,\
 					TObject *obj, \
 					void (TObject::*PFunc)(TEvent *));
+
 	int Connect(const _plEventId id_event, \
 					XEventHandlerData evt_handler_data);
+
 	int Disconnect(const _plEventId id_event);
 	void DisconnectAll();
 
@@ -247,10 +243,12 @@ protected:
 		if(id == -1) id = max_id++;
 		return id;
 	}
+
 	inline int SetIdToNull() { 
 		if (id == -1) id = 0; 
 		return id; 
 	}
+
 	virtual int InitializeId() = 0;
 public:
 	XEventHandler();
@@ -302,27 +300,6 @@ public:
 
 //****************************************************************************
 
-XEvent *XEventHandlerData::MoveEventObj() {
-
-	XEvent *eve = this->eve;
-	this->eve = nullptr;
-	return eve;
-}
-
-CDelegate XEventHandlerData::MoveDelegate() {
-
-	return std::move(this->evt_handler_caller);
-}
-
-IArguments *XEventHandlerData::MoveArgsContainer() {
-
-	IArguments *args = this->args_container;
-	this->args_container = nullptr;
-	return args;
-}
-
-//****************************************************************************
-
 _plCallbackFnRetValue _plCallbackFnModifier \
 XEventHandlerEmbedded::WndProc(_plCallbackFnParams){
 	CEvtHandlerRec rec;
@@ -337,7 +314,7 @@ XEventHandlerEmbedded::WndProc(_plCallbackFnParams){
 
 	p->eve->PostInit(_plCallbackFnParamsList);
 
-	p->evt_handler_caller.Call(p->eve_container);
+	p->evt_handler_caller.Call(p->eve_container.get());
 	if(p->eve->GetDefaultActionStatus()){
 		p->eve->ExecuteDefaultEventAction(false);
 		return _plDefaultEventAction(orig_wnd_proc, _plCallbackFnParamsList);
@@ -362,11 +339,15 @@ int XEventHandlerEmbedded::ConnectImpl(const _plEventId id_event, \
 	if (p != evt_handlers.cend() && *p == rec)
 		return XEventHandlerException::W_DUPLICATE_HANDLER;
 
-	rec.eve = evt_handler_data.MoveEventObj();
+	rec.eve = evt_handler_data.getEventObj();
+	assert(rec.eve);
 	rec.eve->InitEventData(id_event, 0, window, 0);
 
-	rec.evt_handler_caller = evt_handler_data.MoveDelegate();
-	rec.eve_container = evt_handler_data.MoveArgsContainer();
+	rec.evt_handler_caller = evt_handler_data.getDelegate();
+	assert(!rec.evt_handler_caller.empty());
+
+	rec.eve_container = evt_handler_data.getArgsContainer();
+	assert(rec.eve_container);
 
 	evt_handlers.emplace_back(std::move(rec));
 	return RESULT_SUCCESS;
@@ -402,11 +383,15 @@ int XEventHandler::ConnectImpl(const _plEventId id_event, \
 	if (p != evt_handlers.cend() && *p == rec)
 		return XEventHandlerException::W_DUPLICATE_HANDLER;
 
-	rec.eve = evt_handler_data.MoveEventObj();
+	rec.eve = evt_handler_data.getEventObj();
+	assert(rec.eve);
 	rec.eve->InitEventData(id_event, id_ncode, window, rec.id);
 
-	rec.evt_handler_caller = evt_handler_data.MoveDelegate();
-	rec.eve_container = evt_handler_data.MoveArgsContainer();
+	rec.evt_handler_caller = evt_handler_data.getDelegate();
+	assert(!rec.evt_handler_caller.empty());
+
+	rec.eve_container = evt_handler_data.getArgsContainer();
+	assert(rec.eve_container);
 
 	evt_handlers.emplace_back(std::move(rec));
 	std::sort(evt_handlers.begin(), evt_handlers.end());

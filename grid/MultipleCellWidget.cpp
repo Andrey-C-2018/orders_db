@@ -17,29 +17,49 @@ void CMultipleCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 	this->flags = flags;
 
 	for (auto &widget : widgets) {
-		if (!widget.second.id != NOT_CREATED) {
-			int widget_flags = flags;
-			if (curr_field != widget.first)
-				widget_flags &= (~FL_WINDOW_VISIBLE);
+		assert(widget.second.id == NOT_CREATED);
 
-			widget.second.widget->CreateCellWidget(parent, widget_flags, label, x, y, width, height);
-			widget.second.id = widget.second.widget->GetId();
-		}
+		int widget_flags = flags;
+		if (curr_field != widget.first)
+			widget_flags &= (~FL_WINDOW_VISIBLE);
+
+		widget.second.widget->CreateCellWidget(parent, widget_flags, label, x, y, width, height);
+		widget.second.id = widget.second.widget->GetId();
+
+		if(!this->on_change_handler.empty())
+			widget.second.widget->SetOnChangeHandler(this->on_change_handler);
+		if (!this->on_loose_focus_handler.empty())
+			widget.second.widget->SetOnLooseFocusHandler(this->on_loose_focus_handler);
+		if (!this->on_key_press_handler.empty())
+			widget.second.widget->SetOnKeyPressHandler(this->on_key_press_handler);
 	}
 }
 
 void CMultipleCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 
 	assert(default_widget);
-	default_widget->SetOnChangeHandler(on_change);
+	this->on_change_handler = on_change;
+	
+	if (default_widget_id != NOT_CREATED) {
+		default_widget->SetOnChangeHandler(std::move(on_change));
+
+		for (auto &widget : widgets)
+			widget.second.widget->SetOnChangeHandler(this->on_change_handler);
+	}
 }
 
 void CMultipleCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) {
 
+	/*assert(default_widget);
+	this->on_loose_focus_handler = on_loose_focus;
+	default_widget->SetOnLooseFocusHandler(std::move(on_loose_focus));*/
 }
 
 void CMultipleCellWidget::SetOnKeyPressHandler(XEventHandlerData on_key_press) {
 
+	/*assert(default_widget);
+	this->on_key_press_handler = on_key_press;
+	default_widget->SetOnKeyPressHandler(std::move(on_key_press));*/
 }
 
 void CMultipleCellWidget::SetDefaultWidget(IGridCellWidget *widget) {

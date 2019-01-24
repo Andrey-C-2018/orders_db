@@ -20,11 +20,11 @@ class CMultipleCellWidget : public IGridCellWidget {
 
 	XWindow *parent;
 	int flags;
-
+	XEventHandlerData on_change_handler, \
+						on_loose_focus_handler, \
+						on_key_press_handler;
 public:
 	CMultipleCellWidget();
-
-	void SetCurrentField(const size_t field);
 
 	void CreateCellWidget(XWindow *parent, const int flags, \
 							const Tchar *label, \
