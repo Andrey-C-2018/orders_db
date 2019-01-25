@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="CellConfigurator.h" />
     <ClInclude Include="CellsLayout.h" />
+    <ClInclude Include="ComboBoxCellWidget.h" />
     <ClInclude Include="EditableCellWidget.h" />
     <ClInclude Include="FieldsProperties.h" />
     <ClInclude Include="GridCommonDeclarations.h" />
@@ -48,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CellConfigurator.cpp" />
+    <ClCompile Include="ComboBoxCellWidget.cpp" />
     <ClCompile Include="EditableCellWidget.cpp" />
     <ClCompile Include="EditableGrid.cpp" />
     <ClCompile Include="Grid.cpp" />
