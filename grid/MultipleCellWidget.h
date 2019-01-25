@@ -23,6 +23,10 @@ class CMultipleCellWidget : public IGridCellWidget {
 	XEventHandlerData on_change_handler, \
 						on_loose_focus_handler, \
 						on_key_press_handler;
+
+	typedef void (IGridCellWidget::*PEventFunc)(XEventHandlerData);
+	inline void SetEventHandler(XEventHandlerData &on_event_this, \
+								PEventFunc event_func, XEventHandlerData on_event);
 public:
 	CMultipleCellWidget();
 
@@ -53,3 +57,17 @@ public:
 	virtual ~CMultipleCellWidget();
 };
 
+void CMultipleCellWidget::SetEventHandler(XEventHandlerData &on_event_this, \
+											PEventFunc event_func, \
+											XEventHandlerData on_event) {
+
+	assert(default_widget);
+	on_event_this = on_event;
+
+	if (default_widget_id != NOT_CREATED) {
+		(default_widget->*(event_func))(std::move(on_event));
+
+		for (auto &widget : widgets)
+			(widget.second.widget->*(event_func))(on_event_this);
+	}
+}

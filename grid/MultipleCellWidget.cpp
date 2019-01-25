@@ -50,24 +50,39 @@ void CMultipleCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 
 void CMultipleCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) {
 
-	/*assert(default_widget);
+	assert(default_widget);
 	this->on_loose_focus_handler = on_loose_focus;
-	default_widget->SetOnLooseFocusHandler(std::move(on_loose_focus));*/
+
+	if (default_widget_id != NOT_CREATED) {
+		default_widget->SetOnLooseFocusHandler(std::move(on_loose_focus));
+
+		for (auto &widget : widgets)
+			widget.second.widget->SetOnLooseFocusHandler(this->on_loose_focus_handler);
+	}
 }
 
 void CMultipleCellWidget::SetOnKeyPressHandler(XEventHandlerData on_key_press) {
 
-	/*assert(default_widget);
+	assert(default_widget);
 	this->on_key_press_handler = on_key_press;
-	default_widget->SetOnKeyPressHandler(std::move(on_key_press));*/
+
+	if (default_widget_id != NOT_CREATED) {
+		default_widget->SetOnKeyPressHandler(std::move(on_key_press));
+
+		for (auto &widget : widgets)
+			widget.second.widget->SetOnKeyPressHandler(this->on_key_press_handler);
+	}
 }
 
 void CMultipleCellWidget::SetDefaultWidget(IGridCellWidget *widget) {
 
 	assert(widget);
 	assert(widget != this);
-	if (default_widget && default_widget_id == NOT_CREATED)
-		delete default_widget;
+	if (default_widget){
+		assert(default_widget_id == NOT_CREATED);
+		if(default_widget_id == NOT_CREATED)
+			delete default_widget;
+	}
 
 	default_widget = widget;
 	if (default_widget_id != NOT_CREATED) {
