@@ -57,6 +57,8 @@ public:
 	virtual ~CMultipleCellWidget();
 };
 
+//**************************************************************
+
 void CMultipleCellWidget::SetEventHandler(XEventHandlerData &on_event_this, \
 											PEventFunc event_func, \
 											XEventHandlerData on_event) {

@@ -71,14 +71,8 @@ void CDispatcherCell::SetParameters(XWindow * parent, IGridCellWidget *cell_widg
 	if (table_proxy->GetRecordsCount())
 		label = table_proxy->GetCellAsString(active_field, active_record);
 
-	try {
-		def_active_cell->CreateCellWidget(parent, flags, label.str ? label.str : _T(""), \
+	def_active_cell->CreateCellWidget(parent, flags, label.str ? label.str : _T(""), \
 											0, 0, 10, 10);
-	}
-	catch (...) {
-		delete def_active_cell;
-		throw;
-	}
 	assert(def_active_cell);
 
 	def_active_cell->SetOnChangeHandler(XEventHandlerData(this, \

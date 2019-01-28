@@ -51,9 +51,23 @@ public:
 		eve = std::move(eve_t);
 	}
 
-	XEventHandlerData(const XEventHandlerData &obj) noexcept = default;
+	XEventHandlerData(const XEventHandlerData &obj) noexcept {
+
+		this->eve = std::move(obj.eve->clone());
+		evt_handler_caller = obj.evt_handler_caller;
+		args_container = obj.args_container;
+	}
+
 	XEventHandlerData(XEventHandlerData &&obj) noexcept = default;
-	XEventHandlerData &operator=(const XEventHandlerData &obj) noexcept = default;
+
+	XEventHandlerData &operator=(const XEventHandlerData &obj) noexcept {
+
+		this->eve = std::move(obj.eve->clone());
+		evt_handler_caller = obj.evt_handler_caller;
+		args_container = obj.args_container;
+		return *this;
+	}
+
 	XEventHandlerData &operator=(XEventHandlerData &&obj) noexcept = default;
 
 	inline bool empty() const {

@@ -46,7 +46,7 @@ CGrid::CGrid() : headers(nullptr), cells(nullptr), \
 				left_pane_width(DEF_LEFT_PANE_WIDTH), \
 				headers_height(DEF_HEADERS_HEIGHT), \
 				cells_font(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas")), \
-				headers_font(25, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas")), \
+				headers_font(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas")), \
 				cells_color(170, 170, 170), headers_color(128, 128, 128), \
 				grid_lines_brush(0, 0, 200), background_brush(100, 100, 100), \
 				grid_lines_pen(XPEN_SOLID, 1, 0, 0, 200), \
@@ -140,7 +140,7 @@ void CGrid::OnCreate(XEvent *eve) {
 	vscroll.pos = 0;
 	this->SetScrollBar(X_SCROLL_VERT, vscroll);
 
-	Connect(EVT_ERASEBKGND, this, &CGrid::OnEraseBackground);
+	//Connect(EVT_ERASEBKGND, this, &CGrid::OnEraseBackground);
 	Connect(EVT_SIZE, this, &CGrid::OnSize);
 	Connect(EVT_PAINT, this, &CGrid::OnPaint);
 	Connect(EVT_HSCROLL, this, &CGrid::OnHScroll);

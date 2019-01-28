@@ -1,5 +1,6 @@
 #include "EditableGrid.h"
 #include "DispatcherCell.h"
+#include "MultipleCellWidget.h"
 #include "EditableCellWidget.h"
 
 class CEConfigurator : public IConfigurator {
@@ -7,11 +8,14 @@ class CEConfigurator : public IConfigurator {
 	std::shared_ptr<CGridTableProxy> table_proxy;
 
 	CDispatcherCell *disp_cell;
+	CMultipleCellWidget *field_widgets_collection;
 public:
 	CEConfigurator(XWindow *parent_, \
-					std::shared_ptr<CGridTableProxy> table_proxy_) : \
+					std::shared_ptr<CGridTableProxy> table_proxy_, \
+					CMultipleCellWidget *field_widgets_collection_) : \
 					parent(parent_), table_proxy(table_proxy_), \
-					disp_cell(nullptr) { }
+					disp_cell(nullptr), \
+					field_widgets_collection(field_widgets_collection_) { }
 
 	void Configure(CGridLine &line) override { }
 
@@ -20,8 +24,8 @@ public:
 	void Configure(CDispatcherCell &disp_cell_) override {
 
 		this->disp_cell = &disp_cell_;
-		IGridCellWidget *editable_cell_widget = new CEditableCellWidget();
-		this->disp_cell->SetParameters(parent, editable_cell_widget, table_proxy);
+		IGridCellWidget *cell_widget = field_widgets_collection;
+		this->disp_cell->SetParameters(parent, cell_widget, table_proxy);
 	}
 
 	inline CDispatcherCell *GetDispatcherCell() const {
@@ -34,7 +38,34 @@ public:
 
 //**************************************************************
 
-CEditableGrid::CEditableGrid() : CGrid(), disp_cell(nullptr){ }
+CEditableGrid::CEditableGrid() : CGrid(), disp_cell(nullptr), \
+									field_widgets_collection(nullptr) {
+
+	field_widgets_collection = new CMultipleCellWidget();
+	field_widgets_collection->SetDefaultWidget(new CEditableCellWidget());
+}
+
+CEditableGrid::CEditableGrid(CEditableGrid &&obj) : CGrid(std::move(obj)){
+
+	disp_cell = obj.disp_cell;
+	field_widgets_collection = obj.field_widgets_collection;
+
+	obj.disp_cell = nullptr;
+	obj.field_widgets_collection = nullptr;
+}
+
+CEditableGrid &CEditableGrid::operator=(CEditableGrid &&obj) {
+
+	CGrid::operator=(std::move(obj));
+
+	disp_cell = obj.disp_cell;
+	field_widgets_collection = obj.field_widgets_collection;
+
+	obj.disp_cell = nullptr;
+	obj.field_widgets_collection = nullptr;
+
+	return *this;
+}
 
 LayoutObjects CEditableGrid::CreateLayoutObjects(const int kind_of_layout) {
 
@@ -42,12 +73,20 @@ LayoutObjects CEditableGrid::CreateLayoutObjects(const int kind_of_layout) {
 }
 
 void CEditableGrid::OnWindowCreate() {
-	CEConfigurator configurator(this, data_table_proxy);
+
+	CEConfigurator configurator(this, data_table_proxy, field_widgets_collection);
 
 	AcceptConfiguratorOnCells(&configurator);
 	disp_cell = configurator.GetDispatcherCell();
 
 	Connect(EVT_KEYDOWN, this, &CEditableGrid::OnKeyPress);
+}
+
+void CEditableGrid::SetWidgetForField(const size_t field, IGridCellWidget *field_widget) {
+
+	assert(field_widget);
+	assert(!IsCreated());
+	field_widgets_collection->AddCellWidget(field, field_widget);
 }
 
 void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
@@ -120,4 +159,8 @@ void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
 	}
 }
 
-CEditableGrid::~CEditableGrid(){ }
+CEditableGrid::~CEditableGrid(){
+
+	if (field_widgets_collection)
+		delete field_widgets_collection;
+}

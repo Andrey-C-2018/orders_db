@@ -23,6 +23,8 @@ public:
 							const _plNotificationCode id_ncode, \
 							XWindow *sender, const int id);
 
+	virtual std::shared_ptr<XEvent> clone() const noexcept;
+
 	inline _plEventId GetEventType() const { return ID_event; }
 	inline _plNotificationCode GetNCode() const { return ID_ncode; }
 	inline XWindow *GetSender() const { return Sender; }
@@ -42,6 +44,8 @@ public:
 						const _plNotificationCode id_ncode, \
 						XWindow *sender, const int id) override;
 
+	std::shared_ptr<XEvent> clone() const noexcept override;
+
 	virtual ~XCommandEvent();
 };
 
@@ -50,6 +54,8 @@ class XSizeEvent : public XEvent{
 	int param;
 public:
 	XSizeEvent() noexcept;
+
+	std::shared_ptr<XEvent> clone() const noexcept override;
 
 	void PostInit(_plCallbackFnParams) override;
 
@@ -65,6 +71,8 @@ class XMoveEvent : public XEvent{
 public:
 	XMoveEvent() noexcept;
 
+	std::shared_ptr<XEvent> clone() const noexcept override;
+
 	void PostInit(_plCallbackFnParams) override;
 
 	inline int GetX() const{ return x; }
@@ -78,6 +86,8 @@ class XMouseEvent : public XEvent{
 	int virtual_key;
 public:
 	XMouseEvent() noexcept;
+
+	std::shared_ptr<XEvent> clone() const noexcept override;
 
 	void PostInit(_plCallbackFnParams);
 
@@ -93,6 +103,8 @@ class XMouseWheelEvent : public XMouseEvent{
 public:
 	XMouseWheelEvent() noexcept;
 
+	std::shared_ptr<XEvent> clone() const noexcept override;
+
 	void PostInit(_plCallbackFnParams) override;
 
 	inline int GetDelta() const{ return delta; }
@@ -105,6 +117,8 @@ class XKeyboardEvent : public XEvent{
 	int key;
 public:
 	XKeyboardEvent() noexcept;
+
+	std::shared_ptr<XEvent> clone() const noexcept override;
 
 	void PostInit(_plCallbackFnParams) override;
 
@@ -122,6 +136,8 @@ protected:
 public:
 	XScrollEvent() noexcept;
 
+	std::shared_ptr<XEvent> clone() const noexcept override;
+
 	void PostInit(_plCallbackFnParams) override;
 
 	inline int GetThumbPos() const{ return thumb_pos; }
@@ -133,6 +149,8 @@ public:
 class XScrollEventEx : public XScrollEvent {
 public:
 	XScrollEventEx() noexcept;
+
+	std::shared_ptr<XEvent> clone() const noexcept override;
 
 	void PostInit(_plCallbackFnParams) override;
 

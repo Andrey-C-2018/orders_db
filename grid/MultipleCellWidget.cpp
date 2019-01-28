@@ -11,10 +11,18 @@ void CMultipleCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 
 	assert(default_widget);
 	assert(default_widget_id == NOT_CREATED);
+
 	default_widget->CreateCellWidget(parent, flags, label, x, y, width, height);
 	this->parent = parent;
 	this->default_widget_id = default_widget->GetId();
 	this->flags = flags;
+
+	if (!this->on_change_handler.empty())
+		default_widget->SetOnChangeHandler(this->on_change_handler);
+	if (!this->on_loose_focus_handler.empty())
+		default_widget->SetOnLooseFocusHandler(this->on_loose_focus_handler);
+	if (!this->on_key_press_handler.empty())
+		default_widget->SetOnKeyPressHandler(this->on_key_press_handler);
 
 	for (auto &widget : widgets) {
 		assert(widget.second.id == NOT_CREATED);
@@ -78,27 +86,29 @@ void CMultipleCellWidget::SetDefaultWidget(IGridCellWidget *widget) {
 
 	assert(widget);
 	assert(widget != this);
-	if (default_widget){
-		assert(default_widget_id == NOT_CREATED);
-		if(default_widget_id == NOT_CREATED)
-			delete default_widget;
-	}
+	assert(default_widget_id == NOT_CREATED);
 
+	if (default_widget)
+			delete default_widget;
+	
 	default_widget = widget;
-	if (default_widget_id != NOT_CREATED) {
-		default_widget->CreateCellWidget(parent, flags, _T(""), 0, 0, 0, 0);
-		default_widget_id = default_widget->GetId();
-	}
+
+	if (!curr_widget) curr_widget = default_widget;
 }
 
 void CMultipleCellWidget::AddCellWidget(const size_t field, IGridCellWidget *widget) {
 
 	assert(widget);
 	assert(widget != this);
+	assert(default_widget_id == NOT_CREATED);
+
 	auto p = widgets.lower_bound(field);
-	if (p != widgets.cend() && !widgets.key_comp()(field, p->first) && \
-		p->second.id == NOT_CREATED)
-		delete p->second.widget;
+	if (p != widgets.cend() && !widgets.key_comp()(field, p->first)) {
+		
+		if(p->second.id == NOT_CREATED)
+			delete p->second.widget;
+		p->second.widget = widget;
+	}
 	else {
 		CCellWidget widget_item;
 		widget_item.id = NOT_CREATED;
@@ -106,10 +116,7 @@ void CMultipleCellWidget::AddCellWidget(const size_t field, IGridCellWidget *wid
 		p = widgets.insert(p, std::pair<size_t, CCellWidget>(field, widget_item));
 	}
 
-	if (default_widget_id != NOT_CREATED) {
-		widget->CreateCellWidget(parent, flags, _T(""), 0, 0, 0, 0);
-		p->second.id = widget->GetId();
-	}
+	if (field == curr_field) curr_widget = widget;
 }
 
 void CMultipleCellWidget::SetCurrentField(const size_t field) {

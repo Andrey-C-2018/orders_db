@@ -1,5 +1,6 @@
 ﻿#include "MyFrame.h"
 #include <basic/XConv.h>
+#include <grid/ComboBoxCellWidget.h>
 
 CMyFrame::CMyFrame(const Tchar *class_name,\
 					 const Tchar *label, const int X, const int Y,\
@@ -27,6 +28,8 @@ CMyFrame::CMyFrame(const Tchar *class_name,\
 	for(size_t i = 0; i < size; ++i)
 	for (size_t j = 0; j < 2*size; ++j)
 		grid->SetCell(i, j, XConv::ToString(10 * i + j, buffer));
+
+	grid->SetWidgetForField(3, new CComboBoxCellWidget());
 
 	grid->Create(this, FL_WINDOW_VISIBLE, _T(""), 20, 40, \
 					rc.right - 40, rc.bottom - 60);

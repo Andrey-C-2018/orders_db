@@ -1,8 +1,12 @@
 #pragma once
 #include "Grid.h"
 
+struct IGridCellWidget;
+class CMultipleCellWidget;
+
 class CEditableGrid : public CGrid{
 	CDispatcherCell *disp_cell;
+	CMultipleCellWidget *field_widgets_collection;
 
 	void OnKeyPress(XKeyboardEvent *eve);
 protected:
@@ -14,8 +18,10 @@ protected:
 public:
 	CEditableGrid();
 
-	CEditableGrid(CEditableGrid &&obj) = default;
-	CEditableGrid &operator=(CEditableGrid &&obj) = default;
+	CEditableGrid(CEditableGrid &&obj);
+	CEditableGrid &operator=(CEditableGrid &&obj);
+
+	void SetWidgetForField(const size_t field, IGridCellWidget *field_widget);
 
 	virtual ~CEditableGrid();
 };

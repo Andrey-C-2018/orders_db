@@ -3,7 +3,10 @@
 #include "xwindows/XComboBox.h"
 
 class CComboBoxCellWidget final : public XComboBox, public IGridCellWidget {
-	
+	enum {
+		DROPDOWN_SIZE_MULTIPLIER = 10
+	};
+
 	CComboBoxCellWidget(const CComboBoxCellWidget &obj) = delete;
 	CComboBoxCellWidget &operator=(const CComboBoxCellWidget &obj) = delete;
 public:
@@ -26,7 +29,7 @@ public:
 	void Show() override;
 	void Hide() override;
 	void MoveWindow(const int x, const int y, \
-		const int width, const int height) override;
+					const int width, const int height) override;
 	void SetFocus() override;
 
 	ImmutableString<Tchar> GetLabel() override;

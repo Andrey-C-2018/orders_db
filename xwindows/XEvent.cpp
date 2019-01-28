@@ -17,6 +17,11 @@ void XEvent::InitEventData(const _plEventId id_event, \
 	Sender = sender;
 }
 
+std::shared_ptr<XEvent> XEvent::clone() const noexcept {
+
+	return std::make_shared<XEvent>();
+}
+
 void XEvent::PostInit(_plCallbackFnParams){ }
 
 XEvent::~XEvent(){ }
@@ -41,11 +46,21 @@ void XCommandEvent::InitEventData(const _plEventId id_event, \
 	}
 }
 
+std::shared_ptr<XEvent> XCommandEvent::clone() const noexcept {
+
+	return std::make_shared<XCommandEvent>();
+}
+
 XCommandEvent::~XCommandEvent(){ }
 
 //****************************************************************************
 
 XSizeEvent::XSizeEvent() noexcept : width(0), height(0), param(0) { }
+
+std::shared_ptr<XEvent> XSizeEvent::clone() const noexcept {
+
+	return std::make_shared<XSizeEvent>();
+}
 
 void XSizeEvent::PostInit(_plCallbackFnParams){
 
@@ -60,6 +75,11 @@ XSizeEvent::~XSizeEvent(){ }
 
 XMoveEvent::XMoveEvent() noexcept : x(0), y(0) { }
 
+std::shared_ptr<XEvent> XMoveEvent::clone() const noexcept {
+
+	return std::make_shared<XMoveEvent>();
+}
+
 void XMoveEvent::PostInit(_plCallbackFnParams){
 
 	x = _plGetX(_plCallbackFnParamsList);
@@ -71,6 +91,11 @@ XMoveEvent::~XMoveEvent(){ }
 //****************************************************************************
 
 XMouseEvent::XMouseEvent() noexcept : x(0), y(0), virtual_key(0) { }
+
+std::shared_ptr<XEvent> XMouseEvent::clone() const noexcept {
+
+	return std::make_shared<XMouseEvent>();
+}
 
 void XMouseEvent::PostInit(_plCallbackFnParams){
 
@@ -85,6 +110,11 @@ XMouseEvent::~XMouseEvent(){ }
 
 XMouseWheelEvent::XMouseWheelEvent() noexcept : delta(0) { }
 
+std::shared_ptr<XEvent> XMouseWheelEvent::clone() const noexcept {
+
+	return std::make_shared<XMouseWheelEvent>();
+}
+
 void XMouseWheelEvent::PostInit(_plCallbackFnParams){
 
 	delta = _plGetMouseWheelDelta(_plCallbackFnParamsList);
@@ -95,6 +125,11 @@ XMouseWheelEvent::~XMouseWheelEvent(){ }
 //****************************************************************************
 
 XKeyboardEvent::XKeyboardEvent() noexcept : ch(0), key(0){ }
+
+std::shared_ptr<XEvent> XKeyboardEvent::clone() const noexcept {
+
+	return std::make_shared<XKeyboardEvent>();
+}
 
 void XKeyboardEvent::PostInit(_plCallbackFnParams){
 
@@ -108,6 +143,11 @@ XKeyboardEvent::~XKeyboardEvent(){ }
 
 XScrollEvent::XScrollEvent() noexcept : thumb_pos(0), scroll_type(0) { }
 
+std::shared_ptr<XEvent> XScrollEvent::clone() const noexcept {
+
+	return std::make_shared<XScrollEvent>();
+}
+
 void XScrollEvent::PostInit(_plCallbackFnParams){
 
 	thumb_pos = _plGetScrollThumbPos(_plCallbackFnParamsList);
@@ -119,6 +159,11 @@ XScrollEvent::~XScrollEvent(){ }
 //****************************************************************************
 
 XScrollEventEx::XScrollEventEx() noexcept { }
+
+std::shared_ptr<XEvent> XScrollEventEx::clone() const noexcept {
+
+	return std::make_shared<XScrollEventEx>();
+}
 
 void XScrollEventEx::PostInit(_plCallbackFnParams) {
 
