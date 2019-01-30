@@ -9,8 +9,7 @@ void CComboBoxCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 
 	assert(!IsCreated());
 	XComboBox::Create(parent, flags | FL_COMBOBOX_DROPDOWN,
-						label, x, y, width, height + 20);
-	XComboBox::AddItem(_T("item"));
+						label, x, y, width, height + DROPDOWN_PART_SIZE);
 }
 
 void CComboBoxCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
@@ -42,7 +41,7 @@ void CComboBoxCellWidget::Hide() {
 void CComboBoxCellWidget::MoveWindow(const int x, const int y, \
 									const int width, const int height) {
 
-	XComboBox::MoveWindow(x, y, width, height);
+	XComboBox::MoveWindow(x, y, width, height + DROPDOWN_PART_SIZE);
 }
 
 void CComboBoxCellWidget::SetFocus() {

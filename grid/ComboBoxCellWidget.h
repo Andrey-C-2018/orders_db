@@ -4,7 +4,7 @@
 
 class CComboBoxCellWidget final : public XComboBox, public IGridCellWidget {
 	enum {
-		DROPDOWN_SIZE_MULTIPLIER = 10
+		DROPDOWN_PART_SIZE = 100
 	};
 
 	CComboBoxCellWidget(const CComboBoxCellWidget &obj) = delete;

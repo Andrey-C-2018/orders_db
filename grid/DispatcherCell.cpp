@@ -7,7 +7,7 @@ CDispatcherCell::CDispatcherCell() : def_active_cell(nullptr), \
 									active_cell_text(nullptr, 0), \
 									active_cell_color(255, 255, 255), \
 									active_cell_hidden(true), \
-									scroll_ended(true), \
+									move_def_cell(true), \
 									old_scroll_pos(0), table_proxy(nullptr), \
 									update_cell_widget_text(true), \
 									changes_present(false), \
@@ -21,7 +21,7 @@ CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : \
 									active_cell_text(obj.active_cell_text), \
 									active_cell_color(255, 255, 255), \
 									active_cell_hidden(obj.active_cell_hidden), \
-									scroll_ended(obj.scroll_ended), \
+									move_def_cell(obj.move_def_cell), \
 									old_scroll_pos(obj.old_scroll_pos), \
 									table_proxy(std::move(obj.table_proxy)), \
 									update_cell_widget_text(obj.update_cell_widget_text), \
@@ -35,7 +35,7 @@ CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : \
 	obj.active_cell_text.str = nullptr;
 	obj.active_cell_text.size = 0;
 	obj.active_cell_hidden = true;
-	obj.scroll_ended = true;
+	obj.move_def_cell = false;
 	obj.old_scroll_pos = 0;
 	obj.update_cell_widget_text = true;
 	obj.changes_present = false;
@@ -87,7 +87,7 @@ void CDispatcherCell::Draw(XGC &gc, const XPoint &initial_coords, const XSize &s
 
 	if (active_cell_reached && def_active_cell) {
 		if (initial_coords != curr_coords || size != curr_size || \
-			(active_cell_hidden && scroll_ended)) {
+			move_def_cell ) {
 
 			int x(initial_coords.x), y(initial_coords.y);
 			int width(size.width), height(size.height);
@@ -101,13 +101,14 @@ void CDispatcherCell::Draw(XGC &gc, const XPoint &initial_coords, const XSize &s
 				height = size.height - (bounds.top - initial_coords.y);
 			}
 
-			assert(def_active_cell);
-			if (!active_cell_hidden || (active_cell_hidden && scroll_ended))
+			if (move_def_cell) {
 				def_active_cell->MoveWindow(x, y, width, height);
+				move_def_cell = false;
 
-			if (active_cell_hidden && scroll_ended) {
-				def_active_cell->Show();
-				active_cell_hidden = false;
+				if (active_cell_hidden) {
+					def_active_cell->Show();
+					active_cell_hidden = false;
+				}
 			}
 
 			curr_coords = initial_coords;
@@ -164,7 +165,7 @@ void CDispatcherCell::OnClick(const size_t field, const size_t record) {
 	if (!new_records_count) {
 		def_active_cell->Hide();
 		active_cell_hidden = true;
-		scroll_ended = true;
+		move_def_cell = true;
 		return;
 	}
 
@@ -195,7 +196,7 @@ void CDispatcherCell::OnActiveCellLocationChanged() {
 	Reload();
 
 	active_cell_hidden = true;
-	scroll_ended = true;
+	move_def_cell = true;
 }
 
 void CDispatcherCell::Reload() {

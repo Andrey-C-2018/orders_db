@@ -19,7 +19,7 @@ class CDispatcherCell : public IDrawable {
 	XSize curr_size;
 
 	bool active_cell_hidden;
-	bool scroll_ended;
+	bool move_def_cell;
 	int old_scroll_pos;
 
 	XRect bounds;
@@ -100,12 +100,12 @@ void CDispatcherCell::BeginScroll(const int scroll_pos) {
 		def_active_cell->Hide();
 		active_cell_hidden = true;
 	}
-	scroll_ended = false;
+	move_def_cell = false;
 }
 
 void CDispatcherCell::EndScroll(const int scroll_pos) {
 
-	scroll_ended = true;
+	move_def_cell = true;
 }
 
 void CDispatcherCell::Init(const ImmutableString<Tchar> str, \
