@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DbComboBoxCellWidget.h" />
     <ClInclude Include="DbGrid.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DbComboBoxCellWidget.cpp" />
     <ClCompile Include="DbGrid.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
