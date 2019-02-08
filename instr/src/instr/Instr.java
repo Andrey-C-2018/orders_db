@@ -1,5 +1,6 @@
 package instr;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -9,6 +10,7 @@ import java.sql.Statement;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.util.Vector;
 
 public class Instr {
 	
@@ -17,13 +19,14 @@ public class Instr {
 		public String name;
 		public Date startwork_date;
 		public Date dismiss_date;
+		public int id_employer = -1;
 	}
 	
 	private final static int INSTR_OFFSET_IN_MONTHES = 6;
-	private final static int MIN_INSTR_OFFSET_IN_MONTHES = 3;
-	
+		
 	private Connection conn = null;
 	private SimpleDateFormat format_german = null;
+	private SimpleDateFormat format_sql = null;
 	private SpecialDays special_days = null;
 	
 	private final void initConnection() throws SQLException {
@@ -43,6 +46,111 @@ public class Instr {
 		if (conn != null) conn.close();
 	}
 	
+	private StaffListItem[] getWorkersWhoNeedInstr() throws SQLException {
+		StaffListItem[] staff_list = null;
+		
+		assert(conn != null);
+
+		Statement stmt = conn.createStatement();
+		
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT COUNT(*) FROM (");
+		int main_query_begin = query.length();
+		query.append("SELECT s.id, s.name, sa.startwork_date, sa.dismiss_date, sa.id_employer "); 
+		query.append("FROM staff s INNER JOIN staff_assignments sa ON s.id = sa.id_worker "); 
+		query.append("WHERE s.id IN (SELECT id_worker FROM instr GROUP BY id_worker");
+		query.append(" HAVING ((sa.dismiss_date > DATE_ADD(MAX(instr_date), INTERVAL "); 
+		query.append(INSTR_OFFSET_IN_MONTHES); 
+		query.append(" MONTH) OR sa.dismiss_date IS NULL) AND DATE_ADD(MAX(instr_date), INTERVAL ");
+		query.append(INSTR_OFFSET_IN_MONTHES);
+		query.append(" MONTH) <= NOW())	OR (sa.startwork_date > MAX(instr_date) AND sa.startwork_date <= NOW())) ");
+		query.append("OR id NOT IN (SELECT DISTINCT id_worker FROM instr) "); 
+		query.append("ORDER BY id, startwork_date");
+	    int main_query_end = query.length();
+	    query.append(") aaa");
+	    
+	    ResultSet rs = stmt.executeQuery(query.toString());
+	    int records_count = 0;
+	    if(rs.next()) records_count = rs.getInt(1);
+	    	
+	    if(records_count == 0) return null;
+	    	
+		staff_list = new StaffListItem[records_count];
+			
+		rs = stmt.executeQuery(query.substring(main_query_begin, main_query_end));
+	
+		int i = 0;
+	    while (rs.next()) {
+	    	staff_list[i] = new StaffListItem();
+	    	
+			staff_list[i].id = rs.getInt("id");
+	    	staff_list[i].name = rs.getString("name");
+			staff_list[i].startwork_date = rs.getDate("startwork_date");
+	    	staff_list[i].dismiss_date = rs.getDate("dismiss_date");
+	    	staff_list[i].id_employer = rs.getInt("id_employer");
+			++i;
+		}
+	    			
+	    rs.close();
+	    stmt.close();
+				
+		return staff_list;
+	}
+	
+	private StaffListItem[] mergeAssigmentRangesIfNecessary(StaffListItem workers[], 
+															GregorianCalendar calendar) {
+		class Gap {
+			int start;
+			int end;
+			Gap(int start, int end) { this.start = start; this.end = end; }
+		}
+		Vector<Gap> gaps = new Vector<Gap>();
+			
+		for(int i = 1; i < workers.length; ++i) {
+			if(workers[i - 1].dismiss_date == null) continue;
+			
+			calendar.setTime(workers[i - 1].dismiss_date);
+			calendar.add(Calendar.DAY_OF_MONTH, 1);
+			Date date_next_to_dismiss = calendar.getTime();
+			
+			if(workers[i - 1].id_employer == workers[i].id_employer &&
+					workers[i - 1].id == workers[i].id &&
+					workers[i].startwork_date.equals(date_next_to_dismiss)) {
+				
+				workers[i].startwork_date = workers[i - 1].startwork_date;
+				workers[i - 1] = null;
+				
+				int gaps_size = gaps.size();
+				if(gaps_size > 0 && gaps.elementAt(gaps_size - 1).end == i - 1)
+					++gaps.elementAt(gaps_size - 1).end;
+				else
+					gaps.add(new Gap(i - 1, i));
+			}
+		}
+		
+		if(gaps.size() != 0) {
+			int start = gaps.elementAt(0).start;
+		
+			gaps.add(new Gap(workers.length, workers.length));
+			for (int j = 0; j < gaps.size() - 1; ++j) {
+
+				int end = gaps.elementAt(j).end;
+				int next = gaps.elementAt(j + 1).start;
+
+				for(int i = end, k = start; i < next; ++i, ++k) {
+					assert(workers[k] == null);
+					workers[k] = workers[i];
+					workers[i] = null;
+				}
+				start += next - end;
+			}
+			
+			workers = Arrays.copyOfRange(workers, 0, start);
+		}
+		
+		return workers;
+	}
+	
 	private void performInstr(int id_worker, Date instr_date, 
 								String instr_type) throws SQLException {
 
@@ -53,7 +161,7 @@ public class Instr {
 		query.append("INSERT INTO instr VALUES(");
 		query.append(id_worker);
 		query.append(", '");
-		query.append(instr_date);
+		query.append(format_sql.format(instr_date));
 		query.append("', '");
 		query.append(instr_type);
 		query.append("')");
@@ -103,7 +211,18 @@ public class Instr {
 	
 	private String DateToString(Date date) {
 		
-		return format_german.format(date);
+		return date != null ? format_german.format(date) : "NULL";
+	}
+	
+	private Date calcNextInstrDate(Date prev_instr_date, 
+									GregorianCalendar calendar) {
+		
+		calendar.setTime(prev_instr_date);
+		calendar.add(Calendar.MONTH, INSTR_OFFSET_IN_MONTHES);
+	
+		Date next_instr_date = calendar.getTime();
+		return special_days.findNearestWorkingDay(next_instr_date, 
+										SpecialDays.DIRECTION_LEFT);
 	}
 	
 	//----------------------------------------------------------
@@ -113,100 +232,44 @@ public class Instr {
 		initConnection();
 		
 		format_german = new SimpleDateFormat("dd.MM.yyyy");
+		format_sql = new SimpleDateFormat("yyyy-MM-dd");
 		special_days = new SpecialDays(conn);
 	}
 
 	public void evaluateInstr() throws SQLException {
 		
 		GregorianCalendar calendar = new GregorianCalendar();
+		Date now = new Date();
 		
 		StaffListItem workers[] = getWorkersWhoNeedInstr();
-		
+		workers = mergeAssigmentRangesIfNecessary(workers, calendar);
+		if(workers == null) return;
+				
 		for(int i = 0; i < workers.length; ++i){
 			
 			int id = workers[i].id;
 			Date prev_instr_date = getPrevInstrDate(id);
 			Date startwork_date = workers[i].startwork_date;
+			Date dismiss_date = workers[i].dismiss_date;
 			
-			if(prev_instr_date == null)
+			if(prev_instr_date == null || 
+					(prev_instr_date != null && startwork_date.after(prev_instr_date))) {
+				
 				performInitialInstr(id, startwork_date);
-			else {
+				prev_instr_date = startwork_date;
+			}
 				
-				if(startwork_date.after(prev_instr_date)) {
-					performInitialInstr(id, startwork_date);
-					continue;
-				}
-				
-				Date dismiss_date = workers[i].dismiss_date;
-				if(dismiss_date.after(prev_instr_date)) {
-									
-					calendar.setTime(prev_instr_date);
-					calendar.add(Calendar.MONTH, INSTR_OFFSET_IN_MONTHES);
-				
-					Date new_instr_date = calendar.getTime();
-				
-					Date corr_new_instr_date = special_days.findNearestWorkingDay(new_instr_date, 
-															SpecialDays.DIRECTION_LEFT);
-					calendar.setTime(prev_instr_date);
-					calendar.add(Calendar.MONTH, MIN_INSTR_OFFSET_IN_MONTHES);
-					if(corr_new_instr_date.before(calendar.getTime()))
-						corr_new_instr_date = special_days.findNearestWorkingDay(new_instr_date, 
-															SpecialDays.DIRECTION_RIGHT);
-					performInstr(id, corr_new_instr_date);
-				}
+			if(dismiss_date == null) dismiss_date = now;
+			
+			Date next_instr_date = calcNextInstrDate(prev_instr_date, calendar);
+			while(dismiss_date.after(next_instr_date)) {
+					
+				performInstr(id, next_instr_date);
+				next_instr_date = calcNextInstrDate(next_instr_date, calendar);
 			}
 		}
 	}
 	
-	private StaffListItem[] getWorkersWhoNeedInstr() throws SQLException {
-		StaffListItem[] staff_list = null;
-		
-		assert(conn != null);
-
-		Statement stmt = conn.createStatement();
-		
-		StringBuilder query = new StringBuilder();
-		query.append("SELECT COUNT(*) FROM (");
-		int main_query_begin = query.length();
-		query.append("SELECT s.id, s.name, sa.startwork_date, sa.dismiss_date "); 
-		query.append("FROM staff s INNER JOIN staff_assignments sa ON s.id = sa.id_worker "); 
-		query.append("WHERE s.id IN (SELECT id_worker FROM instr GROUP BY id_worker");
-		query.append(" HAVING sa.dismiss_date > DATE_ADD(MAX(instr_date), INTERVAL ");
-		query.append(INSTR_OFFSET_IN_MONTHES);
-		query.append(" MONTH) OR sa.startwork_date > MAX(instr_date)");
-		query.append(" OR DATE_ADD(MAX(instr_date), INTERVAL 6 MONTH) <= NOW()) ");
-		query.append("OR id NOT IN (SELECT DISTINCT id FROM instr) "); 
-		query.append("ORDER BY startwork_date, dismiss_date");
-	    int main_query_end = query.length();
-	    query.append(") aaa");
-	    
-	    ResultSet rs = stmt.executeQuery(query.toString());
-	    int records_count = 0;
-	    if(rs.next()) records_count = rs.getInt(1);
-	    	
-	    if(records_count == 0) return null;
-	    	
-		staff_list = new StaffListItem[records_count];
-			
-		rs = stmt.executeQuery(query.substring(main_query_begin, main_query_end));
-	
-		int i = 0;
-	    while (rs.next()) {
-	    	staff_list[i] = new StaffListItem();
-	    	
-			staff_list[i].id = rs.getInt("id");
-	    	staff_list[i].name = rs.getString("name");
-			staff_list[i].startwork_date = rs.getDate("startwork_date");
-	    	staff_list[i].dismiss_date = rs.getDate("dismiss_date");
-			++i;
-		}
-	    			
-	    rs.close();
-	    stmt.close();
-				
-		return staff_list;
-	}
-
 	public void print() throws SQLException {
 		
 		assert(conn != null);
@@ -223,7 +286,8 @@ public class Instr {
 	    ResultSet rs = stmt.executeQuery(query.toString());
 	    				
 	    while (rs.next()) {
-			System.out.print(rs.getInt("id") + ' ');
+			System.out.print(rs.getInt("id"));
+			System.out.print(' ');
 			System.out.print(rs.getString("name") + ' ');
 			System.out.print(rs.getString("position") + ' ');
 			System.out.print(DateToString(rs.getDate("startwork_date")));
@@ -231,6 +295,7 @@ public class Instr {
 			System.out.print(DateToString(rs.getDate("dismiss_date")));
 			System.out.print(' ');
 			System.out.print(DateToString(rs.getDate("instr_date")));
+			System.out.println();
 		}
 	    			
 	    stmt.close();
