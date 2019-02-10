@@ -13,7 +13,7 @@ class CDependentTableUpdater {
 	std::vector<CFieldsRelation> fields_relations;
 
 	std::vector<const CDbTable> dependent_db_table;
-	inline CMetaInfo &getDependentMetaInfo() { return dependent_db_table->getQuery()->getMetaInfo(); }
+	inline CMetaInfo &getDependentMetaInfo();
 public:
 	CDependentTableUpdater(std::shared_ptr<IDbConnection> conn_, \
 		const Tchar *master_table_name, \
@@ -41,23 +41,6 @@ CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> co
 
 	auto fields = stmt->getResultSetMetadata();
 	master_meta_info.clearAndAddFields(fields);
-}
-
-CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> conn_, \
-			std::shared_ptr<const IDbResultSet> master_records_, \
-			std::shared_ptr<const IDbResultSetMetadata> master_metadata, \
-			const Tchar *dependent_table_name, \
-			std::vector<const CDbTable> dependent_table) : \
-				conn(conn_), master_records(master_records_), \
-				dependent_db_table(dependent_table) {
-
-	assert(conn_);
-	assert(master_records);
-	assert(master_metadata);
-	assert(dependent_table);
-	assert(dependent_table_name);
-	
-	master_meta_info.clearAndAddFields(master_metadata);
 }
 
 void CDependentTableUpdater::SetRelation(const Tchar *master_field, const Tchar *dependent_field) {
