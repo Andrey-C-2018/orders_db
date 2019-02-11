@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="DbComboBoxCellWidget.h" />
     <ClInclude Include="DbGrid.h" />
+    <ClInclude Include="IDbTablesRelationsContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DbComboBoxCellWidget.cpp" />

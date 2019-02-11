@@ -175,7 +175,7 @@ void CMetaInfo::refreshFieldIndexes() {
 	std::sort(fields_index_name.begin(), fields_index_name.end(), predFieldName);
 }
 
-void CMetaInfo::clearAndAddFields(std::shared_ptr<IDbResultSetMetadata> fields) {
+void CMetaInfo::clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fields) {
 	size_t fields_count = fields->getFieldsCount();
 
 	clear();
@@ -205,6 +205,16 @@ void CMetaInfo::clearAndAddFields(std::shared_ptr<IDbResultSetMetadata> fields) 
 	}
 
 	refreshFieldIndexes();
+}
+
+size_t CMetaInfo::appendWherePartOfUpdateQuery(std::string &query) const {
+
+	assert(primary_table_id != -1);
+	size_t prim_key_size = enumeratePrimKey(primary_table_id, \
+										AddPrimKeyToWhereStmt(*this, query));
+	removeEmptyAndStmt(query);
+
+	return prim_key_size;
 }
 
 void CMetaInfo::getUpdateQueryForField(const size_t field, std::string &query) const {

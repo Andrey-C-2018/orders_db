@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="DbTable.cpp" />
     <ClCompile Include="DbTableDispatcher.cpp" />
+    <ClCompile Include="DependentTableUpdater.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MetaInfo.cpp" />
     <ClCompile Include="Query.cpp" />
@@ -167,6 +168,7 @@
   <ItemGroup>
     <ClInclude Include="DbTable.h" />
     <ClInclude Include="DbTableDispatcher.h" />
+    <ClInclude Include="DependentTableUpdater.h" />
     <ClInclude Include="IDbCustomer.h" />
     <ClInclude Include="IndexedSearchPredicates.h" />
     <ClInclude Include="MetaInfo.h" />

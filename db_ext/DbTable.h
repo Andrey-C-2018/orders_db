@@ -31,6 +31,7 @@ public:
 	inline size_t getCurrentRecordNo() const;
 
 	inline const CQuery &getQuery() const;
+	inline std::shared_ptr<const IDbResultSet> getResultSet() const;
 
 	bool empty() const override;
 	size_t GetFieldsCount() const override;
@@ -62,4 +63,9 @@ size_t CDbTable::getCurrentRecordNo() const{
 const CQuery &CDbTable::getQuery() const {
 
 	return query;
+}
+
+std::shared_ptr<const IDbResultSet> CDbTable::getResultSet() const {
+
+	return result_set;
 }

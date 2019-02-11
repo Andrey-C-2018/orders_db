@@ -1,0 +1,100 @@
+#include "DependentTableUpdater.h"
+
+CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> conn_, \
+											const char *master_table_name, \
+											const char *dependent_table_name, \
+											std::shared_ptr<const CDbTable> dependent_table) : \
+											conn(conn_), dependent_db_table(dependent_table) {
+
+	assert(conn_);
+	assert(dependent_table);
+
+	std::string query = "SELECT * FROM ";
+	query += master_table_name;
+	auto stmt = conn->PrepareQuery(query.c_str());
+	master_records = stmt->exec();
+
+	auto fields = stmt->getResultSetMetadata();
+	master_meta_info.clearAndAddFields(fields);
+	master_meta_info.setPrimaryTable(master_table_name);
+
+	query = "UPDATE ";
+	query += master_table_name;
+	query += " m, ";
+	query += dependent_table_name;
+	query += " d SET ";
+	update_query_preamble = std::move(query);
+}
+
+CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> conn_, \
+										std::shared_ptr<const IDbResultSet> master_records_, \
+										std::shared_ptr<const IDbResultSetMetadata> master_metadata, \
+										const char *dependent_table_name, \
+										std::shared_ptr<const CDbTable> dependent_table) : \
+								conn(conn_), master_records(master_records_), \
+								dependent_db_table(dependent_table) {
+
+	assert(conn_);
+	assert(master_records);
+	assert(master_metadata);
+	assert(dependent_table);
+	assert(dependent_table_name);
+
+	master_meta_info.clearAndAddFields(master_metadata);
+	ImmutableString<char> master_table_name = master_meta_info.getTableName(0);
+	master_meta_info.setPrimaryTable(master_table_name.str);
+
+	update_query_preamble = "UPDATE ";
+	update_query_preamble += master_table_name.str;
+	update_query_preamble += " m, ";
+	update_query_preamble += dependent_table_name;
+	update_query_preamble += " d SET ";
+}
+
+void CDependentTableUpdater::SetRelation(const char *master_field, const char *dependent_field) {
+
+	assert(dependent_field);
+	assert(master_field);
+
+	CFieldsRelation item;
+	item.master_field_name = master_field;
+	item.dependent_field_name = dependent_field;
+
+	fields_relations.emplace_back(std::move(item));
+}
+
+std::shared_ptr<IDbStatement> \
+CDependentTableUpdater::createDepTableUpdateStmt(const size_t master_record_index) {
+
+	assert(!fields_relations.empty());
+
+	std::string query = update_query_preamble;
+
+	for (auto p = fields_relations.cbegin(); p != fields_relations.cend(); ++p) {
+
+		query += "d."; query += p->dependent_field_name;
+		query += " = ";
+		query += "m."; query += p->master_field_name;
+		query += ", ";
+	}
+	query.erase(query.end() - 2, query.end());
+
+	size_t parameters_count = 0;
+	const CMetaInfo &dependent_meta_info = getDependentMetaInfo();
+	query += " WHERE ";
+	parameters_count = master_meta_info.appendWherePartOfUpdateQuery(query);
+	query += " AND ";
+	parameters_count += dependent_meta_info.appendWherePartOfUpdateQuery(query);
+
+	std::shared_ptr<IDbStatement> upd_stmt = conn->PrepareQuery(query.c_str());
+
+	master_records->gotoRecord(master_record_index);
+	master_meta_info.bindPrimaryKeyValues(master_records, upd_stmt);
+	dependent_meta_info.bindPrimaryKeyValuesWithOffset(parameters_count, \
+													dependent_db_table->getResultSet(),
+													upd_stmt);
+
+	return upd_stmt;
+}
+
+CDependentTableUpdater::~CDependentTableUpdater() { }

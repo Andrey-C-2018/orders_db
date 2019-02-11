@@ -125,7 +125,7 @@ private:
 	void refreshFieldIndexes();
 
 	template <class FieldPredicate> \
-		void enumeratePrimKey(const id_type table_id, \
+		size_t enumeratePrimKey(const id_type table_id, \
 								FieldPredicate field_pred) const;
 	inline void removeEmptyAndStmt(std::string &query) const;
 								
@@ -152,14 +152,20 @@ public:
 	void setPrimaryTable(const char *table_name);
 
 	void addField(std::shared_ptr<IDbField> field, const size_t new_field_index);
-	void clearAndAddFields(std::shared_ptr<IDbResultSetMetadata> fields);
+	void clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fields);
+
+	size_t appendWherePartOfUpdateQuery(std::string &query) const;
 
 	void getUpdateQueryForField(const size_t field, std::string &query) const;
 	void getDeleteQuery(std::string &query) const;
+
 	void bindPrimaryKeyValues(const size_t field, \
 								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 								std::shared_ptr<IDbBindingTarget> binding_target) const;
 	void bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+								std::shared_ptr<IDbBindingTarget> binding_target) const;
+	void bindPrimaryKeyValuesWithOffset(const size_t params_offset, \
+								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 								std::shared_ptr<IDbBindingTarget> binding_target) const;
 
 	virtual ~CMetaInfo();
@@ -216,7 +222,7 @@ bool CMetaInfo::isPrimaryKey(const size_t field) const noexcept {
 }
 
 template <class FieldPredicate> \
-void CMetaInfo::enumeratePrimKey(const id_type table_id, \
+size_t CMetaInfo::enumeratePrimKey(const id_type table_id, \
 									FieldPredicate field_pred) const {
 	auto table_prim_keys = findTableKeys(table_id);
 
@@ -231,6 +237,8 @@ void CMetaInfo::enumeratePrimKey(const id_type table_id, \
 	if (!keys_counter)
 		throw XException(0, \
 			_T("There are no foreign keys for the table the id field belongs to"));
+
+	return keys_counter;
 }
 
 void CMetaInfo::removeEmptyAndStmt(std::string &query) const {
