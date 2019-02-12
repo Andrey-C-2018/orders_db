@@ -28,23 +28,7 @@ public class Instr {
 	private SimpleDateFormat format_german = null;
 	private SimpleDateFormat format_sql = null;
 	private SpecialDays special_days = null;
-	
-	private final void initConnection() throws SQLException {
-		
-		conn = DriverManager.getConnection(
-		    	"jdbc:mysql://127.0.0.1:3310/staff",
-		    	"staff_user", "123");
-
-	    if (conn == null) {
-	     	System.out.println("Can't connect to the db");
-	    	System.exit(0);
-	    }
-	}
-	
-	private void closeConnection() throws SQLException {
-		
-		if (conn != null) conn.close();
-	}
+	private GregorianCalendar calendar = null;
 	
 	private StaffListItem[] getWorkersWhoNeedInstr() throws SQLException {
 		StaffListItem[] staff_list = null;
@@ -173,8 +157,7 @@ public class Instr {
 	private void performInitialInstr(int id_worker, Date instr_date) throws SQLException {
 
 		assert(instr_date != null);
-		assert(!special_days.isHoliday(instr_date) && 
-				!special_days.isDayOff(id_worker, instr_date) && 
+		assert(!special_days.isHoliday(instr_date, calendar) && 
 				!special_days.isVacationDay(id_worker, instr_date));
 		
 		performInstr(id_worker, instr_date, "вступний");
@@ -214,31 +197,34 @@ public class Instr {
 		return date != null ? format_german.format(date) : "NULL";
 	}
 	
-	private Date calcNextInstrDate(Date prev_instr_date, 
+	private Date calcNextInstrDate(int id_worker, 
+									Date prev_instr_date, 
 									GregorianCalendar calendar) {
 		
 		calendar.setTime(prev_instr_date);
 		calendar.add(Calendar.MONTH, INSTR_OFFSET_IN_MONTHES);
 	
 		Date next_instr_date = calendar.getTime();
-		return special_days.findNearestWorkingDay(next_instr_date, 
-										SpecialDays.DIRECTION_LEFT);
+		return special_days.findNearestWorkingDay(id_worker, next_instr_date, 
+													SpecialDays.DIRECTION_LEFT, 
+													calendar);
 	}
 	
 	//----------------------------------------------------------
 	
-	public Instr() throws SQLException {
+	public Instr(Connection conn) throws SQLException {
 	
-		initConnection();
+		this.conn = conn;
 		
 		format_german = new SimpleDateFormat("dd.MM.yyyy");
 		format_sql = new SimpleDateFormat("yyyy-MM-dd");
 		special_days = new SpecialDays(conn);
+		
+		calendar = new GregorianCalendar();
 	}
 
 	public void evaluateInstr() throws SQLException {
 		
-		GregorianCalendar calendar = new GregorianCalendar();
 		Date now = new Date();
 		
 		StaffListItem workers[] = getWorkersWhoNeedInstr();
@@ -261,11 +247,11 @@ public class Instr {
 				
 			if(dismiss_date == null) dismiss_date = now;
 			
-			Date next_instr_date = calcNextInstrDate(prev_instr_date, calendar);
+			Date next_instr_date = calcNextInstrDate(id, prev_instr_date, calendar);
 			while(dismiss_date.after(next_instr_date)) {
 					
 				performInstr(id, next_instr_date);
-				next_instr_date = calcNextInstrDate(next_instr_date, calendar);
+				next_instr_date = calcNextInstrDate(id, next_instr_date, calendar);
 			}
 		}
 	}
