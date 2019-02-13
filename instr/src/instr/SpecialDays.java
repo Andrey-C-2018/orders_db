@@ -23,6 +23,15 @@ public class SpecialDays {
 			return end_date.before(r.begin_date) ? -1 : 
 					(begin_date.after(r.end_date) ? 1 : 0);
 		}
+		
+		public boolean isLeftNeighbourOf(SpecialDaysRange r, Calendar calendar) {
+			
+			calendar.setTime(r.begin_date);
+			calendar.add(Calendar.DAY_OF_MONTH, -1);
+			Date decr_date = calendar.getTime();
+			
+			return end_date.equals(decr_date);
+		}
 	}
 
 	private class Vacation extends SpecialDaysRange {
@@ -39,6 +48,14 @@ public class SpecialDays {
 			
 			Vacation R = (Vacation) r;
 			return id_worker != R.id_worker ? id_worker - R.id_worker : super.compareTo(r);
+		}
+		@Override
+		public final boolean isLeftNeighbourOf(SpecialDaysRange r, Calendar calendar) {
+			
+			assert(r instanceof Vacation);
+			
+			Vacation R = (Vacation) r;
+			return id_worker == R.id_worker && super.isLeftNeighbourOf(r, calendar);
 		}
 	}
 
@@ -70,7 +87,7 @@ public class SpecialDays {
 		
 		vacations_cache = new ArrayList<Vacation>();
 		
-		rs = stmt.executeQuery("SELECT * FROM vacations ORDER BY begin_date");
+		rs = stmt.executeQuery("SELECT * FROM vacations ORDER BY id_worker, begin_date");
 		while(rs.next()) {
 			Vacation item = new Vacation();
 				
@@ -87,6 +104,21 @@ public class SpecialDays {
 	    stmt.close();
 	}
 	
+	private int findHoliday(Date date, SpecialDaysRange item_cached) {
+		
+		item_cached.begin_date = date;
+		item_cached.end_date = date;
+		
+		return Collections.binarySearch(holidays_cache, item_cached);
+	}
+	
+	private boolean isWeekend(Date date, Calendar calendar) {
+		
+		calendar.setTime(date);
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		return (day == Calendar.SATURDAY || day == Calendar.SUNDAY);
+	}
+	
 	public boolean isHoliday(Date date, Calendar calendar) {
 		
 		calendar.setTime(date);
@@ -95,33 +127,100 @@ public class SpecialDays {
 			return true;
 		
 		SpecialDaysRange item = new SpecialDaysRange();
-		item.begin_date = date;
-		item.end_date = date;
 		
-		int index = Collections.binarySearch(holidays_cache, item);
+		int index = findHoliday(date, item);
 		return index >= 0;
 	}
 
+	private int findVacationDay(int id_worker, Date date, Vacation item_cached) {
+		
+		item_cached.id_worker = id_worker;
+		item_cached.begin_date = date;
+		item_cached.end_date = date;
+		
+		return Collections.binarySearch(vacations_cache, item_cached);
+	}
+	
 	public boolean isVacationDay(int id_worker, Date date) {
 
 		Vacation item = new Vacation();
-		item.id_worker = id_worker;
-		item.begin_date = date;
-		item.end_date = date;
-		
-		int index = Collections.binarySearch(vacations_cache, item);
+		int index = findVacationDay(id_worker, date, item);
 		return index >= 0;
 	}
 
+	private Date shiftDateIfAtWeekend(Date date, Calendar calendar) {
+		
+		calendar.setTime(date);
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		int shift = 0;
+		
+		if (day == Calendar.SATURDAY) shift = 1;
+		else if (day == Calendar.SUNDAY) shift = 2;
+		
+		if(shift > 0) {
+			calendar.add(Calendar.DAY_OF_MONTH, -shift);
+			return calendar.getTime();
+		}
+		return date;
+	}
+	
+	private Date decDate(Date date, Calendar calendar) {
+		
+		calendar.setTime(date);
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		return calendar.getTime();
+	}
+	
 	public Date findNearestWorkingDay(int id_worker, Date date, 
 									int direction, Calendar calendar) {
 		
-		boolean is_holiday = isHoliday(date, calendar);
-		boolean is_vacation_day = isVacationDay(id_worker, date);
+		Vacation item = new Vacation();
+		date = shiftDateIfAtWeekend(date, calendar);
 		
-		if(!is_holiday && !is_vacation_day)
-			return date;
+		int index_holiday = findHoliday(date, item);
+		int index_vacation = 0;
 		
+		while(index_holiday >= 0 || index_vacation >= 0) {
+						
+			if(index_holiday >= 0) {
+				index_holiday = getFirstDayOf(holidays_cache, index_holiday, calendar);
+				if(index_holiday >= 0) {
+					date = holidays_cache.get(index_holiday).begin_date;
+					if(isWeekend(date, calendar)) 
+						date = shiftDateIfAtWeekend(date, calendar);
+					else date = decDate(date, calendar);
+				}
+			}
+						
+			index_vacation = findVacationDay(id_worker, date, item);
+			if(index_vacation >= 0) {
+				index_vacation = getFirstDayOf(vacations_cache, index_vacation, calendar);
+					
+				if(index_vacation >= 0) {
+					date = vacations_cache.get(index_vacation).begin_date;
+					if(isWeekend(date, calendar)) 
+						date = shiftDateIfAtWeekend(date, calendar);
+					else date = decDate(date, calendar);
+				}
+			}
+			
+			index_holiday = findHoliday(date, item);
+		}
 		return date;
 	}
+	
+	private int getFirstDayOf(ArrayList<? extends SpecialDaysRange> cache, 
+													int index, Calendar calendar) {
+		
+		assert(index >= 0 && index < cache.size());
+
+		while(index > 0 && 
+				cache.get(index - 1).isLeftNeighbourOf(cache.get(index), calendar)) {
+
+			--index;
+		} 
+
+		return index;
+	}
+	
 }
