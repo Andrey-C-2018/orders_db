@@ -7,7 +7,6 @@ import java.util.GregorianCalendar;
 import java.text.SimpleDateFormat;
 import java.sql.Connection;
 import java.sql.Statement;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.util.Vector;
@@ -23,6 +22,7 @@ public class Instr {
 	}
 	
 	private final static int INSTR_OFFSET_IN_MONTHES = 6;
+	private final static int MAX_INSTRS_COUNT = 4;
 		
 	private Connection conn = null;
 	private SimpleDateFormat format_german = null;
@@ -197,17 +197,51 @@ public class Instr {
 		return date != null ? format_german.format(date) : "NULL";
 	}
 	
+	private int getInstrsCount(Date date) throws SQLException {
+		
+		assert(conn != null);
+
+		Statement stmt = conn.createStatement();
+		
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT COUNT(id_worker) as count_instr FROM instr ");
+		query.append("WHERE instr_date = '");
+		query.append(format_sql.format(date));
+		query.append("'");
+
+	    ResultSet rs = stmt.executeQuery(query.toString());
+	    int count_instr = 0;
+	    if(rs.next())
+	    	count_instr = rs.getInt("count_instr");
+	    		
+	    rs.close();
+	    stmt.close();
+	    
+	    return count_instr;
+	}
+	
 	private Date calcNextInstrDate(int id_worker, 
 									Date prev_instr_date, 
-									GregorianCalendar calendar) {
+									GregorianCalendar calendar) throws SQLException {
 		
 		calendar.setTime(prev_instr_date);
 		calendar.add(Calendar.MONTH, INSTR_OFFSET_IN_MONTHES);
 	
 		Date next_instr_date = calendar.getTime();
-		return special_days.findNearestWorkingDay(id_worker, next_instr_date, 
+		next_instr_date = special_days.findNearestWorkingDay(id_worker, next_instr_date, 
 													SpecialDays.DIRECTION_LEFT, 
 													calendar);
+		while(getInstrsCount(next_instr_date) > Instr.MAX_INSTRS_COUNT) {
+			calendar.setTime(next_instr_date);
+			calendar.add(Calendar.DAY_OF_MONTH, -1);
+			
+			next_instr_date = calendar.getTime();
+			next_instr_date = special_days.findNearestWorkingDay(id_worker, next_instr_date, 
+														SpecialDays.DIRECTION_LEFT, 
+														calendar);
+		}
+		
+		return next_instr_date;
 	}
 	
 	//----------------------------------------------------------
