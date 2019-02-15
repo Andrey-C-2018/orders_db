@@ -1,5 +1,6 @@
 package instr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -88,7 +89,7 @@ public class Instr {
 			int end;
 			Gap(int start, int end) { this.start = start; this.end = end; }
 		}
-		Vector<Gap> gaps = new Vector<Gap>();
+		ArrayList<Gap> gaps = new ArrayList<Gap>();
 			
 		for(int i = 1; i < workers.length; ++i) {
 			if(workers[i - 1].dismiss_date == null) continue;
@@ -105,21 +106,21 @@ public class Instr {
 				workers[i - 1] = null;
 				
 				int gaps_size = gaps.size();
-				if(gaps_size > 0 && gaps.elementAt(gaps_size - 1).end == i - 1)
-					++gaps.elementAt(gaps_size - 1).end;
+				if(gaps_size > 0 && gaps.get(gaps_size - 1).end == i - 1)
+					++gaps.get(gaps_size - 1).end;
 				else
 					gaps.add(new Gap(i - 1, i));
 			}
 		}
 		
 		if(gaps.size() != 0) {
-			int start = gaps.elementAt(0).start;
+			int start = gaps.get(0).start;
 		
 			gaps.add(new Gap(workers.length, workers.length));
 			for (int j = 0; j < gaps.size() - 1; ++j) {
 
-				int end = gaps.elementAt(j).end;
-				int next = gaps.elementAt(j + 1).start;
+				int end = gaps.get(j).end;
+				int next = gaps.get(j + 1).start;
 
 				for(int i = end, k = start; i < next; ++i, ++k) {
 					assert(workers[k] == null);
@@ -160,13 +161,13 @@ public class Instr {
 		assert(!special_days.isHoliday(instr_date, calendar) && 
 				!special_days.isVacationDay(id_worker, instr_date));
 		
-		performInstr(id_worker, instr_date, "вступний");
+		performInstr(id_worker, instr_date, "РІСЃС‚СѓРїРЅРёР№");
 	}
 
 	private void performInstr(int id_worker, Date instr_date) throws SQLException {
 
 		assert(instr_date != null);
-		performInstr(id_worker, instr_date, "первинний");
+		performInstr(id_worker, instr_date, "РїРµСЂРІРёРЅРЅРёР№");
 	}
 
 	private Date getPrevInstrDate(int id_worker) throws SQLException {

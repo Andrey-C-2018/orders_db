@@ -92,7 +92,7 @@ public class SpecialDays {
 			Vacation item = new Vacation();
 				
 			item.id_worker = rs.getInt("id_worker");
-			item.type = rs.getString("vacation_type") == "Оплачувана" ? 
+			item.type = rs.getString("vacation_type") == "РѕРїР»Р°С‡СѓРІР°РЅРёР№" ? 
 							Vacation.VACATION_REGULAR : Vacation.VACATION_UNPAID;
 			item.begin_date = rs.getDate("begin_date");
 			item.end_date = rs.getDate("end_date");
