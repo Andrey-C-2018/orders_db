@@ -54,6 +54,7 @@ public:
 	void Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) override;
 
 	void OnActiveCellTextChanged(XCommandEvent *eve);
+	void OnActiveCellChangedIndirectly(XCommandEvent *eve);
 	void OnClick(const size_t field, const size_t record);
 	void OnActiveCellLoosesFocus(XEvent *eve);
 	void OnActiveCellKeyPressed(XKeyboardEvent *eve);

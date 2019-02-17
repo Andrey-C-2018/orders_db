@@ -217,6 +217,18 @@ size_t CMetaInfo::appendWherePartOfUpdateQuery(std::string &query) const {
 	return prim_key_size;
 }
 
+size_t CMetaInfo::appendWherePartOfUpdateQuery(const char *table_name, std::string &query) const {
+
+	auto p_table = findTableRecord(table_name);
+	assert(isTableRecordFound(p_table, table_name));
+
+	size_t table_key_size = enumeratePrimKey(tables[*p_table].id, \
+										AddPrimKeyToWhereStmt(*this, query));
+	removeEmptyAndStmt(query);
+
+	return table_key_size;
+}
+
 void CMetaInfo::getUpdateQueryForField(const size_t field, std::string &query) const {
 	
 	assert(field < fields.size());
@@ -270,9 +282,16 @@ void CMetaInfo::bindPrimaryKeyValues(const size_t field, \
 void CMetaInfo::bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 										std::shared_ptr<IDbBindingTarget> binding_target) const {
 	
+	bindPrimaryKeyValuesWithOffset(0, prim_key_values_src, binding_target);
+}
+
+void CMetaInfo::bindPrimaryKeyValuesWithOffset(const size_t params_offset, \
+									std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+									std::shared_ptr<IDbBindingTarget> binding_target) const {
+	
 	assert(primary_table_id != -1);
-	enumeratePrimKey(primary_table_id, BindPrimKeyValue(*this, 0, prim_key_values_src, \
-															binding_target));
+	enumeratePrimKey(primary_table_id, BindPrimKeyValue(*this, params_offset, \
+														prim_key_values_src, binding_target));
 }
 
 CMetaInfo::~CMetaInfo(){ }

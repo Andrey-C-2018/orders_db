@@ -15,15 +15,13 @@ public:
 	CComboBoxCellWidget(CComboBoxCellWidget &&obj) = default;
 	CComboBoxCellWidget &operator=(CComboBoxCellWidget &&obj) = default;
 
-	size_t GetSelectedItemIndex() const;
-	inline void AddItem(const Tchar *item);
-
 	void CreateCellWidget(XWindow *parent, const int flags, \
 							const Tchar *label, \
 							const int x, const int y, \
 							const int width, const int height) override;
 
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
+	void SetOnIndirectChangeHandler(XEventHandlerData on_change);
 	void SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) override;
 	void SetOnKeyPressHandler(XEventHandlerData on_key_press) override;
 

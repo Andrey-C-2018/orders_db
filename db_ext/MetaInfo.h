@@ -45,9 +45,9 @@ private:
 		bool is_primary_key;
 		id_type id_table;
 
-		CFieldRecord() : id(0), field_name(nullptr, 0), \
+		CFieldRecord() noexcept : id(0), field_name(nullptr, 0), \
 								field_name_w(nullptr, 0), \
-								is_primary_key(true), id_table(-1){ }
+								is_primary_key(true), id_table(-1) { }
 		CFieldRecord(const CFieldRecord &obj) = default;
 		CFieldRecord(CFieldRecord &&obj) = default;
 
@@ -62,7 +62,7 @@ private:
 		ImmutableString<char> table_name;
 		mutable ImmutableString<wchar_t> table_name_w;
 
-		CTableRecord() : id(-1), table_name(nullptr, 0), \
+		CTableRecord() noexcept : id(-1), table_name(nullptr, 0), \
 								table_name_w(nullptr, 0) { }
 		CTableRecord(const CTableRecord &obj) = default;
 		CTableRecord(CTableRecord &&obj) = default;
@@ -139,6 +139,7 @@ public:
 	CMetaInfo &operator=(CMetaInfo &&obj) = default;
 	
 	inline size_t getFieldsCount() const;
+	inline size_t getTablesCount() const;
 	inline bool empty() const;
 
 	inline std::shared_ptr<const IDbField> getField(const size_t field) const;
@@ -155,6 +156,7 @@ public:
 	void clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fields);
 
 	size_t appendWherePartOfUpdateQuery(std::string &query) const;
+	size_t appendWherePartOfUpdateQuery(const char *table_name, std::string &query) const;
 
 	void getUpdateQueryForField(const size_t field, std::string &query) const;
 	void getDeleteQuery(std::string &query) const;
@@ -350,6 +352,11 @@ bool CMetaInfo::isTableRecordFound(const CMetaInfo::ConstIndexIterator p_table_i
 size_t CMetaInfo::getFieldsCount() const {
 
 	return fields.size();
+}
+
+size_t CMetaInfo::getTablesCount() const {
+
+	return tables.size();
 }
 
 void CMetaInfo::clear(){

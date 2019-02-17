@@ -24,9 +24,6 @@
     <ClInclude Include="DbComboBoxCellWidget.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="IDbTablesRelationsContainer.h">
-      <Filter>interfaces</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DbGrid.cpp">

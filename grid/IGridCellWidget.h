@@ -12,6 +12,7 @@ struct IGridCellWidget {
 						const int width, const int height) = 0;
 	
 	virtual void SetOnChangeHandler(XEventHandlerData on_change) = 0;
+	virtual void SetOnIndirectChangeHandler(XEventHandlerData on_change) = 0;
 	virtual void SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) = 0;
 	virtual void SetOnKeyPressHandler(XEventHandlerData on_key_press) = 0;
 

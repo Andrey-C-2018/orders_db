@@ -18,6 +18,8 @@ void CComboBoxCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 									XComboBox::GetId(), std::move(on_change));
 }
 
+void CComboBoxCellWidget::SetOnIndirectChangeHandler(XEventHandlerData on_change) { }
+
 void CComboBoxCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) {
 
 	XComboBox::GetParent()->Connect(EVT_COMMAND, NCODE_COMBOBOX_LOOSE_FOCUS, \

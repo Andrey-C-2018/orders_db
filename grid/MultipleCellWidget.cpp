@@ -56,6 +56,19 @@ void CMultipleCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 	}
 }
 
+void CMultipleCellWidget::SetOnIndirectChangeHandler(XEventHandlerData on_change) {
+
+	assert(default_widget);
+	this->on_indirect_change_handler = on_change;
+
+	if (default_widget_id != NOT_CREATED) {
+		default_widget->SetOnIndirectChangeHandler(std::move(on_change));
+
+		for (auto &widget : widgets)
+			widget.second.widget->SetOnIndirectChangeHandler(this->on_indirect_change_handler);
+	}
+}
+
 void CMultipleCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) {
 
 	assert(default_widget);
@@ -89,7 +102,7 @@ void CMultipleCellWidget::SetDefaultWidget(IGridCellWidget *widget) {
 	assert(default_widget_id == NOT_CREATED);
 
 	if (default_widget)
-			delete default_widget;
+		delete default_widget;
 	
 	default_widget = widget;
 

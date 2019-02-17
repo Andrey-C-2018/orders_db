@@ -77,6 +77,8 @@ void CDispatcherCell::SetParameters(XWindow * parent, IGridCellWidget *cell_widg
 
 	def_active_cell->SetOnChangeHandler(XEventHandlerData(this, \
 											&CDispatcherCell::OnActiveCellTextChanged));
+	def_active_cell->SetOnIndirectChangeHandler(XEventHandlerData(this, \
+											&CDispatcherCell::OnActiveCellChangedIndirectly));
 	def_active_cell->SetOnKeyPressHandler(XEventHandlerData(this, \
 											&CDispatcherCell::OnActiveCellKeyPressed));
 	def_active_cell->SetOnLooseFocusHandler(XEventHandlerData(this, \
@@ -131,6 +133,11 @@ void CDispatcherCell::OnActiveCellTextChanged(XCommandEvent *eve) {
 	if (update_cell_widget_text) return;
 	
 	changes_present = true;
+}
+
+void CDispatcherCell::OnActiveCellChangedIndirectly(XCommandEvent *eve) {
+
+
 }
 
 void CDispatcherCell::OnActiveCellKeyPressed(XKeyboardEvent *eve) {

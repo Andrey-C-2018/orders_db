@@ -88,12 +88,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;D:\Apps\MySQL Connector C x86\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X32_PATH%include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Apps\MySQL Connector C x86\lib;../../0libs/Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%MYSQL_CONNECTOR_X32_PATH%lib;../../0libs/Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -104,12 +104,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;D:\Apps\MySQL Connector C\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X64_PATH%include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Apps\MySQL Connector C\lib;../../0libs/x64/Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%MYSQL_CONNECTOR_X64_PATH%lib;../../0libs/x64/Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -122,14 +122,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;D:\Apps\MySQL Connector C x86\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X32_PATH%include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Apps\MySQL Connector C x86\lib;../../0libs/Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%MYSQL_CONNECTOR_X32_PATH%lib;../../0libs/Release</AdditionalLibraryDirectories>
       <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -142,14 +142,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;D:\Apps\MySQL Connector C\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X64_PATH%include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Apps\MySQL Connector C\lib;../../0libs/x64/Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%MYSQL_CONNECTOR_X64_PATH%lib;../../0libs/x64/Release</AdditionalLibraryDirectories>
       <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

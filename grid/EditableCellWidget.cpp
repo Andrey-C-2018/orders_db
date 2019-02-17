@@ -20,6 +20,8 @@ void CEditableCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 								XEdit::GetId(), std::move(on_change));
 }
 
+void CEditableCellWidget::SetOnIndirectChangeHandler(XEventHandlerData on_change) { }
+
 void CEditableCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) {
 
 	XEdit::GetParent()->Connect(EVT_COMMAND, NCODE_EDIT_LOOSE_FOCUS, \

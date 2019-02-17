@@ -8,6 +8,8 @@ CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> co
 
 	assert(conn_);
 	assert(dependent_table);
+	assert(dependent_table_name);
+	this->dependent_table_name = dependent_table_name;
 
 	std::string query = "SELECT * FROM ";
 	query += master_table_name;
@@ -41,6 +43,7 @@ CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> co
 	assert(dependent_table_name);
 
 	master_meta_info.clearAndAddFields(master_metadata);
+	assert(master_meta_info.getTablesCount() == 1);
 	ImmutableString<char> master_table_name = master_meta_info.getTableName(0);
 	master_meta_info.setPrimaryTable(master_table_name.str);
 
@@ -51,7 +54,7 @@ CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> co
 	update_query_preamble += " d SET ";
 }
 
-void CDependentTableUpdater::SetRelation(const char *master_field, const char *dependent_field) {
+void CDependentTableUpdater::AddRelation(const char *master_field, const char *dependent_field) {
 
 	assert(dependent_field);
 	assert(master_field);
@@ -84,7 +87,7 @@ CDependentTableUpdater::createDepTableUpdateStmt(const size_t master_record_inde
 	query += " WHERE ";
 	parameters_count = master_meta_info.appendWherePartOfUpdateQuery(query);
 	query += " AND ";
-	parameters_count += dependent_meta_info.appendWherePartOfUpdateQuery(query);
+	parameters_count += dependent_meta_info.appendWherePartOfUpdateQuery(dependent_table_name.c_str(), query);
 
 	std::shared_ptr<IDbStatement> upd_stmt = conn->PrepareQuery(query.c_str());
 
