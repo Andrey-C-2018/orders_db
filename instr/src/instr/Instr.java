@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.util.Vector;
 
 public class Instr {
 	
@@ -41,16 +40,20 @@ public class Instr {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT COUNT(*) FROM (");
 		int main_query_begin = query.length();
-		query.append("SELECT s.id, s.name, sa.startwork_date, sa.dismiss_date, sa.id_employer "); 
-		query.append("FROM staff s INNER JOIN staff_assignments sa ON s.id = sa.id_worker "); 
-		query.append("WHERE s.id IN (SELECT id_worker FROM instr GROUP BY id_worker");
-		query.append(" HAVING ((sa.dismiss_date > DATE_ADD(MAX(instr_date), INTERVAL "); 
+
+		query.append("SELECT s.id, s.name, sa.startwork_date, sa.dismiss_date, sa.id_employer ");
+		query.append("FROM staff s INNER JOIN staff_assignments sa ON s.id = sa.id_worker"); 
+		query.append(" INNER JOIN (SELECT id_worker, MAX(instr_date) as max_instr_date FROM instr GROUP BY id_worker"); 
+		query.append(" UNION SELECT id, '1901-01-01' FROM staff ss LEFT OUTER JOIN instr ii ON ss.id = ii.id_worker WHERE ii.id_worker IS NULL) i");
+		query.append(" ON s.id = i.id_worker "); 
+		query.append("WHERE sa.dismiss_date > DATE_ADD(i.max_instr_date, INTERVAL ");
 		query.append(INSTR_OFFSET_IN_MONTHES); 
-		query.append(" MONTH) OR sa.dismiss_date IS NULL) AND DATE_ADD(MAX(instr_date), INTERVAL ");
-		query.append(INSTR_OFFSET_IN_MONTHES);
-		query.append(" MONTH) <= NOW())	OR (sa.startwork_date > MAX(instr_date) AND sa.startwork_date <= NOW())) ");
-		query.append("OR id NOT IN (SELECT DISTINCT id_worker FROM instr) "); 
-		query.append("ORDER BY id, startwork_date");
+		query.append(" MONTH)"); 
+		query.append(" OR (sa.dismiss_date IS NULL AND DATE_ADD(i.max_instr_date, INTERVAL ");
+		query.append(INSTR_OFFSET_IN_MONTHES); 
+		query.append(" MONTH) <= NOW())"); 
+		query.append(" OR (sa.startwork_date > i.max_instr_date AND sa.startwork_date <= NOW())");
+
 	    int main_query_end = query.length();
 	    query.append(") aaa");
 	    
@@ -158,9 +161,6 @@ public class Instr {
 	private void performInitialInstr(int id_worker, Date instr_date) throws SQLException {
 
 		assert(instr_date != null);
-		assert(!special_days.isHoliday(instr_date, calendar) && 
-				!special_days.isVacationDay(id_worker, instr_date));
-		
 		performInstr(id_worker, instr_date, "вступний");
 	}
 
@@ -223,7 +223,7 @@ public class Instr {
 	
 	private Date calcNextInstrDate(int id_worker, 
 									Date prev_instr_date, 
-									GregorianCalendar calendar) throws SQLException {
+									GregorianCalendar calendar) throws SQLException, InstrException {
 		
 		calendar.setTime(prev_instr_date);
 		calendar.add(Calendar.MONTH, INSTR_OFFSET_IN_MONTHES);
@@ -232,7 +232,7 @@ public class Instr {
 		next_instr_date = special_days.findNearestWorkingDay(id_worker, next_instr_date, 
 													SpecialDays.DIRECTION_LEFT, 
 													calendar);
-		while(getInstrsCount(next_instr_date) > Instr.MAX_INSTRS_COUNT) {
+		while(getInstrsCount(next_instr_date) >= Instr.MAX_INSTRS_COUNT) {
 			calendar.setTime(next_instr_date);
 			calendar.add(Calendar.DAY_OF_MONTH, -1);
 			
@@ -242,6 +242,13 @@ public class Instr {
 														calendar);
 		}
 		
+		if(prev_instr_date.equals(next_instr_date) || 
+				prev_instr_date.after(next_instr_date))
+			throw new InstrException(InstrException.E_NEXT_INSTR, 
+									"Can't evaluate next instr date! id worker = "
+										+ id_worker + ", previous instr date = "
+										+ format_german.format(prev_instr_date));
+				
 		return next_instr_date;
 	}
 	
@@ -258,13 +265,13 @@ public class Instr {
 		calendar = new GregorianCalendar();
 	}
 
-	public void evaluateInstr() throws SQLException {
+	public void evaluateInstr() throws SQLException, InstrException {
 		
 		Date now = new Date();
 		
 		StaffListItem workers[] = getWorkersWhoNeedInstr();
-		workers = mergeAssigmentRangesIfNecessary(workers, calendar);
 		if(workers == null) return;
+		workers = mergeAssigmentRangesIfNecessary(workers, calendar);
 				
 		for(int i = 0; i < workers.length; ++i){
 			

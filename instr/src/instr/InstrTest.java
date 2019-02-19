@@ -18,7 +18,7 @@ public class InstrTest {
 		try {
 			conn = initConnection();
 			
-			SpecialDays d = new SpecialDays(conn);
+			/*SpecialDays d = new SpecialDays(conn);
 						
 			System.out.println(d.isHoliday(format_german.parse("09.05.2018"), calendar));
 			System.out.println(d.isHoliday(format_german.parse("12.05.2018"), calendar));
@@ -26,14 +26,15 @@ public class InstrTest {
 			
 			Date date = d.findNearestWorkingDay(8, format_german.parse("24.08.2016"), 
 												SpecialDays.DIRECTION_LEFT, calendar);
-			System.out.println(date);
-			/*Instr instr = new Instr();
+			System.out.println(date);*/
+			Instr instr = new Instr(conn);
 			
 			instr.evaluateInstr();
-			instr.print();*/
+			instr.print();
 		}
 		catch(Exception e) {
 			
+			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
 
