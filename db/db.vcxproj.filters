@@ -16,34 +16,52 @@
     <Filter Include="interfaces">
       <UniqueIdentifier>{38166a35-038e-4857-940a-03f3cb4bb3aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MySQL">
+      <UniqueIdentifier>{48d5ad0b-a91a-4b5f-9b7e-3299763d9456}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLite">
+      <UniqueIdentifier>{f795d7b6-f678-4107-91e1-0d7ccd53422c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MySQLResultSet.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="MySQLStatement.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="MySQLConnection.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="MySQLVariant.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="MySQLCommon.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="DbException.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="MySQLResultSetMetadata.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="MySQLField.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="DbConnectionFactory.cpp">
       <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLCommon.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLConnection.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLField.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLResultSet.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLResultSetMetadata.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLStatement.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLVariant.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLite\SQLiteConnection.cpp">
+      <Filter>SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLite\SQLiteCommon.cpp">
+      <Filter>SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLite\SQLiteStatement.cpp">
+      <Filter>SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLite\SQLiteResultSet.cpp">
+      <Filter>SQLite</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -56,21 +74,6 @@
     <ClInclude Include="IDbConnection.h">
       <Filter>interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="MySQLResultSet.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="MySQLCommon.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="MySQLStatement.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="MySQLConnection.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="MySQLVariant.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="IDbCommon.h">
       <Filter>interfaces</Filter>
     </ClInclude>
@@ -80,20 +83,47 @@
     <ClInclude Include="IDbResultSetMetadata.h">
       <Filter>interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="MySQLResultSetMetadata.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="IDbBindingTarget.h">
       <Filter>interfaces</Filter>
     </ClInclude>
     <ClInclude Include="IDbField.h">
       <Filter>interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="MySQLField.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="DbConnectionFactory.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLCommon.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLConnection.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLField.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLResultSet.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLResultSetMetadata.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLStatement.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLVariant.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLite\SQLiteConnection.h">
+      <Filter>SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLite\SQLiteCommon.h">
+      <Filter>SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLite\SQLiteStatement.h">
+      <Filter>SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLite\SQLiteResultSet.h">
+      <Filter>SQLite</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

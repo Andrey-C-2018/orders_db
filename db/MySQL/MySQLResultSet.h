@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "IDbResultSet.h"
+#include "../IDbResultSet.h"
 #include "MySQLCommon.h"
 
 class CMySQLResultSetException : public CMySQLException {

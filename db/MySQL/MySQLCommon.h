@@ -1,7 +1,7 @@
 #pragma once
 #include <basic/ImmutableString.h>
 #include "MySQLVariant.h"
-#include "DbException.h"
+#include "../DbException.h"
 
 struct CMySQLBindingTarget final {
 	mutable CMySQLVariant value;

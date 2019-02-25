@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "IDbStatement.h"
+#include "../IDbStatement.h"
 #include "MySQLResultSet.h"
 
 class CMySQLStatementException : public CMySQLException {

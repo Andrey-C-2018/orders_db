@@ -1,5 +1,5 @@
 #pragma once
-#include "IDbConnection.h"
+#include "../IDbConnection.h"
 #include "MySQLStatement.h"
 
 class CMySQLConnectionException : public CMySQLException {

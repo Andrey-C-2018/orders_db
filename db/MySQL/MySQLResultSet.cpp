@@ -1,5 +1,5 @@
 #include "MySQLResultSet.h"
-#include "IDbBindingTarget.h"
+#include "../IDbBindingTarget.h"
 
 CMySQLResultSetException::CMySQLResultSetException(const int err_code, \
 													const Tchar *err_descr) : \
@@ -79,6 +79,7 @@ CMySQLResultSet &CMySQLResultSet::operator=(CMySQLResultSet &&obj) {
 	records_count = obj.records_count;
 	stmt = std::move(obj.stmt);
 	metadata = std::move(obj.metadata);
+	curr_record = obj.curr_record;
 	
 	obj.records_count = 0;
 	obj.fields_count = 0;

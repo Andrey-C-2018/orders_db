@@ -1,7 +1,7 @@
 #pragma once
 #include <basic/XConv.h>
-#include "IDbField.h"
-#include "IDbBindingTarget.h"
+#include "../IDbField.h"
+#include "../IDbBindingTarget.h"
 #include "MySQLResultSet.h"
 
 class CMySQLField : public IDbField{

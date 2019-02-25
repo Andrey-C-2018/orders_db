@@ -37,15 +37,23 @@ CMySQLStatement::CMySQLStatement(MYSQL_STMT *stmt_) {
 	}
 }
 
-CMySQLStatement::CMySQLStatement(CMySQLStatement &&obj) : stmt(obj.stmt) {
-
-	obj.stmt = nullptr;
+CMySQLStatement::CMySQLStatement(CMySQLStatement &&obj) : stmt(std::move(obj.stmt)), \
+														params_count(obj.params_count), \
+														params(std::move(obj.params)), 
+														params_bindings(std::move(obj.params_bindings)), \
+														metadata(std::move(obj.metadata)){ 
+	obj.params_count = 0;
 }
 
 CMySQLStatement &CMySQLStatement::operator=(CMySQLStatement &&obj) {
 
-	stmt = obj.stmt;
-	obj.stmt = nullptr;
+	stmt = std::move(obj.stmt);
+	params_count = obj.params_count;
+	params = std::move(obj.params);
+	params_bindings = std::move(obj.params_bindings);
+	metadata = std::move(obj.metadata);
+
+	obj.params_count = 0;
 	return *this;
 }
 

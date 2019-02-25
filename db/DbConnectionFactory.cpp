@@ -1,5 +1,5 @@
 #include "DbConnectionFactory.h"
-#include "MySQLConnection.h"
+#include "MySQL/MySQLConnection.h"
 
 CDbConnectionFactory CDbConnectionFactory::instance;
 

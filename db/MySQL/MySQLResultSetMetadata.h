@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <basic/XString.h>
-#include "IDbResultSetMetadata.h"
+#include "../IDbResultSetMetadata.h"
 #include "MySQLCommon.h"
 
 class CMySQLResultSetMetadata :	public IDbResultSetMetadata{

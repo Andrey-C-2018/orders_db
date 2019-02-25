@@ -21,13 +21,17 @@
   <ItemGroup>
     <ClCompile Include="DbConnectionFactory.cpp" />
     <ClCompile Include="DbException.cpp" />
-    <ClCompile Include="MySQLCommon.cpp" />
-    <ClCompile Include="MySQLConnection.cpp" />
-    <ClCompile Include="MySQLField.cpp" />
-    <ClCompile Include="MySQLResultSet.cpp" />
-    <ClCompile Include="MySQLResultSetMetadata.cpp" />
-    <ClCompile Include="MySQLStatement.cpp" />
-    <ClCompile Include="MySQLVariant.cpp" />
+    <ClCompile Include="MySQL\MySQLCommon.cpp" />
+    <ClCompile Include="MySQL\MySQLConnection.cpp" />
+    <ClCompile Include="MySQL\MySQLField.cpp" />
+    <ClCompile Include="MySQL\MySQLResultSet.cpp" />
+    <ClCompile Include="MySQL\MySQLResultSetMetadata.cpp" />
+    <ClCompile Include="MySQL\MySQLStatement.cpp" />
+    <ClCompile Include="MySQL\MySQLVariant.cpp" />
+    <ClCompile Include="SQLite\SQLiteCommon.cpp" />
+    <ClCompile Include="SQLite\SQLiteConnection.cpp" />
+    <ClCompile Include="SQLite\SQLiteResultSet.cpp" />
+    <ClCompile Include="SQLite\SQLiteStatement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbConnectionFactory.h" />
@@ -39,13 +43,17 @@
     <ClInclude Include="IDbResultSet.h" />
     <ClInclude Include="IDbResultSetMetadata.h" />
     <ClInclude Include="IDbStatement.h" />
-    <ClInclude Include="MySQLCommon.h" />
-    <ClInclude Include="MySQLConnection.h" />
-    <ClInclude Include="MySQLField.h" />
-    <ClInclude Include="MySQLResultSet.h" />
-    <ClInclude Include="MySQLResultSetMetadata.h" />
-    <ClInclude Include="MySQLStatement.h" />
-    <ClInclude Include="MySQLVariant.h" />
+    <ClInclude Include="MySQL\MySQLCommon.h" />
+    <ClInclude Include="MySQL\MySQLConnection.h" />
+    <ClInclude Include="MySQL\MySQLField.h" />
+    <ClInclude Include="MySQL\MySQLResultSet.h" />
+    <ClInclude Include="MySQL\MySQLResultSetMetadata.h" />
+    <ClInclude Include="MySQL\MySQLStatement.h" />
+    <ClInclude Include="MySQL\MySQLVariant.h" />
+    <ClInclude Include="SQLite\SQLiteCommon.h" />
+    <ClInclude Include="SQLite\SQLiteConnection.h" />
+    <ClInclude Include="SQLite\SQLiteResultSet.h" />
+    <ClInclude Include="SQLite\SQLiteStatement.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E4BB857A-1E17-4203-BBE6-A4DAF82913FB}</ProjectGuid>
@@ -121,7 +129,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%MYSQL_CONNECTOR_X32_PATH%include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X32_PATH%include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -134,7 +142,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%MYSQL_CONNECTOR_X64_PATH%include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X64_PATH%include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,7 +157,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%MYSQL_CONNECTOR_X32_PATH%include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X32_PATH%include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -166,7 +174,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%MYSQL_CONNECTOR_X64_PATH%include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X64_PATH%include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
