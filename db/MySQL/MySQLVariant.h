@@ -148,6 +148,7 @@ const char *CMySQLVariant::GetString() const{
 	assert(!value_string.size() || (value_string.size() && \
 			value_string.c_str()[value_string.size()] == '\0'));
 
+	conv_buffer.clear();
 	return value_string.c_str();
 }
 
@@ -187,7 +188,7 @@ size_t CMySQLVariant::GetBufferSize() const{
 
 size_t CMySQLVariant::GetValueLength() const{
 
-	return value_string.size();
+	return conv_buffer.empty() ? value_string.size() : conv_buffer.size();
 }
 
 void CMySQLVariant::SetInt(const int value) {

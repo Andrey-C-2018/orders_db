@@ -153,6 +153,7 @@ public:
 	void setPrimaryTable(const char *table_name);
 
 	void addField(std::shared_ptr<IDbField> field, const size_t new_field_index);
+	void markFieldAsPrimaryKey(const size_t field);
 	void clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fields);
 
 	size_t appendWherePartOfUpdateQuery(std::string &query) const;

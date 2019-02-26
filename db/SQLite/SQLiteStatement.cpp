@@ -1,5 +1,6 @@
 #include "SQLiteStatement.h"
 #include "SQLiteResultSet.h"
+#include "SQLiteResultSetMetadata.h"
 
 SQLiteStatementException::SQLiteStatementException(const int err_code, \
 												const Tchar *err_descr) : \
@@ -41,31 +42,31 @@ SQLiteStatement &SQLiteStatement::operator=(SQLiteStatement &&obj) {
 void SQLiteStatement::bindValue(const size_t param_no, const int value) {
 
 	assert(param_no < params_count);
-	sqlite3_bind_int(stmt->stmt, param_no, value);
+	sqlite3_bind_int(stmt->stmt, (int)param_no, value);
 }
 
 void SQLiteStatement::bindValue(const size_t param_no, const char *value) {
 
 	assert(param_no < params_count);
-	sqlite3_bind_text(stmt->stmt, param_no, value, -1, nullptr);
+	sqlite3_bind_text(stmt->stmt, (int)param_no, value, -1, nullptr);
 }
 
 void SQLiteStatement::bindValue(const size_t param_no, const wchar_t *value) {
 
 	assert(param_no < params_count);
-	sqlite3_bind_text16(stmt->stmt, param_no, value, -1, nullptr);
+	sqlite3_bind_text16(stmt->stmt, (int)param_no, value, -1, nullptr);
 }
 
 void SQLiteStatement::bindValue(const size_t param_no, const ImmutableString<char> value) {
 
 	assert(param_no < params_count);
-	sqlite3_bind_text(stmt->stmt, param_no, value.str, value.size, nullptr);
+	sqlite3_bind_text(stmt->stmt, (int)param_no, value.str, (int)value.size, nullptr);
 }
 
 void SQLiteStatement::bindValue(const size_t param_no, const ImmutableString<wchar_t> value) {
 
 	assert(param_no < params_count);
-	sqlite3_bind_text16(stmt->stmt, param_no, value.str, value.size, nullptr);
+	sqlite3_bind_text16(stmt->stmt, (int)param_no, value.str, (int)value.size, nullptr);
 }
 
 void SQLiteStatement::bindValue(const size_t param_no, const CDate &value) {
@@ -75,13 +76,13 @@ void SQLiteStatement::bindValue(const size_t param_no, const CDate &value) {
 	char date_str[CDate::SQL_FORMAT_LEN + 1];
 	value.ToStringSQL(date_str);
 
-	sqlite3_bind_text(stmt->stmt, param_no, date_str, CDate::SQL_FORMAT_LEN, nullptr);
+	sqlite3_bind_text(stmt->stmt, (int)param_no, date_str, CDate::SQL_FORMAT_LEN, nullptr);
 }
 
 void SQLiteStatement::bindNull(const size_t param_no) {
 
 	assert(param_no < params_count);
-	sqlite3_bind_null(stmt->stmt, param_no);
+	sqlite3_bind_null(stmt->stmt, (int)param_no);
 }
 
 std::shared_ptr<IDbResultSet> SQLiteStatement::exec() {
@@ -90,10 +91,6 @@ std::shared_ptr<IDbResultSet> SQLiteStatement::exec() {
 		throw SQLiteStatementException(SQLiteStatementException::E_EXEC, \
 								_T("exec() used instead of execScalar()"));
 
-	int err = sqlite3_step(stmt->stmt);
-	if (err == SQLITE_ERROR)
-		throw SQLiteStatementException(stmt->conn);
-
 	return std::make_shared<SQLiteResultSet>(stmt);
 }
 
@@ -101,13 +98,12 @@ record_t SQLiteStatement::execScalar() {
 
 	if (sqlite3_column_count(stmt->stmt))
 		throw SQLiteStatementException(SQLiteStatementException::E_EXEC, \
-			_T("execScalar() used instead of exec()"));
+								_T("execScalar() used instead of exec()"));
 
-	int err = sqlite3_step(stmt->stmt);
-	if (err == SQLITE_ERROR)
+	if (sqlite3_step(stmt->stmt) == SQLITE_ERROR)
 		throw SQLiteStatementException(stmt->conn);
 
-	return 1;
+	return sqlite3_changes(stmt->conn);
 }
 
 std::shared_ptr<IDbResultSetMetadata> SQLiteStatement::getResultSetMetadata() {

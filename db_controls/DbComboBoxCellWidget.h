@@ -6,6 +6,7 @@ class CDbComboBoxCellWidget : public CComboBoxCellWidget {
 	size_t field_to_display;
 	CDependentTableUpdater updater;
 	CDelegate on_indirect_change_handler;
+	std::shared_ptr<CDbTable> dependent_table;
 	
 	void fillComboBox(std::shared_ptr<const IDbResultSet> master_records);
 	void OnItemChoosed(XCommandEvent *eve);
@@ -17,13 +18,13 @@ public:
 							const size_t field_to_display_, \
 							const char *master_table_name, \
 							const char *dependent_table_name, \
-							std::shared_ptr<const CDbTable> dependent_table);
+							std::shared_ptr<CDbTable> dependent_table);
 	CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
 							const size_t field_to_display_, \
 							std::shared_ptr<const IDbResultSet> master_records, \
 							std::shared_ptr<const IDbResultSetMetadata> master_metadata, \
 							const char *dependent_table_name, \
-							std::shared_ptr<const CDbTable> dependent_table);
+							std::shared_ptr<CDbTable> dependent_table);
 
 	CDbComboBoxCellWidget(CDbComboBoxCellWidget &&obj) = default;
 	CDbComboBoxCellWidget &operator=(CDbComboBoxCellWidget &&obj) = default;

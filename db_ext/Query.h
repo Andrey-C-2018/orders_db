@@ -22,6 +22,8 @@ public:
 	CQuery &operator=(CQuery &&obj) = default;
 	
 	inline const CMetaInfo &getMetaInfo() const noexcept;
+	inline void setPrimaryTable(const char *table_name);
+	inline void markFieldAsPrimaryKey(const size_t field);
 
 	std::shared_ptr<IDbStatement> \
 		getUpdateStmt(const size_t updated_field, \
@@ -41,4 +43,14 @@ public:
 const CMetaInfo &CQuery::getMetaInfo() const noexcept {
 
 	return meta_info;
+}
+
+void CQuery::setPrimaryTable(const char *table_name) {
+
+	meta_info.setPrimaryTable(table_name);
+}
+
+void CQuery::markFieldAsPrimaryKey(const size_t field) {
+
+	meta_info.markFieldAsPrimaryKey(field);
 }

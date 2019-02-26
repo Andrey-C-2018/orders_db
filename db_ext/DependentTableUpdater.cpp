@@ -82,18 +82,21 @@ CDependentTableUpdater::createDepTableUpdateStmt(const size_t master_record_inde
 	}
 	query.erase(query.end() - 2, query.end());
 
-	size_t parameters_count = 0;
+	size_t master_primkey_params_count = 0;
 	const CMetaInfo &dependent_meta_info = getDependentMetaInfo();
 	query += " WHERE ";
-	parameters_count = master_meta_info.appendWherePartOfUpdateQuery(query);
+	master_primkey_params_count = master_meta_info.appendWherePartOfUpdateQuery(query);
 	query += " AND ";
-	parameters_count += dependent_meta_info.appendWherePartOfUpdateQuery(dependent_table_name.c_str(), query);
+	dependent_meta_info.appendWherePartOfUpdateQuery(dependent_table_name.c_str(), query);
 
 	std::shared_ptr<IDbStatement> upd_stmt = conn->PrepareQuery(query.c_str());
 
 	master_records->gotoRecord(master_record_index);
+	auto dependent_result_set = dependent_db_table->getResultSet();
+	dependent_result_set->gotoRecord(dependent_db_table->getCurrentRecordNo());
+
 	master_meta_info.bindPrimaryKeyValues(master_records, upd_stmt);
-	dependent_meta_info.bindPrimaryKeyValuesWithOffset(parameters_count, \
+	dependent_meta_info.bindPrimaryKeyValuesWithOffset(master_primkey_params_count, \
 													dependent_db_table->getResultSet(),
 													upd_stmt);
 

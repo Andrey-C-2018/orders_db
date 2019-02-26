@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DbConnectionFactory.cpp" />
     <ClCompile Include="DbException.cpp" />
     <ClCompile Include="MySQL\MySQLCommon.cpp" />
     <ClCompile Include="MySQL\MySQLConnection.cpp" />
@@ -34,7 +33,6 @@
     <ClCompile Include="SQLite\SQLiteStatement.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DbConnectionFactory.h" />
     <ClInclude Include="DbException.h" />
     <ClInclude Include="IDbBindingTarget.h" />
     <ClInclude Include="IDbCommon.h" />
@@ -53,6 +51,7 @@
     <ClInclude Include="SQLite\SQLiteCommon.h" />
     <ClInclude Include="SQLite\SQLiteConnection.h" />
     <ClInclude Include="SQLite\SQLiteResultSet.h" />
+    <ClInclude Include="SQLite\SQLiteResultSetMetadata.h" />
     <ClInclude Include="SQLite\SQLiteStatement.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

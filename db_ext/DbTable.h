@@ -32,6 +32,8 @@ public:
 
 	inline const CQuery &getQuery() const;
 	inline std::shared_ptr<const IDbResultSet> getResultSet() const;
+	inline void setPrimaryTableForQuery(const char *table_name);
+	inline void markFieldAsPrimaryKey(const size_t field);
 
 	bool empty() const override;
 	size_t GetFieldsCount() const override;
@@ -68,4 +70,14 @@ const CQuery &CDbTable::getQuery() const {
 std::shared_ptr<const IDbResultSet> CDbTable::getResultSet() const {
 
 	return result_set;
+}
+
+void CDbTable::setPrimaryTableForQuery(const char *table_name) {
+
+	query.setPrimaryTable(table_name);
+}
+
+void CDbTable::markFieldAsPrimaryKey(const size_t field) {
+
+	query.markFieldAsPrimaryKey(field);
 }

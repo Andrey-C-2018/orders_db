@@ -160,6 +160,14 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 		addKeyIndex(rec.id_table, (id_type)new_field_index);
 }
 
+void CMetaInfo::markFieldAsPrimaryKey(const size_t field) {
+
+	assert(field < fields.size());
+	CFieldRecord &field_rec = fields[field];
+
+	field_rec.is_primary_key = true;
+}
+
 void CMetaInfo::refreshFieldIndexes() {
 	
 	typedef CIndexedValueSearchPredicate<id_type, IndexType, \

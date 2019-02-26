@@ -82,7 +82,7 @@ record_t SQLiteConnection::ExecScalarQuery(const char *query_text) {
 	if (err == SQLITE_ERROR) 
 		throw SQLiteConnectionException(db);
 
-	records_count = sqlite3_column_count(pStmt) ? 1 : 0; // <- ???
+	records_count = sqlite3_changes(db);
 
 	sqlite3_finalize(pStmt);
 	return records_count;

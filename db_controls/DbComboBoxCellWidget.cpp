@@ -4,20 +4,22 @@ CDbComboBoxCellWidget::CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn
 											const size_t field_to_display_, \
 											const char *master_table_name, \
 											const char *dependent_table_name, \
-											std::shared_ptr<const CDbTable> dependent_table) : \
+											std::shared_ptr<CDbTable> dependent_table_) : \
 									field_to_display(field_to_display_), \
 									updater(conn, master_table_name, \
-											dependent_table_name, dependent_table) { }
+									dependent_table_name, dependent_table_), \
+									dependent_table(dependent_table_){ }
 
 CDbComboBoxCellWidget::CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
 											const size_t field_to_display_, \
 											std::shared_ptr<const IDbResultSet> master_records, \
 											std::shared_ptr<const IDbResultSetMetadata> master_metadata, \
 											const char *dependent_table_name, \
-											std::shared_ptr<const CDbTable> dependent_table) : \
+											std::shared_ptr<CDbTable> dependent_table_) : \
 									field_to_display(field_to_display_), \
 									updater(conn, master_records, master_metadata, \
-											dependent_table_name, dependent_table) { }
+									dependent_table_name, dependent_table_), \
+									dependent_table(dependent_table_) { }
 
 void CDbComboBoxCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 											const Tchar *label, \
@@ -50,10 +52,13 @@ void CDbComboBoxCellWidget::OnItemChoosed(XCommandEvent *eve) {
 	size_t sel_index = XComboBox::GetCurrentSelectionIndex();
 	
 	auto stmt = updater.createDepTableUpdateStmt(sel_index);
-	stmt->execScalar();
+	if (stmt->execScalar()) {
 
-	CArgumentsOne<XCommandEvent *> null_arg(nullptr);
-	on_indirect_change_handler.Call(&null_arg);
+		CArgumentsOne<XCommandEvent *> null_arg(nullptr);
+		on_indirect_change_handler.Call(&null_arg);
+
+		dependent_table->reload();
+	}
 }
 
 void CDbComboBoxCellWidget::SetOnChangeHandler(XEventHandlerData on_change) { }
