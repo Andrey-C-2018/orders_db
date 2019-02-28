@@ -19,7 +19,7 @@ CMyFrame::CMyFrame(const Tchar *class_name,\
 
 	conn->Connect("127.0.0.1", 3310, "orders_user", "123", "orders_test");
 
-	auto stmt = conn->PrepareQuery("SELECT id_center_legalaid, id, order_date, type_name FROM orders INNER JOIN order_types ON id_order_type = id_type WHERE id BETWEEN 3000 AND 3000000 ORDER BY 1,3,2");
+	auto stmt = conn->PrepareQuery("SELECT id_center_legalaid, id, order_date, type_name FROM orders INNER JOIN order_types ON id_order_type = id_type WHERE id = 1298651 ORDER BY 1,3,2");
 	
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
 	db_table->setPrimaryTableForQuery("orders");

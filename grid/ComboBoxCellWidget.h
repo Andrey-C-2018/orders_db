@@ -21,7 +21,7 @@ public:
 							const int width, const int height) override;
 
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
-	void SetOnIndirectChangeHandler(XEventHandlerData on_change);
+	void SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> ignored);
 	void SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) override;
 	void SetOnKeyPressHandler(XEventHandlerData on_key_press) override;
 

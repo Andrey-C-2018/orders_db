@@ -1,4 +1,5 @@
 #include "DbComboBoxCellWidget.h"
+#include <grid/ICellEventHandler.h>
 
 CDbComboBoxCellWidget::CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
 											const size_t field_to_display_, \
@@ -49,23 +50,23 @@ void CDbComboBoxCellWidget::AddRelation(const char *master_field, const char *de
 
 void CDbComboBoxCellWidget::OnItemChoosed(XCommandEvent *eve) {
 
+	assert(on_indirect_change_handler);
+	if (!on_indirect_change_handler->OnCellChangedIndirectly(this))
+		return;
+
 	size_t sel_index = XComboBox::GetCurrentSelectionIndex();
+	dependent_table->gotoCurrentRecord();
 	
 	auto stmt = updater.createDepTableUpdateStmt(sel_index);
-	if (stmt->execScalar()) {
-
-		CArgumentsOne<XCommandEvent *> null_arg(nullptr);
-		on_indirect_change_handler.Call(&null_arg);
-
+	if (stmt->execScalar()) 
 		dependent_table->reload();
-	}
 }
 
 void CDbComboBoxCellWidget::SetOnChangeHandler(XEventHandlerData on_change) { }
 
-void CDbComboBoxCellWidget::SetOnIndirectChangeHandler(XEventHandlerData on_indirect_change) {
+void CDbComboBoxCellWidget::SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> handler) {
 
-	on_indirect_change_handler = on_indirect_change.getDelegate();
+	on_indirect_change_handler = handler;
 }
 
 CDbComboBoxCellWidget::~CDbComboBoxCellWidget() { }

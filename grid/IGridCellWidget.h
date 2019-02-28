@@ -1,7 +1,9 @@
 #pragma once
+#include <memory>
 #include <basic/tstring.h>
 #include <basic/ImmutableString.h>
 
+struct ICellEventHandler;
 class XWindow;
 class XEventHandlerData;
 
@@ -12,7 +14,7 @@ struct IGridCellWidget {
 						const int width, const int height) = 0;
 	
 	virtual void SetOnChangeHandler(XEventHandlerData on_change) = 0;
-	virtual void SetOnIndirectChangeHandler(XEventHandlerData on_change) = 0;
+	virtual void SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> grid_events_handler) = 0;
 	virtual void SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) = 0;
 	virtual void SetOnKeyPressHandler(XEventHandlerData on_key_press) = 0;
 

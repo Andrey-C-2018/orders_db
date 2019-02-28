@@ -18,7 +18,7 @@ void CComboBoxCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 									XComboBox::GetId(), std::move(on_change));
 }
 
-void CComboBoxCellWidget::SetOnIndirectChangeHandler(XEventHandlerData on_change) { }
+void CComboBoxCellWidget::SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> ignored) { }
 
 void CComboBoxCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) {
 

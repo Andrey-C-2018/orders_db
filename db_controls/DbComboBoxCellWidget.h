@@ -5,7 +5,7 @@
 class CDbComboBoxCellWidget : public CComboBoxCellWidget {
 	size_t field_to_display;
 	CDependentTableUpdater updater;
-	CDelegate on_indirect_change_handler;
+	std::shared_ptr<ICellEventHandler> on_indirect_change_handler;
 	std::shared_ptr<CDbTable> dependent_table;
 	
 	void fillComboBox(std::shared_ptr<const IDbResultSet> master_records);
@@ -37,7 +37,7 @@ public:
 	void AddRelation(const char *master_field, const char *dependent_field);
 
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
-	void SetOnIndirectChangeHandler(XEventHandlerData on_indirect_change) override;
+	void SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> handler) override;
 
 	virtual ~CDbComboBoxCellWidget();
 };

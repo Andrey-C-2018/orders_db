@@ -29,6 +29,8 @@ public:
 	CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_);
 
 	inline size_t getCurrentRecordNo() const;
+	inline void setCurrentRecordNo(const size_t rec_no);
+	inline void gotoCurrentRecord();
 
 	inline const CQuery &getQuery() const;
 	inline std::shared_ptr<const IDbResultSet> getResultSet() const;
@@ -60,6 +62,16 @@ public:
 size_t CDbTable::getCurrentRecordNo() const{
 
 	return curr_record;
+}
+
+void CDbTable::setCurrentRecordNo(const size_t rec_no) {
+
+	curr_record = rec_no;
+}
+
+void CDbTable::gotoCurrentRecord() {
+
+	result_set->gotoRecord(curr_record);
 }
 
 const CQuery &CDbTable::getQuery() const {

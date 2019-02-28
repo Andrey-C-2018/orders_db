@@ -30,12 +30,14 @@
     <ClInclude Include="Grid.h" />
     <ClInclude Include="FieldComposer.h" />
     <ClInclude Include="GridTableProxy.h" />
+    <ClInclude Include="ICellEventHandler.h" />
     <ClInclude Include="IComposedDrawable.h" />
     <ClInclude Include="IConfigurator.h" />
     <ClInclude Include="IDrawable.h" />
     <ClInclude Include="IFieldsProperties.h" />
     <ClInclude Include="IGridCellsContainer.h" />
     <ClInclude Include="IGridCellWidget.h" />
+    <ClInclude Include="IGridEventsHandler.h" />
     <ClInclude Include="IInteractiveObject.h" />
     <ClInclude Include="IReloadable.h" />
     <ClInclude Include="ISharedComposer.h" />

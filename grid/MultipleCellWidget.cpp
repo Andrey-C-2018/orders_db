@@ -56,16 +56,16 @@ void CMultipleCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 	}
 }
 
-void CMultipleCellWidget::SetOnIndirectChangeHandler(XEventHandlerData on_change) {
+void CMultipleCellWidget::SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> handler) {
 
 	assert(default_widget);
-	this->on_indirect_change_handler = on_change;
+	this->on_indirect_change_handler = handler;
 
 	if (default_widget_id != NOT_CREATED) {
-		default_widget->SetOnIndirectChangeHandler(std::move(on_change));
+		default_widget->SetOnIndirectChangeHandler(handler);
 
 		for (auto &widget : widgets)
-			widget.second.widget->SetOnIndirectChangeHandler(this->on_indirect_change_handler);
+			widget.second.widget->SetOnIndirectChangeHandler(handler);
 	}
 }
 

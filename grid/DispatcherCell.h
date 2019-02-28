@@ -3,6 +3,7 @@
 #include "IDrawable.h"
 #include "TextCell.h"
 #include "IGridCellWidget.h"
+#include "IGridEventsHandler.h"
 
 class CGridTableProxy;
 
@@ -19,11 +20,12 @@ class CDispatcherCell : public IDrawable {
 	XSize curr_size;
 
 	bool active_cell_hidden;
-	bool move_def_cell;
+	bool move_def_cell, inside_on_click;
 	int old_scroll_pos;
 
 	XRect bounds;
 	std::shared_ptr<CGridTableProxy> table_proxy;
+	std::shared_ptr<IGridEventsHandler> event_handler;
 
 	bool update_cell_widget_text;
 	bool changes_present;
@@ -43,8 +45,10 @@ public:
 	inline size_t GetActiveRecord() const;
 
 	void SetBounds(const int left_bound, const int upper_bound) override;
-	void SetParameters(XWindow * parent, IGridCellWidget *cell_widget, \
-						std::shared_ptr<CGridTableProxy> table_procy);
+	void SetParameters(XWindow * parent, \
+						std::shared_ptr<IGridEventsHandler> grid_events_handler, \
+						IGridCellWidget *cell_widget, \
+						std::shared_ptr<CGridTableProxy> table_proxy);
 
 	inline void BeginScroll(const int scroll_pos);
 	inline void EndScroll(const int scroll_pos);
@@ -54,7 +58,6 @@ public:
 	void Draw(XGC &gc, const XPoint &initial_coords, const XSize &size) override;
 
 	void OnActiveCellTextChanged(XCommandEvent *eve);
-	void OnActiveCellChangedIndirectly(XCommandEvent *eve);
 	void OnClick(const size_t field, const size_t record);
 	void OnActiveCellLoosesFocus(XEvent *eve);
 	void OnActiveCellKeyPressed(XKeyboardEvent *eve);

@@ -21,9 +21,9 @@ class CMultipleCellWidget : public IGridCellWidget {
 	XWindow *parent;
 	int flags;
 	XEventHandlerData on_change_handler, \
-						on_indirect_change_handler, \
 						on_loose_focus_handler, \
 						on_key_press_handler;
+	std::shared_ptr<ICellEventHandler> on_indirect_change_handler;
 
 	typedef void (IGridCellWidget::*PEventFunc)(XEventHandlerData);
 	inline void SetEventHandler(XEventHandlerData &on_event_this, \
@@ -37,7 +37,7 @@ public:
 							const int width, const int height) override;
 
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
-	void SetOnIndirectChangeHandler(XEventHandlerData on_change) override;
+	void SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> handler) override;
 	void SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) override;
 	void SetOnKeyPressHandler(XEventHandlerData on_key_press) override;
 

@@ -140,7 +140,7 @@ void CGrid::OnCreate(XEvent *eve) {
 	vscroll.pos = 0;
 	this->SetScrollBar(X_SCROLL_VERT, vscroll);
 
-	//Connect(EVT_ERASEBKGND, this, &CGrid::OnEraseBackground);
+	Connect(EVT_ERASEBKGND, this, &CGrid::OnEraseBackground);
 	Connect(EVT_SIZE, this, &CGrid::OnSize);
 	Connect(EVT_PAINT, this, &CGrid::OnPaint);
 	Connect(EVT_HSCROLL, this, &CGrid::OnHScroll);
@@ -294,7 +294,7 @@ void CGrid::Reload() {
 		auto fields_props = data_table_proxy->GetFieldsProperties();
 
 		int summ = fields_props->GetFieldsSizesSumm();
-		if (hscroll.max != summ) {
+		if (hscroll.max + 1 != summ) {
 			
 			hscroll.max = summ;
 			this->SetScrollBar(X_SCROLL_HORZ, hscroll);

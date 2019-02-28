@@ -1,4 +1,5 @@
 #include "StringGrid.h"
+#include "IGridEventsHandler.h"
 
 CStringGridException::CStringGridException(const int err_code, const Tchar *err_descr) : \
 											XException(err_code, err_descr) { }
@@ -9,7 +10,39 @@ CStringGridException::~CStringGridException() { }
 
 //****************************************************************************
 
-CStringGrid::CStringGrid() : table(std::make_shared<CStringTable>()){
+class CStringGridEventsHandler final : public IGridEventsHandler {
+
+	size_t active_field, active_record;
+public:
+
+	CStringGridEventsHandler() : active_field(0), active_record(0) { }
+
+	bool OnCellChanged(IGridCellWidget *cell_widget) override {
+
+		return true;
+	}
+
+	bool OnCellChangedIndirectly(IGridCellWidget *cell_widget) override {
+
+		return true;
+	}
+
+	void OnActiveCellLocationChanged(const size_t new_field, \
+									const size_t new_record) override {
+
+		active_field = new_field;
+		active_record = new_record;
+	}
+
+	inline size_t getActiveField() const { return active_field; }
+	inline size_t getActiveRecord() const { return active_record; }
+};
+
+//****************************************************************************
+
+CStringGrid::CStringGrid() : \
+			CEditableGrid(std::unique_ptr<IGridEventsHandler>(new CStringGridEventsHandler())), \
+			table(std::make_shared<CStringTable>()){
 
 	Init(table, LAYOUT_RECORD);
 }

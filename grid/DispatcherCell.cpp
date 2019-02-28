@@ -7,7 +7,7 @@ CDispatcherCell::CDispatcherCell() : def_active_cell(nullptr), \
 									active_cell_text(nullptr, 0), \
 									active_cell_color(255, 255, 255), \
 									active_cell_hidden(true), \
-									move_def_cell(true), \
+									move_def_cell(true), inside_on_click(false), \
 									old_scroll_pos(0), table_proxy(nullptr), \
 									update_cell_widget_text(true), \
 									changes_present(false), \
@@ -22,8 +22,10 @@ CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : \
 									active_cell_color(255, 255, 255), \
 									active_cell_hidden(obj.active_cell_hidden), \
 									move_def_cell(obj.move_def_cell), \
+									inside_on_click(obj.inside_on_click), \
 									old_scroll_pos(obj.old_scroll_pos), \
 									table_proxy(std::move(obj.table_proxy)), \
+									event_handler(std::move(obj.event_handler)), \
 									update_cell_widget_text(obj.update_cell_widget_text), \
 									changes_present(obj.changes_present), \
 									skip_reloading(obj.skip_reloading) {
@@ -36,6 +38,7 @@ CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : \
 	obj.active_cell_text.size = 0;
 	obj.active_cell_hidden = true;
 	obj.move_def_cell = false;
+	obj.inside_on_click = false;
 	obj.old_scroll_pos = 0;
 	obj.update_cell_widget_text = true;
 	obj.changes_present = false;
@@ -48,8 +51,10 @@ void CDispatcherCell::SetBounds(const int left_bound, const int upper_bound) {
 	bounds.top = upper_bound;
 }
 
-void CDispatcherCell::SetParameters(XWindow * parent, IGridCellWidget *cell_widget, \
-										std::shared_ptr<CGridTableProxy> table_proxy) {
+void CDispatcherCell::SetParameters(XWindow * parent, \
+									std::shared_ptr<IGridEventsHandler> grid_events_handler, \
+									IGridCellWidget *cell_widget, \
+									std::shared_ptr<CGridTableProxy> table_proxy) {
 
 	int flags = table_proxy->GetFieldsCount() ? FL_WINDOW_VISIBLE : 0;
 
@@ -59,6 +64,8 @@ void CDispatcherCell::SetParameters(XWindow * parent, IGridCellWidget *cell_widg
 
 	assert(parent);
 	assert(cell_widget);
+	assert(grid_events_handler);
+	this->event_handler = grid_events_handler;
 
 	assert(!this->table_proxy);
 	assert(table_proxy);
@@ -77,8 +84,10 @@ void CDispatcherCell::SetParameters(XWindow * parent, IGridCellWidget *cell_widg
 
 	def_active_cell->SetOnChangeHandler(XEventHandlerData(this, \
 											&CDispatcherCell::OnActiveCellTextChanged));
-	def_active_cell->SetOnIndirectChangeHandler(XEventHandlerData(this, \
-											&CDispatcherCell::OnActiveCellChangedIndirectly));
+	auto cell_event_handler = std::dynamic_pointer_cast<ICellEventHandler, \
+														IGridEventsHandler>(grid_events_handler);
+	assert(cell_event_handler);
+	def_active_cell->SetOnIndirectChangeHandler(cell_event_handler);
 	def_active_cell->SetOnKeyPressHandler(XEventHandlerData(this, \
 											&CDispatcherCell::OnActiveCellKeyPressed));
 	def_active_cell->SetOnLooseFocusHandler(XEventHandlerData(this, \
@@ -135,11 +144,6 @@ void CDispatcherCell::OnActiveCellTextChanged(XCommandEvent *eve) {
 	changes_present = true;
 }
 
-void CDispatcherCell::OnActiveCellChangedIndirectly(XCommandEvent *eve) {
-
-
-}
-
 void CDispatcherCell::OnActiveCellKeyPressed(XKeyboardEvent *eve) {
 
 	switch (eve->GetKey()) {
@@ -163,6 +167,12 @@ void CDispatcherCell::OnActiveCellLoosesFocus(XEvent *eve) {
 
 void CDispatcherCell::OnClick(const size_t field, const size_t record) {
 
+	if (inside_on_click) return;
+	inside_on_click = true;
+
+	size_t prev_active_field(active_field);
+	size_t prev_active_record(active_record);
+
 	CommitChangesIfPresent();
 	size_t new_records_count = table_proxy->GetRecordsCount();
 
@@ -173,15 +183,20 @@ void CDispatcherCell::OnClick(const size_t field, const size_t record) {
 		def_active_cell->Hide();
 		active_cell_hidden = true;
 		move_def_cell = true;
-		return;
+	}
+	else {
+		if (record >= new_records_count)
+			active_record = new_records_count - 1;
+		else
+			active_record = record;
+
+		OnActiveCellLocationChanged();
 	}
 
-	if (record >= new_records_count)
-		active_record = new_records_count - 1;
-	else
-		active_record = record;
+	if(active_field != prev_active_field || active_record != prev_active_record)
+		event_handler->OnActiveCellLocationChanged(active_field, active_record);
 
-	OnActiveCellLocationChanged();
+	inside_on_click = false;
 }
 
 void CDispatcherCell::CommitChangesIfPresent() {

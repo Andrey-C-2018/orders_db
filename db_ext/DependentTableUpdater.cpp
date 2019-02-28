@@ -93,12 +93,10 @@ CDependentTableUpdater::createDepTableUpdateStmt(const size_t master_record_inde
 
 	master_records->gotoRecord(master_record_index);
 	auto dependent_result_set = dependent_db_table->getResultSet();
-	dependent_result_set->gotoRecord(dependent_db_table->getCurrentRecordNo());
 
 	master_meta_info.bindPrimaryKeyValues(master_records, upd_stmt);
 	dependent_meta_info.bindPrimaryKeyValuesWithOffset(master_primkey_params_count, \
-													dependent_db_table->getResultSet(),
-													upd_stmt);
+														dependent_result_set, upd_stmt);
 
 	return upd_stmt;
 }

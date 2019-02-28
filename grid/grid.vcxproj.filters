@@ -99,6 +99,12 @@
     <ClInclude Include="ComboBoxCellWidget.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="IGridEventsHandler.h">
+      <Filter>interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ICellEventHandler.h">
+      <Filter>interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Grid.cpp">
