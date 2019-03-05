@@ -296,7 +296,7 @@ void CGrid::Reload() {
 		int summ = fields_props->GetFieldsSizesSumm();
 		if (hscroll.max + 1 != summ) {
 			
-			hscroll.max = summ;
+			hscroll.max = summ - 1;
 			this->SetScrollBar(X_SCROLL_HORZ, hscroll);
 		}
 

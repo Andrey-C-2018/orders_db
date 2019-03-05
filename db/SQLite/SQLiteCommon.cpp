@@ -17,8 +17,8 @@ int SQLiteException::MapSQLiteErrorCodeToCommonCode(const int err_code) const {
 	}
 }
 
-SQLiteException::SQLiteException(sqlite3 *conn) : CDbException(E_SQLITE_ERROR, \
-									MapSQLiteErrorCodeToCommonCode(sqlite3_errcode(conn)), \
+SQLiteException::SQLiteException(sqlite3 *conn) : \
+				CDbException(MapSQLiteErrorCodeToCommonCode(sqlite3_errcode(conn)), \
 									sqlite3_errmsg(conn)) { }
 
 SQLiteException::~SQLiteException() { }

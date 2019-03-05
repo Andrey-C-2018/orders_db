@@ -1,5 +1,22 @@
 #include "MySQLField.h"
 
+CMySQLFieldException::CMySQLFieldException(const int err_code, \
+											const Tchar *err_descr) : \
+											CMySQLException(err_code, err_descr) { }
+
+CMySQLFieldException::CMySQLFieldException(MYSQL *conn) : \
+											CMySQLException(conn) { }
+
+CMySQLFieldException::CMySQLFieldException(MYSQL_STMT *stmt) : \
+											CMySQLException(stmt) { }
+
+CMySQLFieldException::CMySQLFieldException(const CMySQLFieldException &obj) : \
+											CMySQLException(obj) { }
+
+CMySQLFieldException::~CMySQLFieldException() { }
+
+//*************************************************************
+
 CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
 							const size_t field_, const size_t max_field_size) : \
 							metadata(metadata_), max_size(max_field_size), \

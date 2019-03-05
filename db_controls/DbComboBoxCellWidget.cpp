@@ -58,8 +58,7 @@ void CDbComboBoxCellWidget::OnItemChoosed(XCommandEvent *eve) {
 	dependent_table->gotoCurrentRecord();
 	
 	auto stmt = updater.createDepTableUpdateStmt(sel_index);
-	if (stmt->execScalar()) 
-		dependent_table->reload();
+	dependent_table->executeScalarStmt(stmt);
 }
 
 void CDbComboBoxCellWidget::SetOnChangeHandler(XEventHandlerData on_change) { }

@@ -4,6 +4,18 @@
 #include "../IDbBindingTarget.h"
 #include "MySQLResultSet.h"
 
+class CMySQLFieldException : public CMySQLException {
+public:
+	CMySQLFieldException(const int err_code, const Tchar *err_descr);
+	CMySQLFieldException(MYSQL *conn);
+	CMySQLFieldException(MYSQL_STMT *stmt);
+
+	CMySQLFieldException(const CMySQLFieldException &obj);
+	CMySQLFieldException(CMySQLFieldException &&obj) = default;
+
+	~CMySQLFieldException();
+};
+
 class CMySQLField : public IDbField{
 	std::shared_ptr<MYSQL_RES> metadata;
 
@@ -184,7 +196,13 @@ void CMySQLIntegerField<Tint>::bindValueAsString(std::shared_ptr<IDbBindingTarge
 	int err = 0;
 	Tint i = XConv::ToInt(value, err);
 
-	assert(!err);
+	if (err) {
+		CMySQLFieldException e(CDbException::E_DB_WRONG_VALUE, \
+							_T("the binding value is not an integer: "));
+		e << value << _T(" , param no: ")<< param_no;
+		throw e;
+	}
+	
 	binding_target->bindValue(param_no, i);
 }
 
@@ -195,7 +213,13 @@ void CMySQLIntegerField<Tint>::bindValueAsWString(std::shared_ptr<IDbBindingTarg
 	int err = 0;
 	Tint i = XConv::ToInt(value, err);
 
-	assert(!err);
+	if (err) {
+		CMySQLFieldException e(CDbException::E_DB_WRONG_VALUE, \
+							_T("the binding value is not an integer: "));
+		e << value << _T(" , param no: ") << param_no;
+		throw e;
+	}
+
 	binding_target->bindValue(param_no, i);
 }
 

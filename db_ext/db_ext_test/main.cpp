@@ -1,13 +1,10 @@
 #include <iostream>
-#include <db/DbConnectionFactory.h>
+#include <db/MySQL/MySQLConnection.h>
 #include <db/IDbStatement.h>
 #include <db_ext/DbTable.h>
 
 int main() {
-	const CDbConnectionFactory &factory = CDbConnectionFactory::getInstance();
-	std::shared_ptr<IDbConnection> conn;
-
-	conn = factory.createConnection(CDbConnectionFactory::DB_CONN_MYSQL);
+	std::shared_ptr<IDbConnection> conn = std::make_shared<CMySQLConnection>();
 
 	setlocale(LC_ALL, "ukr_ukr.1251");
 	//setlocale(LC_ALL, "uk_UA.UTF-8");

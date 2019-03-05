@@ -56,7 +56,8 @@ void CDispatcherCell::SetParameters(XWindow * parent, \
 									IGridCellWidget *cell_widget, \
 									std::shared_ptr<CGridTableProxy> table_proxy) {
 
-	int flags = table_proxy->GetFieldsCount() ? FL_WINDOW_VISIBLE : 0;
+	int flags = table_proxy->GetFieldsCount() && table_proxy->GetRecordsCount() ? \
+					FL_WINDOW_VISIBLE : 0;
 
 	assert(!def_active_cell);
 	assert(cell_widget);

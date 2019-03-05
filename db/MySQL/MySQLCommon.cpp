@@ -18,12 +18,12 @@ int CMySQLException::MapMySQLErrorCodeToCommonCode(const int mysql_code) const {
 	}
 }
 
-CMySQLException::CMySQLException(MYSQL *conn) : CDbException(E_MYSQL_ERROR, \
-										MapMySQLErrorCodeToCommonCode(mysql_errno(conn)), \
-												mysql_error(conn)) { }
+CMySQLException::CMySQLException(MYSQL *conn) : \
+				CDbException(MapMySQLErrorCodeToCommonCode(mysql_errno(conn)), \
+								mysql_error(conn)) { }
 
-CMySQLException::CMySQLException(MYSQL_STMT *stmt) : CDbException(E_MYSQL_ERROR, \
-										MapMySQLErrorCodeToCommonCode(mysql_stmt_errno(stmt)), \
-												mysql_stmt_error(stmt)) { }
+CMySQLException::CMySQLException(MYSQL_STMT *stmt) : \
+				CDbException(MapMySQLErrorCodeToCommonCode(mysql_stmt_errno(stmt)), \
+								mysql_stmt_error(stmt)) { }
 
 CMySQLException::~CMySQLException() { }

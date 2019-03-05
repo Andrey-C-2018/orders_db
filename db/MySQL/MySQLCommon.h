@@ -19,9 +19,6 @@ struct CMySQLBindingTarget final {
 };
 
 class CMySQLException : public CDbException {
-	enum {
-		E_MYSQL_ERROR = 0
-	};
 
 	int MapMySQLErrorCodeToCommonCode(const int mysql_code) const;
 public:

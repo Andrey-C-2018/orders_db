@@ -53,6 +53,8 @@ public:
 	ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const override;
 	void SetCell(const size_t field, const size_t record, const Tchar *value) override;
 
+	inline void executeScalarStmt(std::shared_ptr<IDbStatement> stmt);
+
 	void reload();
 	virtual ~CDbTable();
 };
@@ -92,4 +94,11 @@ void CDbTable::setPrimaryTableForQuery(const char *table_name) {
 void CDbTable::markFieldAsPrimaryKey(const size_t field) {
 
 	query.markFieldAsPrimaryKey(field);
+}
+
+void CDbTable::executeScalarStmt(std::shared_ptr<IDbStatement> stmt) {
+
+	assert(stmt);
+	if (stmt->execScalar())
+		reload();
 }

@@ -8,9 +8,6 @@ struct SQLiteStmtHandle{
 };
 
 class SQLiteException : public CDbException {
-	enum {
-		E_SQLITE_ERROR = 0
-	};
 
 	int MapSQLiteErrorCodeToCommonCode(const int err_code) const;
 public:
