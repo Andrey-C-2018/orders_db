@@ -1,5 +1,5 @@
 #pragma once
-#include <grid/ComboBoxCellWidget.h>
+#include <editable_grid/ComboBoxCellWidget.h>
 #include <db_ext/DependentTableUpdater.h>
 
 class CDbComboBoxCellWidget : public CComboBoxCellWidget {

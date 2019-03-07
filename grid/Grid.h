@@ -2,6 +2,7 @@
 #include <memory>
 #include <xwindows/XWidget.h>
 #include "IReloadable.h"
+#include "IGCParamsList.h"
 #include "CellConfigurator.h"
 #include "GridTableProxy.h"
 
@@ -31,12 +32,8 @@ private:
 	int headers_height;
 
 	XScrollParams hscroll, vscroll;
-
-	XFont cells_font, headers_font;
-	XColor cells_color, headers_color;
-	XBrush grid_lines_brush, background_brush;
-	XPen grid_lines_pen, background_pen;
-	CCellConfigurator configurator;
+	std::shared_ptr<CCellConfigurator> headers_configurator, cells_configurator;
+	std::shared_ptr<IGCParamsList> gc_global_params, gc_headers_params;
 	
 	static bool is_class_registered;
 	
@@ -70,12 +67,15 @@ protected:
 	
 	CGrid();
 	void Init(std::shared_ptr<ITable> table, const int kind_of_layout);
+
+	virtual GridConfigurators CreateConfigurators() = 0;
+	virtual GridGCParamsLists CreateGCParamsLists() = 0;
+
 	template <class TCell> \
 		inline LayoutObjects CreateLayoutObjectsHelper(const int kind_of_layout);
 	virtual LayoutObjects CreateLayoutObjects(const int kind_of_layout);
 
 	virtual void OnWindowCreate() { }
-	inline void AcceptConfiguratorOnCells(IConfigurator *configurator);
 	virtual void DrawLeftPane(XGC &gc) const;
 
 	inline size_t GetVisibleRecordsCount() const;
@@ -103,12 +103,6 @@ public:
 
 //**************************************************************
 
-void CGrid::AcceptConfiguratorOnCells(IConfigurator *configurator) {
-
-	assert(configurator);
-	cells->AcceptConfigurator(configurator);
-}
-
 size_t CGrid::GetFieldsCount() const {
 
 	return data_table_proxy->GetFieldsCount();
@@ -134,7 +128,7 @@ void CGrid::SetFieldWidth(const size_t field, const int new_width) {
 int CGrid::GetRecordsSizesSumm() const {
 	size_t records_count = data_table_proxy->GetRecordsCount();
 
-	return (int)(records_count * configurator.GetCellHeight());
+	return (int)(records_count * cells_configurator->GetCellHeight());
 }
 
 void CGrid::ReevaluateHScrollMax() {

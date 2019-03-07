@@ -1,6 +1,6 @@
 #pragma once
 #include "IGridCellWidget.h"
-#include "xwindows/XEdit.h"
+#include <xwindows/XEdit.h>
 
 class CEditableCellWidget final : public XEdit, public IGridCellWidget {
 	

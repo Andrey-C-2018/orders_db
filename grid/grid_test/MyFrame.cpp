@@ -1,6 +1,6 @@
 ﻿#include "MyFrame.h"
 #include <basic/XConv.h>
-#include <grid/ComboBoxCellWidget.h>
+#include <editable_grid/ComboBoxCellWidget.h>
 
 CMyFrame::CMyFrame(const Tchar *class_name,\
 					 const Tchar *label, const int X, const int Y,\

@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "IDrawable.h"
-#include "TextCell.h"
+#include <grid/IDrawable.h>
+#include <grid/TextCell.h>
 #include "IGridCellWidget.h"
 #include "IGridEventsHandler.h"
 

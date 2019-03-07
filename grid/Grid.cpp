@@ -44,13 +44,7 @@ bool CGrid::is_class_registered = false;
 CGrid::CGrid() : headers(nullptr), cells(nullptr), \
 				width(0), height(0), \
 				left_pane_width(DEF_LEFT_PANE_WIDTH), \
-				headers_height(DEF_HEADERS_HEIGHT), \
-				cells_font(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas")), \
-				headers_font(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas")), \
-				cells_color(170, 170, 170), headers_color(128, 128, 128), \
-				grid_lines_brush(0, 0, 200), background_brush(100, 100, 100), \
-				grid_lines_pen(XPEN_SOLID, 1, 0, 0, 200), \
-				background_pen(XPEN_SOLID, 1, 100, 100, 100){
+				headers_height(DEF_HEADERS_HEIGHT) {
 
 	if (!is_class_registered) {
 		RegisterNewWidgetClass(_T("XGRIDCONTROL"));
@@ -103,29 +97,34 @@ void CGrid::Create(XWindow *parent, const int flags, \
 }
 
 void CGrid::OnCreate(XEvent *eve) {
-	XStandAloneGC gc(this);
 	
 	assert(headers);
 	assert(cells);
 	assert(height > 0);
 
-	configurator.Init(&gc, &headers_font, \
-						&background_brush, &background_pen);
+	assert(!gc_global_params);
+	assert(!gc_headers_params);
+	auto gc_params = CreateGCParamsLists();
+	gc_global_params = std::move(gc_params.first);
+	gc_headers_params = std::move(gc_params.second);
+	
+	assert(!headers_configurator);
+	assert(!cells_configurator);
+	auto configurators = CreateConfigurators();
+	headers_configurator = std::move(configurators.first);
+	cells_configurator = std::move(configurators.second);
 
-	headers->AcceptConfigurator(&configurator);
-	headers_height = configurator.GetCellHeight();
+	headers->AcceptConfigurator(headers_configurator.get());
+	headers_height = headers_configurator->GetCellHeight();
 	headers->SetItemHeight(headers_height);
 	headers->SetBounds(left_pane_width, 0);
-
-	configurator.Init(&gc, &cells_font, \
-						&background_brush, &background_pen);
 		
-	cells->AcceptConfigurator(&configurator);
-	cells->SetItemHeight(configurator.GetCellHeight());
+	cells->AcceptConfigurator(cells_configurator.get());
+	cells->SetItemHeight(cells_configurator->GetCellHeight());
 	cells->SetBounds(left_pane_width, headers_height);
 
-	int single_char_width = configurator.GetCharWidthInPixels();
-	int cell_margins_width = configurator.GetCellMarginsWidth();
+	int single_char_width = cells_configurator->GetCharWidthInPixels();
+	int cell_margins_width = cells_configurator->GetCellMarginsWidth();
 
 	auto fields_props = data_table_proxy->GetFieldsProperties();
 	fields_props->TransformAllSizes(cell_margins_width, single_char_width);
@@ -182,11 +181,7 @@ void CGrid::DrawLeftPane(XGC &gc) const {
 
 void CGrid::OnPaint(XEvent *eve) {
 	XPaintEventGC gc(this);
-	int old_bk_mode = gc.SetBackgroundFillMode(X_BK_TRANSPARENT);
-	XColor old_bg_color = gc.SetBackgroundColor(cells_color);
-	XFont old_font = gc.SelectObject(cells_font);
-	XPen old_pen = gc.SelectObject(grid_lines_pen);
-	XBrush old_brush = gc.SelectObject(grid_lines_brush);
+	gc_global_params->Init(gc);
 	
 	DrawLeftPane(gc);
 
@@ -194,18 +189,14 @@ void CGrid::OnPaint(XEvent *eve) {
 	cells->Draw(gc, XPoint(left_pane_width, headers_height), \
 					XSize(width - left_pane_width, height - headers_height));
 
-	gc.SetBackgroundColor(headers_color);
-	gc.SelectObject(headers_font);
+	gc_headers_params->Init(gc);
 
 	gc.SetBounds(left_pane_width, 0);
 	headers->Draw(gc, XPoint(left_pane_width, 0), \
 					XSize(width - left_pane_width, headers_height));
 
-	gc.SelectObject(old_pen);
-	gc.SelectObject(old_brush);
-	gc.SelectObject(old_font);
-	gc.SetBackgroundColor(old_bg_color);
-	gc.SetBackgroundFillMode(old_bk_mode);
+	gc_headers_params->Release();
+	gc_global_params->Release();
 }
 
 void CGrid::OnHScroll(XScrollEvent *eve) {

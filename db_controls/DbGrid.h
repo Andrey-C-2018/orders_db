@@ -1,6 +1,6 @@
 #pragma once
 #pragma once
-#include <grid/EditableGrid.h>
+#include <editable_grid/EditableGrid.h>
 #include <db_ext/DbTable.h>
 
 class CDbGrid :	public CEditableGrid{

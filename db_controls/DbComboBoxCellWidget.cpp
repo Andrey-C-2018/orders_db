@@ -1,5 +1,5 @@
 #include "DbComboBoxCellWidget.h"
-#include <grid/ICellEventHandler.h>
+#include <editable_grid/ICellEventHandler.h>
 
 CDbComboBoxCellWidget::CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
 											const size_t field_to_display_, \

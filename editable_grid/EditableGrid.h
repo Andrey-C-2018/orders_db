@@ -1,18 +1,28 @@
 #pragma once
-#include "Grid.h"
+#include <grid/Grid.h>
 
 struct IGridCellWidget;
 struct IGridEventsHandler;
 class CMultipleCellWidget;
+class CEConfigurator;
 
 class CEditableGrid : public CGrid{
+
 	CDispatcherCell *disp_cell;
 	CMultipleCellWidget *field_widgets_collection;
 	std::shared_ptr<IGridEventsHandler> events_handler;
+	
+	XFont cells_font, headers_font;
+	XColor cells_color, headers_color;
+	XBrush grid_lines_brush, background_brush;
+	XPen grid_lines_pen, background_pen;
 
 	void OnKeyPress(XKeyboardEvent *eve);
 
 protected:
+	GridConfigurators CreateConfigurators() override;
+	GridGCParamsLists CreateGCParamsLists() override;
+
 	LayoutObjects CreateLayoutObjects(const int kind_of_layout) override;
 	void OnWindowCreate() override;
 

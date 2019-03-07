@@ -1,6 +1,6 @@
 #include "DbGrid.h"
 #include <grid/TextCell.h>
-#include <grid/IGridEventsHandler.h>
+#include <editable_grid/IGridEventsHandler.h>
 
 class CDbGridEventsHandler final : public IGridEventsHandler {
 

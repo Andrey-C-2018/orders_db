@@ -1,5 +1,5 @@
 #include "DispatcherCell.h"
-#include "GridTableProxy.h"
+#include <grid/GridTableProxy.h>
 
 CDispatcherCell::CDispatcherCell() : def_active_cell(nullptr), \
 									active_field((size_t)-1), active_record((size_t)-1), \

@@ -94,7 +94,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%MYSQL_CONNECTOR_X32_PATH%lib;../../0libs/Debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,7 +110,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%MYSQL_CONNECTOR_X64_PATH%lib;../../0libs/x64/Debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -130,7 +130,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%MYSQL_CONNECTOR_X32_PATH%lib;../../0libs/Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,7 +150,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%MYSQL_CONNECTOR_X64_PATH%lib;../../0libs/x64/Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

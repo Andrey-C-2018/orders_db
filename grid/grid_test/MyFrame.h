@@ -3,7 +3,7 @@
 #include <xwindows/XButton.h>
 #include <xwindows/XButton.h>
 #include <xwindows/XComboBox.h>
-#include <grid/StringGrid.h>
+#include <editable_grid/StringGrid.h>
 
 class CMyFrame : public XFrame{
 	XButton *button_focus, *button_add, *button_remove, *button_refresh;

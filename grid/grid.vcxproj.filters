@@ -39,12 +39,6 @@
     <ClInclude Include="CellConfigurator.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="StringGrid.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="EditableGrid.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="GridLine.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
@@ -84,25 +78,7 @@
     <ClInclude Include="IFieldsProperties.h">
       <Filter>interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="EditableCellWidget.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="IGridCellWidget.h">
-      <Filter>interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="DispatcherCell.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="MultipleCellWidget.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="ComboBoxCellWidget.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="IGridEventsHandler.h">
-      <Filter>interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="ICellEventHandler.h">
+    <ClInclude Include="IGCParamsList.h">
       <Filter>interfaces</Filter>
     </ClInclude>
   </ItemGroup>
@@ -113,25 +89,7 @@
     <ClCompile Include="CellConfigurator.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="StringGrid.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="EditableGrid.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="GridTableProxy.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="EditableCellWidget.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="MultipleCellWidget.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="DispatcherCell.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="ComboBoxCellWidget.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>

@@ -14,9 +14,33 @@ class CCellConfigurator : public IConfigurator {
 	XBrush *background_brush;
 	XPen *background_pen;
 	
-	inline void InternalInit(XGC *gc, XFont *font, \
-							XBrush *background_brush_, \
-							XPen *background_pen_) {
+protected:
+
+	inline int GetTextHeight() const { return text_height; }
+
+	inline void SetCellHeightAndMargins(const int cell_height, \
+										const int cell_margins_width) {
+
+		assert(text_height != -1);
+		assert(grid_line_size != -1);
+
+		this->cell_height = cell_height;
+		this->cell_margins_width = cell_margins_width;
+	}
+
+public:
+
+	CCellConfigurator(const CCellConfigurator &obj) = delete;
+	CCellConfigurator(CCellConfigurator &&obj) = default;
+	CCellConfigurator &operator=(const CCellConfigurator &obj) = delete;
+	CCellConfigurator &operator=(CCellConfigurator &&obj) = default;
+
+	CCellConfigurator(XGC *gc, XFont *font, \
+						XBrush *background_brush_, \
+						XPen *background_pen_) : \
+						cell_height(-1), cell_margins_width(-1), \
+						grid_line_size(-1) {
+
 		assert(gc && font);
 		assert(background_brush_);
 		assert(background_pen_);
@@ -30,33 +54,6 @@ class CCellConfigurator : public IConfigurator {
 		text_height = tm.GetCharHeight();
 		char_width = tm.GetAverageCharWidth();
 		gc->SelectObject(old_font);
-	}
-
-public:
-	CCellConfigurator() : text_height(-1), cell_height(-1), \
-							cell_margins_width(-1), \
-							char_width(-1), \
-							grid_line_size(-1), \
-							background_brush(nullptr), \
-							background_pen(nullptr){ }
-
-	CCellConfigurator(const CCellConfigurator &obj) = delete;
-	CCellConfigurator(CCellConfigurator &&obj) = default;
-	CCellConfigurator &operator=(const CCellConfigurator &obj) = delete;
-	CCellConfigurator &operator=(CCellConfigurator &&obj) = default;
-
-	CCellConfigurator(XGC *gc, XFont *font, \
-						XBrush *background_brush_, \
-						XPen *background_pen_) : cell_height(-1) {
-
-		InternalInit(gc, font, background_brush_, background_pen_);
-	}
-
-	void Init(XGC *gc, XFont *font, \
-						XBrush *background_brush_, \
-						XPen *background_pen_) {
-
-		InternalInit(gc, font, background_brush_, background_pen_);
 	}
 
 	void Configure(CGridLine &line) override;
