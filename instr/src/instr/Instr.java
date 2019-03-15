@@ -139,6 +139,43 @@ public class Instr {
 		return workers;
 	}
 	
+	private boolean isContiniousAssignment(int id_worker, 
+											Date startwork_date) throws SQLException {
+		
+		assert(conn != null);
+
+		Statement stmt = conn.createStatement();
+		
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT id_employer FROM staff_assignments ");
+		query.append("WHERE id_worker = ");
+		query.append(id_worker);
+		query.append(" AND (startwork_date = '");
+		query.append(format_sql.format(startwork_date));
+		query.append("' OR dismiss_date = '");
+
+		calendar.setTime(startwork_date);
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		
+		query.append(format_sql.format(calendar.getTime()));
+		query.append("')");
+		
+	    ResultSet rs = stmt.executeQuery(query.toString());
+	    int last_employer = -1;
+	    if(rs.next()) last_employer = rs.getInt("id_employer");
+	    
+	    boolean is_continious = false;
+	    if(rs.next()) {
+	    	if(last_employer == rs.getInt("id_employer"))
+	    			is_continious = true;
+	    }
+	  	    		
+	    rs.close();
+	    stmt.close();
+	    
+	    return is_continious;
+	}
+	
 	private void performInstr(int id_worker, Date instr_date, 
 								String instr_type) throws SQLException {
 
@@ -283,8 +320,11 @@ public class Instr {
 			if(prev_instr_date == null || 
 					(prev_instr_date != null && startwork_date.after(prev_instr_date))) {
 				
-				performInitialInstr(id, startwork_date);
-				prev_instr_date = startwork_date;
+				if(!isContiniousAssignment(id, startwork_date)) {
+				
+					performInitialInstr(id, startwork_date);
+					prev_instr_date = startwork_date;
+				}
 			}
 				
 			if(dismiss_date == null) dismiss_date = now;
