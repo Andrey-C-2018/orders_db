@@ -21,7 +21,7 @@ public class Instr {
 		public int id_employer = -1;
 	}
 	
-	private final static int INSTR_OFFSET_IN_MONTHES = 6;
+	private final static int INSTR_OFFSET_IN_MONTHES = 5;
 	private final static int MAX_INSTRS_COUNT = 4;
 		
 	private Connection conn = null;
@@ -30,7 +30,7 @@ public class Instr {
 	private SpecialDays special_days = null;
 	private GregorianCalendar calendar = null;
 	
-	private StaffListItem[] getWorkersWhoNeedInstr() throws SQLException {
+	private StaffListItem[] getWorkersWhoNeedInstr(String instr_table_name) throws SQLException {
 		StaffListItem[] staff_list = null;
 		
 		assert(conn != null);
@@ -43,8 +43,12 @@ public class Instr {
 
 		query.append("SELECT s.id, s.name, sa.startwork_date, sa.dismiss_date, sa.id_employer ");
 		query.append("FROM staff s INNER JOIN staff_assignments sa ON s.id = sa.id_worker"); 
-		query.append(" INNER JOIN (SELECT id_worker, MAX(instr_date) as max_instr_date FROM instr GROUP BY id_worker"); 
-		query.append(" UNION SELECT id, '1901-01-01' FROM staff ss LEFT OUTER JOIN instr ii ON ss.id = ii.id_worker WHERE ii.id_worker IS NULL) i");
+		query.append(" INNER JOIN (SELECT id_worker, MAX(instr_date) as max_instr_date FROM ");
+		query.append(instr_table_name);
+		query.append(" GROUP BY id_worker"); 
+		query.append(" UNION SELECT id, '1901-01-01' FROM staff ss LEFT OUTER JOIN ");
+		query.append(instr_table_name);
+		query.append(" ii ON ss.id = ii.id_worker WHERE ii.id_worker IS NULL) i");
 		query.append(" ON s.id = i.id_worker "); 
 		query.append("WHERE sa.dismiss_date > DATE_ADD(i.max_instr_date, INTERVAL ");
 		query.append(INSTR_OFFSET_IN_MONTHES); 
@@ -177,13 +181,15 @@ public class Instr {
 	}
 	
 	private void performInstr(int id_worker, Date instr_date, 
-								String instr_type) throws SQLException {
+								String instr_type, String instr_table) throws SQLException {
 
 		StringBuilder query = new StringBuilder();
 
 		Statement stmt = conn.createStatement();
 
-		query.append("INSERT INTO instr VALUES(");
+		query.append("INSERT INTO ");
+		query.append(instr_table);
+		query.append(" VALUES(");
 		query.append(id_worker);
 		query.append(", '");
 		query.append(format_sql.format(instr_date));
@@ -195,19 +201,21 @@ public class Instr {
 		stmt.close();
 	}
 
-	private void performInitialInstr(int id_worker, Date instr_date) throws SQLException {
+	private void performInitialInstr(int id_worker, Date instr_date,
+										String instr_table) throws SQLException {
 
 		assert(instr_date != null);
-		performInstr(id_worker, instr_date, "вступний");
+		performInstr(id_worker, instr_date, "вступний", instr_table);
 	}
 
-	private void performInstr(int id_worker, Date instr_date) throws SQLException {
+	private void performInstr(int id_worker, Date instr_date,
+										String instr_table) throws SQLException {
 
 		assert(instr_date != null);
-		performInstr(id_worker, instr_date, "первинний");
+		performInstr(id_worker, instr_date, "первинний", instr_table);
 	}
 
-	private Date getPrevInstrDate(int id_worker) throws SQLException {
+	private Date getPrevInstrDate(int id_worker, String instr_table) throws SQLException {
 
 		assert(id_worker != -1);
 		assert(conn != null);
@@ -216,8 +224,9 @@ public class Instr {
 		Statement stmt = conn.createStatement();
 		
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT MAX(instr_date) as latest_instr_date FROM instr ");
-		query.append("WHERE id_worker = ");
+		query.append("SELECT MAX(instr_date) as latest_instr_date FROM ");
+		query.append(instr_table);
+		query.append(" WHERE id_worker = ");
 		query.append(id_worker);
 
 	    ResultSet rs = stmt.executeQuery(query.toString());
@@ -235,15 +244,16 @@ public class Instr {
 		return date != null ? format_german.format(date) : "NULL";
 	}
 	
-	private int getInstrsCount(Date date) throws SQLException {
+	private int getInstrsCount(Date date, String instr_table) throws SQLException {
 		
 		assert(conn != null);
 
 		Statement stmt = conn.createStatement();
 		
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT COUNT(id_worker) as count_instr FROM instr ");
-		query.append("WHERE instr_date = '");
+		query.append("SELECT COUNT(id_worker) as count_instr FROM ");
+		query.append(instr_table);
+		query.append(" WHERE instr_date = '");
 		query.append(format_sql.format(date));
 		query.append("'");
 
@@ -260,7 +270,9 @@ public class Instr {
 	
 	private Date calcNextInstrDate(int id_worker, 
 									Date prev_instr_date, 
-									GregorianCalendar calendar) throws SQLException, InstrException {
+									GregorianCalendar calendar, 
+									String instr_table) throws SQLException, 
+																		InstrException {
 		
 		calendar.setTime(prev_instr_date);
 		calendar.add(Calendar.MONTH, INSTR_OFFSET_IN_MONTHES);
@@ -269,7 +281,7 @@ public class Instr {
 		next_instr_date = special_days.findNearestWorkingDay(id_worker, next_instr_date, 
 													SpecialDays.DIRECTION_LEFT, 
 													calendar);
-		while(getInstrsCount(next_instr_date) >= Instr.MAX_INSTRS_COUNT) {
+		while(getInstrsCount(next_instr_date, instr_table) >= Instr.MAX_INSTRS_COUNT) {
 			calendar.setTime(next_instr_date);
 			calendar.add(Calendar.DAY_OF_MONTH, -1);
 			
@@ -302,18 +314,18 @@ public class Instr {
 		calendar = new GregorianCalendar();
 	}
 
-	public void evaluateInstr() throws SQLException, InstrException {
+	public void evaluateInstr(String instr_table) throws SQLException, InstrException {
 		
 		Date now = new Date();
 		
-		StaffListItem workers[] = getWorkersWhoNeedInstr();
+		StaffListItem workers[] = getWorkersWhoNeedInstr(instr_table);
 		if(workers == null) return;
-		workers = mergeAssigmentRangesIfNecessary(workers, calendar);
+		//workers = mergeAssigmentRangesIfNecessary(workers, calendar);
 				
 		for(int i = 0; i < workers.length; ++i){
 			
 			int id = workers[i].id;
-			Date prev_instr_date = getPrevInstrDate(id);
+			Date prev_instr_date = getPrevInstrDate(id, instr_table);
 			Date startwork_date = workers[i].startwork_date;
 			Date dismiss_date = workers[i].dismiss_date;
 			
@@ -322,23 +334,25 @@ public class Instr {
 				
 				if(!isContiniousAssignment(id, startwork_date)) {
 				
-					performInitialInstr(id, startwork_date);
+					performInitialInstr(id, startwork_date, instr_table);
 					prev_instr_date = startwork_date;
 				}
 			}
 				
 			if(dismiss_date == null) dismiss_date = now;
 			
-			Date next_instr_date = calcNextInstrDate(id, prev_instr_date, calendar);
+			Date next_instr_date = calcNextInstrDate(id, prev_instr_date, calendar,
+														instr_table);
 			while(dismiss_date.after(next_instr_date)) {
 					
-				performInstr(id, next_instr_date);
-				next_instr_date = calcNextInstrDate(id, next_instr_date, calendar);
+				performInstr(id, next_instr_date, instr_table);
+				next_instr_date = calcNextInstrDate(id, next_instr_date, calendar,
+														instr_table);
 			}
 		}
 	}
 	
-	public void print() throws SQLException {
+	public void print(String instr_table) throws SQLException {
 		
 		assert(conn != null);
 		
@@ -348,7 +362,9 @@ public class Instr {
 
 		query.append("SELECT s.id, s.name, sa.position, sa.startwork_date, sa.dismiss_date,");
 		query.append(" i.instr_date FROM staff s INNER JOIN staff_assignments sa");
-		query.append(" ON s.id = sa.id_worker INNER JOIN instr i ON s.id = i.id_worker "); 
+		query.append(" ON s.id = sa.id_worker INNER JOIN ");
+		query.append(instr_table);
+		query.append(" i ON s.id = i.id_worker "); 
 	    query.append("ORDER BY instr_date");
 	    		    		    	
 	    ResultSet rs = stmt.executeQuery(query.toString());
