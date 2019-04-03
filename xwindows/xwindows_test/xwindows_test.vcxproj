@@ -158,10 +158,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SimpleSizer.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SimpleSizer.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
   </ItemGroup>
