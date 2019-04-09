@@ -24,36 +24,38 @@ CMyFrame::CMyFrame(const Tchar *class_name,\
 void CMyFrame::InitTestControls(const XRect &rc) {
 
 	CVerticalSizer main_sizer(this, 0, 0, rc.right, rc.bottom, \
-								10, 10, 10, 10, 40);
+								10, 10, 10, 10, 2, 40);
 
 	main_sizer.addWidget(new XButton);
 	main_sizer.addWidget(new XEdit);
 	main_sizer.addWidget(new XButton);
 
 	CHorizontalSizer sizer(0, 0, 0, 0);
-	main_sizer.initNestedSizer(sizer);
+	main_sizer.pushNestedSizer(sizer);
 	sizer.addWidget(new XButton(), 100, 40);
 	sizer.addWidget(new XButton(), 100, 40);
 	sizer.addWidget(new XButton(), 100, 60);
 	sizer.addWidget(new XButton(), 100, 20);
 
-	CVerticalSizer sizer2(0, 0, 0, 0, 20);
-	sizer.initNestedSizer(sizer2);
+	CSizerPreferences prefs(0, 0, 0, 0, 20);
+	CVerticalSizer sizer2(prefs, 20);
+	sizer.pushNestedSizer(sizer2);
 	sizer2.addWidget(new XButton(), _T("1"));
 	sizer2.addWidget(new XButton(), _T("2"));
 
-	sizer.addNestedSizerByActualSize(sizer2);
+	sizer.popNestedSizer();
 
-	main_sizer.addNestedSizerByActualSize(sizer);
+	main_sizer.popNestedSizer();
 	main_sizer.addWidget(new XButton);
 
-	main_sizer.initNestedSizer(sizer);
+	main_sizer.pushNestedSizer(sizer);
 	sizer.addWidget(new XButton(), 20, 20);
-	sizer.initNestedSizerWithWidth(sizer2, 100);
+	sizer.pushNestedSizer(sizer2, 100);
 	sizer2.addWidget(new XButton(), _T("1"));
 	sizer2.addWidget(new XButton(), _T("2"));
+	sizer.popNestedSizer();
 
-	//sizer.addWidget(new XButton(), 20, 20);
+	sizer.addWidget(new XButton(), 20, 20);
 }
 
 void CMyFrame::OnSize(XSizeEvent *eve) {

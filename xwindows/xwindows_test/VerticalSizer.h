@@ -14,22 +14,25 @@ public:
 	CVerticalSizer(const int margin_left, const int margin_right, \
 					const int margin_top, const int margin_bottom, \
 					const int row_height) noexcept;
+	CVerticalSizer(CSizerPreferences prefs, const int row_height) noexcept;
 	CVerticalSizer(XWindow *parent, \
 					const int x, const int y, \
 					const int width, const int height, \
 					const int margin_left, const int margin_right, \
 					const int margin_top, const int margin_bottom, \
-					const int row_height) noexcept;
+					const int gap, const int row_height) noexcept;
 
 	CVerticalSizer(const CVerticalSizer &obj) = default;
 	CVerticalSizer(CVerticalSizer &&obj) = default;
 	CVerticalSizer &operator=(const CVerticalSizer &obj) = default;
 	CVerticalSizer &operator=(CVerticalSizer &&obj) = default;
 
+	void addWidget(XWidget *widget, const Tchar *label, const int flags);
+	inline void addWidget(XWidget *widget, const Tchar *label);
 	inline void addWidget(XWidget *widget);
-	void addWidget(XWidget *widget, const Tchar *label);
-	void initNestedSizer(CSizer &sizer) const;
-	void addNestedSizerByActualSize(const CSizer &sizer);
+
+	void pushNestedSizer(CSizer &sizer);
+	void popNestedSizer();
 
 	int getActualHeight() const override;
 
@@ -37,7 +40,12 @@ public:
 	virtual ~CVerticalSizer();
 };
 
+void CVerticalSizer::addWidget(XWidget *widget, const Tchar *label) {
+
+	addWidget(widget, label, FL_WINDOW_CLIPSIBLINGS | FL_WINDOW_BORDERED | FL_WINDOW_VISIBLE);
+}
+
 void CVerticalSizer::addWidget(XWidget *widget) {
 
-	addWidget(widget, _T(""));
+	addWidget(widget, _T(""), FL_WINDOW_CLIPSIBLINGS | FL_WINDOW_BORDERED | FL_WINDOW_VISIBLE);
 }

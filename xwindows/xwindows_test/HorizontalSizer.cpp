@@ -7,13 +7,18 @@ CHorizontalSizer::CHorizontalSizer(const int margin_left, const int margin_right
 					CSizer(margin_left, margin_right, margin_top, margin_bottom), \
 					x_initial(0), max_widget_height(0) { }
 
+CHorizontalSizer::CHorizontalSizer(CSizerPreferences prefs) noexcept : \
+					CSizer(prefs), x_initial(0), max_widget_height(0) { }
+
 CHorizontalSizer::CHorizontalSizer(XWindow *parent, \
 									const int x, const int y, \
 									const int width, const int height, \
 									const int margin_left, const int margin_right, \
-									const int margin_top, const int margin_bottom) noexcept : \
+									const int margin_top, const int margin_bottom, \
+									const int gap) noexcept : \
 					CSizer(parent, x, y, width, height, \
-							margin_left, margin_right, margin_top, margin_bottom), \
+							margin_left, margin_right, \
+							margin_top, margin_bottom, gap), \
 					x_initial(x), max_widget_height(0) { }
 
 void CHorizontalSizer::onParametersChanged(const int new_x, const int new_y, \
@@ -22,7 +27,9 @@ void CHorizontalSizer::onParametersChanged(const int new_x, const int new_y, \
 	x_initial = new_x;
 }
 
-void CHorizontalSizer::addWidget(XWidget *widget, const Tchar *label, XSize size) {
+void CHorizontalSizer::addWidget(XWidget *widget, const Tchar *label, const int flags, XSize size) {
+
+	assert(!nested_sizer);
 	const int widget_width = size.width;
 	const int widget_height = size.height;
 
@@ -33,32 +40,38 @@ void CHorizontalSizer::addWidget(XWidget *widget, const Tchar *label, XSize size
 	if(widget_height > max_widget_height)
 		max_widget_height = widget_height;
 
-	widget->Create(parent, FL_WINDOW_CLIPSIBLINGS | FL_WINDOW_BORDERED | FL_WINDOW_VISIBLE, \
-					label, x, y, widget_width, widget_height);
-	x += widget_width + GAP;
+	widget->Create(parent, flags, label, x, y, widget_width, widget_height);
+	x += widget_width + gap;
 }
 
-void CHorizontalSizer::initNestedSizer(CSizer &sizer) const {
+void CHorizontalSizer::pushNestedSizer(CSizer &sizer) {
 
+	assert(!nested_sizer);
 	setParametersTo(sizer, x, y, width + x_initial - x - margin_right, \
 									height - margin_top - margin_bottom);
+	nested_sizer = &sizer;
 }
 
-void CHorizontalSizer::initNestedSizerWithWidth(CSizer &sizer, const int width) const {
+void CHorizontalSizer::pushNestedSizer(CSizer &sizer, const int width) {
 
+	assert(!nested_sizer);
 	assert(width <= this->width + x_initial - x - margin_right);
+
 	setParametersTo(sizer, x, y, width, height - margin_top - margin_bottom);
+	nested_sizer = &sizer;
 }
 
-void CHorizontalSizer::addNestedSizerByActualSize(const CSizer &sizer) {
+void CHorizontalSizer::popNestedSizer() {
 
-	assert(!sizer.isNull());
+	assert(nested_sizer);
+	assert(!nested_sizer->isNull());
 
-	int sizer_actual_height = sizer.getActualHeight();
+	int sizer_actual_height = nested_sizer->getActualHeight();
 	if (sizer_actual_height > max_widget_height)
 		max_widget_height = sizer_actual_height;
 
-	x += sizer.getWidth() + GAP;
+	x += nested_sizer->getWidth() + gap;
+	nested_sizer = nullptr;
 }
 
 int CHorizontalSizer::getActualHeight() const {
