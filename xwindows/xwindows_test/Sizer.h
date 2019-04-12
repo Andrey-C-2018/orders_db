@@ -3,6 +3,18 @@
 
 class XWindow;
 
+struct CSizerPreferences final {
+	int margin_left, margin_right;
+	int margin_top, margin_bottom;
+	int gap;
+
+	inline CSizerPreferences() noexcept;
+	inline CSizerPreferences(const int margin_left, \
+							const int margin_right, \
+							const int margin_top, \
+							const int margin_bottom, const int gap) noexcept;
+};
+
 class CSizer {
 protected:
 	enum Defaults {
@@ -20,12 +32,13 @@ protected:
 	int margin_top, margin_bottom;
 	int gap;
 
-	inline void init(const int margin_left, const int margin_right, \
-						const int margin_top, const int margin_bottom) noexcept;
+	CSizer *nested_sizer;
+
 	inline void init(const int x, const int y, \
 						const int width, const int height, \
 						const int margin_left, const int margin_right, \
-						const int margin_top, const int margin_bottom) noexcept;
+						const int margin_top, const int margin_bottom, \
+						const int gap) noexcept;
 
 	inline void setParametersTo(CSizer &obj, const int new_x, const int new_y, \
 									const int new_width, const int new_height) const noexcept;
@@ -36,11 +49,13 @@ public:
 	CSizer() noexcept;
 	CSizer(const int margin_left, const int margin_right, \
 			const int margin_top, const int margin_bottom) noexcept;
+	CSizer(CSizerPreferences prefs) noexcept;
 	CSizer(XWindow *parent, \
 			const int x, const int y, \
 			const int width, const int height, \
 			const int margin_left, const int margin_right, \
-			const int margin_top, const int margin_bottom) noexcept;
+			const int margin_top, const int margin_bottom, \
+			const int gap) noexcept;
 
 	CSizer(const CSizer &obj) = default;
 	CSizer(CSizer &&obj) = default;
@@ -52,7 +67,6 @@ public:
 	virtual int getActualHeight() const = 0;
 
 	inline void setWidgetCreationFlags(const int flags);
-	inline void setGap(const int gap);
 
 	virtual bool isNull() const;
 	virtual ~CSizer();
@@ -60,17 +74,25 @@ public:
 
 //****************************************************************************
 
-void CSizer::init(const int margin_left, const int margin_right, \
-					const int margin_top, const int margin_bottom) noexcept {
+CSizerPreferences::CSizerPreferences() noexcept : margin_left(0), margin_right(0), \
+													margin_top(0), margin_bottom(0), \
+													gap(0) { }
 
-	init(0, 0, margin_left + margin_right, margin_top + margin_bottom, \
-			margin_left, margin_right, margin_top, margin_bottom);
-}
+CSizerPreferences::CSizerPreferences(const int margin_left_, \
+										const int margin_right_, \
+										const int margin_top_, \
+										const int margin_bottom_, const int gap_) noexcept : \
+									margin_left(margin_left_), margin_right(margin_right_), \
+									margin_top(margin_top_), margin_bottom(margin_bottom_), \
+									gap(gap_) { }
+
+//****************************************************************************
 
 void CSizer::init(const int x, const int y, \
 					const int width, const int height, \
 					const int margin_left, const int margin_right, \
-					const int margin_top, const int margin_bottom) noexcept {
+					const int margin_top, const int margin_bottom, \
+					const int gap) noexcept {
 
 	assert(margin_left + margin_right <= width);
 	assert(margin_top + margin_bottom <= height);
@@ -86,8 +108,10 @@ void CSizer::init(const int x, const int y, \
 	this->margin_top = margin_top;
 	this->margin_bottom = margin_bottom;
 
-	this->gap = GAP;
+	this->gap = gap;
 	this->flags = 0;
+
+	this->nested_sizer = nullptr;
 }
 
 void CSizer::setParametersTo(CSizer &obj, const int new_x, const int new_y, \
@@ -95,7 +119,6 @@ void CSizer::setParametersTo(CSizer &obj, const int new_x, const int new_y, \
 
 	obj.parent = this->parent;
 	obj.flags = this->flags;
-	obj.gap = this->gap;
 
 	obj.x = new_x + obj.margin_left;
 	obj.y = new_y + obj.margin_top;
@@ -103,6 +126,11 @@ void CSizer::setParametersTo(CSizer &obj, const int new_x, const int new_y, \
 	obj.height = new_height;
 
 	obj.onParametersChanged(new_x, new_y, new_width, new_height);
+}
+
+void CSizer::setWidgetCreationFlags(const int flags) {
+
+	this->flags = flags;
 }
 
 bool CSizer::isNullBasic() const {
