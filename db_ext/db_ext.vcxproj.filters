@@ -33,6 +33,9 @@
     <ClCompile Include="DependentTableUpdater.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="FilteringManager.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbTable.h">
@@ -49,6 +52,12 @@
     </ClInclude>
     <ClInclude Include="DependentTableUpdater.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="FilteringManager.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="IBinder.h">
+      <Filter>interfaces</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

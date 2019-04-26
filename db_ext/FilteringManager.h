@@ -1,3 +1,6 @@
+#include <vector>
+#include <memory>
+#include <basic/ImmutableString.h>
 #include <db_ext/IBinder.h>
 
 class CQueryModifier final {
@@ -7,6 +10,7 @@ class CQueryModifier final {
 public:
 	CQueryModifier(ImmutableString<char> query);
 
+	void getQuery() const;
 	inline size_t getExprCount() const;
 	void addExprToWhereStmt(ImmutableString<char> expr);
 	void setExpr(const size_t expr_index, ImmutableString<char> expr);
@@ -17,6 +21,8 @@ public:
 	void setOrdering(ImmutableString<char> expr);
 	void removeOrdering();
 };
+
+class CDbTable;
 
 class CFilteringManager {
 	enum {
@@ -53,7 +59,7 @@ public:
 	void disableExpr(int id_expr);
 	void resetFilterToDefault();
 
-	void setDefaultOrderingValue(ImmutableString expression);
+	void setDefaultOrderingValue(ImmutableString<char> expression);
 	void setOrderingField(const bool asc);
 	void resetOrderingToDefault();
 

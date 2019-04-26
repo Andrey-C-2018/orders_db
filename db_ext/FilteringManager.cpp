@@ -1,6 +1,8 @@
+#include "FilteringManager.h"
+
 CFilteringManager::CFilteringManager(std::shared_ptr<CDbTable> db_table_, \
-					ImmutableString<char> query_text) : \
-		db_table(db_table_), query_modifier(query_text) { }
+										ImmutableString<char> query_text) : \
+							db_table(db_table_), query_modifier(query_text) { }
 
 void CFilteringManager::setDefaultFilterExpr(ImmutableString<char> expression) {
 
@@ -14,7 +16,7 @@ int CFilteringManager::addExpr(ImmutableString<char> expression, \
 		query_modifier.addExprToWhereStmt(expression);
 
 		FilteringItem item;
-		item.expression = expression;
+		item.expression = expression.str;
 		item.index = query_modifier.getExprCount() - 1;
 		item.disabled = false;
 
@@ -46,7 +48,7 @@ void CFilteringManager::resetFilterToDefault() {
 
 }
 
-void CFilteringManager::setDefaultOrderingValue(ImmutableString expression) {
+void CFilteringManager::setDefaultOrderingValue(ImmutableString<char> expression) {
 
 }
 
