@@ -4,10 +4,22 @@
 #include "../IDbResultSet.h"
 #include "SQLiteCommon.h"
 
+class SQLiteResultSetException : public SQLiteException {
+public:
+	SQLiteResultSetException(const int err_code, const Tchar *err_descr);
+	SQLiteResultSetException(sqlite3 *db);
+
+	SQLiteResultSetException(const SQLiteResultSetException &obj);
+	SQLiteResultSetException(SQLiteResultSetException &&obj) = default;
+
+	~SQLiteResultSetException();
+};
+
 class SQLiteResultSet : public IDbResultSet {
 	size_t fields_count, records_count;
 	std::shared_ptr<SQLiteStmtHandle> stmt_handle;
-	mutable size_t curr_record;
+	mutable bool eof;
+	mutable size_t fetched_record_count;
 
 public:
 	SQLiteResultSet(std::shared_ptr<SQLiteStmtHandle> stmt_handle);

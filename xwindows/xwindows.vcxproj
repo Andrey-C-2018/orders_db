@@ -154,7 +154,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="HorizontalSizer.cpp" />
     <ClCompile Include="platform_specific.cpp" />
+    <ClCompile Include="Sizer.cpp" />
+    <ClCompile Include="VerticalSizer.cpp" />
     <ClCompile Include="XApp.cpp" />
     <ClCompile Include="XButton.cpp" />
     <ClCompile Include="XComboBox.cpp" />
@@ -169,7 +172,10 @@
     <ClCompile Include="XWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HorizontalSizer.h" />
     <ClInclude Include="platform_specific.h" />
+    <ClInclude Include="Sizer.h" />
+    <ClInclude Include="VerticalSizer.h" />
     <ClInclude Include="XApp.h" />
     <ClInclude Include="XButton.h" />
     <ClInclude Include="XComboBox.h" />

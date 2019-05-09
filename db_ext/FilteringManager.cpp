@@ -2,12 +2,12 @@
 #include <db/IDbBindingTarget.h>
 #include "FilteringManager.h"
 
-CFilteringManager::CFilteringManager(ImmutableString<char> query_text_) : \
-									query_text(query_text_.str), \
-									filtering_changed(false) { }
+CFilteringManager::CFilteringManager() : query_text(), \
+									filtering_changed(false), \
+									switched_expr_count(0) { }
 
 int CFilteringManager::addExpr(ImmutableString<char> expression, \
-								std::unique_ptr<IBinder> binder) {
+								std::shared_ptr<IBinder> binder) {
 
 	assert(!expression.isNull());
 	assert(binder);
@@ -23,20 +23,21 @@ int CFilteringManager::addExpr(ImmutableString<char> expression, \
 	item.switched = false;
 	item.first_param = -1;
 
-	item.binders.emplace_back(std::move(binder));
-	filtering_items.emplace_back(item);
+	item.binders.push_back(binder);
+	filtering_items.emplace_back(std::move(item));
 		
 	return item.id;
 }
 
-void CFilteringManager::addBinderToExpr(const int id_expr, std::unique_ptr<IBinder> binder) {
+void CFilteringManager::addBinderToExpr(const int id_expr, \
+										std::shared_ptr<IBinder> binder) {
 
 	assert(binder);
 
 	auto p = findFilteringItem(id_expr);
 	assert(isFound(p, id_expr));
 
-	p->binders.emplace_back(std::move(binder));
+	p->binders.push_back(binder);
 }
 
 void CFilteringManager::enableExpr(int id_expr) {
@@ -44,25 +45,15 @@ void CFilteringManager::enableExpr(int id_expr) {
 	auto p = findFilteringItem(id_expr);
 	assert(isFound(p, id_expr));
 
-	bool prev_switched = p->switched;
-	if(!p->switched && switched_expr_count < MAX_SWITCHED_EXPR_COUNT) {
-		
-		p->expression.insert(0, "? OR (");
-		p->expression += ')';
+	InternalEnable(p);
+	filtering_changed = true;
+}
 
-		p->switched = true;
-		++switched_expr_count;
-	}
-	
-	if (!isExprAddedToQuery(*p) && \
-		(prev_switched != p->switched || (!p->switched && !p->enabled))) {
-	
-		auto pos = addExprToWhereStmt(query_text, p->expression);
-		p->pos_begin = pos.first;
-		p->pos_end = pos.second;
-	}
+void CFilteringManager::enableAll() {
 
-	p->enabled = true;
+	for (auto p = filtering_items.begin(); p != filtering_items.end(); ++p) 
+		InternalEnable(p);
+
 	filtering_changed = true;
 }
 
@@ -71,14 +62,15 @@ void CFilteringManager::disableExpr(int id_expr) {
 	auto p = findFilteringItem(id_expr);
 	assert(isFound(p, id_expr));
 
-	if (isExprAddedToQuery(*p) && !p->switched && p->enabled) {
+	InternalDisable(p);
+	filtering_changed = true;
+}
 
-		query_text.erase(p->pos_begin, p->pos_end - p->pos_begin);
-		p->pos_begin = 0;
-		p->pos_end = 0;
-	}
+void CFilteringManager::disableAll() {
 
-	p->enabled = false;
+	for (auto p = filtering_items.begin(); p != filtering_items.end(); ++p)
+		InternalDisable(p);
+
 	filtering_changed = true;
 }
 

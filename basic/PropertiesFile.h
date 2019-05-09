@@ -21,9 +21,9 @@ class CPropertiesFile{
 	Tstring buffer;
 public:
 	CPropertiesFile();
-	void Open(const char *path);
-	void SetProperty(const Tchar *name, const Tchar *value);
-	const Tchar *GetProperty(const Tchar *name);
+	CPropertiesFile(const char *path);
+	void open(const char *path);
+	const Tchar *getStringProperty(const Tchar *name);
 	virtual ~CPropertiesFile();
 };
 

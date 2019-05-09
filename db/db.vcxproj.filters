@@ -60,6 +60,12 @@
     <ClCompile Include="SQLite\SQLiteStatement.cpp">
       <Filter>SQLite</Filter>
     </ClCompile>
+    <ClCompile Include="SQLite\SQLiteField.cpp">
+      <Filter>SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLite\SQLiteResultSetMetadata.cpp">
+      <Filter>SQLite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IDbResultSet.h">
@@ -120,6 +126,9 @@
       <Filter>SQLite</Filter>
     </ClInclude>
     <ClInclude Include="SQLite\SQLiteStatement.h">
+      <Filter>SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLite\SQLiteField.h">
       <Filter>SQLite</Filter>
     </ClInclude>
   </ItemGroup>

@@ -14,7 +14,12 @@ CPropertiesFileException::~CPropertiesFileException() throw() { }
 
 CPropertiesFile::CPropertiesFile(){ }
 
-void CPropertiesFile::Open(const char *path) {
+CPropertiesFile::CPropertiesFile(const char *path) {
+
+	open(path);
+}
+
+void CPropertiesFile::open(const char *path) {
 
 	f.open(path, std::ios::in);
 	if (!f.is_open())
@@ -25,9 +30,7 @@ void CPropertiesFile::Open(const char *path) {
 	f.imbue(loc);
 }
 
-void CPropertiesFile::SetProperty(const Tchar *name, const Tchar *value){ }
-
-const Tchar *CPropertiesFile::GetProperty(const Tchar *name){
+const Tchar *CPropertiesFile::getStringProperty(const Tchar *name){
 
 	if(!f.is_open())
 		throw CPropertiesFileException(CPropertiesFileException::E_FILE_NOT_OPENED, \

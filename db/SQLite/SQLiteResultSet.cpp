@@ -1,10 +1,24 @@
 #include "SQLiteResultSet.h"
 #include "../IDbBindingTarget.h"
 
+SQLiteResultSetException::SQLiteResultSetException(const int err_code, \
+									const Tchar *err_descr) : \
+									SQLiteException(err_code, err_descr) { }
+
+SQLiteResultSetException::SQLiteResultSetException(sqlite3 *conn) : \
+													SQLiteException(conn) { }
+
+SQLiteResultSetException::SQLiteResultSetException(const SQLiteResultSetException &obj) : \
+													SQLiteException(obj) { }
+
+SQLiteResultSetException::~SQLiteResultSetException() { }
+
+//***************************************************************
+
 SQLiteResultSet::SQLiteResultSet(std::shared_ptr<SQLiteStmtHandle> stmt_handle_) : \
 								fields_count(0), records_count(0), \
 								stmt_handle(stmt_handle), \
-								curr_record((size_t)-1) {
+								eof(false), fetched_record_count(0) {
 	assert(stmt_handle_);
 
 	fields_count = sqlite3_column_count(stmt_handle->stmt);
@@ -15,12 +29,14 @@ SQLiteResultSet::SQLiteResultSet(SQLiteResultSet &&obj) : \
 								fields_count(obj.fields_count), \
 								records_count(obj.records_count), \
 								stmt_handle(std::move(obj.stmt_handle)), \
-								curr_record(obj.curr_record) {
+								eof(obj.eof), \
+								fetched_record_count(obj.fetched_record_count) {
 
 	assert(fields_count || !records_count);
 	obj.fields_count = 0;
 	obj.records_count = 0;
-	obj.curr_record = (size_t)-1;
+	obj.eof = false;
+	obj.fetched_record_count = 0;
 }
 
 SQLiteResultSet &SQLiteResultSet::operator=(SQLiteResultSet &&obj) {
@@ -30,11 +46,13 @@ SQLiteResultSet &SQLiteResultSet::operator=(SQLiteResultSet &&obj) {
 	fields_count = obj.fields_count;
 	records_count = obj.records_count;
 	stmt_handle = std::move(obj.stmt_handle);
-	curr_record = obj.curr_record;
+	eof = obj.eof;
+	fetched_record_count = obj.fetched_record_count;
 	
 	obj.records_count = 0;
 	obj.fields_count = 0;
-	obj.curr_record = (size_t)-1;
+	obj.eof = false;
+	obj.fetched_record_count = 0;
 	
 	return *this;
 }
@@ -57,39 +75,53 @@ size_t SQLiteResultSet::getRecordsCount() const {
 void SQLiteResultSet::gotoRecord(const size_t record) const {
 
 	assert(record < records_count);
-	if (curr_record == record) return;
-
 	assert(stmt_handle->stmt);
-	// TODO: implement
 
-	curr_record = record;
+	if (!eof && record + 1 == fetched_record_count) return;
+	if (eof || record + 1 < fetched_record_count) {
+		sqlite3_reset(stmt_handle->stmt);
+		fetched_record_count = 0;
+		eof = false;
+	}
+
+	int rc;
+	bool Key = !eof;
+	while (Key && (rc = sqlite3_step(stmt_handle->stmt)) != SQLITE_DONE) {
+		Key = (rc != SQLITE_ERROR) && (fetched_record_count < record);
+		fetched_record_count++;
+	}
+
+	if (Key && rc == SQLITE_ERROR)
+		throw SQLiteResultSetException(stmt_handle->conn);
+	
+	eof = (rc == SQLITE_DONE);
 }
 
 int SQLiteResultSet::getInt(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(curr_record != (size_t)-1);
+	assert(fetched_record_count != 0);
 	return sqlite3_column_int(stmt_handle->stmt, (int)field);
 }
 
 const char *SQLiteResultSet::getString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(curr_record != (size_t)-1);
+	assert(fetched_record_count != 0);
 	return (const char *)sqlite3_column_text(stmt_handle->stmt, (int)field);
 }
 
 const wchar_t *SQLiteResultSet::getWString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(curr_record != (size_t)-1);
+	assert(fetched_record_count != 0);
 	return (const wchar_t *)sqlite3_column_text16(stmt_handle->stmt, (int)field);
 }
 
 ImmutableString<char> SQLiteResultSet::getImmutableString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(curr_record != (size_t)-1);
+	assert(fetched_record_count != 0);
 
 	const char *value = (const char *)sqlite3_column_text(stmt_handle->stmt, (int)field);
 	size_t len = strlen(value);
@@ -100,7 +132,7 @@ ImmutableString<char> SQLiteResultSet::getImmutableString(const size_t field) co
 ImmutableString<wchar_t> SQLiteResultSet::getImmutableWString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(curr_record != (size_t)-1);
+	assert(fetched_record_count != 0);
 
 	const wchar_t *value = (const wchar_t *)sqlite3_column_text16(stmt_handle->stmt, (int)field);
 	size_t len = wcslen(value);
@@ -111,7 +143,7 @@ ImmutableString<wchar_t> SQLiteResultSet::getImmutableWString(const size_t field
 CDate SQLiteResultSet::getDate(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(curr_record != (size_t)-1);
+	assert(fetched_record_count != 0);
 	const char *value = (const char *)sqlite3_column_text(stmt_handle->stmt, (int)field);
 
 	return CDate(value, CDate::SQL_FORMAT);

@@ -11,6 +11,7 @@ class CFilteringManager {
 
 	std::string query_text;
 	bool filtering_changed;
+	size_t switched_expr_count;
 
 	struct FilteringItem {
 		int id;
@@ -18,7 +19,7 @@ class CFilteringManager {
 		size_t pos_begin, pos_end;
 		bool enabled;
 		bool switched;
-		std::vector<std::unique_ptr<IBinder> > binders;
+		std::vector<std::shared_ptr<IBinder> > binders;
 		int first_param;
 	};
 
@@ -39,10 +40,9 @@ class CFilteringManager {
 	};
 
 	std::vector<FilteringItem> filtering_items;
-	size_t switched_expr_count;
-
-	auto findFilteringItem(const int id_expr) const;
-	auto findFilteringItem(const int id_expr);
+	
+	inline auto findFilteringItem(const int id_expr) const;
+	inline auto findFilteringItem(const int id_expr);
 	inline bool isFound(std::vector<FilteringItem>::const_iterator, \
 						const int id_expr) const;
 	inline bool isFound(std::vector<FilteringItem>::iterator, \
@@ -52,11 +52,18 @@ class CFilteringManager {
 								const std::string &expression);
 	inline bool isExprAddedToQuery(const FilteringItem &item) const;
 
+	inline void InternalEnable(std::vector<FilteringItem>::iterator p);
+	inline void InternalDisable(std::vector<FilteringItem>::iterator p);
 public:
-	CFilteringManager(ImmutableString<char> query_text);
+	CFilteringManager();
+	CFilteringManager(const CFilteringManager &obj) = default;
+	CFilteringManager(CFilteringManager &&obj) = default;
+	CFilteringManager &operator=(const CFilteringManager &obj) = default;
+	CFilteringManager &operator=(CFilteringManager &&obj) = default;
 
-	int addExpr(ImmutableString<char> expression, std::unique_ptr<IBinder> binder);
-	void addBinderToExpr(const int id_expr, std::unique_ptr<IBinder> binder);
+	int addExpr(ImmutableString<char> expression, \
+				std::shared_ptr<IBinder> binder);
+	void addBinderToExpr(const int id_expr, std::shared_ptr<IBinder> binder);
 
 	void enableExpr(int id_expr);
 	void enableAll();
@@ -101,8 +108,10 @@ std::pair<size_t, size_t> \
 	std::pair<size_t, size_t> pos;
 	pos.first = text.size();
 
-	text += ", ";
+	if(pos.first) text += " AND ";
+	text += '(';
 	text += expression;
+	text += ')';
 	pos.second = text.size();
 
 	return pos;
@@ -116,4 +125,44 @@ bool CFilteringManager::isExprAddedToQuery(const FilteringItem &item) const {
 ImmutableString<char> CFilteringManager::getModifiedQuery() const {
 
 	return ImmutableString<char>(query_text.c_str(), query_text.size());
+}
+
+void CFilteringManager::InternalEnable(std::vector<FilteringItem>::iterator p) {
+
+	bool prev_switched = p->switched;
+	if (!p->switched && switched_expr_count < MAX_SWITCHED_EXPR_COUNT) {
+		const char str_switch[] = "? OR (";
+
+		if (p->binders.size() > 1) {
+			p->expression.insert(0, str_switch);
+			p->expression += ')';
+		}
+		else
+			p->expression.insert(0, str_switch, sizeof(str_switch) - 2);
+
+		p->switched = true;
+		++switched_expr_count;
+	}
+
+	if (!isExprAddedToQuery(*p) && \
+		(prev_switched != p->switched || (!p->switched && !p->enabled))) {
+
+		auto pos = addExprToWhereStmt(query_text, p->expression);
+		p->pos_begin = pos.first;
+		p->pos_end = pos.second;
+	}
+
+	p->enabled = true;
+}
+
+void CFilteringManager::InternalDisable(std::vector<FilteringItem>::iterator p) {
+
+	if (isExprAddedToQuery(*p) && !p->switched && p->enabled) {
+
+		query_text.erase(p->pos_begin, p->pos_end - p->pos_begin);
+		p->pos_begin = 0;
+		p->pos_end = 0;
+	}
+
+	p->enabled = false;
 }

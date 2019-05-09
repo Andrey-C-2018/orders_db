@@ -29,7 +29,9 @@
     <ClCompile Include="MySQL\MySQLVariant.cpp" />
     <ClCompile Include="SQLite\SQLiteCommon.cpp" />
     <ClCompile Include="SQLite\SQLiteConnection.cpp" />
+    <ClCompile Include="SQLite\SQLiteField.cpp" />
     <ClCompile Include="SQLite\SQLiteResultSet.cpp" />
+    <ClCompile Include="SQLite\SQLiteResultSetMetadata.cpp" />
     <ClCompile Include="SQLite\SQLiteStatement.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -50,6 +52,7 @@
     <ClInclude Include="MySQL\MySQLVariant.h" />
     <ClInclude Include="SQLite\SQLiteCommon.h" />
     <ClInclude Include="SQLite\SQLiteConnection.h" />
+    <ClInclude Include="SQLite\SQLiteField.h" />
     <ClInclude Include="SQLite\SQLiteResultSet.h" />
     <ClInclude Include="SQLite\SQLiteResultSetMetadata.h" />
     <ClInclude Include="SQLite\SQLiteStatement.h" />

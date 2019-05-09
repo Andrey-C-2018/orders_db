@@ -3,8 +3,8 @@
 #include <xwindows/XEdit.h>
 #include <xwindows/XLabel.h>
 #include <xwindows/XComboBox.h>
-#include "VerticalSizer.h"
-#include "HorizontalSizer.h"
+#include <xwindows/VerticalSizer.h>
+#include <xwindows/HorizontalSizer.h>
 
 CMyFrame::CMyFrame(const Tchar *class_name,\
 					 const Tchar *label, const int X, const int Y,\

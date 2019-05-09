@@ -25,6 +25,7 @@
     <ClInclude Include="FileSystem.h" />
     <ClInclude Include="ImmutableString.h" />
     <ClInclude Include="Process.h" />
+    <ClInclude Include="PropertiesFile.h" />
     <ClInclude Include="TextConv.h" />
     <ClInclude Include="tstream.h" />
     <ClInclude Include="tstring.h" />
@@ -34,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="PropertiesFile.cpp" />
     <ClCompile Include="win\FileSystemImpl.cpp" />
     <ClCompile Include="win\ProcessImpl.cpp" />
   </ItemGroup>

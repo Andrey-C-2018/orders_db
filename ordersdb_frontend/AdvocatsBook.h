@@ -1,42 +1,31 @@
+#include <basic/PropertiesFile.h>
+#include <db_ext/FilteringManager.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
 
-class CValidatedEdit;
+class CDbComboBox;
 class CDbGrid;
 
 class CAdvocatsBook : public XWidget {
+	enum Defaults {
+		DEF_GUI_ROW_HEIGHT = 40
+	};
+
+	CPropertiesFile props;
+	std::shared_ptr<IDbConnection> conn;
+	std::shared_ptr<CDbTable> db_table;
+	CFilteringManager filtering_manager;
+
 	CDbComboBox *flt_advocats;
-	CValidatedEdit *flt_bdate;
-	CDbComboBox *flt_district;
-	CValidatedEdit *flt_license_no;
-	CValidatedEdit *flt_license_date;
-	CDbComboBox *flt_examiner;
-	CValidatedEdit *flt_post_index;
-	XEdit *flt_address;
-	CValidatedEdit *flt_tel;
-	CValidatedEdit *flt_email;
-	XComboBox *flt_entr_type;
-	XEdit *flt_entr_name;
 
 	XButton *apply_filter, *ordering, *add, *remove, *upload;
 	CDbGrid *grid;
-	CDbNavigator *db_navigator;
 
-	struct FilteringItem {
-		std::string expression;
-		IFilteringWidgetValueAdapter *value_holder;
-		std::shared_ptr<IDbField> value_binder;
-	};
-
-	CSQLQueryFilter filter;
-	std::vector<FilteringItem> filtering_items;
-	void matchWidgetToFilter(XWidget *widget, const char *expression);
 	void OnFilteringWidgetChanged(XCommandEvent *eve);
 
-	std::shared_ptr<IDbConnection> createConnection(std::shared_ptr<CProperties> props);
-	std::shared_ptr<CDbTable> createDbTable();
+	std::shared_ptr<IDbConnection> createConnection(const CPropertiesFile &props);
+	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 	void createCellWidgetsAndAttachToGrid(CEditableGrid *grid);
-	CVerticalSizer createFilterWidgetsAndPackToSizer();
 
 	void OnFilterButtonClick(XCommandEvent *eve);
 	void OnOrderingButtonClick(XCommandEvent *eve);
