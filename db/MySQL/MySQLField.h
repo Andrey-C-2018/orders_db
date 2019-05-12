@@ -19,9 +19,6 @@ public:
 class CMySQLField : public IDbField{
 	std::shared_ptr<MYSQL_RES> metadata;
 
-	mutable std::vector<char> field_name, table_name;
-	mutable std::vector<wchar_t> field_name_w, table_name_w;
-
 	bool is_primary_key;
 	size_t max_size;
 
@@ -39,11 +36,11 @@ public:
 	CMySQLField &operator=(const CMySQLField &obj) = delete;
 	CMySQLField &operator=(CMySQLField &&obj) = default;
 
-	ImmutableString<char> getFieldName() const override;
-	ImmutableString<wchar_t> getFieldNameW() const override;
+	std::string getFieldName() const override;
+	std::wstring getFieldNameW() const override;
 	size_t getFieldMaxLength() const override;
-	ImmutableString<char> getTableName() const override;
-	ImmutableString<wchar_t> getTableNameW() const override;
+	std::string getTableName() const override;
+	std::wstring getTableNameW() const override;
 	bool isPrimaryKey() const override;
 	
 	virtual ~CMySQLField();
@@ -113,7 +110,6 @@ public:
 };
 
 class CMySQLStringField : public CMySQLField {
-	wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1];
 public:
 	CMySQLStringField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
 

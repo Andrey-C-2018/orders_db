@@ -1,5 +1,6 @@
 #include <iostream>
-#include <db/MySQL/MySQLConnection.h>
+//#include <db/MySQL/MySQLConnection.h>
+#include <db/SQLite/SQLiteConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
 #include <db/IDbResultSetMetadata.h>
@@ -7,12 +8,13 @@
 #include <basic/Exception.h>
 
 int main() {
-	CMySQLConnection conn;
+	SQLiteConnection conn;
 
 	setlocale(LC_ALL, "ukr_ukr.1251");
 	//setlocale(LC_ALL, "uk_UA.UTF-8");
 	try {
-		conn.Connect("127.0.0.1", 3310, "orders_stat_user", "123", "orders");
+		//conn.Connect("127.0.0.1", 3310, "orders_stat_user", "123", "orders");
+		conn.Connect("c:\\#projects\\test", 0, nullptr, nullptr, "test");
 
 		auto stmt = conn.PrepareQuery("SELECT t.id_type, t.type_name, a.* FROM orders a INNER JOIN order_types t ON a.id_order_type = t.id_type WHERE id = 858");
 		auto m = stmt->getResultSetMetadata();
@@ -21,8 +23,8 @@ int main() {
 		for (size_t i = 0; i < fields_count; ++i) {
 			auto field = m->getField(i);
 			
-			std::cout << field->getFieldName().str << ' ';
-			std::cout << field->getTableName().str << ' ';
+			std::cout << field->getFieldName() << ' ';
+			std::cout << field->getTableName() << ' ';
 			std::cout << field->getFieldMaxLength() << ' ';
 			std::cout << field->isPrimaryKey() << ' '<< std::endl;
 		}

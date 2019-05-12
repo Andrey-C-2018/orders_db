@@ -6,11 +6,11 @@ struct IDbResultSet;
 struct IDbBindingTarget;
 
 struct IDbField {
-	virtual ImmutableString<char> getFieldName() const = 0;
-	virtual ImmutableString<wchar_t> getFieldNameW() const = 0;
+	virtual std::string getFieldName() const = 0;
+	virtual std::wstring getFieldNameW() const = 0;
 	virtual size_t getFieldMaxLength() const = 0;
-	virtual ImmutableString<char> getTableName() const = 0;
-	virtual ImmutableString<wchar_t> getTableNameW() const = 0;
+	virtual std::string getTableName() const = 0;
+	virtual std::wstring getTableNameW() const = 0;
 	virtual bool isPrimaryKey() const = 0;
 
 	virtual const char *getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const = 0;

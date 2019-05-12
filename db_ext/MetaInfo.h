@@ -13,7 +13,8 @@ public:
 	enum {
 		E_FOREIGN_KEYS = 1, \
 		E_TABLE = 2, \
-		E_FIELD_EXISTS = 3
+		E_FIELD_EXISTS = 3, \
+		E_FIELD_DOES_NOT_EXIST = 4
 	};
 	CMetaInfoException(const int err_code, const Tchar *err_descr);
 	CMetaInfoException(const CMetaInfoException &obj);
@@ -145,6 +146,7 @@ public:
 	inline std::shared_ptr<const IDbField> getField(const size_t field) const;
 	inline ImmutableString<char> getFieldName(const size_t field) const;
 	inline ImmutableString<wchar_t> getFieldNameW(const size_t field) const;
+	inline size_t getFieldIndexByName(const char *field_name) const;
 	inline ImmutableString<char> getTableName(const size_t field) const;
 	inline ImmutableString<wchar_t> getTableNameW(const size_t field) const;
 	inline size_t getFieldSize(const size_t field) const noexcept;
@@ -194,6 +196,21 @@ ImmutableString<wchar_t> CMetaInfo::getFieldNameW(const size_t field) const {
 	if (fields[field].field_name_w.isNull())
 		fields[field].field_name_w = fields[field].field->getFieldNameW();
 	return fields[field].field_name_w;
+}
+
+size_t CMetaInfo::getFieldIndexByName(const char *field_name) const {
+
+	assert(field_name);
+	ConstIndexIterator p_field = findFieldRecord(field_name);
+	if (!isFieldRecordFound(p_field, field_name)) {
+		CMetaInfoException e(CMetaInfoException::E_FIELD_DOES_NOT_EXIST, \
+							_T("the field '"));
+
+		e << field_name << _T("' does not exist");
+		throw e;
+	}
+
+	return *p_field;
 }
 
 size_t CMetaInfo::getFieldSize(const size_t field) const noexcept {

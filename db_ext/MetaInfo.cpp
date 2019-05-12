@@ -120,24 +120,24 @@ void CMetaInfo::addKeyIndex(const id_type id_table, const id_type id_field) {
 
 void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field_index) {
 	CFieldRecord rec;
-	ImmutableString<char> new_field_name = field->getFieldName();
+	std::string new_field_name = field->getFieldName();
 
 	assert(new_field_index <= fields.size());
 
-	ConstIndexIterator p_field = findFieldRecord(new_field_name.str);
-	if (isFieldRecordFound(p_field, new_field_name.str)) {
+	ConstIndexIterator p_field = findFieldRecord(new_field_name.c_str());
+	if (isFieldRecordFound(p_field, new_field_name.c_str())) {
 		CMetaInfoException e(CMetaInfoException::E_FIELD_EXISTS, \
 							_T("the field '"));
 
 		e << fields[*p_field].field_name.str << _T("' is already added. Table: '");
-		e << field->getTableName().str << _T("'");
+		e << field->getTableName() << _T("'");
 		throw e;
 	}
 
 	size_t fields_old_count = fields.size();
 	rec.id = (id_type)fields_old_count;
 	rec.field = field;
-	rec.field_name = new_field_name;
+	rec.field_name = std::move(new_field_name);
 	rec.field_size = field->getFieldMaxLength();
 			
 	ImmutableString<char> table_name = field->getTableName();

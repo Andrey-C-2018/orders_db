@@ -36,6 +36,7 @@ public:
 	inline std::shared_ptr<const IDbResultSet> getResultSet() const;
 	inline void setPrimaryTableForQuery(const char *table_name);
 	inline void markFieldAsPrimaryKey(const size_t field);
+	inline void markFieldAsPrimaryKey(const char *field_name);
 
 	bool empty() const override;
 	size_t GetFieldsCount() const override;
@@ -94,6 +95,11 @@ void CDbTable::setPrimaryTableForQuery(const char *table_name) {
 void CDbTable::markFieldAsPrimaryKey(const size_t field) {
 
 	query.markFieldAsPrimaryKey(field);
+}
+
+void CDbTable::markFieldAsPrimaryKey(const char *field_name) {
+	
+	size_t field = query.getMetaInfo().getFieldIndexByName(field_name);
 }
 
 void CDbTable::executeScalarStmt(std::shared_ptr<IDbStatement> stmt) {

@@ -4,28 +4,53 @@
 #include "../IDbBindingTarget.h"
 #include "SQLiteResultSet.h"
 
-class SQLiteField : public IDbField{
+class SQLiteFieldException : public SQLiteException {
 public:
-	SQLiteField(std::shared_ptr<SQLiteStmtHandle> metadata_, const size_t field_);
+	SQLiteFieldException(const int err_code, const Tchar *err_descr);
+	SQLiteFieldException(sqlite3 *db);
 
+	SQLiteFieldException(const SQLiteFieldException &obj);
+	SQLiteFieldException(SQLiteFieldException &&obj) = default;
+
+	~SQLiteFieldException();
+};
+
+class SQLiteField : public IDbField{
+	std::shared_ptr<SQLiteStmtHandle> stmt_handle;
+	size_t max_length;
+
+	static inline size_t getFieldMaxLengthByType(const char *field_type);
+protected:
+	const size_t field;
+
+public:
+	SQLiteField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+				const size_t field_, const char *field_type);
+	SQLiteField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+				const size_t field_, const char *field_type, const size_t def_max_length);
+	SQLiteField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+				const size_t field_, const size_t def_max_length);
+	
 	SQLiteField(const SQLiteField &obj) = delete;
 	SQLiteField(SQLiteField &&obj) = default;
 	SQLiteField &operator=(const SQLiteField &obj) = delete;
 	SQLiteField &operator=(SQLiteField &&obj) = default;
 
-	ImmutableString<char> getFieldName() const override;
-	ImmutableString<wchar_t> getFieldNameW() const override;
+	std::string getFieldName() const override;
+	std::wstring getFieldNameW() const override;
 	size_t getFieldMaxLength() const override;
-	ImmutableString<char> getTableName() const override;
-	ImmutableString<wchar_t> getTableNameW() const override;
+	std::string getTableName() const override;
+	std::wstring getTableNameW() const override;
 	bool isPrimaryKey() const override;
 	
 	virtual ~SQLiteField();
 };
 
 class SQLiteIntegerField : public SQLiteField {
+	mutable wchar_t buffer[getDigitsCountOfType<int>() + 1];
 public:
-	SQLiteIntegerField(std::shared_ptr<SQLiteStmtHandle> metadata_, const size_t field_);
+	SQLiteIntegerField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+						const size_t field_, const char *field_type);
 
 	SQLiteIntegerField(const SQLiteIntegerField &obj) = delete;
 	SQLiteIntegerField(SQLiteIntegerField &&obj) = default;
@@ -54,8 +79,9 @@ public:
 };
 
 class SQLiteDateField : public SQLiteField {
+	mutable wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1];
 public:
-	SQLiteDateField(std::shared_ptr<SQLiteStmtHandle> metadata_, const size_t field_);
+	SQLiteDateField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, const size_t field_);
 
 	SQLiteDateField(const SQLiteDateField &obj) = delete;
 	SQLiteDateField(SQLiteDateField &&obj) = default;
@@ -85,7 +111,8 @@ public:
 
 class SQLiteStringField : public SQLiteField {
 public:
-	SQLiteStringField(std::shared_ptr<SQLiteStmtHandle> metadata_, const size_t field_);
+	SQLiteStringField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+						const size_t field_, const char *field_type);
 
 	SQLiteStringField(const SQLiteStringField &obj) = delete;
 	SQLiteStringField(SQLiteStringField &&obj) = default;
@@ -115,3 +142,15 @@ public:
 
 //**************************************************
 
+size_t SQLiteField::getFieldMaxLengthByType(const char *field_type) {
+
+	auto p = strchr(field_type, '(');
+	if (p) {
+		int error = 0;
+		size_t max_length = XConv::ToSizeType(p + 1, error);
+		assert(error == XConv::E_CONV_WRONG_VALUE);
+		return max_length;
+	}
+
+	return (size_t)-1;
+}

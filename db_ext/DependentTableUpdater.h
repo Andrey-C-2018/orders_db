@@ -39,6 +39,7 @@ public:
 	CDependentTableUpdater &operator=(CDependentTableUpdater &&obj) = default;
 
 	inline std::shared_ptr<const IDbResultSet> getMasterResultSet() const { return master_records; }
+	inline const CMetaInfo &getMasterMetaInfo() const { return master_meta_info; }
 	void AddRelation(const char *master_field, const char *dependent_field);
 	void setQueryConstantModifier(ImmutableString<char> modifier);
 	std::shared_ptr<IDbStatement> createDepTableUpdateStmt(const size_t master_record_index);

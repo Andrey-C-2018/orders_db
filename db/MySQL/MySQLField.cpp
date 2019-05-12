@@ -35,31 +35,21 @@ CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
 	is_primary_key = (mysql_field->flags & PRI_KEY_FLAG) > 0;
 }
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
-ImmutableString<char> CMySQLField::getFieldName() const {
+std::string CMySQLField::getFieldName() const {
 
-	if (field_name.empty()) {
-		MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
-		field_name.resize(mysql_field->name_length + 1);
-		strncpy(&field_name[0], mysql_field->name, mysql_field->name_length);
-	}
-	return ImmutableString<char>(&field_name[0], field_name.size() - 1);
+	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+	return std::string(mysql_field->name);
 }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
-ImmutableString<wchar_t> CMySQLField::getFieldNameW() const {
+std::wstring CMySQLField::getFieldNameW() const {
 
-	if (field_name_w.empty()) {
-		MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
-		UTF8_ToUCS16(mysql_field->name, mysql_field->name_length, field_name_w);
-		field_name_w.push_back(0);
-	}
-	return ImmutableString<wchar_t>(&field_name_w[0], field_name_w.size() - 1);
+	std::vector<wchar_t> field_name_w;
+	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+
+	UTF8_ToUCS16(mysql_field->name, mysql_field->name_length, field_name_w);
+	field_name_w.push_back(0);
+	
+	return std::wstring(&field_name_w[0]);
 }
 
 size_t CMySQLField::getFieldMaxLength() const {
@@ -67,31 +57,21 @@ size_t CMySQLField::getFieldMaxLength() const {
 	return max_size;
 }
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
-ImmutableString<char> CMySQLField::getTableName() const {
+std::string CMySQLField::getTableName() const {
 
-	if (table_name.empty()) {
-		MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
-		table_name.resize(mysql_field->table_length + 1);
-		strncpy(&table_name[0], mysql_field->table, mysql_field->table_length);
-	}
-	return ImmutableString<char>(&table_name[0], table_name.size() - 1);
+	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+	return std::string(mysql_field->table);
 }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
-ImmutableString<wchar_t> CMySQLField::getTableNameW() const {
+std::wstring CMySQLField::getTableNameW() const {
 
-	if (table_name_w.empty()) {
-		MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
-		UTF8_ToUCS16(mysql_field->table, mysql_field->table_length, table_name_w);
-		table_name_w.push_back(0);
-	}
-	return ImmutableString<wchar_t>(&table_name_w[0], table_name_w.size() - 1);
+	std::vector<wchar_t> table_name_w;
+	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+
+	UTF8_ToUCS16(mysql_field->table, mysql_field->table_length, table_name_w);
+	table_name_w.push_back(0);
+
+	return std::wstring(&table_name_w[0]);
 }
 
 bool CMySQLField::isPrimaryKey() const {

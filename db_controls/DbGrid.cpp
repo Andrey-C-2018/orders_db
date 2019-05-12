@@ -36,4 +36,10 @@ CDbGrid::CDbGrid(std::shared_ptr<CDbTable> db_table_) : \
 	Init(db_table, LAYOUT_FIELD);
 }
 
+void CDbGrid::SetWidgetForField(const char *field_name, IGridCellWidget *field_widget) {
+
+	size_t field = db_table->getQuery().getMetaInfo().getFieldIndexByName(field_name);
+	CEditableGrid::SetWidgetForField(field, field_widget);
+}
+
 CDbGrid::~CDbGrid(){ }

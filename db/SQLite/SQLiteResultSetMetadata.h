@@ -3,6 +3,13 @@
 #include "../IDbResultSetMetadata.h"
 #include "SQLiteCommon.h"
 
+struct SQLiteFieldMetadata {
+	int id;
+	std::string name;
+	bool is_null;
+	bool is_primary_key;
+};
+
 class SQLiteResultSetMetadata : public IDbResultSetMetadata {
 	std::shared_ptr<SQLiteStmtHandle> stmt_handle;
 	size_t fields_count;

@@ -20,6 +20,11 @@ public:
 							const char *dependent_table_name, \
 							std::shared_ptr<CDbTable> dependent_table);
 	CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
+							const char *field_name_to_display_, \
+							const char *master_table_name, \
+							const char *dependent_table_name, \
+							std::shared_ptr<CDbTable> dependent_table);
+	CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
 							const size_t field_to_display_, \
 							std::shared_ptr<const IDbResultSet> master_records, \
 							std::shared_ptr<const IDbResultSetMetadata> master_metadata, \

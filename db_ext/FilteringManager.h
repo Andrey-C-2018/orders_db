@@ -70,7 +70,7 @@ public:
 	void disableExpr(int id_expr);
 	void disableAll();
 	
-	inline ImmutableString<char> getModifiedQuery() const;
+	inline ImmutableString<char> getSQLWherePart() const;
 	void apply(std::shared_ptr<IDbBindingTarget> parsed_query);
 
 	virtual ~CFilteringManager();
@@ -122,7 +122,7 @@ bool CFilteringManager::isExprAddedToQuery(const FilteringItem &item) const {
 	return item.pos_end && item.pos_begin != item.pos_end;
 }
 
-ImmutableString<char> CFilteringManager::getModifiedQuery() const {
+ImmutableString<char> CFilteringManager::getSQLWherePart() const {
 
 	return ImmutableString<char>(query_text.c_str(), query_text.size());
 }

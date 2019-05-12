@@ -8,7 +8,9 @@ class CDbGrid;
 
 class CAdvocatsBook : public XWidget {
 	enum Defaults {
-		DEF_GUI_ROW_HEIGHT = 40
+		DEF_GUI_ROW_HEIGHT = 40, \
+		DEF_GUI_VERT_GAP = 5, \
+		DEF_GUI_HORZ_GAP = 5
 	};
 
 	CPropertiesFile props;
@@ -18,14 +20,14 @@ class CAdvocatsBook : public XWidget {
 
 	CDbComboBox *flt_advocats;
 
-	XButton *apply_filter, *ordering, *add, *remove, *upload;
+	XButton *btn_apply_filter, *btn_ordering, *btn_add, *btn_remove, *btn_upload;
 	CDbGrid *grid;
 
 	void OnFilteringWidgetChanged(XCommandEvent *eve);
 
 	std::shared_ptr<IDbConnection> createConnection(const CPropertiesFile &props);
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
-	void createCellWidgetsAndAttachToGrid(CEditableGrid *grid);
+	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
 
 	void OnFilterButtonClick(XCommandEvent *eve);
 	void OnOrderingButtonClick(XCommandEvent *eve);

@@ -17,23 +17,41 @@ std::shared_ptr<IDbField> SQLiteResultSetMetadata::getField(const size_t field) 
 
 	assert(field < fields_count);
 	int column_type = sqlite3_column_type(stmt_handle->stmt, (int)field);
-	const char *column_origin = sqlite3_column_origin_name(stmt_handle->stmt, (int)field);
+	const char *column_table = sqlite3_column_table_name(stmt_handle->stmt, (int)field);
+
+	std::string query;
+	sqlite3_stmt *stmt = getTableFieldMetaInfo(stmt_handle->conn, column_table, field, query);
+	if (!stmt) {
+		SQLiteException e(0, _T("Cannot get a meta-info of the column: '"));
+		e << field << "' of the table '" << column_table;
+		throw e;
+	}
 	
-	if (column_type == SQLITE_TEXT) {
-		if (strstr(column_origin, "date"))
+	int rc = sqlite3_step(stmt);
+	assert(rc != SQLITE_ERROR && rc != SQLITE_DONE);
+	assert(!strcmp(getFieldNameFromMetaInfo(stmt), \
+			sqlite3_column_name(stmt_handle->stmt, (int)field)));
+
+	query = (const char *) sqlite3_column_text(stmt, 2);
+	auto column_type_str = query.c_str();
+	
+	sqlite3_finalize(stmt);
+
+	if(column_type == SQLITE_TEXT){
+		if (!strcmp(column_type_str, "DATE")) 
 			return std::make_shared<SQLiteDateField>(stmt_handle, field);
 		else
-			return std::make_shared<SQLiteStringField>(stmt_handle, field);
+			return std::make_shared<SQLiteStringField>(stmt_handle, field, column_type_str);
 	}
 
-	if (column_type == SQLITE_TEXT)
-		return std::make_shared<SQLiteIntegerField>(stmt_handle, field);
+	if (column_type == SQLITE_INTEGER)
+		return std::make_shared<SQLiteIntegerField>(stmt_handle, field, column_type_str);
 
-	XException e(0, _T("No such field type: "));
-	e << column_type << ", column origin: " << column_origin;
+	SQLiteException e(0, _T("No such field type, type ID: "));
+	e << column_type << ", type name: " << column_type_str;
+	e << ", table_name: " << column_table;
 	throw e;
 
-	assert(false);
 	return std::shared_ptr<IDbField>();
 }
 

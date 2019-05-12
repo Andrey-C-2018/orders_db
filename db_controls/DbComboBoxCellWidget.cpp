@@ -8,8 +8,20 @@ CDbComboBoxCellWidget::CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn
 											std::shared_ptr<CDbTable> dependent_table_) : \
 									field_to_display(field_to_display_), \
 									updater(conn, master_table_name, \
-									dependent_table_name, dependent_table_), \
+											dependent_table_name, dependent_table_), \
 									dependent_table(dependent_table_){ }
+
+CDbComboBoxCellWidget::CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
+											const char *field_name_to_display_, \
+											const char *master_table_name, \
+											const char *dependent_table_name, \
+											std::shared_ptr<CDbTable> dependent_table_) : \
+									updater(conn, master_table_name, \
+											dependent_table_name, dependent_table_), \
+									dependent_table(dependent_table_) {
+	
+	this->field_to_display = updater.getMasterMetaInfo().getFieldIndexByName(field_name_to_display_);
+}
 
 CDbComboBoxCellWidget::CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
 											const size_t field_to_display_, \
@@ -19,7 +31,7 @@ CDbComboBoxCellWidget::CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn
 											std::shared_ptr<CDbTable> dependent_table_) : \
 									field_to_display(field_to_display_), \
 									updater(conn, master_records, master_metadata, \
-									dependent_table_name, dependent_table_), \
+											dependent_table_name, dependent_table_), \
 									dependent_table(dependent_table_) { }
 
 void CDbComboBoxCellWidget::CreateCellWidget(XWindow *parent, const int flags, \

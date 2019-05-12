@@ -104,13 +104,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X64_PATH%include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X64_PATH%include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%MYSQL_CONNECTOR_X64_PATH%lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;db.lib;libmysql.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%MYSQL_CONNECTOR_X64_PATH%lib;%SQLITE_CONNECTOR_PATH%x64/Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;date.lib;db.lib;libmysql.lib;libsqlite3.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
