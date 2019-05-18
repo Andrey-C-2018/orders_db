@@ -1,12 +1,15 @@
 #include <basic/PropertiesFile.h>
 #include <db_ext/FilteringManager.h>
+#include <xwindows/XFrame.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
 
+struct IDbConnection;
+class CDbTable;
 class CDbComboBox;
 class CDbGrid;
 
-class CAdvocatsBook : public XWidget {
+class CAdvocatsBook : public XFrame {
 	enum Defaults {
 		DEF_GUI_ROW_HEIGHT = 40, \
 		DEF_GUI_VERT_GAP = 5, \
@@ -34,12 +37,10 @@ class CAdvocatsBook : public XWidget {
 	void OnRemoveButtonClick(XCommandEvent *eve);
 	void OnUploadButtonClick(XCommandEvent *eve);
 public:
-	CAdvocatsBook();
-	
-	void Create(XWindow *parent, const int flags,
-				const Tchar *label, \
-				const int x, const int y, \
-				const int width, const int height) override;
+	CAdvocatsBook(const Tchar *class_name, \
+					const Tchar *label, const int X, const int Y, \
+					const int width, const int height);
+	void DisplayWidgets();
 
 	virtual ~CAdvocatsBook();
 };

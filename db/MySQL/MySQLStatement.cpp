@@ -171,7 +171,7 @@ std::shared_ptr<IDbResultSet> CMySQLStatement::exec() {
 		mysql_stmt_bind_param(stmt.get(), &params_bindings[0]);
 
 	if (mysql_stmt_execute(stmt.get()))
-		throw CMySQLException(stmt.get());
+		throw CMySQLStatementException(stmt.get());
 
 	MYSQL_RES *metadata_ptr = mysql_stmt_result_metadata(stmt.get());
 	if (!metadata_ptr)

@@ -18,11 +18,12 @@ public:
 };
 
 class SQLiteStatement : public IDbStatement {
-	std::shared_ptr<SQLiteStmtHandle> stmt;
+	std::shared_ptr<sqlite3> db;
+	std::shared_ptr<Statement> stmt;
 	size_t params_count;
 
 public:
-	SQLiteStatement(SQLiteStmtHandle stmt_handle);
+	SQLiteStatement(std::shared_ptr<sqlite3> db, const char *query_text);
 
 	SQLiteStatement(const SQLiteStatement &obj) = delete;
 	SQLiteStatement(SQLiteStatement &&obj);

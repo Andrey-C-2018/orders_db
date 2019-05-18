@@ -158,6 +158,7 @@ const wchar_t *CMySQLVariant::GetWString() const{
 	assert(!value_string.size() || (value_string.size() && \
 			value_string.c_str()[value_string.size()] == '\0'));
 
+	if (value_string.empty()) return L"";
 	return UTF8_ToUCS16(value_string, conv_buffer);
 }
 

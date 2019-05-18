@@ -56,6 +56,9 @@ void CMyFrame::InitTestControls(const XRect &rc) {
 	sizer.popNestedSizer();
 
 	sizer.addWidget(new XButton(), 20, 20);
+	main_sizer.popNestedSizer();
+
+	main_sizer.addLastWidget(new XButton());
 }
 
 void CMyFrame::OnSize(XSizeEvent *eve) {

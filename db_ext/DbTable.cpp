@@ -124,22 +124,23 @@ ImmutableString<Tchar> CDbTable::GetCellAsString(const size_t field, const size_
 void CDbTable::SetCell(const size_t field, const size_t record, const Tchar *value){
 
 	result_set->gotoRecord(record);
-	auto update_stmt = query.getUpdateStmt(field, result_set);
+	std::shared_ptr<IDbStatement> update_stmt;
 
 	auto updated_field_ptr = query.getMetaInfo().getField(field);
-	bindValueAsTString(updated_field_ptr, update_stmt, 0, value);
+	update_stmt = query.getUpdateStmt(field, result_set);
+	if (value && value[0] != _T('\0'))
+		bindValueAsTString(updated_field_ptr, update_stmt, 0, value);
+	else
+		update_stmt->bindNull(0);
+	
 	update_stmt->execScalar();
 
-	result_set = query.exec();
-	size_t records_count = result_set->getRecordsCount();
-	event_handlers.OnRecordsCountChanged(records_count);
+	rereadQueryContents();
 }
 
 void CDbTable::reload(){
 
-	result_set = query.exec();
-	size_t records_count = result_set->getRecordsCount();
-	event_handlers.OnRecordsCountChanged(records_count);
+	rereadQueryContents();
 }
 
 CDbTable::~CDbTable(){ }

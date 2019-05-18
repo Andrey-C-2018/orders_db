@@ -16,7 +16,8 @@ public:
 };
 
 class SQLiteField : public IDbField{
-	std::shared_ptr<SQLiteStmtHandle> stmt_handle;
+	std::shared_ptr<sqlite3> db;
+	std::shared_ptr<Statement> stmt;
 	size_t max_length;
 
 	static inline size_t getFieldMaxLengthByType(const char *field_type);
@@ -24,11 +25,14 @@ protected:
 	const size_t field;
 
 public:
-	SQLiteField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+	SQLiteField(std::shared_ptr<sqlite3> db_, \
+				std::shared_ptr<Statement> stmt_, \
 				const size_t field_, const char *field_type);
-	SQLiteField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+	SQLiteField(std::shared_ptr<sqlite3> db_, \
+				std::shared_ptr<Statement> stmt_, \
 				const size_t field_, const char *field_type, const size_t def_max_length);
-	SQLiteField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+	SQLiteField(std::shared_ptr<sqlite3> db_, \
+				std::shared_ptr<Statement> stmt_, \
 				const size_t field_, const size_t def_max_length);
 	
 	SQLiteField(const SQLiteField &obj) = delete;
@@ -49,7 +53,8 @@ public:
 class SQLiteIntegerField : public SQLiteField {
 	mutable wchar_t buffer[getDigitsCountOfType<int>() + 1];
 public:
-	SQLiteIntegerField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+	SQLiteIntegerField(std::shared_ptr<sqlite3> db_, \
+						std::shared_ptr<Statement> stmt_, \
 						const size_t field_, const char *field_type);
 
 	SQLiteIntegerField(const SQLiteIntegerField &obj) = delete;
@@ -81,7 +86,8 @@ public:
 class SQLiteDateField : public SQLiteField {
 	mutable wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1];
 public:
-	SQLiteDateField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, const size_t field_);
+	SQLiteDateField(std::shared_ptr<sqlite3> db_, \
+					std::shared_ptr<Statement> stmt_, const size_t field_);
 
 	SQLiteDateField(const SQLiteDateField &obj) = delete;
 	SQLiteDateField(SQLiteDateField &&obj) = default;
@@ -111,7 +117,8 @@ public:
 
 class SQLiteStringField : public SQLiteField {
 public:
-	SQLiteStringField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+	SQLiteStringField(std::shared_ptr<sqlite3> db_, \
+						std::shared_ptr<Statement> stmt_, \
 						const size_t field_, const char *field_type);
 
 	SQLiteStringField(const SQLiteStringField &obj) = delete;

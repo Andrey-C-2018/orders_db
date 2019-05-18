@@ -18,7 +18,7 @@
     <ClCompile Include="MyApp.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="MyFrame.cpp">
+    <ClCompile Include="AdvocatsBook.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
@@ -26,7 +26,7 @@
     <ClInclude Include="MyApp.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="MyFrame.h">
+    <ClInclude Include="AdvocatsBook.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

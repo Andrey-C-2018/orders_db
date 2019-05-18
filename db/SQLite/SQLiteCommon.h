@@ -3,9 +3,9 @@
 #include "../DbException.h"
 #include <basic/XConv.h>
 
-struct SQLiteStmtHandle{
-	sqlite3 *conn;
+struct Statement {
 	sqlite3_stmt *stmt;
+	sqlite3_stmt *stmt_records_count;
 };
 
 class SQLiteException : public CDbException {
@@ -21,14 +21,28 @@ public:
 	~SQLiteException();
 };
 
+inline sqlite3_stmt *prepareQuery(sqlite3 *db, const char *query_text) {
+
+	assert(db);
+
+	int err = 0;
+	const int QUERY_IS_NULL_TERM_STR = -1;
+	sqlite3_stmt *pStmt = nullptr;
+
+	err = sqlite3_prepare_v2(db, query_text, QUERY_IS_NULL_TERM_STR, &pStmt, NULL);
+	if (err != SQLITE_OK) return nullptr;
+
+	return pStmt;
+}
+
 inline sqlite3_stmt *getTableFieldMetaInfo(sqlite3 *db, const char *table_name, \
-											const size_t field, std::string &buffer) {
+											const char *field_name, std::string &buffer) {
 
 	buffer = "SELECT * FROM pragma_table_info('";
 	buffer += table_name;
-	buffer += "') WHERE cid = ";
-	char conv_buffer[getDigitsCountOfType<size_t>() + 1];
-	buffer += XConv::ToString(field, conv_buffer);
+	buffer += "') WHERE name = '";
+	buffer += field_name;
+	buffer += "'";
 
 	sqlite3_stmt *stmt = nullptr;
 	int rc = sqlite3_prepare_v2(db, buffer.c_str(), -1, &stmt, nullptr);
@@ -37,13 +51,13 @@ inline sqlite3_stmt *getTableFieldMetaInfo(sqlite3 *db, const char *table_name, 
 }
 
 inline sqlite3_stmt *getTableFieldMetaInfo(sqlite3 *db, const wchar_t *table_name, \
-											const size_t field, std::wstring &buffer) {
+											const wchar_t *field_name, std::wstring &buffer) {
 
 	buffer = L"SELECT * FROM pragma_table_info('";
 	buffer += table_name;
-	buffer += L"') WHERE cid = ";
-	wchar_t conv_buffer[getDigitsCountOfType<size_t>() + 1];
-	buffer += XConv::ToString(field, conv_buffer);
+	buffer += L"') WHERE name = '";
+	buffer += field_name;
+	buffer += L"'";
 
 	sqlite3_stmt *stmt = nullptr;
 	int rc = sqlite3_prepare16_v2(db, buffer.c_str(), -1, &stmt, nullptr);
@@ -84,5 +98,5 @@ inline bool canFieldBeNULLFromMetaInfo(sqlite3_stmt *stmt) {
 inline bool isFieldPrimKeyFromMetaInfo(sqlite3_stmt *stmt) {
 
 	assert(stmt);
-	return sqlite3_column_int(stmt, 5) == 1;
+	return sqlite3_column_int(stmt, 5) > 0;
 }

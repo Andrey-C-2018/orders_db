@@ -40,15 +40,13 @@ private:
 	struct CFieldRecord {
 		id_type id;
 		std::shared_ptr<IDbField> field;
-		ImmutableString<char> field_name;
-		mutable ImmutableString<wchar_t> field_name_w;
+		std::string field_name;
+		mutable std::wstring field_name_w;
 		size_t field_size;
 		bool is_primary_key;
 		id_type id_table;
 
-		CFieldRecord() noexcept : id(0), field_name(nullptr, 0), \
-								field_name_w(nullptr, 0), \
-								is_primary_key(true), id_table(-1) { }
+		CFieldRecord() noexcept : id(0), is_primary_key(true), id_table(-1) { }
 		CFieldRecord(const CFieldRecord &obj) = default;
 		CFieldRecord(CFieldRecord &&obj) = default;
 
@@ -60,11 +58,10 @@ private:
 
 	struct CTableRecord {
 		id_type id;
-		ImmutableString<char> table_name;
-		mutable ImmutableString<wchar_t> table_name_w;
+		std::string table_name;
+		mutable std::wstring table_name_w;
 
-		CTableRecord() noexcept : id(-1), table_name(nullptr, 0), \
-								table_name_w(nullptr, 0) { }
+		CTableRecord() noexcept : id(-1) { }
 		CTableRecord(const CTableRecord &obj) = default;
 		CTableRecord(CTableRecord &&obj) = default;
 
@@ -83,7 +80,7 @@ private:
 
 	struct CGetFieldNameByIndex {
 		inline const char *operator()(const std::vector<CFieldRecord> &fields, \
-						const size_t index) const { return fields[index].field_name.str; }
+						const size_t index) const { return fields[index].field_name.c_str(); }
 	};
 	struct CGetFieldIdByIndex {
 		inline id_type operator()(const std::vector<CFieldRecord> &fields, \
@@ -91,7 +88,7 @@ private:
 	};
 	struct CGetTableNameByIndex {
 		inline const char *operator()(const std::vector<CTableRecord> &tables, \
-						const size_t index) const {	return tables[index].table_name.str; }
+						const size_t index) const {	return tables[index].table_name.c_str(); }
 	};
 	struct CGetTableIdByIndex {
 		inline id_type operator()(const std::vector<CTableRecord> &tables, \
@@ -121,7 +118,7 @@ private:
 	inline bool isTableRecordFound(const ConstIndexIterator p_table_id, \
 									const id_type id_table) const;
 
-	id_type addTableRecord(ImmutableString<char> table_name);
+	id_type addTableRecord(std::string &table_name);
 	void addKeyIndex(const id_type id_table, const id_type id_field);
 	void refreshFieldIndexes();
 
@@ -187,15 +184,18 @@ std::shared_ptr<const IDbField> CMetaInfo::getField(const size_t field) const {
 ImmutableString<char> CMetaInfo::getFieldName(const size_t field) const {
 
 	assert(field < fields.size());
-	return fields[field].field_name;
+	return ImmutableString<char>(fields[field].field_name.c_str(), \
+									fields[field].field_name.size());
 }
 
 ImmutableString<wchar_t> CMetaInfo::getFieldNameW(const size_t field) const {
 
 	assert(field < fields.size());
-	if (fields[field].field_name_w.isNull())
+	if (fields[field].field_name_w.empty())
 		fields[field].field_name_w = fields[field].field->getFieldNameW();
-	return fields[field].field_name_w;
+
+	return ImmutableString<wchar_t>(fields[field].field_name_w.c_str(), \
+									fields[field].field_name_w.size());
 }
 
 size_t CMetaInfo::getFieldIndexByName(const char *field_name) const {
@@ -223,16 +223,19 @@ ImmutableString<char> CMetaInfo::getTableName(const size_t field) const {
 
 	assert(field < fields.size());
 	ConstIndexIterator p_table = findTableRecord(fields[field].id_table);
-	return tables[*p_table].table_name;
+	return ImmutableString<char>(tables[*p_table].table_name.c_str(), \
+									tables[*p_table].table_name.size());
 }
 
 ImmutableString<wchar_t> CMetaInfo::getTableNameW(const size_t field) const {
 
 	assert(field < fields.size());
 	ConstIndexIterator p_table = findTableRecord(fields[field].id_table);
-	if (tables[*p_table].table_name_w.isNull())
+	if (tables[*p_table].table_name_w.empty())
 		tables[*p_table].table_name_w = fields[field].field->getTableNameW();
-	return tables[*p_table].table_name_w;
+
+	return ImmutableString<wchar_t>(tables[*p_table].table_name_w.c_str(), \
+									tables[*p_table].table_name_w.size());
 }
 
 bool CMetaInfo::isPrimaryKey(const size_t field) const noexcept {
@@ -343,7 +346,7 @@ bool CMetaInfo::isFieldRecordFound(const ConstIndexIterator p_field_name, \
 									const char *field_name) const {
 
 	return p_field_name != fields_index_name.end() && \
-			!strcmp(fields[*p_field_name].field_name.str, field_name);
+			fields[*p_field_name].field_name == field_name;
 }
 
 bool CMetaInfo::isFieldRecordFound(const ConstIndexIterator p_field_id, \
@@ -357,7 +360,7 @@ bool CMetaInfo::isTableRecordFound(const CMetaInfo::ConstIndexIterator p_table_n
 									const char *table_name) const {
 
 	return p_table_name != tables_index_name.end() && \
-			!strcmp(tables[*p_table_name].table_name.str, table_name);
+			tables[*p_table_name].table_name == table_name;
 }
 
 bool CMetaInfo::isTableRecordFound(const CMetaInfo::ConstIndexIterator p_table_id, \

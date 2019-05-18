@@ -8,9 +8,9 @@ class CEConfigurator;
 
 class CEditableGrid : public CGrid{
 
-	CDispatcherCell *disp_cell;
 	CMultipleCellWidget *field_widgets_collection;
 	std::shared_ptr<IGridEventsHandler> events_handler;
+	std::shared_ptr<CEConfigurator> ce_configurator;
 	
 	XFont cells_font, headers_font;
 	XColor cells_color, headers_color;

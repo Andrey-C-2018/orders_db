@@ -26,6 +26,21 @@ std::shared_ptr<IDbStatement> CQuery::getUpdateStmt(const size_t updated_field, 
 	return update_stmt;
 }
 
+//std::shared_ptr<IDbStatement> \
+//CQuery::getSetFieldValueToNullStmt(const size_t updated_field, \
+//									std::shared_ptr<IDbResultSet> result_set) const {
+//
+//	std::shared_ptr<IDbStatement> update_to_null_stmt;
+//	std::string query = "UPDATE ";
+//	query += meta_info.get
+//
+//	meta_info.getDeleteQuery(query);
+//	update_to_null_stmt = conn->PrepareQuery(query.c_str());
+//
+//	meta_info.bindPrimaryKeyValues(result_set, update_to_null_stmt);
+//	return update_to_null_stmt;
+//}
+
 std::shared_ptr<IDbStatement> CQuery::getDeleteStmt(std::shared_ptr<IDbResultSet> result_set) const {
 	std::shared_ptr<IDbStatement> delete_stmt;
 	std::string query;

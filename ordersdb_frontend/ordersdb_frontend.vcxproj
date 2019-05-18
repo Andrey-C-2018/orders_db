@@ -156,12 +156,10 @@
   <ItemGroup>
     <ClCompile Include="AdvocatsBook.cpp" />
     <ClCompile Include="MyApp.cpp" />
-    <ClCompile Include="MyFrame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdvocatsBook.h" />
     <ClInclude Include="MyApp.h" />
-    <ClInclude Include="MyFrame.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

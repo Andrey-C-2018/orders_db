@@ -2,7 +2,7 @@
 #include "Grid.h"
 
 CGridException::CGridException(const int err_code, const Tchar *err_descr) : \
-XException(err_code, err_descr) { }
+								XException(err_code, err_descr) { }
 
 CGridException::CGridException(const CGridException &obj) : XException(obj) { }
 

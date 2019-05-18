@@ -155,15 +155,21 @@ CMySQLIntegerField<Tint>::CMySQLIntegerField(std::shared_ptr<MYSQL_RES> metadata
 
 template <typename Tint> \
 const char *CMySQLIntegerField<Tint>::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
+	
 	char *p = (char *)buffer;
+	bool is_null = false;
+	Tint int_value = result_set->getInt(field, is_null);
 
-	return XConv::ToString(result_set->getInt(field), p);
+	return is_null ? nullptr : XConv::ToString(int_value, p);
 }
 
 template <typename Tint> \
 const wchar_t *CMySQLIntegerField<Tint>::getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const {
 
-	return XConv::ToString(result_set->getInt(field), buffer);
+	bool is_null = false;
+	Tint int_value = result_set->getInt(field, is_null);
+
+	return is_null ? nullptr : XConv::ToString(int_value, buffer);
 }
 
 template <typename Tint> \
@@ -172,7 +178,10 @@ ImmutableString<char> CMySQLIntegerField<Tint>::getValueAsImmutableString(\
 	char *p = (char *)buffer;
 	size_t size = 0;
 
-	auto str = XConv::ToString(result_set->getInt(field), p, size);
+	bool is_null = false;
+	Tint int_value = result_set->getInt(field, is_null);
+
+	const char *str = is_null ? nullptr : XConv::ToString(int_value, p, size);
 	return ImmutableString<char>(str, size);
 }
 
@@ -181,7 +190,10 @@ ImmutableString<wchar_t> CMySQLIntegerField<Tint>::getValueAsImmutableWString(\
 										const std::shared_ptr<const IDbResultSet> result_set) const {
 	size_t size = 0;
 
-	auto str = XConv::ToString(result_set->getInt(field), buffer, size);
+	bool is_null = false;
+	Tint int_value = result_set->getInt(field, is_null);
+
+	const wchar_t *str = is_null ? nullptr : XConv::ToString(int_value, buffer, size);
 	return ImmutableString<wchar_t>(str, size);
 }
 
@@ -223,8 +235,13 @@ template <typename Tint> \
 void CMySQLIntegerField<Tint>::getValueAndBindItTo(const std::shared_ptr<const IDbResultSet> result_set, \
 												std::shared_ptr<IDbBindingTarget> binding_target, \
 												const size_t param_no) const {
-	Tint i = result_set->getInt(field);
-	binding_target->bindValue(param_no, i);
+	bool is_null = false;
+	Tint i = result_set->getInt(field, is_null);
+
+	if (is_null)
+		binding_target->bindNull(param_no);
+	else
+		binding_target->bindValue(param_no, i);
 }
 
 template <typename Tint> \

@@ -15,28 +15,41 @@ SQLiteResultSetException::~SQLiteResultSetException() { }
 
 //***************************************************************
 
-SQLiteResultSet::SQLiteResultSet(std::shared_ptr<SQLiteStmtHandle> stmt_handle_) : \
-								fields_count(0), records_count(0), \
-								stmt_handle(stmt_handle), \
-								eof(false), fetched_record_count(0) {
-	assert(stmt_handle_);
+SQLiteResultSet::SQLiteResultSet(std::shared_ptr<sqlite3> db_, \
+								std::shared_ptr<Statement> stmt_) : \
+							fields_count(0), records_count(0), \
+							db(db_), stmt(stmt_), \
+							eof(false), fetched_record_no(0) {
+	assert(db);
+	assert(stmt);
+	assert(stmt->stmt);
+	assert(stmt->stmt_records_count);
+	assert(sqlite3_column_count(stmt->stmt_records_count) == 1);
 
-	fields_count = sqlite3_column_count(stmt_handle->stmt);
-	records_count = 0;
+	fields_count = sqlite3_column_count(stmt->stmt);
+
+	sqlite3_reset(stmt->stmt);
+	sqlite3_reset(stmt->stmt_records_count);
+
+	int rc = sqlite3_step(stmt->stmt_records_count);
+	assert(rc != SQLITE_ERROR && rc != SQLITE_DONE);
+	
+	records_count = sqlite3_column_int64(stmt->stmt_records_count, 0);
 }
 
 SQLiteResultSet::SQLiteResultSet(SQLiteResultSet &&obj) : \
 								fields_count(obj.fields_count), \
 								records_count(obj.records_count), \
-								stmt_handle(std::move(obj.stmt_handle)), \
+								db(std::move(obj.db)), \
+								stmt(std::move(obj.stmt)), \
 								eof(obj.eof), \
-								fetched_record_count(obj.fetched_record_count) {
+								fetched_record_no(obj.fetched_record_no) {
 
 	assert(fields_count || !records_count);
 	obj.fields_count = 0;
 	obj.records_count = 0;
 	obj.eof = false;
-	obj.fetched_record_count = 0;
+	obj.fetched_record_no = 0;
 }
 
 SQLiteResultSet &SQLiteResultSet::operator=(SQLiteResultSet &&obj) {
@@ -45,14 +58,15 @@ SQLiteResultSet &SQLiteResultSet::operator=(SQLiteResultSet &&obj) {
 	
 	fields_count = obj.fields_count;
 	records_count = obj.records_count;
-	stmt_handle = std::move(obj.stmt_handle);
+	db = std::move(obj.db);
+	stmt = std::move(obj.stmt);
 	eof = obj.eof;
-	fetched_record_count = obj.fetched_record_count;
+	fetched_record_no = obj.fetched_record_no;
 	
 	obj.records_count = 0;
 	obj.fields_count = 0;
 	obj.eof = false;
-	obj.fetched_record_count = 0;
+	obj.fetched_record_no = 0;
 	
 	return *this;
 }
@@ -75,55 +89,57 @@ size_t SQLiteResultSet::getRecordsCount() const {
 void SQLiteResultSet::gotoRecord(const size_t record) const {
 
 	assert(record < records_count);
-	assert(stmt_handle->stmt);
+	assert(stmt->stmt);
 
-	if (!eof && record + 1 == fetched_record_count) return;
-	if (eof || record + 1 < fetched_record_count) {
-		sqlite3_reset(stmt_handle->stmt);
-		fetched_record_count = 0;
+	if (!eof && record + 1 == fetched_record_no) return;
+	if (eof || record + 1 < fetched_record_no) {
+		sqlite3_reset(stmt->stmt);
+		fetched_record_no = 0;
 		eof = false;
 	}
 
 	int rc;
 	bool Key = !eof;
-	while (Key && (rc = sqlite3_step(stmt_handle->stmt)) != SQLITE_DONE) {
-		Key = (rc != SQLITE_ERROR) && (fetched_record_count < record);
-		fetched_record_count++;
+	while (Key && (rc = sqlite3_step(stmt->stmt)) != SQLITE_DONE) {
+		Key = (rc != SQLITE_ERROR) && (fetched_record_no < record);
+		fetched_record_no++;
 	}
 
 	if (Key && rc == SQLITE_ERROR)
-		throw SQLiteResultSetException(stmt_handle->conn);
+		throw SQLiteResultSetException(db.get());
 	
 	eof = (rc == SQLITE_DONE);
 }
 
-int SQLiteResultSet::getInt(const size_t field) const {
+int SQLiteResultSet::getInt(const size_t field, bool &is_null) const {
 
 	assert(field < fields_count);
-	assert(fetched_record_count != 0);
-	return sqlite3_column_int(stmt_handle->stmt, (int)field);
+	assert(fetched_record_no != 0);
+	// is_null ???
+	is_null = false;
+	return sqlite3_column_int(stmt->stmt, (int)field);
 }
 
 const char *SQLiteResultSet::getString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(fetched_record_count != 0);
-	return (const char *)sqlite3_column_text(stmt_handle->stmt, (int)field);
+	assert(fetched_record_no != 0);
+	return (const char *)sqlite3_column_text(stmt->stmt, (int)field);
 }
 
 const wchar_t *SQLiteResultSet::getWString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(fetched_record_count != 0);
-	return (const wchar_t *)sqlite3_column_text16(stmt_handle->stmt, (int)field);
+	assert(fetched_record_no != 0);
+	return (const wchar_t *)sqlite3_column_text16(stmt->stmt, (int)field);
 }
 
 ImmutableString<char> SQLiteResultSet::getImmutableString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(fetched_record_count != 0);
+	assert(fetched_record_no != 0);
 
-	const char *value = (const char *)sqlite3_column_text(stmt_handle->stmt, (int)field);
+	const char *value = (const char *)sqlite3_column_text(stmt->stmt, (int)field);
 	size_t len = strlen(value);
 
 	return ImmutableString<char>(value, len);
@@ -132,26 +148,37 @@ ImmutableString<char> SQLiteResultSet::getImmutableString(const size_t field) co
 ImmutableString<wchar_t> SQLiteResultSet::getImmutableWString(const size_t field) const {
 
 	assert(field < fields_count);
-	assert(fetched_record_count != 0);
+	assert(fetched_record_no != 0);
 
-	const wchar_t *value = (const wchar_t *)sqlite3_column_text16(stmt_handle->stmt, (int)field);
+	const wchar_t *value = (const wchar_t *)sqlite3_column_text16(stmt->stmt, (int)field);
 	size_t len = wcslen(value);
 
 	return ImmutableString<wchar_t>(value, len);
 }
 
-CDate SQLiteResultSet::getDate(const size_t field) const {
+CDate SQLiteResultSet::getDate(const size_t field, bool &is_null) const {
 
 	assert(field < fields_count);
-	assert(fetched_record_count != 0);
-	const char *value = (const char *)sqlite3_column_text(stmt_handle->stmt, (int)field);
+	assert(fetched_record_no != 0);
+	const char *value = (const char *)sqlite3_column_text(stmt->stmt, (int)field);
 
+	is_null = (value == nullptr);
 	return CDate(value, CDate::SQL_FORMAT);
+}
+
+void SQLiteResultSet::reload() {
+
+	records_count = sqlite3_column_int64(stmt->stmt_records_count, 0);
+	fetched_record_no = 0;
+	eof = false;
 }
 
 void SQLiteResultSet::Release() {
 
-	stmt_handle.reset();
+	fields_count = records_count = fetched_record_no = 0;
+	
+	stmt.reset();
+	db.reset();
 }
 
 SQLiteResultSet::~SQLiteResultSet() {

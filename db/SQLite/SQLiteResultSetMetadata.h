@@ -11,11 +11,13 @@ struct SQLiteFieldMetadata {
 };
 
 class SQLiteResultSetMetadata : public IDbResultSetMetadata {
-	std::shared_ptr<SQLiteStmtHandle> stmt_handle;
+	std::shared_ptr<sqlite3> db;
+	std::shared_ptr<Statement> stmt;
 	size_t fields_count;
 
 public:
-	SQLiteResultSetMetadata(std::shared_ptr<SQLiteStmtHandle> stmt_handle_);
+	SQLiteResultSetMetadata(std::shared_ptr<sqlite3> db_, \
+							std::shared_ptr<Statement> stmt_);
 
 	SQLiteResultSetMetadata(const SQLiteResultSetMetadata &obj) = delete;
 	SQLiteResultSetMetadata(SQLiteResultSetMetadata &&obj) = default;

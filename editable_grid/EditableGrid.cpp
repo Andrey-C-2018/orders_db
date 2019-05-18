@@ -118,8 +118,7 @@ public:
 //**************************************************************
 
 CEditableGrid::CEditableGrid(std::unique_ptr<IGridEventsHandler> events_handler_) : \
-									CGrid(), disp_cell(nullptr), \
-									field_widgets_collection(nullptr), \
+									CGrid(), field_widgets_collection(nullptr), \
 									events_handler(std::move(events_handler_)), \
 									cells_font(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas")), \
 									headers_font(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Arial")), \
@@ -155,7 +154,7 @@ GridConfigurators CEditableGrid::CreateConfigurators() {
 	auto cells_configurator = std::make_shared<CEConfigurator>(&gc, cell_drawing_params, \
 														disp_cell_params);
 
-	disp_cell = cells_configurator->GetDispatcherCell();
+	ce_configurator = cells_configurator;
 
 	return GridConfigurators(std::move(headers_configurator), \
 								std::move(cells_configurator));
@@ -172,9 +171,9 @@ GridGCParamsLists CEditableGrid::CreateGCParamsLists() {
 
 CEditableGrid::CEditableGrid(CEditableGrid &&obj) : CGrid(std::move(obj)){
 
-	disp_cell = obj.disp_cell;
 	field_widgets_collection = obj.field_widgets_collection;
 	events_handler = std::move(obj.events_handler);
+	ce_configurator = std::move(obj.ce_configurator);
 
 	cells_font = std::move(obj.cells_font);
 	headers_font = std::move(obj.headers_font);
@@ -185,7 +184,6 @@ CEditableGrid::CEditableGrid(CEditableGrid &&obj) : CGrid(std::move(obj)){
 	grid_lines_pen = std::move(obj.grid_lines_pen);
 	background_pen = std::move(obj.background_pen);
 
-	obj.disp_cell = nullptr;
 	obj.field_widgets_collection = nullptr;
 }
 
@@ -193,9 +191,9 @@ CEditableGrid &CEditableGrid::operator=(CEditableGrid &&obj) {
 
 	CGrid::operator=(std::move(obj));
 
-	disp_cell = obj.disp_cell;
 	field_widgets_collection = obj.field_widgets_collection;
 	events_handler = std::move(obj.events_handler);
+	ce_configurator = std::move(obj.ce_configurator);
 
 	cells_font = std::move(obj.cells_font);
 	headers_font = std::move(obj.headers_font);
@@ -206,7 +204,6 @@ CEditableGrid &CEditableGrid::operator=(CEditableGrid &&obj) {
 	grid_lines_pen = std::move(obj.grid_lines_pen);
 	background_pen = std::move(obj.background_pen);
 
-	obj.disp_cell = nullptr;
 	obj.field_widgets_collection = nullptr;
 
 	return *this;
@@ -231,7 +228,9 @@ void CEditableGrid::SetWidgetForField(const size_t field, IGridCellWidget *field
 
 void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
 
+	auto disp_cell = ce_configurator->GetDispatcherCell();
 	assert(disp_cell);
+
 	size_t visible_records_count = GetVisibleRecordsCount();
 	size_t active_record = disp_cell->GetActiveRecord();
 	size_t active_field = disp_cell->GetActiveField();

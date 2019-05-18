@@ -25,6 +25,7 @@ class CDbTable : public ITable{
 	size_t curr_record;
 
 	CEventsHandlersContainer event_handlers;
+	inline void rereadQueryContents();
 public:
 	CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_);
 
@@ -35,7 +36,7 @@ public:
 	inline const CQuery &getQuery() const;
 	inline std::shared_ptr<const IDbResultSet> getResultSet() const;
 	inline void setPrimaryTableForQuery(const char *table_name);
-	inline void markFieldAsPrimaryKey(const size_t field);
+	inline void markFieldAsPrimaryKeyByIndex(const size_t field);
 	inline void markFieldAsPrimaryKey(const char *field_name);
 
 	bool empty() const override;
@@ -92,7 +93,7 @@ void CDbTable::setPrimaryTableForQuery(const char *table_name) {
 	query.setPrimaryTable(table_name);
 }
 
-void CDbTable::markFieldAsPrimaryKey(const size_t field) {
+void CDbTable::markFieldAsPrimaryKeyByIndex(const size_t field) {
 
 	query.markFieldAsPrimaryKey(field);
 }
@@ -100,6 +101,7 @@ void CDbTable::markFieldAsPrimaryKey(const size_t field) {
 void CDbTable::markFieldAsPrimaryKey(const char *field_name) {
 	
 	size_t field = query.getMetaInfo().getFieldIndexByName(field_name);
+	query.markFieldAsPrimaryKey(field);
 }
 
 void CDbTable::executeScalarStmt(std::shared_ptr<IDbStatement> stmt) {
@@ -107,4 +109,12 @@ void CDbTable::executeScalarStmt(std::shared_ptr<IDbStatement> stmt) {
 	assert(stmt);
 	if (stmt->execScalar())
 		reload();
+}
+
+void CDbTable::rereadQueryContents() {
+
+	result_set = query.exec();
+	//result_set->reload();
+	size_t records_count = result_set->getRecordsCount();
+	event_handlers.OnRecordsCountChanged(records_count);
 }

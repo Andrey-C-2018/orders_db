@@ -14,50 +14,39 @@ SQLiteFieldException::~SQLiteFieldException() { }
 
 //*************************************************************
 
-SQLiteField::SQLiteField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+SQLiteField::SQLiteField(std::shared_ptr<sqlite3> db_, \
+							std::shared_ptr<Statement> stmt_, \
 							const size_t field_, const char *field_type) : \
-						stmt_handle(stmt_handle_), field(field_) {
+						db(db_), stmt(stmt_), field(field_) {
 
 	max_length = getFieldMaxLengthByType(field_type);
 }
 
-SQLiteField::SQLiteField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+SQLiteField::SQLiteField(std::shared_ptr<sqlite3> db_, \
+							std::shared_ptr<Statement> stmt_, \
 							const size_t field_, const char *field_type, \
 							const size_t def_max_length) : \
-						stmt_handle(stmt_handle_), field(field_) {
+						db(db_), stmt(stmt_), field(field_) {
 
 	max_length = getFieldMaxLengthByType(field_type);
 	if (max_length == (size_t)-1)
 		max_length = def_max_length;
 }
 
-SQLiteField::SQLiteField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+SQLiteField::SQLiteField(std::shared_ptr<sqlite3> db_, \
+							std::shared_ptr<Statement> stmt_, \
 							const size_t field_, const size_t def_max_length) : \
-						stmt_handle(stmt_handle_), field(field_), \
+						db(db_), stmt(stmt_), field(field_), \
 						max_length(def_max_length) { }
 
 std::string SQLiteField::getFieldName() const {
 
-	const char *table_name = sqlite3_column_table_name(stmt_handle->stmt, (int)field);
-	std::string buffer;
-	auto stmt = getTableFieldMetaInfo(stmt_handle->conn, table_name, field, buffer);
-
-	buffer = getFieldNameFromMetaInfo(stmt);
-	sqlite3_finalize(stmt);
-
-	return std::move(buffer);
+	return std::string(sqlite3_column_name(stmt->stmt, (int)field));
 }
 
 std::wstring SQLiteField::getFieldNameW() const {
 
-	auto table_name = (const wchar_t *)sqlite3_column_table_name16(stmt_handle->stmt, (int)field);
-	std::wstring buffer;
-	auto stmt = getTableFieldMetaInfo(stmt_handle->conn, table_name, field, buffer);
-
-	buffer = getFieldNameWFromMetaInfo(stmt);
-	sqlite3_finalize(stmt);
-
-	return std::move(buffer);
+	return std::wstring((const wchar_t *)sqlite3_column_name16(stmt->stmt, (int)field));
 }
 
 size_t SQLiteField::getFieldMaxLength() const {
@@ -67,19 +56,24 @@ size_t SQLiteField::getFieldMaxLength() const {
 
 std::string SQLiteField::getTableName() const {
 
-	return std::string(sqlite3_column_table_name(stmt_handle->stmt, (int)field));
+	return std::string(sqlite3_column_table_name(stmt->stmt, (int)field));
 }
 
 std::wstring SQLiteField::getTableNameW() const {
 
-	return std::wstring((const wchar_t *)sqlite3_column_table_name16(stmt_handle->stmt, (int)field));
+	return std::wstring((const wchar_t *)sqlite3_column_table_name16(stmt->stmt, (int)field));
 }
 
 bool SQLiteField::isPrimaryKey() const {
 
-	const char *table_name = sqlite3_column_table_name(stmt_handle->stmt, (int)field);
+	const char *table_name = sqlite3_column_table_name(stmt->stmt, (int)field);
+	const char *field_name = sqlite3_column_origin_name(stmt->stmt, (int)field);
+
 	std::string buffer;
-	auto stmt = getTableFieldMetaInfo(stmt_handle->conn, table_name, field, buffer);
+	auto stmt = getTableFieldMetaInfo(db.get(), table_name, field_name, buffer);
+
+	int rc = sqlite3_step(stmt);
+	assert(rc != SQLITE_ERROR && rc != SQLITE_DONE);
 
 	bool is_primary = isFieldPrimKeyFromMetaInfo(stmt);
 	sqlite3_finalize(stmt);
@@ -91,21 +85,27 @@ SQLiteField::~SQLiteField() { }
 
 //**************************************************
 
-SQLiteIntegerField::SQLiteIntegerField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+SQLiteIntegerField::SQLiteIntegerField(std::shared_ptr<sqlite3> db_, \
+										std::shared_ptr<Statement> stmt_, \
 										const size_t field_, const char *field_type) : \
-											SQLiteField(stmt_handle_, field_, \
+											SQLiteField(db_, stmt_, field_, \
 														field_type, getDigitsCountOfType<int>()) { }
 
 const char *SQLiteIntegerField::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
 
 	char *p = (char *)buffer;
+	bool is_null = false;
+	int int_value = result_set->getInt(field, is_null);
 
-	return XConv::ToString(result_set->getInt(field), p);
+	return is_null ? nullptr : XConv::ToString(int_value, p);
 }
 
 const wchar_t *SQLiteIntegerField::getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const {
+	
+	bool is_null = false;
+	int int_value = result_set->getInt(field, is_null);
 
-	return XConv::ToString(result_set->getInt(field), buffer);
+	return is_null ? nullptr : XConv::ToString(int_value, buffer);
 }
 
 ImmutableString<char> SQLiteIntegerField::getValueAsImmutableString(\
@@ -114,7 +114,10 @@ ImmutableString<char> SQLiteIntegerField::getValueAsImmutableString(\
 	char *p = (char *)buffer;
 	size_t size = 0;
 
-	auto str = XConv::ToString(result_set->getInt(field), p, size);
+	bool is_null = false;
+	int int_value = result_set->getInt(field, is_null);
+
+	const char *str = is_null ? nullptr : XConv::ToString(int_value, p, size);
 	return ImmutableString<char>(str, size);
 }
 
@@ -123,7 +126,10 @@ ImmutableString<wchar_t> SQLiteIntegerField::getValueAsImmutableWString(\
 
 	size_t size = 0;
 
-	auto str = XConv::ToString(result_set->getInt(field), buffer, size);
+	bool is_null = false;
+	int int_value = result_set->getInt(field, is_null);
+
+	const wchar_t *str = is_null ? nullptr : XConv::ToString(int_value, buffer, size);
 	return ImmutableString<wchar_t>(str, size);
 }
 
@@ -164,22 +170,29 @@ void SQLiteIntegerField::bindValueAsWString(std::shared_ptr<IDbBindingTarget> bi
 void SQLiteIntegerField::getValueAndBindItTo(const std::shared_ptr<const IDbResultSet> result_set, \
 											std::shared_ptr<IDbBindingTarget> binding_target, \
 											const size_t param_no) const {
-	int i = result_set->getInt(field);
-	binding_target->bindValue(param_no, i);
+	bool is_null = false;
+	int i = result_set->getInt(field, is_null);
+
+	if (is_null)
+		binding_target->bindNull(param_no);
+	else
+		binding_target->bindValue(param_no, i);
 }
 
 SQLiteIntegerField::~SQLiteIntegerField() { }
 
 //**************************************************
 
-SQLiteDateField::SQLiteDateField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, const size_t field_) : \
-									SQLiteField(stmt_handle_, field, CDate::GERMAN_FORMAT_LEN) { }
+SQLiteDateField::SQLiteDateField(std::shared_ptr<sqlite3> db_, \
+									std::shared_ptr<Statement> stmt_, const size_t field_) : \
+									SQLiteField(db_, stmt_, field_, CDate::GERMAN_FORMAT_LEN) { }
 
 const char *SQLiteDateField::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
 
 	char *p = (char *)buffer;
 
-	CDate date_value = result_set->getDate(field);
+	bool is_null;
+	CDate date_value = result_set->getDate(field, is_null);
 	date_value.ToStringGerman(p);
 
 	return p;
@@ -187,7 +200,8 @@ const char *SQLiteDateField::getValueAsString(const std::shared_ptr<const IDbRes
 
 const wchar_t *SQLiteDateField::getValueAsWString(const std::shared_ptr<const IDbResultSet> result_set) const {
 	
-	CDate date_value = result_set->getDate(field);
+	bool is_null;
+	CDate date_value = result_set->getDate(field, is_null);
 	date_value.ToStringGerman(buffer);
 
 	return buffer;
@@ -198,7 +212,8 @@ ImmutableString<char> SQLiteDateField::getValueAsImmutableString(\
 
 	char *p = (char *)buffer;
 
-	CDate date_value = result_set->getDate(field);
+	bool is_null;
+	CDate date_value = result_set->getDate(field, is_null);
 	date_value.ToStringGerman(p);
 
 	return ImmutableString<char>(p, CDate::GERMAN_FORMAT_LEN);
@@ -206,7 +221,8 @@ ImmutableString<char> SQLiteDateField::getValueAsImmutableString(\
 
 ImmutableString<wchar_t> SQLiteDateField::getValueAsImmutableWString(\
 													const std::shared_ptr<const IDbResultSet> result_set) const {
-	CDate date_value = result_set->getDate(field);
+	bool is_null;
+	CDate date_value = result_set->getDate(field, is_null);
 	date_value.ToStringGerman(buffer);
 
 	return ImmutableString<wchar_t>(buffer, CDate::GERMAN_FORMAT_LEN);
@@ -234,17 +250,23 @@ void SQLiteDateField::getValueAndBindItTo(const std::shared_ptr<const IDbResultS
 													std::shared_ptr<IDbBindingTarget> binding_target, \
 													const size_t param_no) const {
 
-	CDate date_value = result_set->getDate(field);
-	binding_target->bindValue(param_no, date_value);
+	bool is_null;
+	CDate date_value = result_set->getDate(field, is_null);
+
+	if (is_null)
+		binding_target->bindNull(param_no);
+	else
+		binding_target->bindValue(param_no, date_value);
 }
 
 SQLiteDateField::~SQLiteDateField() { }
 
 //**************************************************
 
-SQLiteStringField::SQLiteStringField(std::shared_ptr<SQLiteStmtHandle> stmt_handle_, \
+SQLiteStringField::SQLiteStringField(std::shared_ptr<sqlite3> db_, \
+										std::shared_ptr<Statement> stmt_, \
 										const size_t field_, const char *field_type) : \
-									SQLiteField(stmt_handle_, field, field_type) {
+									SQLiteField(db_, stmt_, field_, field_type) {
 	
 	assert(getFieldMaxLength() != (size_t)-1);
 }

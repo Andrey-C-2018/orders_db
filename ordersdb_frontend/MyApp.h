@@ -1,9 +1,9 @@
 #pragma once
 #include <xwindows/XApp.h>
-#include "MyFrame.h"
+#include "AdvocatsBook.h"
 
 class CMyApp : public XApp{
-	CMyFrame *frame;
+	CAdvocatsBook *frame;
 public:
 	void OnInit();
 	virtual ~CMyApp();

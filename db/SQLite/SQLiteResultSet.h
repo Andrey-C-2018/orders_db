@@ -17,12 +17,16 @@ public:
 
 class SQLiteResultSet : public IDbResultSet {
 	size_t fields_count, records_count;
-	std::shared_ptr<SQLiteStmtHandle> stmt_handle;
+
+	std::shared_ptr<sqlite3> db;
+	std::shared_ptr<Statement> stmt;
+
 	mutable bool eof;
-	mutable size_t fetched_record_count;
+	mutable size_t fetched_record_no;
 
 public:
-	SQLiteResultSet(std::shared_ptr<SQLiteStmtHandle> stmt_handle);
+	SQLiteResultSet(std::shared_ptr<sqlite3> db_, \
+					std::shared_ptr<Statement> stmt_);
 
 	SQLiteResultSet(const SQLiteResultSet &obj) = delete;
 	SQLiteResultSet(SQLiteResultSet &&obj);
@@ -35,12 +39,14 @@ public:
 
 	void gotoRecord(const size_t record) const override;
 
-	int getInt(const size_t field) const override;
+	int getInt(const size_t field, bool &is_null) const override;
 	const char *getString(const size_t field) const override;
 	const wchar_t *getWString(const size_t field) const override;
 	ImmutableString<char> getImmutableString(const size_t field) const override;
 	ImmutableString<wchar_t> getImmutableWString(const size_t field) const override;
-	CDate getDate(const size_t field) const override;
+	CDate getDate(const size_t field, bool &is_null) const override;
+
+	void reload() override;
 
 	void Release();
 	virtual ~SQLiteResultSet();

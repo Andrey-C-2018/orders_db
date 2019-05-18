@@ -73,7 +73,7 @@ void CMetaInfo::setPrimaryTable(const char *table_name) {
 	auto p_table = std::find_if(tables.cbegin(), tables.cend(), \
 		[table_name](const CTableRecord &rec) {
 
-			return !strcmp(rec.table_name.str, table_name);
+			return rec.table_name == table_name;
 		});
 
 	if (p_table == tables.cend()) {
@@ -83,20 +83,20 @@ void CMetaInfo::setPrimaryTable(const char *table_name) {
 		throw e;
 	}
 
-	primary_table_name = p_table->table_name.str;
+	primary_table_name = p_table->table_name;
 	primary_table_id = p_table->id;
 }
 
-CMetaInfo::id_type CMetaInfo::addTableRecord(ImmutableString<char> table_name) {
-	auto p_table_name = findTableRecord(table_name.str);
+CMetaInfo::id_type CMetaInfo::addTableRecord(std::string &table_name) {
+	auto p_table_name = findTableRecord(table_name.c_str());
 	id_type table_id = 0;
 	
-	if (!isTableRecordFound(p_table_name, table_name.str)) {
+	if (!isTableRecordFound(p_table_name, table_name.c_str())) {
 		CTableRecord rec;
 		size_t new_index = tables.size();
 
 		rec.id = table_id = (id_type)new_index;
-		rec.table_name = table_name;
+		rec.table_name = std::move(table_name);
 
 		tables.emplace_back(rec);
 		
@@ -129,7 +129,7 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 		CMetaInfoException e(CMetaInfoException::E_FIELD_EXISTS, \
 							_T("the field '"));
 
-		e << fields[*p_field].field_name.str << _T("' is already added. Table: '");
+		e << fields[*p_field].field_name << _T("' is already added. Table: '");
 		e << field->getTableName() << _T("'");
 		throw e;
 	}
@@ -140,7 +140,7 @@ void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field
 	rec.field_name = std::move(new_field_name);
 	rec.field_size = field->getFieldMaxLength();
 			
-	ImmutableString<char> table_name = field->getTableName();
+	std::string table_name = field->getTableName();
 	rec.id_table = addTableRecord(table_name);
 
 	rec.is_primary_key = field->isPrimaryKey();
@@ -195,7 +195,7 @@ void CMetaInfo::clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fi
 	for (size_t i = 0; i < fields_count; ++i) {
 		CFieldRecord rec;
 		rec.field = fields->getField(i);
-		ImmutableString<char> table_name = rec.field->getTableName();
+		std::string table_name = rec.field->getTableName();
 
 		rec.id = (id_type)i;
 		rec.id_table = addTableRecord(table_name);
@@ -248,10 +248,10 @@ void CMetaInfo::getUpdateQueryForField(const size_t field, std::string &query) c
 
 	query.clear();
 	query = "UPDATE ";
-	query += tables[*p_table].table_name.str;
+	query += tables[*p_table].table_name;
 	
 	query += " SET ";
-	query += fields[field].field_name.str;
+	query += fields[field].field_name;
 	query += " = ? WHERE ";
 
 	enumeratePrimKey(tables[*p_table].id, AddPrimKeyToWhereStmt(*this, query));

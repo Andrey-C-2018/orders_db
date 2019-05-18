@@ -5,7 +5,9 @@
 #include <xwindows/VerticalSizer.h>
 #include "AdvocatsBook.h"
 
-CAdvocatsBook::CAdvocatsBook() {
+CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
+								const Tchar *label, const int X, const int Y, \
+								const int width, const int height) {
 
 	props.open("config.ini");
 
@@ -14,6 +16,10 @@ CAdvocatsBook::CAdvocatsBook() {
 	
 	grid = new CDbGrid(db_table);
 	createCellWidgetsAndAttachToGrid(grid);
+
+	Create(class_name, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
+			label, X, Y, width, height);
+	DisplayWidgets();
 }
 	
 std::shared_ptr<IDbConnection> CAdvocatsBook::createConnection(const CPropertiesFile &props) {
@@ -45,11 +51,12 @@ std::shared_ptr<IDbConnection> CAdvocatsBook::createConnection(const CProperties
 std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnection> conn) {
 
 	std::string query = "SELECT b.id_advocat, b.adv_name, b.license_no, b.license_date,";
-	query += " e.examiner_name, post_index, address, adv_bdate,";
+	query += " e.exm_name, b.post_index, b.address, b.adv_bdate,";
 	query += " d.distr_center, b.org_name, b.org_type ";
-	query += "FROM advocats b INNER JOIN examiners e ON b.id_exm = a.id_examiner ";
-	query += "WHERE ";
-	query += filtering_manager.getSQLWherePart().str;
+	query += "FROM advocats b INNER JOIN examiners e ON b.id_exm = e.id_examiner";
+	query += " INNER JOIN districts d ON b.id_main_district = d.id_distr";
+	//query += "WHERE ";
+	//query += filtering_manager.getSQLWherePart().str;
 	query += " ORDER BY adv_name";
 	auto stmt = conn->PrepareQuery(query.c_str());
 
@@ -66,19 +73,16 @@ void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	auto examiners_list = new CDbComboBoxCellWidget(conn, "exm_name", \
 												"examiners", "advocats", db_table);
 	examiners_list->AddRelation("id_examiner", "id_exm");
-	grid->SetWidgetForField("examiner_name", examiners_list);
+	grid->SetWidgetForFieldByName("exm_name", examiners_list);
 
 	auto adv_org_types_list = new CComboBoxCellWidget();
 	adv_org_types_list->AddItem(_T("²ÍÄ"));
 	adv_org_types_list->AddItem(_T("ÀÎ"));
 	adv_org_types_list->AddItem(_T("ÀÁ"));
-	grid->SetWidgetForField("org_type", adv_org_types_list);
+	grid->SetWidgetForFieldByName("org_type", adv_org_types_list);
 }
 
-void CAdvocatsBook::Create(XWindow *parent, const int flags,
-				const Tchar *label, \
-				const int x, const int y, \
-				const int width, const int height) {
+void CAdvocatsBook::DisplayWidgets() {
 
 	XRect rc;
 
@@ -97,7 +101,7 @@ void CAdvocatsBook::Create(XWindow *parent, const int flags,
 					XSize(100, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
-	main_sizer.addWidget(grid);
+	main_sizer.addLastWidget(grid);
 	grid->SetFocus();
 }
 

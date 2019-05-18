@@ -1,5 +1,7 @@
 #include "SQLiteConnection.h"
 #include <string>
+#include <chrono>
+#include <thread>
 #include <assert.h>
 #include "SQLiteStatement.h"
 
@@ -17,19 +19,7 @@ SQLiteConnectionException::~SQLiteConnectionException() { }
 
 //***************************************************************
 
-SQLiteConnection::SQLiteConnection() : db(nullptr) { }
-
-SQLiteConnection::SQLiteConnection(SQLiteConnection &&obj) : db(obj.db) {
-
-	obj.db = nullptr;
-}
-
-SQLiteConnection &SQLiteConnection::operator=(SQLiteConnection &&obj) {
-
-	db = obj.db;
-	obj.db = nullptr;
-	return *this;
-}
+SQLiteConnection::SQLiteConnection() { }
 
 void SQLiteConnection::Connect(const char *location, const unsigned port, \
 								const char *login, \
@@ -51,38 +41,50 @@ void SQLiteConnection::Connect(const char *location, const unsigned port, \
 
 	full_path += schema_name;
 	full_path += ".db";
+
+	sqlite3 *db = nullptr;
 	err = sqlite3_open(full_path.c_str(), &db);
 	if (err) 
 		throw SQLiteConnectionException(db);
+
+	this->db = std::shared_ptr<sqlite3>(db, \
+		[](sqlite3 *db) {
+			
+			auto opt_stmt = prepareQuery(db, "PRAGMA optimize");
+			assert(opt_stmt);
+			int err = sqlite3_step(opt_stmt);
+			assert(err != SQLITE_ERROR);
+
+			size_t i = 0;
+			while (i < 4 && (err = sqlite3_close(db)) != SQLITE_OK) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(500));
+				++i;
+			}
+		});
 }
 
 void SQLiteConnection::SetSchema(const char *schema_name) { }
 
-sqlite3_stmt *SQLiteConnection::InternalPrepareQuery(const char *query_text) const {
-	int err = 0;
-	const int QUERY_IS_NULL_TERM_STR = -1;
-	sqlite3_stmt *pStmt = nullptr;
-	
-	assert(db);
-	err = sqlite3_prepare_v2(db, query_text, QUERY_IS_NULL_TERM_STR, &pStmt, NULL);
-	if (err != SQLITE_OK)
-		throw SQLiteConnectionException(db);
-
-	return pStmt;
-}
-
 record_t SQLiteConnection::ExecScalarQuery(const char *query_text) {
 	
-	sqlite3_stmt *pStmt = InternalPrepareQuery(query_text);
+	sqlite3_stmt *pStmt =prepareQuery(db.get(), query_text);
+	if(!pStmt) throw SQLiteConnectionException(db.get());
+
+	if (sqlite3_column_count(pStmt)) {
+		SQLiteConnectionException e(SQLiteConnectionException::E_NOT_A_SCALAR_QUERY, \
+									_T("The query id not CREATE/UPDATE/DELETE: '"));
+		e << query_text << "'";
+		throw e;
+	}
 
 	int err = 0;
 	record_t records_count = 0;
 
 	err = sqlite3_step(pStmt);
 	if (err == SQLITE_ERROR) 
-		throw SQLiteConnectionException(db);
+		throw SQLiteConnectionException(db.get());
 
-	records_count = sqlite3_changes(db);
+	records_count = sqlite3_changes(db.get());
 
 	sqlite3_finalize(pStmt);
 	return records_count;
@@ -92,9 +94,7 @@ std::shared_ptr<IDbResultSet> SQLiteConnection::ExecQuery(const char *query_text
 	
 	assert(query_text);
 
-	auto stmt = InternalPrepareQuery(query_text);
-	SQLiteStmtHandle stmt_handle{ db, stmt };
-	SQLiteStatement sqlite_stmt(stmt_handle);
+	SQLiteStatement sqlite_stmt(db, query_text);
 
 	if (sqlite_stmt.getParamsCount() > 0)
 		throw SQLiteConnectionException(SQLiteConnectionException::E_WRONG_QUERY, \
@@ -105,18 +105,12 @@ std::shared_ptr<IDbResultSet> SQLiteConnection::ExecQuery(const char *query_text
 
 std::shared_ptr<IDbStatement> SQLiteConnection::PrepareQuery(const char *query_text) const {
 	
-	sqlite3_stmt *stmt = InternalPrepareQuery(query_text);
-	SQLiteStmtHandle stmt_handle{ db, stmt };
-
-	return std::make_shared<SQLiteStatement>(stmt_handle);
+	return std::make_shared<SQLiteStatement>(db, query_text);
 }
 
 void SQLiteConnection::Disconnect() {
 
-	if (db) {
-		sqlite3_close(db);
-		db = nullptr;
-	}
+	db.reset();
 }
 
 SQLiteConnection::~SQLiteConnection(){

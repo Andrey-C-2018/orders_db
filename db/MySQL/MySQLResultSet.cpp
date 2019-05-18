@@ -118,10 +118,12 @@ void CMySQLResultSet::gotoRecord(const size_t record) const {
 	curr_record = record;
 }
 
-int CMySQLResultSet::getInt(const size_t field) const {
+int CMySQLResultSet::getInt(const size_t field, bool &is_null) const {
 
 	assert(field < fields_count);
 	assert(curr_record != (size_t)-1);
+
+	is_null = fields[field].is_null > 0;
 	return fields[field].value.GetInt();
 }
 
@@ -130,7 +132,9 @@ const char *CMySQLResultSet::getString(const size_t field) const {
 	assert(field < fields_count);
 	assert(curr_record != (size_t)-1);
 	fields[field].value.UpdateLength(fields[field].length);
-	return fields[field].value.GetString();
+
+	bool is_null = fields[field].is_null > 0;
+	return is_null ? nullptr : fields[field].value.GetString();
 }
 
 const wchar_t *CMySQLResultSet::getWString(const size_t field) const {
@@ -138,7 +142,9 @@ const wchar_t *CMySQLResultSet::getWString(const size_t field) const {
 	assert(field < fields_count);
 	assert(curr_record != (size_t)-1);
 	fields[field].value.UpdateLength(fields[field].length);
-	return fields[field].value.GetWString();
+
+	bool is_null = fields[field].is_null > 0;
+	return is_null ? nullptr : fields[field].value.GetWString();
 }
 
 ImmutableString<char> CMySQLResultSet::getImmutableString(const size_t field) const {
@@ -147,10 +153,13 @@ ImmutableString<char> CMySQLResultSet::getImmutableString(const size_t field) co
 	assert(curr_record != (size_t)-1);
 	fields[field].value.UpdateLength(fields[field].length);
 
-	const char *str = fields[field].value.GetString();
-	size_t len = fields[field].value.GetValueLength();
+	if (!fields[field].is_null) {
+		const char *str = fields[field].value.GetString();
+		size_t len = fields[field].value.GetValueLength();
+		return ImmutableString<char>(str, len);
+	}
 
-	return ImmutableString<char>(str, len);
+	return ImmutableString<char>(nullptr, 0);
 }
 
 ImmutableString<wchar_t> CMySQLResultSet::getImmutableWString(const size_t field) const {
@@ -159,20 +168,43 @@ ImmutableString<wchar_t> CMySQLResultSet::getImmutableWString(const size_t field
 	assert(curr_record != (size_t)-1);
 	fields[field].value.UpdateLength(fields[field].length);
 
-	const wchar_t *str = fields[field].value.GetWString();
-	size_t len = fields[field].value.GetValueLength();
+	if (!fields[field].is_null) {
+		const wchar_t *str = fields[field].value.GetWString();
+		size_t len = fields[field].value.GetValueLength();
+		return ImmutableString<wchar_t>(str, len);
+	}
 
-	return ImmutableString<wchar_t>(str, len);
+	return ImmutableString<wchar_t>(nullptr, 0);
 }
 
-CDate CMySQLResultSet::getDate(const size_t field) const {
+CDate CMySQLResultSet::getDate(const size_t field, bool &is_null) const {
 
 	assert(field < fields_count);
 	assert(curr_record != (size_t)-1);
+
+	is_null = fields[field].is_null > 0;
 	return fields[field].value.GetDate();
 }
 
+void CMySQLResultSet::reload() {
+
+	assert(stmt);
+	assert(metadata);
+
+	if (mysql_stmt_execute(stmt.get()))
+		throw CMySQLResultSetException(stmt.get());
+
+	if (mysql_stmt_store_result(stmt.get()))
+		throw CMySQLResultSetException(stmt.get());
+
+	curr_record = (size_t)-1;
+	records_count = (size_t)mysql_stmt_num_rows(stmt.get());
+}
+
 void CMySQLResultSet::Release() {
+
+	curr_record = (size_t)-1;
+	records_count = fields_count = 0;
 
 	metadata.reset();
 	stmt.reset();

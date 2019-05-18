@@ -158,18 +158,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="HorizontalSizer.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />
-    <ClCompile Include="Sizer.cpp" />
-    <ClCompile Include="VerticalSizer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HorizontalSizer.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
-    <ClInclude Include="Sizer.h" />
-    <ClInclude Include="VerticalSizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,7 +5,8 @@
 class SQLiteConnectionException : public SQLiteException {
 public:
 	enum {
-		E_WRONG_QUERY = 1
+		E_WRONG_QUERY = 1, \
+		E_NOT_A_SCALAR_QUERY = 2
 	};
 
 	SQLiteConnectionException(const int err_code, const Tchar *err_descr);
@@ -18,16 +19,15 @@ public:
 };
 
 class SQLiteConnection : public IDbConnection {
-	sqlite3 *db;
+	std::shared_ptr<sqlite3> db;
 
-	sqlite3_stmt *InternalPrepareQuery(const char *query_text) const;
 public:
 	SQLiteConnection();
 	SQLiteConnection(const SQLiteConnection &obj) = delete;
-	SQLiteConnection(SQLiteConnection &&obj);
+	SQLiteConnection(SQLiteConnection &&obj) = default;
 
 	SQLiteConnection &operator=(const SQLiteConnection &obj) = delete;
-	SQLiteConnection &operator=(SQLiteConnection &&obj);
+	SQLiteConnection &operator=(SQLiteConnection &&obj) = default;
 
 	void Connect(const char *location, const unsigned port, \
 					const char *login, \

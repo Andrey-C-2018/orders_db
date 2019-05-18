@@ -30,6 +30,7 @@ public:
 	void addWidget(XWidget *widget, const Tchar *label, const int flags);
 	inline void addWidget(XWidget *widget, const Tchar *label);
 	inline void addWidget(XWidget *widget);
+	void addLastWidget(XWidget *widget);
 
 	void pushNestedSizer(CSizer &sizer);
 	void popNestedSizer();
