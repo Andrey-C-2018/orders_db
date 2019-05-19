@@ -8,6 +8,7 @@ struct IDbConnection;
 class CDbTable;
 class CDbComboBox;
 class CDbGrid;
+class CComboBoxCellWidget;
 
 class CAdvocatsBook : public XFrame {
 	enum Defaults {
@@ -25,13 +26,19 @@ class CAdvocatsBook : public XFrame {
 
 	XButton *btn_apply_filter, *btn_ordering, *btn_add, *btn_remove, *btn_upload;
 	CDbGrid *grid;
+	CComboBoxCellWidget *adv_org_types_list;
+	int grid_x, grid_y;
+	int grid_margin_x, grid_margin_y;
 
 	void OnFilteringWidgetChanged(XCommandEvent *eve);
 
 	std::shared_ptr<IDbConnection> createConnection(const CPropertiesFile &props);
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
+	void setFieldsSizes();
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
+	void adjustUIDependentCellWidgets(CDbGrid *grid);
 
+	void OnSize(XSizeEvent *eve);
 	void OnFilterButtonClick(XCommandEvent *eve);
 	void OnOrderingButtonClick(XCommandEvent *eve);
 	void OnRemoveButtonClick(XCommandEvent *eve);

@@ -44,7 +44,8 @@ bool CGrid::is_class_registered = false;
 CGrid::CGrid() : headers(nullptr), cells(nullptr), \
 				width(0), height(0), \
 				left_pane_width(DEF_LEFT_PANE_WIDTH), \
-				headers_height(DEF_HEADERS_HEIGHT) {
+				headers_height(DEF_HEADERS_HEIGHT), \
+				single_char_width(0) {
 
 	if (!is_class_registered) {
 		RegisterNewWidgetClass(_T("XGRIDCONTROL"));
@@ -123,7 +124,7 @@ void CGrid::OnCreate(XEvent *eve) {
 	cells->SetItemHeight(cells_configurator->GetCellHeight());
 	cells->SetBounds(left_pane_width, headers_height);
 
-	int single_char_width = cells_configurator->GetCharWidthInPixels();
+	single_char_width = cells_configurator->GetCharWidthInPixels();
 	int cell_margins_width = cells_configurator->GetCellMarginsWidth();
 
 	auto fields_props = data_table_proxy->GetFieldsProperties();
@@ -183,8 +184,6 @@ void CGrid::OnPaint(XEvent *eve) {
 	XPaintEventGC gc(this);
 	gc_global_params->Init(gc);
 	
-	DrawLeftPane(gc);
-
 	gc.SetBounds(left_pane_width, headers_height);
 	cells->Draw(gc, XPoint(left_pane_width, headers_height), \
 					XSize(width - left_pane_width, height - headers_height));
@@ -195,6 +194,7 @@ void CGrid::OnPaint(XEvent *eve) {
 	headers->Draw(gc, XPoint(left_pane_width, 0), \
 					XSize(width - left_pane_width, headers_height));
 
+	DrawLeftPane(gc);
 	gc_headers_params->Release();
 	gc_global_params->Release();
 }

@@ -28,7 +28,7 @@ public:
 	}
 
 	void OnActiveCellLocationChanged(const size_t new_field, \
-									const size_t new_record) override {
+										const size_t new_record) override {
 
 		active_field = new_field;
 		active_record = new_record;

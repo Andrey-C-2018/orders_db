@@ -30,12 +30,13 @@ public:
 	void addWidget(XWidget *widget, const Tchar *label, const int flags);
 	inline void addWidget(XWidget *widget, const Tchar *label);
 	inline void addWidget(XWidget *widget);
-	void addLastWidget(XWidget *widget);
+	XRect addLastWidget(XWidget *widget);
 
 	void pushNestedSizer(CSizer &sizer);
 	void popNestedSizer();
 
 	int getActualHeight() const override;
+	inline XRect getMargins() const;
 
 	inline bool isNull() const;
 	virtual ~CVerticalSizer();
@@ -49,4 +50,9 @@ void CVerticalSizer::addWidget(XWidget *widget, const Tchar *label) {
 void CVerticalSizer::addWidget(XWidget *widget) {
 
 	addWidget(widget, _T(""), FL_WINDOW_CLIPSIBLINGS | FL_WINDOW_BORDERED | FL_WINDOW_VISIBLE);
+}
+
+XRect CVerticalSizer::getMargins() const {
+
+	return XRect(margin_left, margin_top, margin_right, margin_bottom);
 }

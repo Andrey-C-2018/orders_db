@@ -113,8 +113,7 @@ void CDbTable::executeScalarStmt(std::shared_ptr<IDbStatement> stmt) {
 
 void CDbTable::rereadQueryContents() {
 
-	result_set = query.exec();
-	//result_set->reload();
+	result_set->reload();
 	size_t records_count = result_set->getRecordsCount();
 	event_handlers.OnRecordsCountChanged(records_count);
 }

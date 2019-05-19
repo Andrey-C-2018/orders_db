@@ -18,7 +18,7 @@ class CEditableGrid : public CGrid{
 	XPen grid_lines_pen, background_pen;
 
 	void OnKeyPress(XKeyboardEvent *eve);
-
+	void InitEditableGrid();
 protected:
 	GridConfigurators CreateConfigurators() override;
 	GridGCParamsLists CreateGCParamsLists() override;
@@ -26,13 +26,19 @@ protected:
 	LayoutObjects CreateLayoutObjects(const int kind_of_layout) override;
 	void OnWindowCreate() override;
 
-	CEditableGrid(const CEditableGrid &obj) = delete;
-	CEditableGrid &operator=(const CEditableGrid &obj) = delete;
+	inline void SetEventHandler(std::shared_ptr<IGridEventsHandler> events_handler) {
+
+		assert(!ce_configurator);
+		this->events_handler = events_handler;
+	}
 public:
-	CEditableGrid(std::unique_ptr<IGridEventsHandler> events_handler_);
+	CEditableGrid();
+	CEditableGrid(std::shared_ptr<IGridEventsHandler> events_handler_);
 
 	CEditableGrid(CEditableGrid &&obj);
+	CEditableGrid(const CEditableGrid &obj) = delete;
 	CEditableGrid &operator=(CEditableGrid &&obj);
+	CEditableGrid &operator=(const CEditableGrid &obj) = delete;
 
 	void SetWidgetForField(const size_t field, IGridCellWidget *field_widget);
 

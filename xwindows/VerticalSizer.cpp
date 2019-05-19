@@ -40,16 +40,23 @@ void CVerticalSizer::addWidget(XWidget *widget, const Tchar *label, const int fl
 	y += row_height + gap;
 }
 
-void CVerticalSizer::addLastWidget(XWidget *widget) {
+XRect CVerticalSizer::addLastWidget(XWidget *widget) {
 
 	assert(!nested_sizer);
 	assert(widget);
 	assert(y - y_initial + margin_bottom <= height);
+	XRect rc;
+
+	rc.left = x;
+	rc.top = y;
 	widget->Create(parent, FL_WINDOW_CLIPSIBLINGS | FL_WINDOW_BORDERED | FL_WINDOW_VISIBLE, \
 					_T(""), x, y, width - margin_left - margin_right, \
 					height + y_initial - y - margin_bottom);
 
 	y = height - margin_bottom;
+	rc.right = width - margin_left - margin_right;
+	rc.bottom = y;
+	return rc;
 }
 
 void CVerticalSizer::pushNestedSizer(CSizer &sizer) {

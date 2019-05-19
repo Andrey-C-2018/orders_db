@@ -16,7 +16,7 @@ class CDispatcherCell : public IDrawable {
 	ImmutableString<Tchar> active_cell_text;
 	XColor active_cell_color;
 
-	XPoint curr_coords;
+	XPoint curr_coords, def_act_cell_coords;
 	XSize curr_size;
 
 	bool active_cell_hidden;

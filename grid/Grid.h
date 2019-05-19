@@ -31,6 +31,8 @@ private:
 	int left_pane_width;
 	int headers_height;
 
+	int single_char_width;
+
 	XScrollParams hscroll, vscroll;
 	std::shared_ptr<CCellConfigurator> headers_configurator, cells_configurator;
 	std::shared_ptr<IGCParamsList> gc_global_params, gc_headers_params;
@@ -79,6 +81,12 @@ protected:
 	virtual void DrawLeftPane(XGC &gc) const;
 
 	inline size_t GetVisibleRecordsCount() const;
+	inline int GetLeftPaneSize() const;
+	inline int GetHeight() const;
+	inline int GetHeadersHeight() const;
+	inline int GetRecordHeight() const;
+	inline int GetVScrollPos() const;
+
 	inline void FocusOnRecord(const size_t record_index);
 	inline void FocusOnField(const size_t field_index);
 
@@ -122,6 +130,7 @@ LayoutObjects CGrid::CreateLayoutObjectsHelper(const int kind_of_layout) {
 void CGrid::SetFieldWidth(const size_t field, const int new_width) {
 
 	CheckWhetherFieldIndexValid(field);
+	assert(!IsCreated());
 	data_table_proxy->SetFieldWidth(field, new_width);
 }
 
@@ -177,6 +186,31 @@ void CGrid::EvaluateScrollPos(const XScrollEvent *eve, \
 size_t CGrid::GetVisibleRecordsCount() const {
 
 	return cells->GetVisibleRecordsCount(height);
+}
+
+int CGrid::GetLeftPaneSize() const {
+
+	return left_pane_width;
+}
+
+int CGrid::GetHeight() const {
+
+	return width;
+}
+
+int CGrid::GetHeadersHeight() const {
+
+	return headers_height;
+}
+
+int CGrid::GetRecordHeight() const {
+
+	return cells_configurator->GetCellHeight();
+}
+
+int CGrid::GetVScrollPos() const {
+
+	return vscroll.pos;
 }
 
 void CGrid::FocusOnRecord(const size_t record_index) {

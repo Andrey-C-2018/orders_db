@@ -38,7 +38,6 @@ void CGridTableProxy::OnTableReset() {
 void CGridTableProxy::SetFieldWidth(const size_t field, const int new_width) {
 
 	fields_props->SetWidth(field, new_width);
-	table_widget->Reload();
 }
 
 void CGridTableProxy::HideField(const size_t field) {

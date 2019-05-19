@@ -6,6 +6,7 @@ CDispatcherCell::CDispatcherCell() : def_active_cell(nullptr), \
 									active_cell_reached(false), \
 									active_cell_text(nullptr, 0), \
 									active_cell_color(255, 255, 255), \
+									def_act_cell_coords(0, 0), \
 									active_cell_hidden(true), \
 									move_def_cell(true), inside_on_click(false), \
 									old_scroll_pos(0), table_proxy(nullptr), \
@@ -20,6 +21,7 @@ CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : \
 									active_cell_reached(obj.active_cell_reached), \
 									active_cell_text(obj.active_cell_text), \
 									active_cell_color(255, 255, 255), \
+									def_act_cell_coords(obj.def_act_cell_coords), \
 									active_cell_hidden(obj.active_cell_hidden), \
 									move_def_cell(obj.move_def_cell), \
 									inside_on_click(obj.inside_on_click), \
@@ -36,6 +38,8 @@ CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : \
 	obj.active_cell_reached = false;
 	obj.active_cell_text.str = nullptr;
 	obj.active_cell_text.size = 0;
+	obj.def_act_cell_coords.x = 0;
+	obj.def_act_cell_coords.y = 0;
 	obj.active_cell_hidden = true;
 	obj.move_def_cell = false;
 	obj.inside_on_click = false;
@@ -124,6 +128,7 @@ void CDispatcherCell::Draw(XGC &gc, const XPoint &initial_coords, const XSize &s
 			}
 
 			curr_coords = initial_coords;
+			//event_handler->OnActiveCellCoordsChanged(x, y);
 			curr_size = size;
 		}
 		active_cell_reached = false;

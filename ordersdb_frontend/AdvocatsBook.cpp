@@ -15,11 +15,15 @@ CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 	db_table = createDbTable(conn);
 	
 	grid = new CDbGrid(db_table);
+	setFieldsSizes();
 	createCellWidgetsAndAttachToGrid(grid);
 
 	Create(class_name, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
 			label, X, Y, width, height);
 	DisplayWidgets();
+	adjustUIDependentCellWidgets(grid);
+
+	Connect(EVT_SIZE, this, &CAdvocatsBook::OnSize);
 }
 	
 std::shared_ptr<IDbConnection> CAdvocatsBook::createConnection(const CPropertiesFile &props) {
@@ -67,6 +71,18 @@ std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnec
 	return std::move(db_table);
 }
 
+void CAdvocatsBook::setFieldsSizes() {
+
+	grid->SetFieldWidth(0, 4);
+	grid->SetFieldWidth(1, 37);
+	grid->SetFieldWidth(2, 10);
+	grid->SetFieldWidth(4, 70);
+	grid->SetFieldWidth(5, 6);
+	grid->SetFieldWidth(6, 75);
+	grid->SetFieldWidth(8, 25);
+	grid->SetFieldWidth(9, 55);
+}
+
 void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 	assert(grid);
@@ -75,11 +91,16 @@ void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	examiners_list->AddRelation("id_examiner", "id_exm");
 	grid->SetWidgetForFieldByName("exm_name", examiners_list);
 
-	auto adv_org_types_list = new CComboBoxCellWidget();
+	adv_org_types_list = new CComboBoxCellWidget();
+	grid->SetWidgetForFieldByName("org_type", adv_org_types_list);
+}
+
+void CAdvocatsBook::adjustUIDependentCellWidgets(CDbGrid *grid) {
+
+	assert(adv_org_types_list);
 	adv_org_types_list->AddItem(_T("²ÍÄ"));
 	adv_org_types_list->AddItem(_T("ÀÎ"));
 	adv_org_types_list->AddItem(_T("ÀÁ"));
-	grid->SetWidgetForFieldByName("org_type", adv_org_types_list);
 }
 
 void CAdvocatsBook::DisplayWidgets() {
@@ -101,8 +122,25 @@ void CAdvocatsBook::DisplayWidgets() {
 					XSize(100, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
-	main_sizer.addLastWidget(grid);
+	XRect grid_coords = main_sizer.addLastWidget(grid);
 	grid->SetFocus();
+
+	grid_x = grid_coords.left;
+	grid_y = grid_coords.top;
+
+	XRect margins = main_sizer.getMargins();
+	grid_margin_x = margins.left;
+	grid_margin_y = margins.top;
+}
+
+void CAdvocatsBook::OnSize(XSizeEvent *eve) {
+
+	int width = eve->GetWidth();
+	int height = eve->GetHeight();
+
+	if (grid) grid->MoveWindow(grid_x, grid_y, \
+								width - 2 * grid_margin_x, \
+								height - grid_y - grid_margin_y);
 }
 
 void CAdvocatsBook::OnFilteringWidgetChanged(XCommandEvent *eve) {

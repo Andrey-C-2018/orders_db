@@ -117,22 +117,37 @@ public:
 
 //**************************************************************
 
-CEditableGrid::CEditableGrid(std::unique_ptr<IGridEventsHandler> events_handler_) : \
-									CGrid(), field_widgets_collection(nullptr), \
-									events_handler(std::move(events_handler_)), \
-									cells_font(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas")), \
-									headers_font(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Arial")), \
-									cells_color(170, 170, 170), headers_color(128, 128, 128), \
-									grid_lines_brush(0, 0, 200), background_brush(100, 100, 100), \
-									grid_lines_pen(XPEN_SOLID, 1, 0, 0, 200), \
-									background_pen(XPEN_SOLID, 1, 100, 100, 100) {
+void CEditableGrid::InitEditableGrid() {
 
-	assert(events_handler);
+	field_widgets_collection = nullptr;
+	cells_font = XFont(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas"));
+	headers_font = XFont(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Arial"));
+	cells_color = XColor(170, 170, 170);
+	headers_color = XColor(128, 128, 128);
+	grid_lines_brush = XBrush(0, 0, 200);
+	background_brush = XBrush(100, 100, 100);
+	grid_lines_pen = XPen(XPEN_SOLID, 1, 0, 0, 200);
+	background_pen = XPen(XPEN_SOLID, 1, 100, 100, 100);
+
 	field_widgets_collection = new CMultipleCellWidget();
 	field_widgets_collection->SetDefaultWidget(new CEditableCellWidget());
 }
 
+CEditableGrid::CEditableGrid() {
+
+	InitEditableGrid();
+}
+
+CEditableGrid::CEditableGrid(std::shared_ptr<IGridEventsHandler> events_handler_) : \
+									events_handler(events_handler_) {
+
+	assert(events_handler);
+	InitEditableGrid();
+}
+
 GridConfigurators CEditableGrid::CreateConfigurators() {
+
+	assert(events_handler);
 
 	XStandAloneGC gc(this);
 	CellDrawingParams cell_drawing_params;
