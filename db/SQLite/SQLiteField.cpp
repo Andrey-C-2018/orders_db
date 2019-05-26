@@ -41,10 +41,20 @@ SQLiteField::SQLiteField(std::shared_ptr<sqlite3> db_, \
 
 std::string SQLiteField::getFieldName() const {
 
-	return std::string(sqlite3_column_name(stmt->stmt, (int)field));
+	return std::string(sqlite3_column_origin_name(stmt->stmt, (int)field));
 }
 
 std::wstring SQLiteField::getFieldNameW() const {
+
+	return std::wstring((const wchar_t *)sqlite3_column_origin_name16(stmt->stmt, (int)field));
+}
+
+std::string SQLiteField::getFieldAlias() const {
+
+	return std::string(sqlite3_column_name(stmt->stmt, (int)field));
+}
+
+std::wstring SQLiteField::getFieldAliasW() const {
 
 	return std::wstring((const wchar_t *)sqlite3_column_name16(stmt->stmt, (int)field));
 }

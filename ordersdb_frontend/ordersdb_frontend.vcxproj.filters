@@ -21,12 +21,24 @@
     <ClCompile Include="AdvocatsBook.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="QueryModifier.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="BinderControls.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyApp.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="AdvocatsBook.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryModifier.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="BinderControls.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,6 +4,7 @@
 
 CFilteringManager::CFilteringManager() : query_text(), \
 									filtering_changed(false), \
+									query_text_changed(false), \
 									switched_expr_count(0) { }
 
 int CFilteringManager::addExpr(ImmutableString<char> expression, \
@@ -76,6 +77,7 @@ void CFilteringManager::disableAll() {
 
 void CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
 
+	assert(filtering_changed || (!filtering_changed & !query_text_changed));
 	if (!filtering_changed) return;
 
 	assert(parsed_query);
@@ -85,7 +87,7 @@ void CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
 
 		p->first_param = params_counter;
 		if (p->switched) {
-			parsed_query->bindValue(p->first_param, p->enabled);
+			parsed_query->bindValue(p->first_param, !p->enabled);
 			++params_counter;
 		}
 

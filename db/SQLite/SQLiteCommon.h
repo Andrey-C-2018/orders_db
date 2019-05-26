@@ -3,9 +3,34 @@
 #include "../DbException.h"
 #include <basic/XConv.h>
 
-struct Statement {
+struct Statement final {
 	sqlite3_stmt *stmt;
 	sqlite3_stmt *stmt_records_count;
+	bool initial_state;
+	inline Statement() noexcept : stmt(nullptr), \
+									stmt_records_count(nullptr), \
+									initial_state(true) { }
+
+	inline Statement(sqlite3_stmt *stmt_, \
+						sqlite3_stmt *stmt_records_count_, \
+						const bool initial_state_) noexcept : \
+					stmt(stmt_), \
+					stmt_records_count(stmt_records_count_), \
+					initial_state(initial_state_) { }
+
+	~Statement() {
+
+		int err = 0;
+		if (stmt) {
+			err = sqlite3_finalize(stmt);
+			assert(err != SQLITE_ERROR);
+		}
+
+		if (stmt_records_count) {
+			err = sqlite3_finalize(stmt_records_count);
+			assert(err != SQLITE_ERROR);
+		}
+	}
 };
 
 class SQLiteException : public CDbException {

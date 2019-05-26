@@ -38,6 +38,8 @@ public:
 
 	std::string getFieldName() const override;
 	std::wstring getFieldNameW() const override;
+	std::string getFieldAlias() const override;
+	std::wstring getFieldAliasW() const override;
 	size_t getFieldMaxLength() const override;
 	std::string getTableName() const override;
 	std::wstring getTableNameW() const override;

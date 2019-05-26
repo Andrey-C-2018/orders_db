@@ -766,14 +766,18 @@ _plCOLOR _plGetColorRGB(unsigned char red, unsigned char green, \
 void _plTextOut(_plHDC dc, int x, int y, \
 				const Tchar *text, const size_t len) noexcept {
 
-	TextOut(dc, x, y, text, (int)len);
+	int ln = (int)len;
+	ln += (int)(len == 0 && text && text[0] == _T('\0'));
+	TextOut(dc, x, y, text, ln);
 }
 
 void _plTextOut(_plHDC dc, int x, int y, \
 				int options, XRect &rc, \
 				const Tchar *text, const size_t len) noexcept {
 
-	ExtTextOut(dc, x, y, options, &rc, text, (int)len, 0);
+	int ln = (int)len;
+	ln += (int)(len == 0 && text && text[0] == _T('\0'));
+	ExtTextOut(dc, x, y, options, &rc, text, ln, 0);
 }
 
 void _plRectangle(_plHDC dc, int left, int top, int right, int bottom) noexcept {

@@ -35,6 +35,7 @@ public:
 
 	inline const CQuery &getQuery() const;
 	inline std::shared_ptr<const IDbResultSet> getResultSet() const;
+	inline std::shared_ptr<IDbBindingTarget> getBindingTarget();
 	inline void setPrimaryTableForQuery(const char *table_name);
 	inline void markFieldAsPrimaryKeyByIndex(const size_t field);
 	inline void markFieldAsPrimaryKey(const char *field_name);
@@ -58,6 +59,7 @@ public:
 	inline void executeScalarStmt(std::shared_ptr<IDbStatement> stmt);
 
 	void reload();
+	void reload(std::shared_ptr<IDbStatement> stmt);
 	virtual ~CDbTable();
 };
 
@@ -86,6 +88,11 @@ const CQuery &CDbTable::getQuery() const {
 std::shared_ptr<const IDbResultSet> CDbTable::getResultSet() const {
 
 	return result_set;
+}
+
+std::shared_ptr<IDbBindingTarget> CDbTable::getBindingTarget() {
+
+	return query.getBindingTarget();
 }
 
 void CDbTable::setPrimaryTableForQuery(const char *table_name) {

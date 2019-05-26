@@ -143,4 +143,13 @@ void CDbTable::reload(){
 	rereadQueryContents();
 }
 
+void CDbTable::reload(std::shared_ptr<IDbStatement> stmt) {
+
+	query.setStmtWithTheSameMetaInfo(stmt);
+	result_set = query.exec();
+
+	size_t records_count = result_set->getRecordsCount();
+	event_handlers.OnRecordsCountChanged(records_count);
+}
+
 CDbTable::~CDbTable(){ }

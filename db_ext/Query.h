@@ -33,8 +33,9 @@ public:
 	std::shared_ptr<IDbStatement> \
 		getDeleteStmt(std::shared_ptr<IDbResultSet> result_set) const;
 
-	std::shared_ptr<IDbBindingTarget> getBindingTarget();
-	std::shared_ptr<IDbResultSet> exec();
+	inline std::shared_ptr<IDbBindingTarget> getBindingTarget();
+	inline std::shared_ptr<IDbResultSet> exec();
+	void setStmtWithTheSameMetaInfo(std::shared_ptr<IDbStatement> stmt);
 
 	~CQuery();
 };
@@ -54,4 +55,14 @@ void CQuery::setPrimaryTable(const char *table_name) {
 void CQuery::markFieldAsPrimaryKey(const size_t field) {
 
 	meta_info.markFieldAsPrimaryKey(field);
+}
+
+std::shared_ptr<IDbBindingTarget> CQuery::getBindingTarget() {
+
+	return stmt;
+}
+
+std::shared_ptr<IDbResultSet> CQuery::exec() {
+
+	return stmt->exec();
 }

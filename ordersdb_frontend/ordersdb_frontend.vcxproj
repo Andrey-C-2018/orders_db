@@ -155,11 +155,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AdvocatsBook.cpp" />
+    <ClCompile Include="BinderControls.cpp" />
     <ClCompile Include="MyApp.cpp" />
+    <ClCompile Include="QueryModifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdvocatsBook.h" />
+    <ClInclude Include="BinderControls.h" />
     <ClInclude Include="MyApp.h" />
+    <ClInclude Include="QueryModifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

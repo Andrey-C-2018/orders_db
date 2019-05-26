@@ -1,6 +1,6 @@
 #include <iostream>
-//#include <db/MySQL/MySQLConnection.h>
-#include <db/SQLite/SQLiteConnection.h>
+#include <db/MySQL/MySQLConnection.h>
+//#include <db/SQLite/SQLiteConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
 #include <db/IDbResultSetMetadata.h>
@@ -12,14 +12,21 @@ int main() {
 	setlocale(LC_ALL, "ukr_ukr.1251");
 	//setlocale(LC_ALL, "uk_UA.UTF-8");
 	{
-		SQLiteConnection conn;
+		CMySQLConnection conn;
 	
 		try {
-			//conn.Connect("127.0.0.1", 3310, "orders_stat_user", "123", "orders");
-			conn.Connect("c:\\#projects\\test", 0, nullptr, nullptr, "test");
+			conn.Connect("192.168.1.4", 3310, "root", "12345", "orders");
+			//conn.Connect("c:\\#projects\\test", 0, nullptr, nullptr, "test");
 
-			std::string query = "SELECT t.id_type, a.id_center, a.id, a.order_date, t.type_name, a.client_name ";
-			query += "FROM orders a INNER JOIN order_types t ON a.id_order_type = t.id_type";
+			//std::string query = "SELECT t.id_type, a.id_center, a.id, a.order_date, t.type_name, a.client_name ";
+			//query += "FROM orders a INNER JOIN order_types t ON a.id_order_type = t.id_type";
+			std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date, aa.id_stage, aa.cycle,";
+			query += " b.adv_name, aa.act_date, aa.fee as fee_DB, aa.id_act ";
+			query += "FROM orders a INNER JOIN payments aa ON";
+			query += " a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
+			query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat ";
+			query += "WHERE aa.act_date >= '2019-01-01' AND aa.is_paid IS NULL AND aa.fee <> 0 ";
+			query += "ORDER BY adv_name, id_act";
 
 			auto stmt = conn.PrepareQuery(query.c_str());
 			auto m = stmt->getResultSetMetadata();
@@ -37,9 +44,10 @@ int main() {
 			size_t records_count = result_set->getRecordsCount();
 			for (size_t i = 0; i < records_count; ++i) {
 				result_set->gotoRecord(i);
+				bool is_null;
 
-				int id_center = result_set->getInt(1);
-				int id = result_set->getInt(2);
+				int id_center = result_set->getInt(1, is_null);
+				int id = result_set->getInt(2, is_null);
 				auto client = result_set->getWString(5);
 				auto order_date = result_set->getWString(3);
 

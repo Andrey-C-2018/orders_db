@@ -48,7 +48,7 @@ void CDbGrid::DrawLeftPane(XGC &gc) const {
 	int left_pane_width = GetLeftPaneSize();
 	int height = GetHeight();
 	int record_height = GetRecordHeight();
-	int y_initial = GetHeadersHeight() + record_height * active_record_no - GetVScrollPos();
+	int y_initial = GetHeadersHeight() + record_height * (int)active_record_no - GetVScrollPos();
 
 	gc.Rectangle(0, 0, (int)(left_pane_width * 0.15F), height);
 	XPoint points[5];

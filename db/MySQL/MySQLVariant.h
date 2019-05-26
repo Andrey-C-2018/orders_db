@@ -144,7 +144,7 @@ void CMySQLVariant::UpdateLength(const size_t len) {
 
 const char *CMySQLVariant::GetString() const{
 
-	assert(IsString());
+	assert(IsVectorType());
 	assert(!value_string.size() || (value_string.size() && \
 			value_string.c_str()[value_string.size()] == '\0'));
 
@@ -154,7 +154,7 @@ const char *CMySQLVariant::GetString() const{
 
 const wchar_t *CMySQLVariant::GetWString() const{
 
-	assert(IsString());
+	assert(IsVectorType());
 	assert(!value_string.size() || (value_string.size() && \
 			value_string.c_str()[value_string.size()] == '\0'));
 
@@ -224,19 +224,19 @@ void CMySQLVariant::SetDate(const CDate &date) {
 
 void CMySQLVariant::SetString(const char *value) {
 
-	assert(IsString());
+	assert(IsVectorType());
 	value_string = value;
 }
 
 void CMySQLVariant::SetString(const char *value, const size_t len){
 
-	assert(IsString());
+	assert(IsVectorType());
 	value_string.assign(value, len);
 }
 
 void CMySQLVariant::SetString(const wchar_t *value) {
 
-	assert(IsString());
+	assert(IsVectorType());
 	UCS16_ToUTF8(value, -1, value_string);
 	if (value_string.size())
 		value_string.resize(value_string.size() - 1);
@@ -244,22 +244,8 @@ void CMySQLVariant::SetString(const wchar_t *value) {
 
 void CMySQLVariant::SetString(const wchar_t *value, const size_t len) {
 
-	assert(IsString());
+	assert(IsVectorType());
 	UCS16_ToUTF8(value, (int)len, value_string);
 	if (value_string.size())
 		value_string.resize(value_string.size() - 1);
 }
-
-void CMySQLVariant::SetDecimal(const char *value) {
-
-	assert(IsDecimal());
-	value_string = value;
-}
-
-void CMySQLVariant::SetDecimal(const wchar_t *value) {
-
-	assert(IsDecimal());
-	UCS16_ToUTF8(value, -1, value_string);
-	if (value_string.size())
-		value_string.resize(value_string.size() - 1);
-}    

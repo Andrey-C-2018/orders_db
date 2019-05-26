@@ -3,6 +3,7 @@
 #include <xwindows/XFrame.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
+#include "QueryModifier.h"
 
 struct IDbConnection;
 class CDbTable;
@@ -20,8 +21,16 @@ class CAdvocatsBook : public XFrame {
 	CPropertiesFile props;
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
+
+	CQueryModifier query_modifier;
 	CFilteringManager filtering_manager;
 
+	void OnFilteringWidgetChanged(XCommandEvent *eve);
+	void OnFilteringWidgetLooseFocus(XCommandEvent *eve);
+	void OnFilterButtonClick(XCommandEvent *eve);
+
+	XEdit *flt_id;
+	bool flt_id_changed;
 	CDbComboBox *flt_advocats;
 
 	XButton *btn_apply_filter, *btn_ordering, *btn_add, *btn_remove, *btn_upload;
@@ -29,17 +38,15 @@ class CAdvocatsBook : public XFrame {
 	CComboBoxCellWidget *adv_org_types_list;
 	int grid_x, grid_y;
 	int grid_margin_x, grid_margin_y;
-
-	void OnFilteringWidgetChanged(XCommandEvent *eve);
-
+	
 	std::shared_ptr<IDbConnection> createConnection(const CPropertiesFile &props);
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 	void setFieldsSizes();
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
 	void adjustUIDependentCellWidgets(CDbGrid *grid);
+	void initBinderControls();
 
 	void OnSize(XSizeEvent *eve);
-	void OnFilterButtonClick(XCommandEvent *eve);
 	void OnOrderingButtonClick(XCommandEvent *eve);
 	void OnRemoveButtonClick(XCommandEvent *eve);
 	void OnUploadButtonClick(XCommandEvent *eve);

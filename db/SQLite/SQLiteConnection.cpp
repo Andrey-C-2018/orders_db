@@ -49,11 +49,14 @@ void SQLiteConnection::Connect(const char *location, const unsigned port, \
 
 	this->db = std::shared_ptr<sqlite3>(db, \
 		[](sqlite3 *db) {
-			
+			int err = 0;
+
+#ifdef SQLITE_DB_OPTIMIZEON_EXIT
 			auto opt_stmt = prepareQuery(db, "PRAGMA optimize");
 			assert(opt_stmt);
-			int err = sqlite3_step(opt_stmt);
+			err = sqlite3_step(opt_stmt);
 			assert(err != SQLITE_ERROR);
+#endif
 
 			size_t i = 0;
 			while (i < 4 && (err = sqlite3_close(db)) != SQLITE_OK) {

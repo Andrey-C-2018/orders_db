@@ -4,12 +4,19 @@
 #include <xwindows/HorizontalSizer.h>
 #include <xwindows/VerticalSizer.h>
 #include "AdvocatsBook.h"
+#include "BinderControls.h"
 
 CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 								const Tchar *label, const int X, const int Y, \
-								const int width, const int height) {
+								const int width, const int height) : \
+	flt_id(nullptr), flt_id_changed(false), btn_apply_filter(nullptr), btn_ordering(nullptr), \
+	btn_add(nullptr), btn_remove(nullptr), btn_upload(nullptr), grid(nullptr), \
+	adv_org_types_list(nullptr), \
+	grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
 
 	props.open("config.ini");
+
+	initBinderControls();
 
 	conn = createConnection(props);
 	db_table = createDbTable(conn);
@@ -24,6 +31,11 @@ CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 	adjustUIDependentCellWidgets(grid);
 
 	Connect(EVT_SIZE, this, &CAdvocatsBook::OnSize);
+	Connect(EVT_COMMAND, NCODE_EDIT_CHANGED, \
+				flt_id->GetId(), this, &CAdvocatsBook::OnFilteringWidgetChanged);
+	Connect(EVT_COMMAND, NCODE_EDIT_LOOSE_FOCUS, \
+				flt_id->GetId(), this, &CAdvocatsBook::OnFilteringWidgetLooseFocus);
+	Connect(EVT_COMMAND, btn_apply_filter->GetId(), this, &CAdvocatsBook::OnFilterButtonClick);
 }
 	
 std::shared_ptr<IDbConnection> CAdvocatsBook::createConnection(const CPropertiesFile &props) {
@@ -49,7 +61,7 @@ std::shared_ptr<IDbConnection> CAdvocatsBook::createConnection(const CProperties
 	const char *p_database = UCS16_ToUTF8(curr_prop, -1, database);
 
 	conn->Connect(p_server, port, p_user, p_pwd, p_database);
-	return std::move(conn);
+	return conn;
 }
 
 std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnection> conn) {
@@ -59,16 +71,17 @@ std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnec
 	query += " d.distr_center, b.org_name, b.org_type ";
 	query += "FROM advocats b INNER JOIN examiners e ON b.id_exm = e.id_examiner";
 	query += " INNER JOIN districts d ON b.id_main_district = d.id_distr";
-	//query += "WHERE ";
-	//query += filtering_manager.getSQLWherePart().str;
-	query += " ORDER BY adv_name";
-	auto stmt = conn->PrepareQuery(query.c_str());
+	query += " #### ";
+	query += "ORDER BY adv_name";
+	query_modifier.Init(query);
+
+	auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
 	db_table->setPrimaryTableForQuery("advocats");
 	db_table->markFieldAsPrimaryKey("id_advocat");
 
-	return std::move(db_table);
+	return db_table;
 }
 
 void CAdvocatsBook::setFieldsSizes() {
@@ -111,6 +124,7 @@ void CAdvocatsBook::DisplayWidgets() {
 	CVerticalSizer main_sizer(this, 0, 0, rc.right, rc.bottom, \
 								10, 10, 10, 10, \
 								DEF_GUI_VERT_GAP, DEF_GUI_ROW_HEIGHT);
+	main_sizer.addWidget(flt_id, _T(""), FL_WINDOW_VISIBLE);
 
 	CHorizontalSizer sizer(CSizerPreferences(0, 0, 0, 0, DEF_GUI_HORZ_GAP));
 	main_sizer.pushNestedSizer(sizer);
@@ -133,22 +147,52 @@ void CAdvocatsBook::DisplayWidgets() {
 	grid_margin_y = margins.top;
 }
 
-void CAdvocatsBook::OnSize(XSizeEvent *eve) {
+void CAdvocatsBook::initBinderControls() {
 
-	int width = eve->GetWidth();
-	int height = eve->GetHeight();
+	flt_id = new XEdit();
+	std::shared_ptr<IBinder> id_binder = std::make_shared<CIntWidgetBinderControl>(flt_id);
+	ImmutableString<char> expr("b.id_advocat = ?", sizeof("b.id_advocat = ?") - 1);
 
-	if (grid) grid->MoveWindow(grid_x, grid_y, \
-								width - 2 * grid_margin_x, \
-								height - grid_y - grid_margin_y);
+	int id_expr = filtering_manager.addExpr(expr, id_binder);
+	flt_id->SetTag(id_expr);
 }
 
 void CAdvocatsBook::OnFilteringWidgetChanged(XCommandEvent *eve) {
 
+	flt_id_changed = true;
+}
+
+void CAdvocatsBook::OnFilteringWidgetLooseFocus(XCommandEvent *eve) {
+
+	if (flt_id_changed) {
+		int id_expr = eve->GetSender()->GetTag();
+
+		const Tchar *label = eve->GetSender()->GetLabel();
+		if(label && label[0] != _T('\0'))
+			filtering_manager.enableExpr(id_expr);
+		else
+			filtering_manager.disableExpr(id_expr);
+
+		flt_id_changed = false;
+	}
 }
 
 void CAdvocatsBook::OnFilterButtonClick(XCommandEvent *eve) {
 
+	query_modifier.changeWherePart(filtering_manager.getSQLWherePart());
+	//MessageBoxA(nullptr, query_modifier.getQuery().c_str(), "", MB_OK);
+
+	if (filtering_manager.isWherePartChanged()) {
+
+		auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
+		filtering_manager.apply(stmt);
+		db_table->reload(stmt);
+	}
+	else {
+
+		filtering_manager.apply(db_table->getBindingTarget());
+		db_table->reload();
+	}
 }
 
 void CAdvocatsBook::OnOrderingButtonClick(XCommandEvent *eve) {
@@ -161,6 +205,16 @@ void CAdvocatsBook::OnRemoveButtonClick(XCommandEvent *eve) {
 
 void CAdvocatsBook::OnUploadButtonClick(XCommandEvent *eve) {
 
+}
+
+void CAdvocatsBook::OnSize(XSizeEvent *eve) {
+
+	int width = eve->GetWidth();
+	int height = eve->GetHeight();
+
+	if (grid) grid->MoveWindow(grid_x, grid_y, \
+		width - 2 * grid_margin_x, \
+		height - grid_y - grid_margin_y);
 }
 
 CAdvocatsBook::~CAdvocatsBook() { }

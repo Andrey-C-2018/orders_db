@@ -20,8 +20,10 @@ public:
 class SQLiteStatement : public IDbStatement {
 	std::shared_ptr<sqlite3> db;
 	std::shared_ptr<Statement> stmt;
+	size_t fields_count;
 	size_t params_count;
 
+	inline void resetStmtIfNecessary();
 public:
 	SQLiteStatement(std::shared_ptr<sqlite3> db, const char *query_text);
 

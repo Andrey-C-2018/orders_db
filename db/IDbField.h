@@ -8,6 +8,8 @@ struct IDbBindingTarget;
 struct IDbField {
 	virtual std::string getFieldName() const = 0;
 	virtual std::wstring getFieldNameW() const = 0;
+	virtual std::string getFieldAlias() const = 0;
+	virtual std::wstring getFieldAliasW() const = 0;
 	virtual size_t getFieldMaxLength() const = 0;
 	virtual std::string getTableName() const = 0;
 	virtual std::wstring getTableNameW() const = 0;

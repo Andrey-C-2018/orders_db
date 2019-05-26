@@ -28,13 +28,7 @@ SQLiteResultSet::SQLiteResultSet(std::shared_ptr<sqlite3> db_, \
 
 	fields_count = sqlite3_column_count(stmt->stmt);
 
-	sqlite3_reset(stmt->stmt);
-	sqlite3_reset(stmt->stmt_records_count);
-
-	int rc = sqlite3_step(stmt->stmt_records_count);
-	assert(rc != SQLITE_ERROR && rc != SQLITE_DONE);
-	
-	records_count = sqlite3_column_int64(stmt->stmt_records_count, 0);
+	reload();
 }
 
 SQLiteResultSet::SQLiteResultSet(SQLiteResultSet &&obj) : \
@@ -94,13 +88,15 @@ void SQLiteResultSet::gotoRecord(const size_t record) const {
 	if (!eof && record + 1 == fetched_record_no) return;
 	if (eof || record + 1 < fetched_record_no) {
 		sqlite3_reset(stmt->stmt);
+		stmt->initial_state = true;
+
 		fetched_record_no = 0;
 		eof = false;
 	}
 
 	int rc;
 	bool Key = !eof;
-	while (Key && (rc = sqlite3_step(stmt->stmt)) != SQLITE_DONE) {
+	while (Key && (rc = execute_stmt()) != SQLITE_DONE) {
 		Key = (rc != SQLITE_ERROR) && (fetched_record_no < record);
 		fetched_record_no++;
 	}
@@ -168,7 +164,15 @@ CDate SQLiteResultSet::getDate(const size_t field, bool &is_null) const {
 
 void SQLiteResultSet::reload() {
 
-	records_count = sqlite3_column_int64(stmt->stmt_records_count, 0);
+	sqlite3_reset(stmt->stmt);
+
+	sqlite3_reset(stmt->stmt_records_count);
+	int rc = sqlite3_step(stmt->stmt_records_count);
+	assert(rc != SQLITE_ERROR && rc != SQLITE_DONE);
+
+	stmt->initial_state = false;
+
+	records_count = sqlite3_column_int(stmt->stmt_records_count, 0);
 	fetched_record_no = 0;
 	eof = false;
 }

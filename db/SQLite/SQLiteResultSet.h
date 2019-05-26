@@ -19,11 +19,12 @@ class SQLiteResultSet : public IDbResultSet {
 	size_t fields_count, records_count;
 
 	std::shared_ptr<sqlite3> db;
-	std::shared_ptr<Statement> stmt;
+	mutable std::shared_ptr<Statement> stmt;
 
 	mutable bool eof;
 	mutable size_t fetched_record_no;
 
+	inline int execute_stmt() const;
 public:
 	SQLiteResultSet(std::shared_ptr<sqlite3> db_, \
 					std::shared_ptr<Statement> stmt_);
@@ -52,3 +53,8 @@ public:
 	virtual ~SQLiteResultSet();
 };
 
+int SQLiteResultSet::execute_stmt() const {
+
+	stmt->initial_state = false;
+	return sqlite3_step(stmt->stmt);
+}

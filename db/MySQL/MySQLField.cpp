@@ -52,6 +52,23 @@ std::wstring CMySQLField::getFieldNameW() const {
 	return std::wstring(&field_name_w[0]);
 }
 
+std::string CMySQLField::getFieldAlias() const {
+
+	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+	return std::string(mysql_field->name);
+}
+
+std::wstring CMySQLField::getFieldAliasW() const {
+
+	std::vector<wchar_t> field_name_w;
+	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
+
+	UTF8_ToUCS16(mysql_field->name, mysql_field->name_length, field_name_w);
+	field_name_w.push_back(0);
+
+	return std::wstring(&field_name_w[0]);
+}
+
 size_t CMySQLField::getFieldMaxLength() const {
 
 	return max_size;
