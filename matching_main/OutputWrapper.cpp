@@ -52,6 +52,9 @@ CHTMLOutputWrapper::~CHTMLOutputWrapper(){ }
 
 CCsvOutputWrapper::CCsvOutputWrapper(const CMatchingResultsTable &table_) : table(table_){ }
 
+CCsvOutputWrapper::CCsvOutputWrapper(const CMatchingResultsTable &table_, std::string prefix_) : \
+										table(table_), prefix(std::move(prefix_)) { }
+
 std::ostream &CCsvOutputWrapper::writeHeader(std::ostream &out) {
 const size_t cols_count = table.getColumnsCount();
 
@@ -72,6 +75,8 @@ const size_t rec_count = obj.table.getRecordsCount();
 for(size_t i = 0; i < rec_count; ++i){
 	const CMatchingResultsRecord rec = obj.table.getRecord(i);
 	const size_t cols_count = rec.size();
+
+	out << obj.prefix;
 
 	if(cols_count)
 		obj.writeCSValue(rec.getColValueAsCharArray(0), out);

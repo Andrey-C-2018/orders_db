@@ -27,7 +27,9 @@ void CPropertiesFile::open(const char *path) {
 		throw CPropertiesFileException(CPropertiesFileException::E_FILE_NOT_FOUND, \
 			_T("Config file cannot be opened"));
 
-	std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
+	f.unsetf(std::ios::skipws);
+	std::locale loc("ukr_ukr.1251");
+	//std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
 	f.imbue(loc);
 }
 
@@ -87,7 +89,9 @@ int CPropertiesFile::getIntProperty(const Tchar *name, Tstring &buffer) const {
 	if (error) {
 		CPropertiesFileException e(CPropertiesFileException::E_WRONG_VALUE, \
 									_T("Invalid integer value: '"));
-		e << p << "' for parameter name '" << name << "'";
+		if (p) e << p;
+		else e << _T("NULL");
+		e << _T("' for parameter name '" << name << "'");
 		throw e;
 	}
 	return value;

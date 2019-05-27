@@ -65,10 +65,7 @@ x64/
 _libs/
 _old/
 _scripts/
-advocat_duties/
-advocats_registry/
-csv_file/
-curl_test/
 diff_backup/
 orders/
 /.metadata/
+*.ini

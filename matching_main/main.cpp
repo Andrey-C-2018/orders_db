@@ -122,8 +122,7 @@ int main() {
 													p2.second.position, \
 													p2.second.position + p2.second.size, \
 													false);
-			CCsvOutputWrapper output_wrapper(results_table);
-			result << empty_cells_filler;
+			CCsvOutputWrapper output_wrapper(results_table, empty_cells_filler);
 			result << output_wrapper;
 			std::cout << " OK" << std::endl;
 		}

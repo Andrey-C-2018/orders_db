@@ -106,7 +106,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X64_PATH%include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../;%SQLITE_CONNECTOR_PATH%</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

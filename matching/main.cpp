@@ -39,7 +39,7 @@ void replaceAdvNameIfNecessary(std::vector<wchar_t> &adv_name, \
 
 int main() {
 
-	setlocale(LC_ALL, "RUSSIAN");
+	setlocale(LC_ALL, "ukr_ukr.1251");
 	CCOMHelper init_COM;
 
 	try {

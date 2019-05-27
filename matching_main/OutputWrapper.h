@@ -22,10 +22,13 @@ public:
 
 class CCsvOutputWrapper {
 	const CMatchingResultsTable &table;
+	std::string prefix;
 
 	inline std::ostream &writeCSValue(const char *value, std::ostream &out) const;
 public:
 	CCsvOutputWrapper(const CMatchingResultsTable &table_);
+	CCsvOutputWrapper(const CMatchingResultsTable &table_, std::string prefix_);
+
 	CCsvOutputWrapper(const CCsvOutputWrapper &obj) = default;
 	CCsvOutputWrapper(CCsvOutputWrapper &&obj) = default;
 	CCsvOutputWrapper &operator=(const CCsvOutputWrapper &obj) = default;
