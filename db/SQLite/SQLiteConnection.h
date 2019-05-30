@@ -6,7 +6,8 @@ class SQLiteConnectionException : public SQLiteException {
 public:
 	enum {
 		E_WRONG_QUERY = 1, \
-		E_NOT_A_SCALAR_QUERY = 2
+		E_NOT_A_SCALAR_QUERY = 2, \
+		E_CONNECTION_PARAMS = 3
 	};
 
 	SQLiteConnectionException(const int err_code, const Tchar *err_descr);

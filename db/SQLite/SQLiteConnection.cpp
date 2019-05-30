@@ -26,7 +26,10 @@ void SQLiteConnection::Connect(const char *location, const unsigned port, \
 								const char *pwd, \
 								const char *schema_name) {
 
-	assert(location && schema_name);
+	if (!location || !schema_name)
+		throw SQLiteConnectionException(SQLiteConnectionException::E_CONNECTION_PARAMS, \
+										_T("the path to database is NULL"));
+
 	Disconnect();
 
 	int err = 0;

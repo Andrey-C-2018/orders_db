@@ -90,7 +90,7 @@ int CPropertiesFile::getIntProperty(const Tchar *name, Tstring &buffer) const {
 		CPropertiesFileException e(CPropertiesFileException::E_WRONG_VALUE, \
 									_T("Invalid integer value: '"));
 		if (p) e << p;
-		else e << _T("NULL");
+		else e << _T("NULL'");
 		e << _T("' for parameter name '" << name << "'");
 		throw e;
 	}
