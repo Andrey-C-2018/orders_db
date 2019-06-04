@@ -195,11 +195,13 @@ record_t CMySQLStatement::execScalar() {
 	if (mysql_stmt_execute(stmt.get()))
 		throw CMySQLStatementException(stmt.get());
 
+	my_ulonglong affected_rows = mysql_stmt_affected_rows(stmt.get());
+
 	if (mysql_stmt_result_metadata(stmt.get()))
 		throw CMySQLStatementException(CMySQLStatementException::E_EXEC, \
 										_T("execScalar() used instead of exec()"));
 
-	return mysql_stmt_affected_rows(stmt.get());
+	return affected_rows;
 }
 
 std::shared_ptr<IDbResultSetMetadata> CMySQLStatement::getResultSetMetadata() {

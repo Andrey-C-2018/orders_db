@@ -69,3 +69,5 @@ diff_backup/
 orders/
 /.metadata/
 *.ini
+matching_main/config.ini
+matching3/result.csv

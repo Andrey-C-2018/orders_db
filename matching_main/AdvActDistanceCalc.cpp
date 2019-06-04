@@ -27,6 +27,9 @@ p = std::copy_if(str2, str2 + r.len2, r.act2, is_not_backspace);
 r.len2 = p - r.act2;
 *p = '\0';
 
+std::for_each(r.act1, r.act1 + r.len1, [](char &ch) { ch = toupper(ch); });
+std::for_each(r.act2, r.act2 + r.len2, [](char &ch) { ch = toupper(ch); });
+
 return r;
 }
 
