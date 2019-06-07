@@ -24,6 +24,7 @@
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FileSystem.h" />
     <ClInclude Include="ImmutableString.h" />
+    <ClInclude Include="locale_init.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="PropertiesFile.h" />
     <ClInclude Include="TextConv.h" />

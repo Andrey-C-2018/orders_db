@@ -1,32 +1,16 @@
-#include <basic/Exception.h>
-#include <basic/tstream.h>
-#include <basic/Process.h>
+#include <iostream>
+#include <basic/locale_init.h>
+#include <UnitTest++/UnitTest++.h>
+
+TEST(Sanity) {
+
+	CHECK_EQUAL(1, 1);
+}
 
 int main() {
-	//try {
-	//	XException e(0, "const char *");
 
-	//	e << L" and wchar_t";
-	//	throw e;
-	//}
-	//catch (XException &e) {
-	//	Tcout << e.what()<< std::endl;
-	//}
+	setLocaleToCurrOS_Locale();
+	int ret_value = UnitTest::RunAllTests();
 
-	//try {
-	//	XException e(0, L"");
-
-	//	e << " and char";
-	//	e << 1234;
-	//	throw e;
-	//}
-	//catch (XException &e) {
-	//	Tcout << e.what() << std::endl;
-	//}
-
-	std::string cmd;
-	exec("c:\\Windows\\System32\\cmd.exe", "/c echo OK && pause", "c:\\Windows\\System32");
-
-	Tcin.get();
-	return 0;
+	return ret_value;
 }

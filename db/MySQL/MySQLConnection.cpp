@@ -42,7 +42,15 @@ void CMySQLConnection::Connect(const char *location, const unsigned port, \
 		throw CMySQLConnectionException(conn);
 }
 
-void CMySQLConnection::SetSchema(const char *schema_name) { }
+void CMySQLConnection::SetSchema(const char *schema_name) {
+
+	assert(schema_name);
+	std::string query = "USE ";
+	query += schema_name;
+
+	if (mysql_query(conn, query.c_str()))
+		throw CMySQLConnectionException(conn);
+}
 
 record_t CMySQLConnection::ExecScalarQuery(const char *query_text) {
 

@@ -54,6 +54,12 @@
     <ClInclude Include="Process.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="PropertiesFile.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="locale_init.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Exception.cpp">
@@ -64,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="win\ProcessImpl.cpp">
       <Filter>platform_specific</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesFile.cpp">
+      <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -135,7 +135,7 @@ template <typename Tchar> \
 void XString<Tchar>::initChar(const Tchar ch) {
 
 	resize(MIN_ALLOCATION_SIZE, false);
-	str_size = 1;
+	str_size = (ch != 0);
 	data[0] = ch;
 	data[1] = 0;
 }
@@ -205,9 +205,9 @@ XString<Tchar> &XString<Tchar>::operator+=(const Tchar ch) {
 
 	resize(str_size + 2, true);
 	data[str_size] = ch;
-	data[str_size + 1] = ch;
+	data[str_size + 1] = 0;
 
-	++str_size;
+	str_size += (ch != 0);
 	return *this;
 }
 

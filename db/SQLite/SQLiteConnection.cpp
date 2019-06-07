@@ -54,7 +54,7 @@ void SQLiteConnection::Connect(const char *location, const unsigned port, \
 		[](sqlite3 *db) {
 			int err = 0;
 
-#ifdef SQLITE_DB_OPTIMIZEON_EXIT
+#ifdef SQLITE_DB_OPTIMIZE_ON_EXIT
 			auto opt_stmt = prepareQuery(db, "PRAGMA optimize");
 			assert(opt_stmt);
 			err = sqlite3_step(opt_stmt);
