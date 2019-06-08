@@ -7,13 +7,14 @@
 #include <basic/XConv.h>
 #include <basic/TextConv.h>
 #include <basic/FileSystem.h>
+#include <basic/locale_init.h>
 #include <date/Date.h>
-#include "DbfTable.h"
-#include "Directory.h"
 #include <db/SQLite/SQLiteConnection.h>
 #include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
+#include "DbfTable.h"
+#include "Directory.h"
 
 enum Defaults {
 	MAX_DBF_FILE_NAME_LEN = 30, \
@@ -39,7 +40,7 @@ void replaceAdvNameIfNecessary(std::vector<wchar_t> &adv_name, \
 
 int main() {
 
-	setlocale(LC_ALL, "ukr_ukr.1251");
+	setLocaleToCurrOS_Locale();
 	CCOMHelper init_COM;
 
 	try {

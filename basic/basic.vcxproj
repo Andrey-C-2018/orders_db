@@ -30,6 +30,7 @@
     <ClInclude Include="TextConv.h" />
     <ClInclude Include="tstream.h" />
     <ClInclude Include="tstring.h" />
+    <ClInclude Include="win\locale_init.h" />
     <ClInclude Include="win\TextConvImpl.h" />
     <ClInclude Include="XConv.h" />
     <ClInclude Include="XString.h" />

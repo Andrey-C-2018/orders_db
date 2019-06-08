@@ -66,6 +66,9 @@
     <ClCompile Include="SQLite\SQLiteResultSetMetadata.cpp">
       <Filter>SQLite</Filter>
     </ClCompile>
+    <ClCompile Include="MySQL\MySQLConnectionFactory.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IDbResultSet.h">
@@ -130,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="SQLite\SQLiteField.h">
       <Filter>SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLConnectionFactory.h">
+      <Filter>MySQL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

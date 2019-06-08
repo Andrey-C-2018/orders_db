@@ -3,11 +3,12 @@
 #include <basic/Exception.h>
 #include <basic/PropertiesFile.h>
 #include <basic/XConv.h>
+#include <basic/locale_init.h>
 #include <csv_file/CsvTable.h>
+#include <db/MySQL/MySQLConnectionFactory.h>
 #include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
-#include "mysql_initializer.h"
 
 std::map<std::wstring, size_t> fields;
 
@@ -20,7 +21,7 @@ int convAndCheckIntCell(std::shared_ptr<TRecord> rec, const wchar_t *field_name,
 
 int main() {
 
-	setlocale(LC_ALL, "ukr_ukr.1251");
+	setLocaleToCurrOS_Locale();
 
 	try {
 		CPropertiesFile props;
@@ -29,14 +30,14 @@ int main() {
 		auto csv_input = openCSV("result.csv");
 		fields = createFieldNamesMap(csv_input);
 
-		auto mysql_conn = createMySQLConnection(props);
+		auto mysql_conn = CMySQLConnectionFactory::createConnection(props);
 		std::string query = "UPDATE payments SET id_act_parus = ?,";
 		query += " fee_parus = ?, payment_date = ? ";
 		query += "WHERE id_center = ? AND id_order = ? AND order_date = ?";
 		query += " AND id_stage = ? AND cycle = ?";
 		auto stmt = mysql_conn->PrepareQuery(query.c_str());
 
-		query = "SELECT id_order FROM payments ";
+		query = "SELECT id_act_parus, fee_parus, payment_date FROM payments ";
 		query += "WHERE id_center = ? AND id_order = ? AND order_date = ?";
 		query += " AND id_stage = ? AND cycle = ?";
 		auto check_stmt = mysql_conn->PrepareQuery(query.c_str());
@@ -52,9 +53,9 @@ int main() {
 			stmt->bindValue(0, act_name.c_str());
 
 			std::wstring fee = rec->getColValueAsCharArray(fields[L"fee_1C"]);
-			auto p_comma = fee.find(L',');
-			if (p_comma != std::wstring::npos)
-				fee.replace(p_comma, p_comma + 1, L".");
+			auto pos_comma = fee.find(L',');
+			if (pos_comma != std::wstring::npos)
+				fee.replace(pos_comma, 1, L".");
 			stmt->bindValue(1, fee.c_str());
 
 			CDate payment_date(rec->getColValueAsCharArray(fields[L"payment_date"]), \
@@ -88,9 +89,10 @@ int main() {
 			check_stmt->bindValue(4, cycle);
 
 			auto rs = check_stmt->exec();
-			if (!rs->getRecordsCount()) {
-				wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1] = L"";
-
+			wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1] = L"";
+			auto recs_count = rs->getRecordsCount();
+			if (!recs_count) {
+				
 				std::wcerr << _T("Немає такого доручення: рядок ") << i;
 				std::wcerr << _T(", значення полів: ");
 				std::wcerr << _T("id_center = ") << id_center;
@@ -101,6 +103,23 @@ int main() {
 			}
 
 			auto affected_records = stmt->execScalar();
+			if(affected_records && recs_count) {
+				rs->gotoRecord(0);
+				std::wcout << _T("Оновлено: ");
+				std::wcout << id_center << _T('-') << id << _T('-');
+				order_date.ToStringGerman(buffer);
+				std::wcout << buffer << _T('-') << id_stage << _T('-');
+				std::wcout << cycle << _T(": '") << rs->getWString(0);
+				std::wcout << _T("' <- '") << act_name << _T("', ");
+				std::wcout << rs->getWString(1) << _T(" <- ") << fee;
+				bool is_null = false;
+				CDate payment_date_old = rs->getDate(2, is_null);
+				payment_date_old.ToStringGerman(buffer);
+				std::wcout << _T(", '") << (is_null ? _T("NULL") : buffer);
+				payment_date.ToStringGerman(buffer);
+				std::wcout << _T("' <- '") << buffer << _T("'") << std::endl;
+			}
+
 			total_updated_recs += affected_records;
 		}
 
@@ -119,7 +138,7 @@ int main() {
 
 std::shared_ptr<TTable> openCSV(const char *path) {
 
-	return std::make_shared<TTable>(path, "ukr_ukr.1251", L',', true);
+	return std::make_shared<TTable>(path, getOS_Locale(), L',', true, true);
 }
 
 std::map<std::wstring, size_t> createFieldNamesMap(std::shared_ptr<TTable> csv) {

@@ -2,12 +2,13 @@
 #include <iostream>
 #include <basic/PropertiesFile.h>
 #include <basic/TextConv.h>
+#include <basic/locale_init.h>
 #include <db/SQLite/SQLiteConnection.h>
+#include <db/MySQL/MySQLConnectionFactory.h>
 #include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
 #include <db/IDbResultSetMetaData.h>
-#include "mysql_initializer.h"
 #include "DbTable.h"
 #include "Matching.h"
 #include "CurrencyDiffCalc.h"
@@ -26,19 +27,24 @@ CAdvocats fillAdvocatBlocks(std::shared_ptr<const ITable> in, const size_t col_i
 
 int main() {
 
-	setlocale(LC_ALL, "ukr_ukr.1251");
+	setLocaleToCurrOS_Locale();
 
 	try {
 		CPropertiesFile props;
 		props.open("config.ini");
 
-		auto mysql_conn = createMySQLConnection(props);
+		auto mysql_conn = CMySQLConnectionFactory::createConnection(props);
 		std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date, aa.id_stage, aa.cycle,";
 		query += " b.adv_name, aa.act_date, aa.fee as fee_DB, aa.id_act ";
 		query += "FROM orders a INNER JOIN payments aa ON";
 		query += " a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
 		query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat ";
-		query += "WHERE a.zone = ? AND aa.act_date >= '2019-01-01' AND aa.is_paid IS NULL AND aa.fee <> 0 ";
+		query += "WHERE a.zone = ? AND aa.act_date >= '2019-01-01' AND aa.fee <> 0 ";
+
+		Tstring props_buffer;
+		if (props.getIntProperty(_T("only_payed_acts"), props_buffer)) {
+			query += "AND aa.is_paid IS NULL ";
+		}
 		query += "ORDER BY adv_name, id_act";
 
 		auto ordersdb_stmt = mysql_conn->PrepareQuery(query.c_str());

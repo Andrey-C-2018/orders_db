@@ -46,7 +46,8 @@ class CCsvTableException : public XException{
 public:
 	enum Errors{
 		E_FILE_NOT_FOUND = 1, \
-		E_FILE_IS_EMPTY = 2
+		E_FILE_IS_EMPTY = 2, \
+		E_DIFFERENT_COLUMNS_COUNT = 3
 	};
 	
 	CCsvTableException(const int err_code, const Tchar *err_descr);
@@ -82,7 +83,7 @@ class CCsvTable : public ITable<Tstring_> {
 	inline void initFileStream(std::wifstream &f, const char *encoding);
 public:
 	CCsvTable(const char *file_name, const char *encoding, \
-				const Tchar_ delimiter_, const bool read_header);
+				const Tchar_ delimiter_, const bool read_header, const bool check_cols_count);
 				
 	CCsvTable(const CCsvTable &obj) = delete;
 	CCsvTable(CCsvTable &&obj) = default;
@@ -310,7 +311,8 @@ void CCsvTable<Tstring_>::initFileStream(std::wifstream &f, const char *encoding
 
 template <typename Tstring_> \
 CCsvTable<Tstring_>::CCsvTable(const char *file_name, const char *encoding, \
-								const Tchar_ delimiter_, const bool read_header) : \
+								const Tchar_ delimiter_, const bool read_header, \
+								const bool check_cols_count) : \
 								file_size(0), crlf(0), crlf_size(0), delimiter(delimiter_) {
 	assert(file_name);
 	assert(encoding);
@@ -366,14 +368,29 @@ CCsvTable<Tstring_>::CCsvTable(const char *file_name, const char *encoding, \
 		rec_offsets.insert(rec_offsets.begin(), 0);
 	}
 
+	if (check_cols_count) buffer.clear();
 	while (p != istr_iter()) {
 		if (*p == crlf) {
+			if (check_cols_count) {
+				size_t curr_cols_count = CCsvRecord<Tstring_>::evalColumnsCount(buffer, delimiter);
+				if (curr_cols_count != col_names.size()) {
+					CCsvTableException e(CCsvTableException::E_DIFFERENT_COLUMNS_COUNT, \
+											_T("The record "));
+					e << rec_offsets.size() << _T(" has ") << curr_cols_count;
+					e << _T(" columns, that is different from columns count in the header: ");
+					e << col_names.size();
+					throw e;
+				}
+
+				buffer.clear();
+			}
 			std::advance(p, crlf_size);
 
 			rec_offsets.push_back((size_t)in.tellg());
 			++crlf_count;
 		}
 		else {
+			if (check_cols_count) buffer += *p;
 			++p;
 			crlf_count = 0;
 		}
