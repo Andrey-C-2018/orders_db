@@ -109,13 +109,20 @@ int main() {
 				std::wcout << id_center << _T('-') << id << _T('-');
 				order_date.ToStringGerman(buffer);
 				std::wcout << buffer << _T('-') << id_stage << _T('-');
-				std::wcout << cycle << _T(": '") << rs->getWString(0);
-				std::wcout << _T("' <- '") << act_name << _T("', ");
-				std::wcout << rs->getWString(1) << _T(" <- ") << fee;
+				std::wcout << cycle << _T(": '");
+
+				const Tchar *act_name_old = rs->getWString(0);
+				act_name_old = act_name_old ? act_name_old : _T("NULL");
+				std::wcout << act_name_old << _T("' <- '") << act_name << _T("', ");
+
+				const Tchar *fee_old = rs->getWString(1);
+				fee_old = fee_old ? fee_old : _T("NULL");
+				std::wcout << fee_old << _T(" <- ") << fee << _T(", '");
+
 				bool is_null = false;
 				CDate payment_date_old = rs->getDate(2, is_null);
 				payment_date_old.ToStringGerman(buffer);
-				std::wcout << _T(", '") << (is_null ? _T("NULL") : buffer);
+				std::wcout << (is_null ? _T("NULL") : buffer);
 				payment_date.ToStringGerman(buffer);
 				std::wcout << _T("' <- '") << buffer << _T("'") << std::endl;
 			}
