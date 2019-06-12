@@ -128,7 +128,6 @@ void CDispatcherCell::Draw(XGC &gc, const XPoint &initial_coords, const XSize &s
 			}
 
 			curr_coords = initial_coords;
-			//event_handler->OnActiveCellCoordsChanged(x, y);
 			curr_size = size;
 		}
 		active_cell_reached = false;
@@ -176,31 +175,16 @@ void CDispatcherCell::OnClick(const size_t field, const size_t record) {
 	if (inside_on_click) return;
 	inside_on_click = true;
 
-	size_t prev_active_field(active_field);
-	size_t prev_active_record(active_record);
-
 	CommitChangesIfPresent();
-	size_t new_records_count = table_proxy->GetRecordsCount();
+
+	size_t prev_active_field = active_field;
+	size_t prev_active_record = active_record;
 
 	active_field = field;
 	def_active_cell->SetCurrentField(active_field);
 
-	if (!new_records_count) {
-		def_active_cell->Hide();
-		active_cell_hidden = true;
-		move_def_cell = true;
-	}
-	else {
-		if (record >= new_records_count)
-			active_record = new_records_count - 1;
-		else
-			active_record = record;
-
-		OnActiveCellLocationChanged();
-	}
-
-	if(active_field != prev_active_field || active_record != prev_active_record)
-		event_handler->OnActiveCellLocationChanged(active_field, active_record);
+	active_record = record;
+	OnTableChanged(prev_active_field, prev_active_record);
 
 	inside_on_click = false;
 }
@@ -218,18 +202,33 @@ void CDispatcherCell::CommitChangesIfPresent() {
 	}
 }
 
-void CDispatcherCell::OnActiveCellLocationChanged() {
+void CDispatcherCell::OnTableChanged(const size_t old_field, const size_t old_record) {
 
+	size_t records_count = table_proxy->GetRecordsCount();
 	def_active_cell->Hide();
-	Reload();
+
+	if (records_count) {
+		if (active_record >= records_count)
+			active_record = records_count - 1;
+
+		RefreshActiveCellWidgetLabel();
+	}
 
 	active_cell_hidden = true;
 	move_def_cell = true;
+
+	if (active_field != old_field || active_record != old_record)
+		event_handler->OnActiveCellLocationChanged(active_field, active_record);
 }
 
 void CDispatcherCell::Reload() {
 
-	if (skip_reloading || !table_proxy->GetRecordsCount()) return;
+	if (skip_reloading) return;
+
+	OnTableChanged(active_field, active_record);
+}
+
+void CDispatcherCell::RefreshActiveCellWidgetLabel() {
 
 	ImmutableString<Tchar> label = table_proxy->GetCellAsString(active_field, active_record);
 	label.str = label.str ? label.str : _T("");

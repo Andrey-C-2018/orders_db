@@ -1,7 +1,6 @@
 ﻿#include "MyFrame.h"
 #include <db_ext/DbTable.h>
 #include <db/MySQL/MySQLConnection.h>
-//#include <db/SQLite/SQLiteConnection.h>
 #include <db_controls/DbComboBoxCellWidget.h>
 
 CMyFrame::CMyFrame(const Tchar *class_name,\
@@ -17,13 +16,10 @@ CMyFrame::CMyFrame(const Tchar *class_name,\
 	GetClientRect(rc);
 
 	std::shared_ptr<IDbConnection> conn = std::make_shared<CMySQLConnection>();
-	//std::shared_ptr<IDbConnection> conn = std::make_shared<SQLiteConnection>();
 
-	conn->Connect("192.168.1.2", 3310, "orders_user", "123", "orders");
-	//conn->Connect("c:\\#projects\\test", 0, nullptr, nullptr, "test");
+	conn->Connect("127.0.0.1", 3310, "root", "12345", "orders");
 
 	auto stmt = conn->PrepareQuery("SELECT id_center_legalaid, id, order_date, type_name FROM orders INNER JOIN order_types ON id_order_type = id_type WHERE id BETWEEN 1700 AND 1702 ORDER BY 1,3,2");
-	//auto stmt = conn->PrepareQuery("SELECT id_center, id, order_date, type_name FROM orders INNER JOIN order_types ON id_order_type = id_type ORDER BY 1,3,2");
 	
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
 	db_table->setPrimaryTableForQuery("orders");

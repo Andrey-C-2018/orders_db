@@ -159,6 +159,13 @@ public:
 		return 0;
 	}
 
+	GridScrollParams GetVerticalScrollParams(const size_t new_items_count, \
+												const int height) override {
+		
+		auto scroll_params = composer.GetCurrViewParams(new_items_count, height);
+		return GridScrollParams( scroll_params.first, scroll_params.second );
+	}
+
 	virtual ~TSimpleFieldLayout(){ }
 };
 
@@ -267,6 +274,13 @@ public:
 					const int sum) override {
 
 		return items.RemoveField(field, grid_widget_width, sum);
+	}
+
+	GridScrollParams GetVerticalScrollParams(const size_t new_items_count, \
+												const int height) override {
+
+		auto scroll_params = composer.GetCurrViewParams(new_items_count, height);
+		return GridScrollParams( scroll_params.first, scroll_params.second );
 	}
 
 	virtual ~TFieldOfRecordsLayout(){ }
@@ -392,6 +406,11 @@ public:
 		return composer.RemoveField(field, grid_widget_width, sum);
 	}
 
+	GridScrollParams GetVerticalScrollParams(const size_t new_items_count, \
+												const int height) override {
+		return GridScrollParams();
+	}
+
 	virtual ~TSimpleRecordLayout(){ }
 };
 
@@ -502,6 +521,12 @@ public:
 
 		items.RemoveField(field, grid_widget_width, sum);
 		return composer.RemoveField(field, grid_widget_width, sum);
+	}
+
+	GridScrollParams GetVerticalScrollParams(const size_t new_items_count, \
+												const int height) override {
+
+		return items.GetVerticalScrollParams(new_items_count, height);
 	}
 
 	virtual ~TRecordOfFieldsLayout(){ }

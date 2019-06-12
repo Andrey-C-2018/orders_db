@@ -76,6 +76,18 @@ public:
 		RecalcInitialItemAndShift();
 	}
 
+	inline std::pair<int, int> GetCurrViewParams(const size_t new_items_count, \
+														const int height) {
+
+		int all_records_size = (int)new_items_count * record_height;
+		if (offset && offset + height > all_records_size) {
+			offset = height - (all_records_size - offset);
+			RecalcInitialItemAndShift();
+		}
+
+		return std::pair<int, int>(offset, all_records_size);
+	}
+
 	size_t GetItemIndexByCoord(const int coord) { 
 		size_t item_index = (size_t)((coord + shift) / record_height);
 		

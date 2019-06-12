@@ -168,7 +168,6 @@ void CFilteringManager::InternalDisable(std::vector<FilteringItem>::iterator p) 
 		query_text.erase(p->pos_begin, p->pos_end - p->pos_begin);
 		p->pos_begin = 0;
 		p->pos_end = 0;
-		query_text_changed = true;
 	}
 
 	p->enabled = false;

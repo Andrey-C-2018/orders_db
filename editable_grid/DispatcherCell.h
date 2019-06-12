@@ -32,7 +32,8 @@ class CDispatcherCell : public IDrawable {
 	bool skip_reloading;
 
 	void CommitChangesIfPresent();
-	void OnActiveCellLocationChanged();
+	void OnTableChanged(const size_t old_field, const size_t old_record);
+	void RefreshActiveCellWidgetLabel();
 public:
 	CDispatcherCell();
 	CDispatcherCell(const CDispatcherCell &obj) = delete;
@@ -138,6 +139,8 @@ void CDispatcherCell::OnFieldRemoved(const size_t field) {
 	if (field <= active_field) {
 		
 		CommitChangesIfPresent();
+
+		size_t prev_active_field = active_field;
 		if (field == active_field)
 			active_field = active_field ? \
 							active_field - 1 : 1;
@@ -145,6 +148,7 @@ void CDispatcherCell::OnFieldRemoved(const size_t field) {
 			--active_field;
 
 		def_active_cell->SetCurrentField(active_field);
-		OnActiveCellLocationChanged();
+
+		OnTableChanged(prev_active_field, active_record);
 	}
 }

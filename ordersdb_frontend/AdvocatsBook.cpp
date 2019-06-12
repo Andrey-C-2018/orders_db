@@ -1,5 +1,6 @@
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbComboBoxCellWidget.h>
+#include <db/MySQL/MySQLConnectionFactory.h>
 #include <db/MySQL/MySQLConnection.h>
 #include <xwindows/HorizontalSizer.h>
 #include <xwindows/VerticalSizer.h>
@@ -18,7 +19,7 @@ CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 
 	initBinderControls();
 
-	conn = createConnection(props);
+	conn = CMySQLConnectionFactory::createConnection(props);
 	db_table = createDbTable(conn);
 	
 	grid = new CDbGrid(db_table);
@@ -38,32 +39,6 @@ CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 	Connect(EVT_COMMAND, btn_apply_filter->GetId(), this, &CAdvocatsBook::OnFilterButtonClick);
 }
 	
-std::shared_ptr<IDbConnection> CAdvocatsBook::createConnection(const CPropertiesFile &props) {
-
-	std::shared_ptr<IDbConnection> conn = std::make_shared<CMySQLConnection>();
-
-	Tstring buffer;
-	const Tchar *curr_prop = nullptr;
-	std::string server, user, pwd, database;
-	
-	curr_prop = props.getStringProperty(_T("server_address"), buffer);
-	const char *p_server = UCS16_ToUTF8(curr_prop, -1, server);
-
-	int port = props.getIntProperty(_T("port"), buffer);
-
-	curr_prop = props.getStringProperty(_T("user"), buffer);
-	const char *p_user = UCS16_ToUTF8(curr_prop, -1, user);
-
-	curr_prop = props.getStringProperty(_T("password"), buffer);
-	const char *p_pwd = UCS16_ToUTF8(curr_prop, -1, pwd);
-
-	curr_prop = props.getStringProperty(_T("database"), buffer);
-	const char *p_database = UCS16_ToUTF8(curr_prop, -1, database);
-
-	conn->Connect(p_server, port, p_user, p_pwd, p_database);
-	return conn;
-}
-
 std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnection> conn) {
 
 	std::string query = "SELECT b.id_advocat, b.adv_name, b.license_no, b.license_date,";
@@ -179,11 +154,10 @@ void CAdvocatsBook::OnFilteringWidgetLooseFocus(XCommandEvent *eve) {
 
 void CAdvocatsBook::OnFilterButtonClick(XCommandEvent *eve) {
 
-	query_modifier.changeWherePart(filtering_manager.getSQLWherePart());
-	//MessageBoxA(nullptr, query_modifier.getQuery().c_str(), "", MB_OK);
-
 	if (filtering_manager.isWherePartChanged()) {
 
+		query_modifier.changeWherePart(filtering_manager.getSQLWherePart());
+		
 		auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 		filtering_manager.apply(stmt);
 		db_table->reload(stmt);

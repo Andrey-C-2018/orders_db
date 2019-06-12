@@ -39,7 +39,6 @@ class CAdvocatsBook : public XFrame {
 	int grid_x, grid_y;
 	int grid_margin_x, grid_margin_y;
 	
-	std::shared_ptr<IDbConnection> createConnection(const CPropertiesFile &props);
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 	void setFieldsSizes();
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);

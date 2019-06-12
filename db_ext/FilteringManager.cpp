@@ -99,6 +99,7 @@ void CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
 	}
 
 	filtering_changed = false;
+	query_text_changed = false;
 }
 
 CFilteringManager::~CFilteringManager() { }

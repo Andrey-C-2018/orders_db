@@ -291,6 +291,17 @@ void CGrid::Reload() {
 			this->SetScrollBar(X_SCROLL_HORZ, hscroll);
 		}
 
+		size_t records_count = data_table_proxy->GetRecordsCount();
+		auto scroll_params = cells->GetVerticalScrollParams(records_count, \
+															height - headers_height);
+		if (vscroll.pos != scroll_params.offset || \
+			vscroll.max != scroll_params.records_sizes_summ - 1) {
+
+			vscroll.pos = scroll_params.offset;
+			vscroll.max = scroll_params.records_sizes_summ - 1;
+			this->SetScrollBar(X_SCROLL_VERT, vscroll);
+		}
+
 		cells->Reload();
 		Invalidate(nullptr, false);
 	}
