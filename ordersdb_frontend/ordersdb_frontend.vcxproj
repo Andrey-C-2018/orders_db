@@ -156,12 +156,14 @@
   <ItemGroup>
     <ClCompile Include="AdvocatsBook.cpp" />
     <ClCompile Include="BinderControls.cpp" />
+    <ClCompile Include="FilteringEdit.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="QueryModifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdvocatsBook.h" />
     <ClInclude Include="BinderControls.h" />
+    <ClInclude Include="FilteringEdit.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="QueryModifier.h" />
   </ItemGroup>

@@ -10,6 +10,7 @@ class CDbTable;
 class CDbComboBox;
 class CDbGrid;
 class CComboBoxCellWidget;
+class CFilteringEdit;
 
 class CAdvocatsBook : public XFrame {
 	enum Defaults {
@@ -25,13 +26,9 @@ class CAdvocatsBook : public XFrame {
 	CQueryModifier query_modifier;
 	CFilteringManager filtering_manager;
 
-	void OnFilteringWidgetChanged(XCommandEvent *eve);
-	void OnFilteringWidgetLooseFocus(XCommandEvent *eve);
 	void OnFilterButtonClick(XCommandEvent *eve);
 
-	XEdit *flt_id;
-	bool flt_id_changed;
-	CDbComboBox *flt_advocats;
+	CFilteringEdit *flt_id;
 
 	XButton *btn_apply_filter, *btn_ordering, *btn_add, *btn_remove, *btn_upload;
 	CDbGrid *grid;

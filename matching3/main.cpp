@@ -100,15 +100,17 @@ int main() {
 				order_date.ToStringGerman(buffer);
 				std::wcerr << _T(", order_date = ") << buffer;
 				std::wcerr << _T(", act_name = ") << act_name << std::endl;
+
+				continue;
 			}
 
 			auto affected_records = stmt->execScalar();
 			if(affected_records && recs_count) {
 				rs->gotoRecord(0);
 				std::wcout << _T("Оновлено: ");
-				std::wcout << id_center << _T('-') << id << _T('-');
+				std::wcout << id_center << _T('-') << id << _T("-'");
 				order_date.ToStringGerman(buffer);
-				std::wcout << buffer << _T('-') << id_stage << _T('-');
+				std::wcout << buffer << _T("'-") << id_stage << _T('-');
 				std::wcout << cycle << _T(": '");
 
 				const Tchar *act_name_old = rs->getWString(0);

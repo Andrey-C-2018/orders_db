@@ -42,7 +42,7 @@ int main() {
 		query += "WHERE a.zone = ? AND aa.act_date >= '2019-01-01' AND aa.fee <> 0 ";
 
 		Tstring props_buffer;
-		if (props.getIntProperty(_T("only_payed_acts"), props_buffer)) {
+		if (props.getIntProperty(_T("only_unpaid_acts"), props_buffer)) {
 			query += "AND aa.is_paid IS NULL ";
 		}
 		query += "ORDER BY adv_name, id_act";

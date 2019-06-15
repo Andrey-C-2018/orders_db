@@ -1,6 +1,35 @@
 #include "DbComboBoxCellWidget.h"
 #include <editable_grid/ICellEventHandler.h>
 
+class OnComboCellChangedAction : public IOnCellChangedAction {
+	XComboBox &combo_cell_widget;
+	CDbTable *dependent_table;
+	CDependentTableUpdater &updater;
+
+public:
+	inline OnComboCellChangedAction(CDbComboBoxCellWidget &combo_cell_widget_, \
+								CDbTable *dependent_table_, \
+								CDependentTableUpdater &updater_) noexcept : \
+							combo_cell_widget(combo_cell_widget_), \
+							dependent_table(dependent_table_), \
+							updater(updater_) {
+
+		assert(dependent_table);
+	}
+
+	void executeAction() override {
+
+		size_t sel_index = combo_cell_widget.GetCurrentSelectionIndex();
+		dependent_table->gotoCurrentRecord();
+
+		auto stmt = updater.createDepTableUpdateStmt(sel_index);
+		dependent_table->executeScalarStmt(stmt);
+	}
+	virtual ~OnComboCellChangedAction() { }
+};
+
+//**************************************************************
+
 CDbComboBoxCellWidget::CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
 											const size_t field_to_display_, \
 											const char *master_table_name, \
@@ -63,14 +92,8 @@ void CDbComboBoxCellWidget::AddRelation(const char *master_field, const char *de
 void CDbComboBoxCellWidget::OnItemChoosed(XCommandEvent *eve) {
 
 	assert(on_indirect_change_handler);
-	if (!on_indirect_change_handler->OnCellChangedIndirectly(this))
-		return;
-
-	size_t sel_index = XComboBox::GetCurrentSelectionIndex();
-	dependent_table->gotoCurrentRecord();
-	
-	auto stmt = updater.createDepTableUpdateStmt(sel_index);
-	dependent_table->executeScalarStmt(stmt);
+	OnComboCellChangedAction combo_action(*this, dependent_table.get(), updater);
+	on_indirect_change_handler->OnCellChangedIndirectly(this, combo_action);
 }
 
 void CDbComboBoxCellWidget::SetOnChangeHandler(XEventHandlerData on_change) { }

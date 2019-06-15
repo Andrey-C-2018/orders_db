@@ -1,4 +1,5 @@
 #include "DbGrid.h"
+#include <db/DbException.h>
 #include <grid/TextCell.h>
 #include <editable_grid/IGridEventsHandler.h>
 
@@ -12,14 +13,28 @@ public:
 	CDbGridEventsHandler(std::shared_ptr<CDbTable> db_table_, size_t &active_record_no_) :
 								db_table(db_table_), active_record_no(active_record_no_) { }
 
-	bool OnCellChanged(IGridCellWidget *cell_widget) override {
+	void OnCellChanged(IGridCellWidget *cell_widget, \
+						IOnCellChangedAction &action) override {
 
-		return true;
+		try {
+			action.executeAction();
+		}
+		catch (CDbException &e) {
+
+			MessageBox(NULL, e.what(), _T("Error"), MB_OK);
+		}
 	}
 
-	bool OnCellChangedIndirectly(IGridCellWidget *cell_widget) override {
+	void OnCellChangedIndirectly(IGridCellWidget *cell_widget, \
+								IOnCellChangedAction &action) override { 
+	
+		try {
+			action.executeAction();
+		}
+		catch (CDbException &e) {
 
-		return true;
+			MessageBox(NULL, e.what(), _T("Error"), MB_OK);
+		}
 	}
 
 	void OnActiveCellLocationChanged(const size_t new_field, \

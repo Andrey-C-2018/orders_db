@@ -3,14 +3,13 @@
 #include <xwindows/XEdit.h>
 
 class CEditableCellWidget final : public XEdit, public IGridCellWidget {
-	
-	CEditableCellWidget(const CEditableCellWidget &obj) = delete;
-	CEditableCellWidget &operator=(const CEditableCellWidget &obj) = delete;
 public:
 	CEditableCellWidget();
 
+	CEditableCellWidget(const CEditableCellWidget &obj) = delete;
 	CEditableCellWidget(CEditableCellWidget &&obj) = default;
 	CEditableCellWidget &operator=(CEditableCellWidget &&obj) = default;
+	CEditableCellWidget &operator=(const CEditableCellWidget &obj) = delete;
 
 	void CreateCellWidget(XWindow *parent, const int flags, \
 				const Tchar *label, \

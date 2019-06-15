@@ -17,15 +17,11 @@ public:
 
 	CStringGridEventsHandler() : active_field(0), active_record(0) { }
 
-	bool OnCellChanged(IGridCellWidget *cell_widget) override {
+	void OnCellChanged(IGridCellWidget *cell_widget, \
+						IOnCellChangedAction &action) override { }
 
-		return true;
-	}
-
-	bool OnCellChangedIndirectly(IGridCellWidget *cell_widget) override {
-
-		return true;
-	}
+	void OnCellChangedIndirectly(IGridCellWidget *cell_widget, \
+									IOnCellChangedAction &action) override { }
 
 	void OnActiveCellLocationChanged(const size_t new_field, \
 										const size_t new_record) override {

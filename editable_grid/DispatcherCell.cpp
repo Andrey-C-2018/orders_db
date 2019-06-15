@@ -1,6 +1,33 @@
 #include "DispatcherCell.h"
 #include <grid/GridTableProxy.h>
 
+class OnCellChangedAction : public IOnCellChangedAction {
+	CGridTableProxy *table_proxy;
+	const size_t active_field;
+	const size_t active_record;
+	const Tchar *value;
+public:
+	inline OnCellChangedAction(CGridTableProxy *table_proxy_, \
+								const size_t active_field_, \
+								const size_t active_record_, \
+								const Tchar *value_) noexcept : \
+							table_proxy(table_proxy_),\
+							active_field(active_field_), \
+							active_record(active_record_), value(value_) {
+
+		assert(table_proxy);
+		assert(value);
+	}
+
+	void executeAction() override {
+		
+		table_proxy->SetCell(active_field, active_record, value);
+	}
+	virtual ~OnCellChangedAction() { }
+};
+
+//**************************************************************
+
 CDispatcherCell::CDispatcherCell() : def_active_cell(nullptr), \
 									active_field((size_t)-1), active_record((size_t)-1), \
 									active_cell_reached(false), \
@@ -150,19 +177,20 @@ void CDispatcherCell::OnActiveCellTextChanged(XCommandEvent *eve) {
 }
 
 void CDispatcherCell::OnActiveCellKeyPressed(XKeyboardEvent *eve) {
+	bool exec_def_action = true;
 
 	switch (eve->GetKey()) {
 	case X_VKEY_ENTER:
 		OnClick(active_field, active_record);
-
-		eve->ExecuteDefaultEventAction(false);
+		exec_def_action = false;
 		break;
 
 	case X_VKEY_ESCAPE:
-		Reload();
-
-		eve->ExecuteDefaultEventAction(false);
+		RefreshActiveCellWidgetLabel();
+		exec_def_action = false;
 	}
+
+	eve->ExecuteDefaultEventAction(exec_def_action);
 }
 
 void CDispatcherCell::OnActiveCellLoosesFocus(XEvent *eve) {
@@ -195,7 +223,9 @@ void CDispatcherCell::CommitChangesIfPresent() {
 		ImmutableString<Tchar> value = def_active_cell->GetLabel();
 
 		skip_reloading = true;
-		table_proxy->SetCell(active_field, active_record, value.str);
+		OnCellChangedAction action(table_proxy.get(), \
+									active_field, active_record, value.str);
+		event_handler->OnCellChanged(def_active_cell, action);
 		skip_reloading = false;
 
 		changes_present = false;
