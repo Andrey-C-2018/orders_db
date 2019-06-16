@@ -44,7 +44,9 @@ Thumbs.db
 *.suo
 .vs/
 Debug/
+Debug DLL/
 Release/
+Release DLL/
 x64/
 
 # Codelite specific
@@ -58,6 +60,7 @@ x64/
 
 # Output folders
 ######################
+0bin
 0libs
 
 # Rectricted

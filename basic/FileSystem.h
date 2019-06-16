@@ -9,5 +9,3 @@ bool checkFileExists(const wchar_t *path);
 void getModuleFilePath(std::string &path);
 
 void getModuleDirectoryPath(std::string &path);
-
-std::string getParentDirectoryPath(const char *path);

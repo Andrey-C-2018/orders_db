@@ -63,6 +63,9 @@
     <ClInclude Include="win\locale_init.h">
       <Filter>platform_specific</Filter>
     </ClInclude>
+    <ClInclude Include="dll_definitions.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Exception.cpp">

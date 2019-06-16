@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <string>
 #include <string.h>
+#include "dll_definitions.h"
 
 #ifdef UNICODE
 	typedef wchar_t Tchar;

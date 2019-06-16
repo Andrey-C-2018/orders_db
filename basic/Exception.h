@@ -1,9 +1,19 @@
 #pragma once
 #include "tstring.h"
+#include "dll_definitions.h"
 
-class XException{
+class BASIC_LIB_API XException{
 	int err_code;
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
 	Tstring err_msg;
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 public:
 	XException(const int err_code, const char *err_descr);
 	XException(const int err_code, const wchar_t *err_descr);
