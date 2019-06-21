@@ -1,7 +1,7 @@
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbComboBoxCellWidget.h>
 #include <db/MySQL/MySQLConnectionFactory.h>
-#include <db/MySQL/MySQLConnection.h>
+#include <db/IDbConnection.h>
 #include <xwindows/HorizontalSizer.h>
 #include <xwindows/VerticalSizer.h>
 #include <xwindows/XLabel.h>
@@ -12,7 +12,7 @@
 CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 								const Tchar *label, const int X, const int Y, \
 								const int width, const int height) : \
-	flt_id(nullptr), btn_apply_filter(nullptr), btn_ordering(nullptr), \
+	flt_id(nullptr), edit_adv_name(nullptr), btn_apply_filter(nullptr), btn_ordering(nullptr), \
 	btn_add(nullptr), btn_remove(nullptr), btn_upload(nullptr), grid(nullptr), \
 	adv_org_types_list(nullptr), \
 	grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
@@ -103,7 +103,13 @@ void CAdvocatsBook::DisplayWidgets() {
 		sizer.addWidget(new XLabel(), _T("ID: "), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
 		sizer.addWidget(flt_id, _T(""), FL_WINDOW_VISIBLE, \
-						XSize(80, DEF_GUI_ROW_HEIGHT));
+						XSize(65, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("ПІБ: "), FL_WINDOW_VISIBLE, \
+						XSize(30, DEF_GUI_ROW_HEIGHT));
+		edit_adv_name = new XEdit();
+		sizer.addWidget(flt_id, _T(""), FL_WINDOW_VISIBLE, \
+						XSize(120, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -113,6 +119,9 @@ void CAdvocatsBook::DisplayWidgets() {
 		btn_ordering = new XButton();
 		sizer.addWidget(btn_ordering, _T("Сорт."), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
+		btn_add = new XButton();
+		sizer.addWidget(btn_add, _T("+"), FL_WINDOW_VISIBLE, \
+						XSize(30, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
@@ -131,6 +140,8 @@ void CAdvocatsBook::initBinderControls() {
 	flt_id = new CFilteringEdit(filtering_manager);
 	std::shared_ptr<IBinder> id_binder = std::make_shared<CIntWidgetBinderControl>(flt_id);
 	ImmutableString<char> expr("b.id_advocat = ?", sizeof("b.id_advocat = ?") - 1);
+
+
 
 	int id_expr = filtering_manager.addExpr(expr, id_binder);
 	flt_id->setExprId(id_expr);
@@ -154,6 +165,11 @@ void CAdvocatsBook::OnFilterButtonClick(XCommandEvent *eve) {
 }
 
 void CAdvocatsBook::OnOrderingButtonClick(XCommandEvent *eve) {
+
+}
+
+void CAdvocatsBook::OnAddRecordButtonClick(XCommandEvent *eve) {
+
 
 }
 

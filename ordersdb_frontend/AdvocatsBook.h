@@ -29,6 +29,7 @@ class CAdvocatsBook : public XFrame {
 	void OnFilterButtonClick(XCommandEvent *eve);
 
 	CFilteringEdit *flt_id;
+	XEdit *edit_adv_name;
 
 	XButton *btn_apply_filter, *btn_ordering, *btn_add, *btn_remove, *btn_upload;
 	CDbGrid *grid;
@@ -44,6 +45,7 @@ class CAdvocatsBook : public XFrame {
 
 	void OnSize(XSizeEvent *eve);
 	void OnOrderingButtonClick(XCommandEvent *eve);
+	void OnAddRecordButtonClick(XCommandEvent *eve);
 	void OnRemoveButtonClick(XCommandEvent *eve);
 	void OnUploadButtonClick(XCommandEvent *eve);
 public:
