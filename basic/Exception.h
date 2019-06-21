@@ -2,7 +2,7 @@
 #include "tstring.h"
 #include "dll_definitions.h"
 
-class BASIC_LIB_API XException{
+class BASIC_DLL_EXPORT XException{
 	int err_code;
 
 #ifdef _MSC_VER

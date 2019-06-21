@@ -3,7 +3,6 @@
 #include <vector>
 #include <algorithm>
 #include <basic/Exception.h>
-#include <basic/NumericTypeWrapper.h>
 #include <db/IDbResultSetMetadata.h>
 #include <db/IDbField.h>
 #include "IndexedSearchPredicates.h"
@@ -46,7 +45,8 @@ private:
 		bool is_primary_key;
 		id_type id_table;
 
-		CFieldRecord() noexcept : id(0), is_primary_key(true), id_table(-1) { }
+		CFieldRecord() noexcept : id(0), is_primary_key(true), \
+									field_size(0), id_table(-1) { }
 		CFieldRecord(const CFieldRecord &obj) = default;
 		CFieldRecord(CFieldRecord &&obj) = default;
 

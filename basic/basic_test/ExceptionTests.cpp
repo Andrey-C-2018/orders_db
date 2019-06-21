@@ -20,8 +20,8 @@ SUITE(XExceptionTests) {
 
 	TEST(EncodingIndependence) {
 
-		XException e(1, "Тест");
-		XException e_UCS16(2, L"Тест");
+		XException e(1, "Test");
+		XException e_UCS16(2, L"Test");
 
 		auto err_descr1 = e.what();
 		auto err_descr2 = e_UCS16.what();

@@ -48,7 +48,7 @@ const wchar_t *UTF8_ToUCS16(const char *in, const int len, Out &out) {
 		rc = mbrtowc(&wch, p_in, len_in, &state);
 	}
 	
-	assert(!len_in || (len_in && !rc));
+	assert(!len_in || !rc);
 	addChar(out, L'\0');
 	return out.size() ? &out[0] : nullptr;
 }
@@ -77,7 +77,7 @@ inline const char *UCS16_ToUTF8(const wchar_t *in, const int len, Out &out) {
 		rc = wcrtomb(&ch, *p_in, &state);
 	}
 	
-	assert(!len_in || (len_in && !rc));
+	assert(!len_in || !rc);
 	addChar(out, '\0');
 	return out.size() ? &out[0] : nullptr;
 }

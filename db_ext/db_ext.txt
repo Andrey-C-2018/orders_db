@@ -1,1 +1,1 @@
-./Release/main.cpp.o ./Release/DbTable.cpp.o ./Release/DbTableDispatcher.cpp.o ./Release/MetaInfo.cpp.o ./Release/Query.cpp.o
+./Debug/Query.cpp.o ./Debug/main.cpp.o ./Debug/FilteringManager.cpp.o ./Debug/DependentTableUpdater.cpp.o ./Debug/MetaInfo.cpp.o ./Debug/DbTable.cpp.o

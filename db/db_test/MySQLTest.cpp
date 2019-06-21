@@ -15,7 +15,7 @@ protected:
 				
 			try {
 				conn = std::make_shared<CMySQLConnection>();
-				conn->Connect("127.0.0.1", 3310, "root", "12345", "");
+				conn->Connect("127.0.0.1", 3306, "root", "12345", "");
 			}
 			catch (XException &e) {
 
@@ -57,7 +57,7 @@ protected:
 
 		query = u8"CREATE TABLE orders(id_center_legalaid INT(4) NOT NULL,";
 		query += u8" id INT(6) NOT NULL, order_date DATE NOT NULL, id_adv INT(6) NOT NULL,";
-		query += u8" client_name VARCHAR(255), order_type ENUM(' «','««œ','¿ƒÃ'), ";
+		query += u8" client_name VARCHAR(255), order_type ENUM('–ö–ó','–ó–ó–ü','–ê–î–ú'), ";
 		query += u8" fee DECIMAL(8,2), PRIMARY KEY (id_center_legalaid, id, order_date))";
 
 		try {
@@ -171,7 +171,7 @@ SUITE(MySQL_tests) {
 	TEST_FIXTURE(CMySQLTest, InsertIntoTable) {
 
 		auto recs_count = insertIntoOrders("1", "1", "1991-01-01", "1", \
-											u8"œÂÚÓ‚ ≤. ≤.", u8" «", "1234.56");
+											u8"–ü–µ—Ç—Ä–æ–≤ –Ü. –Ü.", u8"–ö–ó", "1234.56");
 		CHECK_EQUAL(1, recs_count);
 	}
 
@@ -180,7 +180,7 @@ SUITE(MySQL_tests) {
 		auto stmt = getInsertionStmtOrders();
 
 		auto recs_count = insertIntoOrders(stmt, 1, 2, CDate(5, 2, 1992), 1, \
-											u8"≤‚‡ÌÓ‚ ¿. ¿.", u8"««œ", "503.7");
+											u8"–Ü–≤–∞–Ω–æ–≤ –ê. –ê.", u8"–ó–ó–ü", "503.7");
 		CHECK_EQUAL(1, recs_count);
 	}
 }

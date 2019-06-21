@@ -1,6 +1,16 @@
 #include "MySQLConnectionFactory.h"
 #include <basic/PropertiesFile.h>
 
+inline void convertToUTF8IfNecessary(const wchar_t *curr_prop, std::string &destination) {
+	
+	UCS16_ToUTF8(curr_prop, -1, destination);
+}
+
+inline void convertToUTF8IfNecessary(const char *curr_prop, std::string &destination) {
+	
+	destination = curr_prop;
+}
+
 void getPropertyValue(const CPropertiesFile &props, \
 						const Tchar *prop_name, const Tchar *prop_descr, \
 						Tstring &buffer, std::string &dest) {
@@ -17,7 +27,7 @@ void getPropertyValue(const CPropertiesFile &props, \
 		throw e;
 	}
 
-	UCS16_ToUTF8(curr_prop, -1, dest);
+	convertToUTF8IfNecessary(curr_prop, dest);
 }
 
 CMySQLConnectionFactory::CMySQLConnectionFactory() { }

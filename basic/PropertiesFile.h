@@ -2,7 +2,7 @@
 #include "tstream.h"
 #include "Exception.h"
 
-class CPropertiesFileException : public XException {
+class BASIC_DLL_EXPORT CPropertiesFileException : public XException {
 public:
 	enum {
 		E_FILE_NOT_FOUND = 1, \
@@ -17,7 +17,7 @@ public:
 	~CPropertiesFileException() throw();
 };
 
-class CPropertiesFile{
+class BASIC_DLL_EXPORT CPropertiesFile{
 	mutable Tfstream f;
 	Tstring buffer;
 

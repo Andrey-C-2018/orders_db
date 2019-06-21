@@ -1,0 +1,1 @@
+./Debug/ExceptionTests.cpp.o ./Debug/main.cpp.o ./Debug/XStringTests.cpp.o

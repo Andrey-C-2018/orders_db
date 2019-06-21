@@ -77,7 +77,7 @@ void CFilteringManager::disableAll() {
 
 void CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
 
-	assert(filtering_changed || (!filtering_changed & !query_text_changed));
+	assert(filtering_changed || (!filtering_changed && !query_text_changed));
 	if (!filtering_changed) return;
 
 	assert(parsed_query);

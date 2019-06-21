@@ -226,7 +226,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>USE_BASIC_LIB_AS_DLL;BASIC_LIB_EXPORTS;_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);TARGET_SYSTEM_WINDOWS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BASIC_IS_DLL;BASIC_DLL_EXPORTS;_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);TARGET_SYSTEM_WINDOWS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -268,7 +268,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>USE_BASIC_LIB_AS_DLL;BASIC_LIB_EXPORTS;_SCL_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions);TARGET_SYSTEM_WINDOWS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BASIC_IS_DLL;BASIC_DLL_EXPORTS;_SCL_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions);TARGET_SYSTEM_WINDOWS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -287,12 +287,12 @@
       </ModuleDefinitionFile>
     </Link>
     <ClCompile>
-      <PreprocessorDefinitions>_WINDLL;USE_BASIC_LIB_AS_DLL;BASIC_LIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;BASIC_IS_DLL;BASIC_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>_WINDLL;USE_BASIC_LIB_AS_DLL;BASIC_LIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;BASIC_IS_DLL;BASIC_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

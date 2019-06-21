@@ -57,6 +57,9 @@ x64/
 *.workspace
 *.project
 *.mk
+compile_commands.json
+Makefile
+compile_flags.txt
 
 # Output folders
 ######################
@@ -73,4 +76,5 @@ orders/
 /.metadata/
 *.ini
 matching_main/config.ini
+matching_main/result.csv
 matching3/result.csv

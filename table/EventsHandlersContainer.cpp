@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "ITable.h"
 #include "EventsHandlersContainer.h"
 

@@ -63,7 +63,7 @@ const char *UCS16_ToDefEnc(const wchar_t *in, const int len, Out &out, addCharPr
 		rc = wcrtomb(&ch, *p_in, &state);
 	}
 	
-	assert(!len_in || (len_in && !rc));
+	assert(!len_in || !rc);
 	return out.size() ? &out[0] : nullptr;
 }
 
