@@ -74,6 +74,16 @@ inline int Tstrcmp(const wchar_t *str1, const wchar_t *str2) noexcept {
 	return wcscmp(str1, str2);
 }
 
+inline const char *Tstrchr(const char *str1, const int ch) noexcept {
+
+	return strchr(str1, ch);
+}
+
+inline const wchar_t *Tstrchr(const wchar_t *str1, const wchar_t ch) noexcept {
+
+	return wcschr(str1, ch);
+}
+
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

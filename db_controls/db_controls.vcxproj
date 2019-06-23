@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DbComboBox.h" />
     <ClInclude Include="DbComboBoxCellWidget.h" />
     <ClInclude Include="DbGrid.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DbComboBox.cpp" />
     <ClCompile Include="DbComboBoxCellWidget.cpp" />
     <ClCompile Include="DbGrid.cpp" />
   </ItemGroup>

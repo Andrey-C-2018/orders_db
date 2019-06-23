@@ -217,9 +217,9 @@ void CMySQLVariant::SetDate(const unsigned day, \
 void CMySQLVariant::SetDate(const CDate &date) {
 
 	assert(IsDate());
-	value_datetime.day = date.GetDay();
-	value_datetime.month = date.GetMonth();
-	value_datetime.year = date.GetYear();
+	value_datetime.day = date.getDay();
+	value_datetime.month = date.getMonth();
+	value_datetime.year = date.getYear();
 }
 
 void CMySQLVariant::SetString(const char *value) {

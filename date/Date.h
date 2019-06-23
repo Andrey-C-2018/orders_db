@@ -40,24 +40,33 @@ public:
 	CDate &operator=(CDate &&obj) = default;
 
 	inline bool operator==(const CDate &obj) const noexcept;
-	inline bool IsNull() const noexcept;
+	inline bool operator!=(const CDate &obj) const noexcept;
+	inline bool operator>(const CDate &obj) const noexcept;
+	inline bool operator<(const CDate &obj) const noexcept;
+	inline bool operator>=(const CDate &obj) const noexcept;
+	inline bool operator<=(const CDate &obj) const noexcept;
+
+	inline bool isNull() const noexcept;
 	inline void clear() noexcept { day = 0; month = 0; year = 0; }
-	inline unsigned GetDay() const noexcept { return day; }
-	inline unsigned GetMonth() const noexcept { return month; }
-	inline unsigned GetYear() const noexcept { return year; }
-	inline void Set(const unsigned day, \
+
+	inline unsigned getDay() const noexcept { return day; }
+	inline unsigned getMonth() const noexcept { return month; }
+	inline unsigned getYear() const noexcept { return year; }
+	static CDate now();
+
+	inline void set(const unsigned day, \
 					const unsigned month, \
 					const unsigned year) noexcept;
 
 	template <typename Tchar> \
-		inline bool SetDateSQL(const Tchar *date_str) noexcept;
+		inline bool setDateSQL(const Tchar *date_str) noexcept;
 	template <typename Tchar> \
-		inline bool SetDateGerman(const Tchar *date_str) noexcept;
+		inline bool setDateGerman(const Tchar *date_str) noexcept;
 
 	template <typename Tchar> \
-		inline void ToStringGerman(Tchar *buffer) const noexcept;
+		inline void toStringGerman(Tchar *buffer) const noexcept;
 	template <typename Tchar> \
-		inline void ToStringSQL(Tchar *buffer) const noexcept;
+		inline void toStringSQL(Tchar *buffer) const noexcept;
 
 	virtual ~CDate() noexcept;
 };
@@ -70,10 +79,10 @@ CDate::CDate(const Tchar *date_str, const int format) noexcept : \
 
 	switch (format) {
 	case SQL_FORMAT:
-		SetDateSQL(date_str);
+		setDateSQL(date_str);
 
 	case GERMAN_FORMAT:
-		SetDateGerman(date_str);
+		setDateGerman(date_str);
 	}
 }
 
@@ -82,12 +91,41 @@ bool CDate::operator==(const CDate &obj) const noexcept {
 	return day == obj.day && month == obj.month && year == obj.year;
 }
 
-bool CDate::IsNull() const noexcept {
+bool CDate::operator!=(const CDate &obj) const noexcept {
+
+	return !operator==(obj);
+}
+
+bool CDate::operator>(const CDate &obj) const noexcept {
+
+	return year > obj.year || \
+			(year == obj.year && month > obj.month) || \
+			(year == obj.year && month == obj.month && day > obj.day);
+}
+
+bool CDate::operator<(const CDate &obj) const noexcept {
+
+	return year < obj.year || \
+			(year == obj.year && month < obj.month) || \
+			(year == obj.year && month == obj.month && day < obj.day);
+}
+
+bool CDate::operator>=(const CDate &obj) const noexcept {
+
+	return !operator<(obj);
+}
+
+bool CDate::operator<=(const CDate &obj) const noexcept {
+
+	return !operator>(obj);
+}
+
+bool CDate::isNull() const noexcept {
 
 	return day == 0 && month == 0 && year == 0;
 }
 
-void CDate::Set(const unsigned day, \
+void CDate::set(const unsigned day, \
 				const unsigned month, \
 				const unsigned year) noexcept {
 
@@ -98,7 +136,7 @@ void CDate::Set(const unsigned day, \
 }
 
 template <typename Tchar> \
-bool CDate::SetDateSQL(const Tchar *date_str) noexcept {
+bool CDate::setDateSQL(const Tchar *date_str) noexcept {
 	bool key = false;
 	unsigned Day(day), Month(month), Year(year);
 	const Tchar _0 = ZERO(Tchar());
@@ -128,7 +166,7 @@ bool CDate::SetDateSQL(const Tchar *date_str) noexcept {
 }
 
 template <typename Tchar> \
-bool CDate::SetDateGerman(const Tchar *date_str) noexcept {
+bool CDate::setDateGerman(const Tchar *date_str) noexcept {
 	bool key = false;
 	unsigned Day(day), Month(month), Year(year);
 	const Tchar _0 = ZERO(Tchar());
@@ -159,7 +197,7 @@ bool CDate::SetDateGerman(const Tchar *date_str) noexcept {
 }
 
 template <typename Tchar> \
-void CDate::ToStringGerman(Tchar *buffer) const noexcept {
+void CDate::toStringGerman(Tchar *buffer) const noexcept {
 	const Tchar _0 = ZERO(Tchar());
 
 	assert(buffer);
@@ -184,7 +222,7 @@ void CDate::ToStringGerman(Tchar *buffer) const noexcept {
 }
 
 template <typename Tchar> \
-void CDate::ToStringSQL(Tchar *buffer) const noexcept {
+void CDate::toStringSQL(Tchar *buffer) const noexcept {
 	unsigned Year = year;
 	const Tchar _0 = ZERO(Tchar());
 

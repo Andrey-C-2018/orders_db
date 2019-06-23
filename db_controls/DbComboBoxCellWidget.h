@@ -11,8 +11,6 @@ class CDbComboBoxCellWidget : public CComboBoxCellWidget {
 	void fillComboBox(std::shared_ptr<const IDbResultSet> master_records);
 	void OnItemChoosed(XCommandEvent *eve);
 
-	CDbComboBoxCellWidget(const CDbComboBoxCellWidget &obj) = delete;
-	CDbComboBoxCellWidget &operator=(const CDbComboBoxCellWidget &obj) = delete;
 public:
 	CDbComboBoxCellWidget(std::shared_ptr<IDbConnection> conn, \
 							const size_t field_to_display_, \
@@ -31,7 +29,9 @@ public:
 							const char *dependent_table_name, \
 							std::shared_ptr<CDbTable> dependent_table);
 
+	CDbComboBoxCellWidget(const CDbComboBoxCellWidget &obj) = delete;
 	CDbComboBoxCellWidget(CDbComboBoxCellWidget &&obj) = default;
+	CDbComboBoxCellWidget &operator=(const CDbComboBoxCellWidget &obj) = delete;
 	CDbComboBoxCellWidget &operator=(CDbComboBoxCellWidget &&obj) = default;
 
 	void CreateCellWidget(XWindow *parent, const int flags, \

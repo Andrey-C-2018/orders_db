@@ -1,7 +1,7 @@
-#include <db_controls/DbGrid.h>
-#include <db_controls/DbComboBoxCellWidget.h>
 #include <db/MySQL/MySQLConnectionFactory.h>
 #include <db/IDbConnection.h>
+#include <db_controls/DbGrid.h>
+#include <db_controls/DbComboBoxCellWidget.h>
 #include <xwindows/HorizontalSizer.h>
 #include <xwindows/VerticalSizer.h>
 #include <xwindows/XLabel.h>
@@ -12,9 +12,8 @@
 CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 								const Tchar *label, const int X, const int Y, \
 								const int width, const int height) : \
-	flt_id(nullptr), edit_adv_name(nullptr), btn_apply_filter(nullptr), btn_ordering(nullptr), \
-	btn_add(nullptr), btn_remove(nullptr), btn_upload(nullptr), grid(nullptr), \
-	adv_org_types_list(nullptr), \
+	flt_id(nullptr), btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
+	grid(nullptr), adv_org_types_list(nullptr), \
 	grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
 
 	props.open("config.ini");
@@ -101,14 +100,16 @@ void CAdvocatsBook::DisplayWidgets() {
 	CHorizontalSizer sizer(CSizerPreferences(0, 0, 0, 0, DEF_GUI_HORZ_GAP));
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(new XLabel(), _T("ID: "), FL_WINDOW_VISIBLE, \
-						XSize(30, DEF_GUI_ROW_HEIGHT));
+						XSize(20, DEF_GUI_ROW_HEIGHT));
+		adv_inserter.setIdAdvocatWidget(flt_id);
 		sizer.addWidget(flt_id, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(65, DEF_GUI_ROW_HEIGHT));
 
 		sizer.addWidget(new XLabel(), _T("Ï²Á: "), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
-		edit_adv_name = new XEdit();
-		sizer.addWidget(flt_id, _T(""), FL_WINDOW_VISIBLE, \
+		XEdit *edit_adv_name = new XEdit();
+		adv_inserter.setAdvNameWidget(edit_adv_name);
+		sizer.addWidget(edit_adv_name, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(120, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
@@ -116,11 +117,11 @@ void CAdvocatsBook::DisplayWidgets() {
 		btn_apply_filter = new XButton();
 		sizer.addWidget(btn_apply_filter, _T("Ô³ëüòð"), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
-		btn_ordering = new XButton();
-		sizer.addWidget(btn_ordering, _T("Ñîðò."), FL_WINDOW_VISIBLE, \
-						XSize(100, DEF_GUI_ROW_HEIGHT));
 		btn_add = new XButton();
 		sizer.addWidget(btn_add, _T("+"), FL_WINDOW_VISIBLE, \
+						XSize(30, DEF_GUI_ROW_HEIGHT));
+		btn_remove = new XButton();
+		sizer.addWidget(btn_remove, _T("-"), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
@@ -133,16 +134,16 @@ void CAdvocatsBook::DisplayWidgets() {
 	XRect margins = main_sizer.getMargins();
 	grid_margin_x = margins.left;
 	grid_margin_y = margins.top;
+
+	adv_inserter.prepare(conn);
 }
 
 void CAdvocatsBook::initBinderControls() {
 
 	flt_id = new CFilteringEdit(filtering_manager);
 	std::shared_ptr<IBinder> id_binder = std::make_shared<CIntWidgetBinderControl>(flt_id);
+	
 	ImmutableString<char> expr("b.id_advocat = ?", sizeof("b.id_advocat = ?") - 1);
-
-
-
 	int id_expr = filtering_manager.addExpr(expr, id_binder);
 	flt_id->setExprId(id_expr);
 }
@@ -164,22 +165,12 @@ void CAdvocatsBook::OnFilterButtonClick(XCommandEvent *eve) {
 	}
 }
 
-void CAdvocatsBook::OnOrderingButtonClick(XCommandEvent *eve) {
-
-}
-
 void CAdvocatsBook::OnAddRecordButtonClick(XCommandEvent *eve) {
 
-
+	adv_inserter.insert();
 }
 
-void CAdvocatsBook::OnRemoveButtonClick(XCommandEvent *eve) {
-
-}
-
-void CAdvocatsBook::OnUploadButtonClick(XCommandEvent *eve) {
-
-}
+void CAdvocatsBook::OnRemoveButtonClick(XCommandEvent *eve) { }
 
 void CAdvocatsBook::OnSize(XSizeEvent *eve) {
 
@@ -191,4 +182,8 @@ void CAdvocatsBook::OnSize(XSizeEvent *eve) {
 		height - grid_y - grid_margin_y);
 }
 
-CAdvocatsBook::~CAdvocatsBook() { }
+CAdvocatsBook::~CAdvocatsBook() {
+
+	if (grid && !grid->IsCreated()) delete grid;
+	if (flt_id && !flt_id->IsCreated()) delete flt_id;
+}

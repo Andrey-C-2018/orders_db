@@ -164,7 +164,7 @@ void SQLiteStatement::bindValue(const size_t param_no, const CDate &value) {
 	if (!stmt->initial_state) sqlite3_reset(stmt->stmt);
 
 	wchar_t date_str[CDate::SQL_FORMAT_LEN + 1];
-	value.ToStringSQL(date_str);
+	value.toStringSQL(date_str);
 
 	int rc = sqlite3_bind_text16(stmt->stmt, (int)param_no + 1, \
 									date_str, CDate::SQL_FORMAT_LEN * sizeof(wchar_t), nullptr);

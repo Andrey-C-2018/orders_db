@@ -203,7 +203,7 @@ const char *SQLiteDateField::getValueAsString(const std::shared_ptr<const IDbRes
 
 	bool is_null;
 	CDate date_value = result_set->getDate(field, is_null);
-	date_value.ToStringGerman(p);
+	date_value.toStringGerman(p);
 
 	return p;
 }
@@ -212,7 +212,7 @@ const wchar_t *SQLiteDateField::getValueAsWString(const std::shared_ptr<const ID
 	
 	bool is_null;
 	CDate date_value = result_set->getDate(field, is_null);
-	date_value.ToStringGerman(buffer);
+	date_value.toStringGerman(buffer);
 
 	return buffer;
 }
@@ -224,7 +224,7 @@ ImmutableString<char> SQLiteDateField::getValueAsImmutableString(\
 
 	bool is_null;
 	CDate date_value = result_set->getDate(field, is_null);
-	date_value.ToStringGerman(p);
+	date_value.toStringGerman(p);
 
 	return ImmutableString<char>(p, CDate::GERMAN_FORMAT_LEN);
 }
@@ -233,7 +233,7 @@ ImmutableString<wchar_t> SQLiteDateField::getValueAsImmutableWString(\
 													const std::shared_ptr<const IDbResultSet> result_set) const {
 	bool is_null;
 	CDate date_value = result_set->getDate(field, is_null);
-	date_value.ToStringGerman(buffer);
+	date_value.toStringGerman(buffer);
 
 	return ImmutableString<wchar_t>(buffer, CDate::GERMAN_FORMAT_LEN);
 }
@@ -243,7 +243,7 @@ void SQLiteDateField::bindValueAsString(std::shared_ptr<IDbBindingTarget> bindin
 													const char *value) const {
 	CDate date_value(value, CDate::GERMAN_FORMAT);
 
-	assert(!date_value.IsNull());
+	assert(!date_value.isNull());
 	binding_target->bindValue(param_no, date_value);
 }
 
@@ -252,7 +252,7 @@ void SQLiteDateField::bindValueAsWString(std::shared_ptr<IDbBindingTarget> bindi
 													const wchar_t *value) const {
 	CDate date_value(value, CDate::GERMAN_FORMAT);
 
-	assert(!date_value.IsNull());
+	assert(!date_value.isNull());
 	binding_target->bindValue(param_no, date_value);
 }
 

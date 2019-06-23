@@ -111,7 +111,7 @@ const char *CMySQLDateField::getValueAsString(const std::shared_ptr<const IDbRes
 	CDate date_value = result_set->getDate(field, is_null);
 	if (is_null) return nullptr;
 
-	date_value.ToStringGerman(p);
+	date_value.toStringGerman(p);
 	return p;
 }
 
@@ -121,7 +121,7 @@ const wchar_t *CMySQLDateField::getValueAsWString(const std::shared_ptr<const ID
 	CDate date_value = result_set->getDate(field, is_null);
 	if (is_null) return nullptr;
 
-	date_value.ToStringGerman(buffer);
+	date_value.toStringGerman(buffer);
 	return buffer;
 }
 
@@ -133,7 +133,7 @@ ImmutableString<char> CMySQLDateField::getValueAsImmutableString(\
 	if (is_null) return ImmutableString<char>(nullptr, 0);
 
 	char *p = (char *)buffer;
-	date_value.ToStringGerman(p);
+	date_value.toStringGerman(p);
 	return ImmutableString<char>(p, CDate::GERMAN_FORMAT_LEN);
 }
 
@@ -144,7 +144,7 @@ ImmutableString<wchar_t> CMySQLDateField::getValueAsImmutableWString(\
 	CDate date_value = result_set->getDate(field, is_null);
 	if (is_null) return ImmutableString<wchar_t>(nullptr, 0);
 
-	date_value.ToStringGerman(buffer);
+	date_value.toStringGerman(buffer);
 	return ImmutableString<wchar_t>(buffer, CDate::GERMAN_FORMAT_LEN);
 }
 
@@ -153,7 +153,7 @@ void CMySQLDateField::bindValueAsString(std::shared_ptr<IDbBindingTarget> bindin
 										const char *value) const {
 	CDate date_value(value, CDate::GERMAN_FORMAT);
 
-	assert(!date_value.IsNull());
+	assert(!date_value.isNull());
 	binding_target->bindValue(param_no, date_value);
 }
 
@@ -162,7 +162,7 @@ void CMySQLDateField::bindValueAsWString(std::shared_ptr<IDbBindingTarget> bindi
 										const wchar_t *value) const {
 	CDate date_value(value, CDate::GERMAN_FORMAT);
 
-	assert(!date_value.IsNull());
+	assert(!date_value.isNull());
 	binding_target->bindValue(param_no, date_value);
 }
 

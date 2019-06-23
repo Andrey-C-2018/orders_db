@@ -47,5 +47,5 @@ public:
 
 void XWidget::RegisterNewWidgetClass(const Tchar *class_name){
 
-CheckAndInitWindowClassName(class_name, CRegisterPredicate(*this, class_name));
+	CheckAndInitWindowClassName(class_name, CRegisterPredicate(*this, class_name));
 }
