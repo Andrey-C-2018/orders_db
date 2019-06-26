@@ -6,7 +6,6 @@
 #include "FieldsProperties.h"
 
 struct IReloadable;
-class CFieldsProperties;
 
 class CGridTableProxy : public ITableEventsHandler {
 	std::shared_ptr<ITable> table;
@@ -37,6 +36,7 @@ public:
 	inline std::shared_ptr<IFieldsProperties> GetFieldsProperties();
 
 	void SetFieldWidth(const size_t field, const int new_width);
+	void SetFieldName(const size_t field, const Tchar *new_name);
 	inline bool IsFieldHidden(const size_t field) const;
 	inline size_t GetRelativeFieldIndex(const size_t abs_field_index) const;
 	void HideField(const size_t field);

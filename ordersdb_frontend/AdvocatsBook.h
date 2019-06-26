@@ -10,6 +10,7 @@ struct IDbConnection;
 class CDbTable;
 class CDbGrid;
 class CComboBoxCellWidget;
+class CDbComboBoxCellWidget;
 class CFilteringEdit;
 
 class CAdvocatsBook : public XFrame {
@@ -28,6 +29,7 @@ class CAdvocatsBook : public XFrame {
 	CFilteringEdit *flt_id;
 	
 	CDbGrid *grid;
+	CDbComboBoxCellWidget *examiners_list, *districts_list;
 	CComboBoxCellWidget *adv_org_types_list;
 	int grid_x, grid_y;
 	int grid_margin_x, grid_margin_y;

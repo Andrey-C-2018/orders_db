@@ -464,6 +464,7 @@ inline void _plComboBoxReset(_plHWND hwnd) noexcept;
 
 inline void _plMessageBox(const Tchar *message) noexcept;
 inline void _plMessageBoxANSI(const char *message) noexcept;
+inline int _plMessageBoxYesNo(const Tchar *message) noexcept;
 inline void ErrorBox(const Tchar *message) noexcept;
 inline void ErrorBoxANSI(const char *message) noexcept;
 
@@ -932,6 +933,11 @@ void _plMessageBox(const Tchar *message) noexcept {
 void _plMessageBoxANSI(const char *message) noexcept {
 
 	MessageBoxA(0, message, "Info", MB_OK);
+}
+
+int _plMessageBoxYesNo(const Tchar *message) noexcept {
+
+	return MessageBox(0, message, _T("Info"), MB_YESNO | MB_ICONQUESTION);
 }
 
 void ErrorBox(const Tchar *message) noexcept {

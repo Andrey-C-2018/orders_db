@@ -40,6 +40,7 @@ public:
 							const int width, const int height) override;
 
 	void AddRelation(const char *master_field, const char *dependent_field);
+	inline std::shared_ptr<const IDbResultSet> getMasterResultSet() const;
 
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
 	void SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> handler) override;
@@ -47,3 +48,9 @@ public:
 	virtual ~CDbComboBoxCellWidget();
 };
 
+//**************************************************************
+
+std::shared_ptr<const IDbResultSet> CDbComboBoxCellWidget::getMasterResultSet() const {
+
+	return updater.getMasterResultSet();
+}

@@ -1,6 +1,7 @@
 #include <db/MySQL/MySQLConnectionFactory.h>
 #include <db/IDbConnection.h>
 #include <db_controls/DbGrid.h>
+#include <db_controls/DbComboBox.h>
 #include <db_controls/DbComboBoxCellWidget.h>
 #include <xwindows/HorizontalSizer.h>
 #include <xwindows/VerticalSizer.h>
@@ -34,6 +35,8 @@ CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 
 	Connect(EVT_SIZE, this, &CAdvocatsBook::OnSize);
 	Connect(EVT_COMMAND, btn_apply_filter->GetId(), this, &CAdvocatsBook::OnFilterButtonClick);
+	Connect(EVT_COMMAND, btn_add->GetId(), this, &CAdvocatsBook::OnAddRecordButtonClick);
+	Connect(EVT_COMMAND, btn_remove->GetId(), this, &CAdvocatsBook::OnRemoveButtonClick);
 }
 	
 std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnection> conn) {
@@ -59,9 +62,13 @@ std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnec
 void CAdvocatsBook::setFieldsSizes() {
 
 	grid->SetFieldWidth(0, 4);
+	grid->SetFieldLabel(0, _T("ID"));
 	grid->SetFieldWidth(1, 37);
+	grid->SetFieldLabel(1, _T("ПІБ адвоката"));
 	grid->SetFieldWidth(2, 10);
+	grid->SetFieldLabel(2, _T("№ св."));
 	grid->SetFieldWidth(4, 70);
+	grid->SetFieldLabel(4, _T("Орган, який видав свідоцтво"));
 	grid->SetFieldWidth(5, 6);
 	grid->SetFieldWidth(6, 75);
 	grid->SetFieldWidth(8, 25);
@@ -71,10 +78,15 @@ void CAdvocatsBook::setFieldsSizes() {
 void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 	assert(grid);
-	auto examiners_list = new CDbComboBoxCellWidget(conn, "exm_name", \
+	examiners_list = new CDbComboBoxCellWidget(conn, "exm_name", \
 												"examiners", "advocats", db_table);
 	examiners_list->AddRelation("id_examiner", "id_exm");
 	grid->SetWidgetForFieldByName("exm_name", examiners_list);
+
+	districts_list = new CDbComboBoxCellWidget(conn, "distr_center", \
+												"districts", "advocats", db_table);
+	districts_list->AddRelation("id_distr", "id_main_district");
+	grid->SetWidgetForFieldByName("distr_center", districts_list);
 
 	adv_org_types_list = new CComboBoxCellWidget();
 	grid->SetWidgetForFieldByName("org_type", adv_org_types_list);
@@ -91,6 +103,8 @@ void CAdvocatsBook::adjustUIDependentCellWidgets(CDbGrid *grid) {
 void CAdvocatsBook::DisplayWidgets() {
 
 	XRect rc;
+	const int edit_flags = FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
+							FL_WINDOW_CLIPSIBLINGS | FL_EDIT_AUTOHSCROLL;
 
 	GetClientRect(rc);
 	CVerticalSizer main_sizer(this, 0, 0, rc.right, rc.bottom, \
@@ -103,14 +117,91 @@ void CAdvocatsBook::DisplayWidgets() {
 						XSize(20, DEF_GUI_ROW_HEIGHT));
 		adv_inserter.setIdAdvocatWidget(flt_id);
 		sizer.addWidget(flt_id, _T(""), FL_WINDOW_VISIBLE, \
-						XSize(65, DEF_GUI_ROW_HEIGHT));
+						XSize(45, DEF_GUI_ROW_HEIGHT));
 
 		sizer.addWidget(new XLabel(), _T("ПІБ: "), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
 		XEdit *edit_adv_name = new XEdit();
 		adv_inserter.setAdvNameWidget(edit_adv_name);
-		sizer.addWidget(edit_adv_name, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
-						XSize(120, DEF_GUI_ROW_HEIGHT));
+		sizer.addWidget(edit_adv_name, _T(""), edit_flags, XSize(280, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("№ свід.: "), FL_WINDOW_VISIBLE, \
+						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
+		XEdit *license_no = new XEdit();
+		adv_inserter.setLicenseNoWidget(license_no);
+		sizer.addWidget(license_no, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Дата свід.: "), FL_WINDOW_VISIBLE, \
+						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
+		XEdit *license_date = new XEdit();
+		adv_inserter.setLicenseDateWidget(license_date);
+		sizer.addWidget(license_date, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+						XSize(80, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Хто видав:"), FL_WINDOW_VISIBLE, \
+						XSize(45, DEF_GUI_ROW_HEIGHT + 10));
+		CDbComboBox *examiner = new CDbComboBox(examiners_list->getMasterResultSet(), 1, 0);
+		adv_inserter.setExaminerWidget(examiner);
+		sizer.addResizeableWidget(examiner, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+						XSize(250, DEF_GUI_ROW_HEIGHT), 150);
+	main_sizer.popNestedSizer();
+
+	main_sizer.pushNestedSizer(sizer);
+		sizer.addWidget(new XLabel(), _T("Пошт. індекс:"), FL_WINDOW_VISIBLE, \
+						XSize(50, DEF_GUI_ROW_HEIGHT + 10));
+		XEdit *post_index = new XEdit();
+		adv_inserter.setPostIndexWidget(post_index);
+		sizer.addWidget(post_index, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+						XSize(70, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Адреса:"), FL_WINDOW_VISIBLE, \
+						XSize(53, DEF_GUI_ROW_HEIGHT));
+		XEdit *address = new XEdit();
+		adv_inserter.setAddressWidget(address);
+		sizer.addWidget(address, _T(""), edit_flags, XSize(380, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Дата народж:"), FL_WINDOW_VISIBLE, \
+						XSize(55, DEF_GUI_ROW_HEIGHT + 10));
+		XEdit *bdate = new XEdit();
+		adv_inserter.setBDateWidget(bdate);
+		sizer.addWidget(bdate, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Тел.:"), FL_WINDOW_VISIBLE, \
+						XSize(40, DEF_GUI_ROW_HEIGHT));
+		XEdit *tel = new XEdit();
+		adv_inserter.setTelWidget(tel);
+		sizer.addWidget(tel, _T(""), edit_flags, XSize(200, DEF_GUI_ROW_HEIGHT));
+	main_sizer.popNestedSizer();
+
+	main_sizer.pushNestedSizer(sizer);
+		sizer.addWidget(new XLabel(), _T("E-mail:"), FL_WINDOW_VISIBLE, \
+						XSize(50, DEF_GUI_ROW_HEIGHT));
+		XEdit *email = new XEdit();
+		adv_inserter.setEmailWidget(email);
+		sizer.addWidget(email, _T(""), edit_flags, XSize(200, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Район роботи:"), FL_WINDOW_VISIBLE, \
+						XSize(55, DEF_GUI_ROW_HEIGHT + 10));
+		CDbComboBox *distr = new CDbComboBox(districts_list->getMasterResultSet(), 2, 0);
+		adv_inserter.setDistrictWidget(distr);
+		sizer.addResizeableWidget(distr, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+									XSize(190, DEF_GUI_ROW_HEIGHT), 150);
+
+		sizer.addWidget(new XLabel(), _T("Назва орг.:"), FL_WINDOW_VISIBLE, \
+						XSize(45, DEF_GUI_ROW_HEIGHT + 10));
+		XEdit *org = new XEdit();
+		adv_inserter.setOrgNameWidget(org);
+		sizer.addWidget(org, _T(""), edit_flags, XSize(200, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Тип орг.:"), FL_WINDOW_VISIBLE, \
+						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
+		XComboBox *org_type = new XComboBox();
+		adv_inserter.setOrgTypeWidget(org_type);
+		sizer.addResizeableWidget(org_type, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
+									FL_COMBOBOX_DROPDOWN, XSize(50, DEF_GUI_ROW_HEIGHT), 150);
+		org_type->AddItem(_T("ІНД"));
+		org_type->AddItem(_T("АО"));
+		org_type->AddItem(_T("АБ"));
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -168,9 +259,15 @@ void CAdvocatsBook::OnFilterButtonClick(XCommandEvent *eve) {
 void CAdvocatsBook::OnAddRecordButtonClick(XCommandEvent *eve) {
 
 	adv_inserter.insert();
+	db_table->reload();
 }
 
-void CAdvocatsBook::OnRemoveButtonClick(XCommandEvent *eve) { }
+void CAdvocatsBook::OnRemoveButtonClick(XCommandEvent *eve) {
+
+	int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
+	if(option == IDYES)
+		db_table->removeCurrentRecord();
+}
 
 void CAdvocatsBook::OnSize(XSizeEvent *eve) {
 
@@ -183,6 +280,11 @@ void CAdvocatsBook::OnSize(XSizeEvent *eve) {
 }
 
 CAdvocatsBook::~CAdvocatsBook() {
+
+	if (examiners_list && !examiners_list->IsCreated()) delete examiners_list;
+	if (districts_list && !districts_list->IsCreated()) delete districts_list;
+	if (adv_org_types_list && !adv_org_types_list->IsCreated()) 
+		delete adv_org_types_list;
 
 	if (grid && !grid->IsCreated()) delete grid;
 	if (flt_id && !flt_id->IsCreated()) delete flt_id;

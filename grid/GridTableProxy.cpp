@@ -40,6 +40,11 @@ void CGridTableProxy::SetFieldWidth(const size_t field, const int new_width) {
 	fields_props->SetWidth(field, new_width);
 }
 
+void CGridTableProxy::SetFieldName(const size_t field, const Tchar *new_name) {
+
+	fields_props->SetFieldName(field, new_name);
+}
+
 void CGridTableProxy::HideField(const size_t field) {
 
 	fields_props->HideField(field);

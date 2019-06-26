@@ -168,6 +168,16 @@ public:
 		return data_table->GetFieldNameAsImmutableStr(exact_index);
 	}
 
+	inline void SetFieldName(const size_t index, const Tchar *new_name) {
+
+		assert(index < indexes.size());
+		size_t size = Tstrlen(new_name);
+		auto &name = fields_props[GetFieldIndex(index)].field_name;
+
+		name.resize(size + 1);
+		Tstrncpy(&name[0], new_name, size);
+	}
+
 	size_t size() const override { return GetFieldsCount(); }
 
 	inline size_t GetFieldsCount() const {

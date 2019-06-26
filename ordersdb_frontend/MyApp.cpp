@@ -5,10 +5,10 @@ IMPLEMENT_APP(CMyApp)
 void CMyApp::OnInit(){
 
 	frame = nullptr;
-	frame = new CAdvocatsBook(_T("База даних доручень адвокатам"), \
-					_T("ORDERSDB_FRONTEND"), \
-				   20, 20,\
-				   800, 600);
+	frame = new CAdvocatsBook(_T("ORDERSDB_ADV_REFERNCE"), \
+					_T("Довідник адвокатів"), \
+				   20, 10,\
+				   1000, 650);
 }
 
 CMyApp::~CMyApp(){

@@ -27,7 +27,8 @@ void CHorizontalSizer::onParametersChanged(const int new_x, const int new_y, \
 	x_initial = new_x;
 }
 
-void CHorizontalSizer::addWidget(XWidget *widget, const Tchar *label, const int flags, XSize size) {
+void CHorizontalSizer::addWidget(XWidget *widget, const Tchar *label, \
+									const int flags, XSize size, const int widget_max_height) {
 
 	assert(!nested_sizer);
 	const int widget_width = size.width;
@@ -40,7 +41,7 @@ void CHorizontalSizer::addWidget(XWidget *widget, const Tchar *label, const int 
 	if(widget_height > max_widget_height)
 		max_widget_height = widget_height;
 
-	widget->Create(parent, flags, label, x, y, widget_width, widget_height);
+	widget->Create(parent, flags, label, x, y, widget_width, widget_max_height);
 	x += widget_width + gap;
 }
 

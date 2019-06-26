@@ -103,6 +103,7 @@ public:
 	inline size_t GetRecordsCount() const;
 
 	inline void SetFieldWidth(const size_t field, const int new_width);
+	inline void SetFieldLabel(const size_t field, const Tchar *label);
 	void HideField(const size_t field_index);
 
 	void Reload() override;
@@ -132,6 +133,13 @@ void CGrid::SetFieldWidth(const size_t field, const int new_width) {
 	CheckWhetherFieldIndexValid(field);
 	assert(!IsCreated());
 	data_table_proxy->SetFieldWidth(field, new_width);
+}
+
+void CGrid::SetFieldLabel(const size_t field, const Tchar *label) {
+
+	CheckWhetherFieldIndexValid(field);
+	assert(!IsCreated());
+	data_table_proxy->SetFieldName(field, label);
 }
 
 int CGrid::GetRecordsSizesSumm() const {

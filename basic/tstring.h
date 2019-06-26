@@ -74,6 +74,16 @@ inline int Tstrcmp(const wchar_t *str1, const wchar_t *str2) noexcept {
 	return wcscmp(str1, str2);
 }
 
+inline int Tstrncmp(const char *str1, const char *str2, const size_t max_count) noexcept {
+
+	return strncmp(str1, str2, max_count);
+}
+
+inline int Tstrncmp(const wchar_t *str1, const wchar_t *str2, const size_t max_count) noexcept {
+
+	return wcsncmp(str1, str2, max_count);
+}
+
 inline const char *Tstrchr(const char *str1, const int ch) noexcept {
 
 	return strchr(str1, ch);

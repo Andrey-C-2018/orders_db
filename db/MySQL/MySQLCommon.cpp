@@ -7,6 +7,9 @@ CMySQLException::CMySQLException(const int err_code, const Tchar *err_descr) : \
 int CMySQLException::MapMySQLErrorCodeToCommonCode(const int mysql_code) const {
 
 	switch (mysql_code) {
+		case ER_DUP_ENTRY:
+			return CDbException::E_DB_PRIMARY_KEY_DUPLICATE;
+
 		case ER_FOREIGN_DUPLICATE_KEY_WITH_CHILD_INFO:
 			return CDbException::E_DB_FOREIGN_KEY_DUPLICATE;
 

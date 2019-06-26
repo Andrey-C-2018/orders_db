@@ -138,6 +138,15 @@ void CDbTable::SetCell(const size_t field, const size_t record, const Tchar *val
 	rereadQueryContents();
 }
 
+void CDbTable::removeCurrentRecord() {
+
+	result_set->gotoRecord(curr_record);
+	auto del_stmt = query.getDeleteStmt(result_set);
+
+	del_stmt->execScalar();
+	rereadQueryContents();
+}
+
 void CDbTable::reload(){
 
 	rereadQueryContents();

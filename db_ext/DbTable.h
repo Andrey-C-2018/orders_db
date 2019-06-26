@@ -48,6 +48,7 @@ public:
 
 	void AddField(const size_t max_field_len, const Tchar *field_name) override;
 	void AddRecord() override;
+	void removeCurrentRecord();
 
 	size_t GetFieldMaxLengthInChars(const size_t field) const override;
 	const Tchar *GetFieldName(const size_t field) const override;

@@ -32,6 +32,8 @@ class CAdvocatInserter {
 	Tstring bindText(size_t &param_no, XWidget *text_holder, const Tchar *param_name);
 	Tstring bindDate(size_t &param_no, XWidget *date_holder, const Tchar *param_name);
 	Tstring bindDbCombo(size_t &param_no, CDbComboBox *db_combo, const Tchar *param_name);
+	Tstring bindPostIndex(size_t &param_no, XWidget *post_index_holder);
+	Tstring bindOrg(size_t &param_no, XWidget *org_name, XWidget *org_type);
 public:
 	CAdvocatInserter();
 
@@ -42,6 +44,7 @@ public:
 	inline void setExaminerWidget(CDbComboBox *examiner) { this->examiner = examiner; }
 	inline void setPostIndexWidget(XWidget *post_index) { this->post_index = post_index; }
 	inline void setAddressWidget(XWidget *address) { this->address = address; }
+	inline void setBDateWidget(XWidget *bdate) { this->adv_bdate = bdate; }
 	inline void setTelWidget(XWidget *tel) { this->tel = tel; }
 	inline void setEmailWidget(XWidget *email) { this->email = email; }
 	inline void setDistrictWidget(CDbComboBox *district) { this->district = district; }
