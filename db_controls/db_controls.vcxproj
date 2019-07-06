@@ -19,14 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BinderControls.h" />
     <ClInclude Include="DbComboBox.h" />
     <ClInclude Include="DbComboBoxCellWidget.h" />
     <ClInclude Include="DbGrid.h" />
+    <ClInclude Include="DbGridHeaderCell.h" />
+    <ClInclude Include="FilteringEdit.h" />
+    <ClInclude Include="InsertionBinders.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BinderControls.cpp" />
     <ClCompile Include="DbComboBox.cpp" />
     <ClCompile Include="DbComboBoxCellWidget.cpp" />
     <ClCompile Include="DbGrid.cpp" />
+    <ClCompile Include="DbGridHeaderCell.cpp" />
+    <ClCompile Include="FilteringEdit.cpp" />
+    <ClCompile Include="InsertionBinders.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E46C0A02-6CD9-43D8-9DBF-295C64ADCC81}</ProjectGuid>

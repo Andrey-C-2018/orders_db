@@ -158,21 +158,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DbInserter.cpp" />
     <ClCompile Include="DbTable.cpp" />
     <ClCompile Include="DependentTableUpdater.cpp" />
     <ClCompile Include="FilteringManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MetaInfo.cpp" />
     <ClCompile Include="Query.cpp" />
+    <ClCompile Include="QueryModifier.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DbInserter.h" />
     <ClInclude Include="DbTable.h" />
     <ClInclude Include="DependentTableUpdater.h" />
     <ClInclude Include="FilteringManager.h" />
     <ClInclude Include="IBinder.h" />
+    <ClInclude Include="IInsertBinder.h" />
     <ClInclude Include="IndexedSearchPredicates.h" />
     <ClInclude Include="MetaInfo.h" />
     <ClInclude Include="Query.h" />
+    <ClInclude Include="QueryModifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

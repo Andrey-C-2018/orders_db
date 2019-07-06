@@ -43,11 +43,19 @@ inline void ConvertionWrapper(const wchar_t *str, std::string &buffer) { Convert
 
 inline void ConvertionWrapper(const std::string &str, std::string &buffer) { Append(str.c_str(), buffer); }
 
+inline void ConvertionWrapper(std::string &&str, std::string &buffer) { buffer = std::move(str); }
+
 inline void ConvertionWrapper(const std::string &str, std::wstring &buffer) { ConvertAndAppend(str.c_str(), buffer, str.size()); }
+
+inline void ConvertionWrapper(std::string &&str, std::wstring &buffer) { ConvertAndAppend(str.c_str(), buffer, str.size()); }
 
 inline void ConvertionWrapper(const std::wstring &str, std::wstring &buffer) { Append(str.c_str(), buffer); }
 
+inline void ConvertionWrapper(std::wstring &&str, std::wstring &buffer) { buffer = std::move(str); }
+
 inline void ConvertionWrapper(const std::wstring &str, std::string &buffer) { ConvertAndAppend(str.c_str(), buffer, str.size()); }
+
+inline void ConvertionWrapper(std::wstring &&str, std::string &buffer) { ConvertAndAppend(str.c_str(), buffer, str.size()); }
 
 //**************************************************************
 
@@ -72,6 +80,18 @@ XException::XException(const int err_code, const std::string &err_descr){
 XException::XException(const int err_code, const std::wstring &err_descr) {
 
 	ConvertionWrapper(err_descr, this->err_msg);
+	this->err_code = err_code;
+}
+
+XException::XException(const int err_code, std::string &&err_descr) {
+
+	ConvertionWrapper(std::move(err_descr), this->err_msg);
+	this->err_code = err_code;
+}
+
+XException::XException(const int err_code, std::wstring &&err_descr) {
+
+	ConvertionWrapper(std::move(err_descr), this->err_msg);
 	this->err_code = err_code;
 }
 

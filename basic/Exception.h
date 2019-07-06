@@ -19,6 +19,8 @@ public:
 	XException(const int err_code, const wchar_t *err_descr);
 	XException(const int err_code, const std::string &err_descr);
 	XException(const int err_code, const std::wstring &err_descr);
+	XException(const int err_code, std::string &&err_descr);
+	XException(const int err_code, std::wstring &&err_descr);
 	XException(const int err_code, const size_t reserved_size);
 
 	XException(const XException &obj);

@@ -37,7 +37,7 @@ public:
 //****************************************************************************
 
 CStringGrid::CStringGrid() : \
-			CEditableGrid(std::unique_ptr<IGridEventsHandler>(new CStringGridEventsHandler())), \
+			CEditableGrid(std::make_shared<CStringGridEventsHandler>()), \
 			table(std::make_shared<CStringTable>()){
 
 	Init(table, LAYOUT_RECORD);

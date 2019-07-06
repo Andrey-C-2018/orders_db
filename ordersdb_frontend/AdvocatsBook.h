@@ -1,9 +1,9 @@
 #include <basic/PropertiesFile.h>
 #include <db_ext/FilteringManager.h>
+#include <db_ext/QueryModifier.h>
 #include <xwindows/XFrame.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
-#include "QueryModifier.h"
 #include "AdvocatInserter.h"
 
 struct IDbConnection;

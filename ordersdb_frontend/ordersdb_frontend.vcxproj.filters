@@ -21,15 +21,6 @@
     <ClCompile Include="AdvocatsBook.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="QueryModifier.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="BinderControls.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="FilteringEdit.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="AdvocatInserter.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
@@ -39,15 +30,6 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="AdvocatsBook.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="QueryModifier.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="BinderControls.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="FilteringEdit.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="AdvocatInserter.h">

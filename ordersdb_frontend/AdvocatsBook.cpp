@@ -3,12 +3,12 @@
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbComboBox.h>
 #include <db_controls/DbComboBoxCellWidget.h>
+#include <db_controls/BinderControls.h>
+#include <db_controls/FilteringEdit.h>
 #include <xwindows/HorizontalSizer.h>
 #include <xwindows/VerticalSizer.h>
 #include <xwindows/XLabel.h>
 #include "AdvocatsBook.h"
-#include "BinderControls.h"
-#include "FilteringEdit.h"
 
 CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 								const Tchar *label, const int X, const int Y, \
