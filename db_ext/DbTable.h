@@ -4,6 +4,7 @@
 #include <db/IDbConnection.h>
 #include <db/IDbResultSet.h>
 #include <table/EventsHandlersContainer.h>
+#include "DbEventsHandlersContainer.h"
 #include "Query.h"
 
 class CDbTableException : public XException {
@@ -17,6 +18,8 @@ public:
 	~CDbTableException();
 };
 
+typedef std::shared_ptr<IDbTableEventsHandler> IDbTableEvtHandlerPtr;
+
 class CDbTable : public ITable{
 	std::shared_ptr<IDbConnection> conn;
 	CQuery query;
@@ -24,8 +27,12 @@ class CDbTable : public ITable{
 
 	size_t curr_record;
 
-	CEventsHandlersContainer event_handlers;
+	CDbEventsHandlersContainer db_event_handlers;
+	CEventsHandlersContainer<ITableEventsHandler> event_handlers;
 	inline void rereadQueryContents();
+
+	void ConnectEventsHandler(ITableEventsHandlerPtr handler) override;
+	void DisconnectEventsHandler(ITableEventsHandlerPtr handler) override;
 public:
 	CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_);
 
@@ -43,8 +50,9 @@ public:
 	bool empty() const override;
 	size_t GetFieldsCount() const override;
 	size_t GetRecordsCount() const override;
-	void ConnectEventsHandler(ITableEventsHandlerPtr handler) override;
-	void DisconnectEventsHandler(ITableEventsHandlerPtr handler) override;
+
+	void ConnectEventsHandler(IDbTableEvtHandlerPtr handler);
+	void DisconnectEventsHandler(IDbTableEvtHandlerPtr handler);
 
 	void AddField(const size_t max_field_len, const Tchar *field_name) override;
 	void AddRecord() override;
@@ -74,6 +82,7 @@ size_t CDbTable::getCurrentRecordNo() const{
 void CDbTable::setCurrentRecordNo(const size_t rec_no) {
 
 	curr_record = rec_no;
+	db_event_handlers.OnCurrRecordNoChanged(curr_record);
 }
 
 void CDbTable::gotoCurrentRecord() {
@@ -122,6 +131,8 @@ void CDbTable::executeScalarStmt(std::shared_ptr<IDbStatement> stmt) {
 void CDbTable::rereadQueryContents() {
 
 	result_set->reload();
+
 	size_t records_count = result_set->getRecordsCount();
 	event_handlers.OnRecordsCountChanged(records_count);
+	db_event_handlers.OnRecordsCountChanged(records_count);
 }

@@ -23,7 +23,9 @@
     <ClInclude Include="DbComboBox.h" />
     <ClInclude Include="DbComboBoxCellWidget.h" />
     <ClInclude Include="DbGrid.h" />
+    <ClInclude Include="DbGridEventsHandler.h" />
     <ClInclude Include="DbGridHeaderCell.h" />
+    <ClInclude Include="DbNavigator.h" />
     <ClInclude Include="FilteringEdit.h" />
     <ClInclude Include="InsertionBinders.h" />
   </ItemGroup>
@@ -32,7 +34,9 @@
     <ClCompile Include="DbComboBox.cpp" />
     <ClCompile Include="DbComboBoxCellWidget.cpp" />
     <ClCompile Include="DbGrid.cpp" />
+    <ClCompile Include="DbGridEventsHandler.cpp" />
     <ClCompile Include="DbGridHeaderCell.cpp" />
+    <ClCompile Include="DbNavigator.cpp" />
     <ClCompile Include="FilteringEdit.cpp" />
     <ClCompile Include="InsertionBinders.cpp" />
   </ItemGroup>

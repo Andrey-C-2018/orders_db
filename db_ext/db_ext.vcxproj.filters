@@ -74,5 +74,11 @@
     <ClInclude Include="QueryModifier.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="IDbTableEventsHandler.h">
+      <Filter>interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="DbEventsHandlersContainer.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

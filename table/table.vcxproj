@@ -24,7 +24,6 @@
     <ClInclude Include="StringTable.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EventsHandlersContainer.cpp" />
     <ClCompile Include="StringTable.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

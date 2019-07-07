@@ -24,6 +24,9 @@
     <ClCompile Include="AdvocatInserter.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="AdvocatsGridEvtHandler.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyApp.h">
@@ -33,6 +36,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="AdvocatInserter.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="AdvocatsGridEvtHandler.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

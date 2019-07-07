@@ -168,11 +168,13 @@
     <ClCompile Include="QueryModifier.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DbEventsHandlersContainer.h" />
     <ClInclude Include="DbInserter.h" />
     <ClInclude Include="DbTable.h" />
     <ClInclude Include="DependentTableUpdater.h" />
     <ClInclude Include="FilteringManager.h" />
     <ClInclude Include="IBinder.h" />
+    <ClInclude Include="IDbTableEventsHandler.h" />
     <ClInclude Include="IInsertBinder.h" />
     <ClInclude Include="IndexedSearchPredicates.h" />
     <ClInclude Include="MetaInfo.h" />

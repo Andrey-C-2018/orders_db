@@ -1,59 +1,21 @@
 #include "DbGrid.h"
 #include <db/DbException.h>
 #include <grid/TextCell.h>
-#include <editable_grid/IGridEventsHandler.h>
-
-class CDbGridEventsHandler final : public IGridEventsHandler {
-
-	std::shared_ptr<CDbTable> db_table;
-	size_t &active_record_no;
-
-public:
-
-	CDbGridEventsHandler(std::shared_ptr<CDbTable> db_table_, size_t &active_record_no_) :
-								db_table(db_table_), active_record_no(active_record_no_) { }
-
-	void OnCellChanged(IGridCellWidget *cell_widget, \
-						IOnCellChangedAction &action) override {
-
-		try {
-			action.executeAction();
-		}
-		catch (CDbException &e) {
-
-			MessageBox(NULL, e.what(), _T("Error"), MB_OK);
-		}
-	}
-
-	void OnCellChangedIndirectly(IGridCellWidget *cell_widget, \
-								IOnCellChangedAction &action) override { 
-	
-		try {
-			action.executeAction();
-		}
-		catch (CDbException &e) {
-
-			MessageBox(NULL, e.what(), _T("Error"), MB_OK);
-		}
-	}
-
-	void OnActiveCellLocationChanged(const size_t new_field, \
-										const size_t new_record) override {
-
-		active_record_no = new_record;
-		db_table->setCurrentRecordNo(new_record);
-	}
-
-};
-
-//**************************************************************
 
 CDbGrid::CDbGrid(std::shared_ptr<CDbTable> db_table_) : \
-					dbgrid_event_handler(std::make_shared<CDbGridEventsHandler>(\
-														db_table_, active_record_no)), \
-					active_record_no(0), \
+					dbgrid_event_handler(std::make_shared<CDbGridEventsHandler>(db_table_)), \
 					db_table(db_table_), pointer_brush(0, 255, 0) {
 
+	SetEventHandler(dbgrid_event_handler);
+	Init(db_table, LAYOUT_FIELD);
+}
+
+CDbGrid::CDbGrid(std::shared_ptr<CDbTable> db_table_, \
+					std::shared_ptr<CDbGridEventsHandler> dbgrid_evt_handler) : \
+				db_table(db_table_), dbgrid_event_handler(dbgrid_evt_handler), \
+				pointer_brush(0, 255, 0) {
+
+	assert(dbgrid_event_handler);
 	SetEventHandler(dbgrid_event_handler);
 	Init(db_table, LAYOUT_FIELD);
 }
@@ -63,7 +25,8 @@ void CDbGrid::DrawLeftPane(XGC &gc) const {
 	int left_pane_width = GetLeftPaneSize();
 	int height = GetHeight();
 	int record_height = GetRecordHeight();
-	int y_initial = GetHeadersHeight() + record_height * (int)active_record_no - GetVScrollPos();
+	int active_record_no = (int)db_table->getCurrentRecordNo();
+	int y_initial = GetHeadersHeight() + record_height * active_record_no - GetVScrollPos();
 
 	gc.Rectangle(0, 0, (int)(left_pane_width * 0.15F), height);
 	XPoint points[5];

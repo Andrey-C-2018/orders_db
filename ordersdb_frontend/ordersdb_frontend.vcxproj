@@ -156,11 +156,13 @@
   <ItemGroup>
     <ClCompile Include="AdvocatInserter.cpp" />
     <ClCompile Include="AdvocatsBook.cpp" />
+    <ClCompile Include="AdvocatsGridEvtHandler.cpp" />
     <ClCompile Include="MyApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdvocatInserter.h" />
     <ClInclude Include="AdvocatsBook.h" />
+    <ClInclude Include="AdvocatsGridEvtHandler.h" />
     <ClInclude Include="MyApp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -87,6 +87,16 @@ void CDbTable::DisconnectEventsHandler(ITableEventsHandlerPtr handler) {
 	event_handlers.DisconnectEventsHandler(handler);
 }
 
+void CDbTable::ConnectEventsHandler(IDbTableEvtHandlerPtr handler) {
+
+	db_event_handlers.ConnectEventsHandler(handler);
+}
+
+void CDbTable::DisconnectEventsHandler(IDbTableEvtHandlerPtr handler) {
+
+	db_event_handlers.DisconnectEventsHandler(handler);
+}
+
 void CDbTable::AddField(const size_t max_field_len, const Tchar *field_name){
 
 	throw CDbTableException(CDbTableException::E_WRONG_OPERATION, \
@@ -159,6 +169,7 @@ void CDbTable::reload(std::shared_ptr<IDbStatement> stmt) {
 
 	size_t records_count = result_set->getRecordsCount();
 	event_handlers.OnRecordsCountChanged(records_count);
+	db_event_handlers.OnRecordsCountChanged(records_count);
 }
 
 CDbTable::~CDbTable(){ }

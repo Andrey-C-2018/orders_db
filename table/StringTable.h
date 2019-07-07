@@ -17,7 +17,7 @@ class CStringTable : public ITable {
 		Tstring field_name;
 	};
 	std::vector<CField> fields;
-	CEventsHandlersContainer event_handlers;
+	CEventsHandlersContainer<ITableEventsHandler> event_handlers;
 public:
 	CStringTable();
 

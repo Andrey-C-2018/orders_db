@@ -5,10 +5,12 @@
 #include <db_controls/DbComboBoxCellWidget.h>
 #include <db_controls/BinderControls.h>
 #include <db_controls/FilteringEdit.h>
+#include <db_controls/DbNavigator.h>
 #include <xwindows/HorizontalSizer.h>
 #include <xwindows/VerticalSizer.h>
 #include <xwindows/XLabel.h>
 #include "AdvocatsBook.h"
+#include "AdvocatsGridEvtHandler.h"
 
 CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 								const Tchar *label, const int X, const int Y, \
@@ -24,7 +26,7 @@ CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 	conn = CMySQLConnectionFactory::createConnection(props);
 	db_table = createDbTable(conn);
 	
-	grid = new CDbGrid(db_table);
+	grid = new CDbGrid(db_table, std::make_shared<CAdvocatsGridEvtHandler>(db_table));
 	setFieldsSizes();
 	createCellWidgetsAndAttachToGrid(grid);
 
@@ -208,9 +210,15 @@ void CAdvocatsBook::DisplayWidgets() {
 		btn_apply_filter = new XButton();
 		sizer.addWidget(btn_apply_filter, _T("Ô³ëüòð"), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
+
+		auto db_navigator = new CDbNavigator(db_table);
+		sizer.addWidget(db_navigator, _T(""), FL_WINDOW_VISIBLE, \
+						XSize(100, DEF_GUI_ROW_HEIGHT));
+
 		btn_add = new XButton();
 		sizer.addWidget(btn_add, _T("+"), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
+
 		btn_remove = new XButton();
 		sizer.addWidget(btn_remove, _T("-"), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));

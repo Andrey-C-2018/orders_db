@@ -130,6 +130,7 @@ enum EditFlags{
 	FL_EDIT_LEFT = ES_LEFT,\
 	FL_EDIT_CENTER = ES_CENTER,\
 	FL_EDIT_RIGHT = ES_RIGHT,\
+	FL_EDIT_READONLY = ES_READONLY
 };
 
 enum ComboboxFlags{

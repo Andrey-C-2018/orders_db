@@ -14,13 +14,13 @@ class CGridTableProxy : public ITableEventsHandler {
 
 	size_t records_count;
 
-	CGridTableProxy(const CGridTableProxy &obj) = delete;
-	CGridTableProxy &operator=(const CGridTableProxy &obj) = delete;
 public:
 	CGridTableProxy(std::shared_ptr<ITable> table_, \
 					IReloadable *table_widget_);
 	
+	CGridTableProxy(const CGridTableProxy &obj) = delete;
 	CGridTableProxy(CGridTableProxy &&obj) = default;
+	CGridTableProxy &operator=(const CGridTableProxy &obj) = delete;
 	CGridTableProxy &operator=(CGridTableProxy &&obj) = default;
 
 	template <class TCell> \
@@ -45,6 +45,7 @@ public:
 	void OnRecordsCountChanged(const size_t new_records_count) override;
 	void OnTableReset() override;
 
+	inline bool checkIsTheSame(std::shared_ptr<ITable> table) const;
 	virtual ~CGridTableProxy();
 };
 
@@ -238,4 +239,9 @@ size_t CGridTableProxy::GetRelativeFieldIndex(const size_t abs_field_index) cons
 	assert(rel_index != (size_t)-1);
 
 	return rel_index;
+}
+
+bool CGridTableProxy::checkIsTheSame(std::shared_ptr<ITable> table) const {
+
+	return this->table == table;
 }
