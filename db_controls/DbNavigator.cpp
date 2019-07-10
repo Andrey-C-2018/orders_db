@@ -52,8 +52,9 @@ void CDbNavigator::Create(XWindow *parent, const int flags, \
 	records_count = db_table->GetRecordsCount();
 	auto nav_label = ConvToStr();
 
-	XEdit::Create(parent, flags | FL_WINDOW_CLIPSIBLINGS | \
-									FL_EDIT_AUTOHSCROLL | FL_EDIT_READONLY, \
+	XEdit::Create(parent, flags | FL_WINDOW_CLIPSIBLINGS | FL_WINDOW_BORDERED | \
+									FL_EDIT_AUTOHSCROLL | FL_EDIT_READONLY | \
+									FL_EDIT_CENTER, \
 					nav_label, x, y, width, height);
 }
 

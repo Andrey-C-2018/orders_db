@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matching", "matching.vcxproj", "{3668DB1D-09FB-4E1A-A4F2-4CE5DB489568}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matching1", "matching1\matching1.vcxproj", "{3668DB1D-09FB-4E1A-A4F2-4CE5DB489568}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E80E0509-21D7-4A1E-AE33-C16633261EF4} = {E80E0509-21D7-4A1E-AE33-C16633261EF4}
 		{E4BB857A-1E17-4203-BBE6-A4DAF82913FB} = {E4BB857A-1E17-4203-BBE6-A4DAF82913FB}

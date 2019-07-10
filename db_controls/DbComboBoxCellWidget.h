@@ -45,6 +45,9 @@ public:
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
 	void SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> handler) override;
 
+	bool Validate() const override { return true; }
+	bool Validate(ImmutableString<Tchar> label) const override { return true; }
+
 	virtual ~CDbComboBoxCellWidget();
 };
 

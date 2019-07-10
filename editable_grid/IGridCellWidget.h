@@ -31,5 +31,8 @@ struct IGridCellWidget {
 
 	virtual int GetId() const = 0;
 
+	virtual bool Validate() const = 0;
+	virtual bool Validate(ImmutableString<Tchar> label) const = 0;
+
 	virtual ~IGridCellWidget() { }
 };

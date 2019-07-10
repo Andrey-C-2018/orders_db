@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{820ADC9D-FF0E-4599-A026-3F19B179998A}</ProjectGuid>
+    <ProjectGuid>{E05CFF00-567A-4EFA-B014-93EB1B68A9EE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>matching_main</RootNamespace>
+    <RootNamespace>acts_form</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -87,15 +87,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X32_PATH%\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X32_PATH%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../0libs/Debug;%SQLITE_CONNECTOR_PATH%\Debug;%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;db.lib;libsqlite3.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/Debug;%(AdditionalLibraryDirectories);%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,15 +103,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X64_PATH%\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X64_PATH%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../0libs/x64/Debug;%SQLITE_CONNECTOR_PATH%\x64\Debug;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;db.lib;libsqlite3.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -123,17 +121,16 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X32_PATH%\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X32_PATH%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../0libs/Release;%SQLITE_CONNECTOR_PATH%Release;%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;db.lib;libsqlite3.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/Release;%(AdditionalLibraryDirectories);%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,42 +141,29 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../;%SQLITE_CONNECTOR_PATH%;%MYSQL_CONNECTOR_X64_PATH%\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X64_PATH%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../0libs/x64/Release;%SQLITE_CONNECTOR_PATH%\x64\Release;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;db.lib;libsqlite3.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/x64/Release;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;xwindows.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AdvActDistanceCalc.cpp" />
-    <ClCompile Include="Currency.cpp" />
-    <ClCompile Include="CurrencyDiffCalc.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="DbTable.cpp" />
-    <ClCompile Include="Matching.cpp" />
-    <ClCompile Include="MatchingResultsTable.cpp" />
-    <ClCompile Include="OutputWrapper.cpp" />
-    <ClCompile Include="StandartDistanceCalcs.cpp" />
+    <ClCompile Include="ActsForm.cpp" />
+    <ClCompile Include="AdvocatsListEvtHandler.cpp" />
+    <ClCompile Include="AdvocatsListManager.cpp" />
+    <ClCompile Include="MyApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AdvActDistanceCalc.h" />
-    <ClInclude Include="Currency.h" />
-    <ClInclude Include="CurrencyDiffCalc.h" />
-    <ClInclude Include="DbTable.h" />
-    <ClInclude Include="IDistanceCalculator.h" />
-    <ClInclude Include="ITable.h" />
-    <ClInclude Include="Matching.h" />
-    <ClInclude Include="MatchingResultsTable.h" />
-    <ClInclude Include="OutputWrapper.h" />
-    <ClInclude Include="StandartDistanceCalcs.h" />
-    <ClInclude Include="wagnerfisheralgo.h" />
+    <ClInclude Include="ActsForm.h" />
+    <ClInclude Include="AdvocatsListEvtHandler.h" />
+    <ClInclude Include="AdvocatsListManager.h" />
+    <ClInclude Include="MyApp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

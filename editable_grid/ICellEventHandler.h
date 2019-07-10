@@ -3,6 +3,7 @@
 
 struct IOnCellChangedAction {
 	virtual void executeAction() = 0;
+	virtual void executeAction(ImmutableString<Tchar> cell_value) = 0;
 	virtual ~IOnCellChangedAction() { }
 };
 

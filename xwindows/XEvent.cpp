@@ -22,6 +22,11 @@ std::shared_ptr<XEvent> XEvent::clone() const noexcept {
 	return std::make_shared<XEvent>();
 }
 
+EvtPair XEvent::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XEvent>();
+}
+
 void XEvent::PostInit(_plCallbackFnParams){ }
 
 XEvent::~XEvent(){ }
@@ -51,6 +56,11 @@ std::shared_ptr<XEvent> XCommandEvent::clone() const noexcept {
 	return std::make_shared<XCommandEvent>();
 }
 
+EvtPair XCommandEvent::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XCommandEvent>();
+}
+
 XCommandEvent::~XCommandEvent(){ }
 
 //****************************************************************************
@@ -60,6 +70,11 @@ XSizeEvent::XSizeEvent() noexcept : width(0), height(0), param(0) { }
 std::shared_ptr<XEvent> XSizeEvent::clone() const noexcept {
 
 	return std::make_shared<XSizeEvent>();
+}
+
+EvtPair XSizeEvent::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XSizeEvent>();
 }
 
 void XSizeEvent::PostInit(_plCallbackFnParams){
@@ -80,6 +95,11 @@ std::shared_ptr<XEvent> XMoveEvent::clone() const noexcept {
 	return std::make_shared<XMoveEvent>();
 }
 
+EvtPair XMoveEvent::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XMoveEvent>();
+}
+
 void XMoveEvent::PostInit(_plCallbackFnParams){
 
 	x = _plGetX(_plCallbackFnParamsList);
@@ -95,6 +115,11 @@ XMouseEvent::XMouseEvent() noexcept : x(0), y(0), virtual_key(0) { }
 std::shared_ptr<XEvent> XMouseEvent::clone() const noexcept {
 
 	return std::make_shared<XMouseEvent>();
+}
+
+EvtPair XMouseEvent::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XMouseEvent>();
 }
 
 void XMouseEvent::PostInit(_plCallbackFnParams){
@@ -115,6 +140,11 @@ std::shared_ptr<XEvent> XMouseWheelEvent::clone() const noexcept {
 	return std::make_shared<XMouseWheelEvent>();
 }
 
+EvtPair XMouseWheelEvent::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XMouseWheelEvent>();
+}
+
 void XMouseWheelEvent::PostInit(_plCallbackFnParams){
 
 	delta = _plGetMouseWheelDelta(_plCallbackFnParamsList);
@@ -129,6 +159,11 @@ XKeyboardEvent::XKeyboardEvent() noexcept : ch(0), key(0){ }
 std::shared_ptr<XEvent> XKeyboardEvent::clone() const noexcept {
 
 	return std::make_shared<XKeyboardEvent>();
+}
+
+EvtPair XKeyboardEvent::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XKeyboardEvent>();
 }
 
 void XKeyboardEvent::PostInit(_plCallbackFnParams){
@@ -148,6 +183,11 @@ std::shared_ptr<XEvent> XScrollEvent::clone() const noexcept {
 	return std::make_shared<XScrollEvent>();
 }
 
+EvtPair XScrollEvent::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XScrollEvent>();
+}
+
 void XScrollEvent::PostInit(_plCallbackFnParams){
 
 	thumb_pos = _plGetScrollThumbPos(_plCallbackFnParamsList);
@@ -163,6 +203,11 @@ XScrollEventEx::XScrollEventEx() noexcept { }
 std::shared_ptr<XEvent> XScrollEventEx::clone() const noexcept {
 
 	return std::make_shared<XScrollEventEx>();
+}
+
+EvtPair XScrollEventEx::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XScrollEventEx>();
 }
 
 void XScrollEventEx::PostInit(_plCallbackFnParams) {

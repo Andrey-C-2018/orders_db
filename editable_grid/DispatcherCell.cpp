@@ -5,24 +5,31 @@ class OnCellChangedAction : public IOnCellChangedAction {
 	CGridTableProxy *table_proxy;
 	const size_t active_field;
 	const size_t active_record;
-	const Tchar *value;
+	IGridCellWidget *cell_widget;
 public:
 	inline OnCellChangedAction(CGridTableProxy *table_proxy_, \
 								const size_t active_field_, \
 								const size_t active_record_, \
-								const Tchar *value_) noexcept : \
+								IGridCellWidget *cell_widget_) noexcept : \
 							table_proxy(table_proxy_),\
 							active_field(active_field_), \
-							active_record(active_record_), value(value_) {
+							active_record(active_record_), cell_widget(cell_widget_) {
 
 		assert(table_proxy);
-		assert(value);
+		assert(cell_widget);
 	}
 
 	void executeAction() override {
 		
-		table_proxy->SetCell(active_field, active_record, value);
+		ImmutableString<Tchar> value = cell_widget->GetLabel();
+		table_proxy->SetCell(active_field, active_record, value.str);
 	}
+
+	void executeAction(ImmutableString<Tchar> cell_value) override {
+
+		table_proxy->SetCell(active_field, active_record, cell_value.str);
+	}
+
 	virtual ~OnCellChangedAction() { }
 };
 
@@ -220,11 +227,10 @@ void CDispatcherCell::OnClick(const size_t field, const size_t record) {
 void CDispatcherCell::CommitChangesIfPresent() {
 
 	if (changes_present) {
-		ImmutableString<Tchar> value = def_active_cell->GetLabel();
-
+		
 		skip_reloading = true;
 		OnCellChangedAction action(table_proxy.get(), \
-									active_field, active_record, value.str);
+									active_field, active_record, def_active_cell);
 		event_handler->OnCellChanged(def_active_cell, action);
 		skip_reloading = false;
 

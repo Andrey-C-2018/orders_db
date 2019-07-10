@@ -17,7 +17,7 @@ CMyFrame::CMyFrame(const Tchar *class_name,\
 
 	std::shared_ptr<IDbConnection> conn = std::make_shared<CMySQLConnection>();
 
-	conn->Connect("127.0.0.1", 3310, "root", "12345", "orders");
+	conn->Connect("127.0.0.1", 3306, "root", "12345", "orders");
 
 	auto stmt = conn->PrepareQuery("SELECT id_center_legalaid, id, order_date, type_name FROM orders INNER JOIN order_types ON id_order_type = id_type WHERE id BETWEEN 1700 AND 1702 ORDER BY 1,3,2");
 	

@@ -3,6 +3,18 @@
 #include <basic/Delegate.h>
 
 class XWindow;
+class XEvent;
+struct EvtPair final {
+	std::shared_ptr<XEvent> eve;
+	std::shared_ptr<IArguments> args;
+
+	inline EvtPair() noexcept { }
+	inline EvtPair(const EvtPair &obj) = default;
+	inline EvtPair(EvtPair &&obj) = default;
+	inline EvtPair &operator=(const EvtPair &obj) = default;
+	inline EvtPair &operator=(EvtPair &&obj) = default;
+	inline ~EvtPair() { }
+};
 
 class XEvent{
 	_plEventId ID_event;
@@ -17,6 +29,16 @@ class XEvent{
 protected:
 
 	inline void SetSender(XWindow *sender) { Sender = sender; }
+	template <class TEvent> \
+		inline EvtPair cloneTemplate() const noexcept {
+
+		EvtPair pair;
+		auto eve = std::make_shared<TEvent>();
+		pair.args = std::make_shared<CArgumentsOne<TEvent *> >(eve.get());
+		pair.eve = std::move(eve);
+
+		return std::move(pair);
+	}
 public:
 	XEvent() noexcept;
 	virtual void InitEventData(const _plEventId id_event, \
@@ -24,6 +46,7 @@ public:
 							XWindow *sender, const int id);
 
 	virtual std::shared_ptr<XEvent> clone() const noexcept;
+	virtual EvtPair cloneAndCreateArgsWrapper() const noexcept;
 
 	inline _plEventId GetEventType() const { return ID_event; }
 	inline _plNotificationCode GetNCode() const { return ID_ncode; }
@@ -45,6 +68,7 @@ public:
 						XWindow *sender, const int id) override;
 
 	std::shared_ptr<XEvent> clone() const noexcept override;
+	EvtPair cloneAndCreateArgsWrapper() const noexcept override;
 
 	virtual ~XCommandEvent();
 };
@@ -56,6 +80,7 @@ public:
 	XSizeEvent() noexcept;
 
 	std::shared_ptr<XEvent> clone() const noexcept override;
+	EvtPair cloneAndCreateArgsWrapper() const noexcept override;
 
 	void PostInit(_plCallbackFnParams) override;
 
@@ -72,6 +97,7 @@ public:
 	XMoveEvent() noexcept;
 
 	std::shared_ptr<XEvent> clone() const noexcept override;
+	EvtPair cloneAndCreateArgsWrapper() const noexcept override;
 
 	void PostInit(_plCallbackFnParams) override;
 
@@ -88,6 +114,7 @@ public:
 	XMouseEvent() noexcept;
 
 	std::shared_ptr<XEvent> clone() const noexcept override;
+	EvtPair cloneAndCreateArgsWrapper() const noexcept override;
 
 	void PostInit(_plCallbackFnParams);
 
@@ -104,6 +131,7 @@ public:
 	XMouseWheelEvent() noexcept;
 
 	std::shared_ptr<XEvent> clone() const noexcept override;
+	EvtPair cloneAndCreateArgsWrapper() const noexcept override;
 
 	void PostInit(_plCallbackFnParams) override;
 
@@ -119,6 +147,7 @@ public:
 	XKeyboardEvent() noexcept;
 
 	std::shared_ptr<XEvent> clone() const noexcept override;
+	EvtPair cloneAndCreateArgsWrapper() const noexcept override;
 
 	void PostInit(_plCallbackFnParams) override;
 
@@ -137,6 +166,7 @@ public:
 	XScrollEvent() noexcept;
 
 	std::shared_ptr<XEvent> clone() const noexcept override;
+	EvtPair cloneAndCreateArgsWrapper() const noexcept override;
 
 	void PostInit(_plCallbackFnParams) override;
 
@@ -151,6 +181,7 @@ public:
 	XScrollEventEx() noexcept;
 
 	std::shared_ptr<XEvent> clone() const noexcept override;
+	EvtPair cloneAndCreateArgsWrapper() const noexcept override;
 
 	void PostInit(_plCallbackFnParams) override;
 

@@ -31,6 +31,14 @@ class XEventHandlerData final {
 	std::shared_ptr<XEvent> eve;
 	std::shared_ptr<IArguments> args_container;
 
+	inline void copy(const XEventHandlerData &obj) {
+
+		EvtPair pair = obj.eve->cloneAndCreateArgsWrapper();
+		this->eve = std::move(pair.eve);
+		args_container = std::move(pair.args);
+
+		evt_handler_caller = obj.evt_handler_caller;
+	}
 public:
 	XEventHandlerData() { }
 
@@ -48,23 +56,20 @@ public:
 
 		evt_handler_caller.Connect(object, PFunc);
 		args_container = std::make_shared<CArgumentsOne<TEvent *> >(eve_t.get());
+		
 		eve = std::move(eve_t);
 	}
 
 	XEventHandlerData(const XEventHandlerData &obj) noexcept {
 
-		this->eve = std::move(obj.eve->clone());
-		evt_handler_caller = obj.evt_handler_caller;
-		args_container = obj.args_container;
+		copy(obj);
 	}
 
 	XEventHandlerData(XEventHandlerData &&obj) noexcept = default;
 
 	XEventHandlerData &operator=(const XEventHandlerData &obj) noexcept {
 
-		this->eve = std::move(obj.eve->clone());
-		evt_handler_caller = obj.evt_handler_caller;
-		args_container = obj.args_container;
+		copy(obj);
 		return *this;
 	}
 
@@ -327,7 +332,7 @@ XEventHandlerEmbedded::WndProc(_plCallbackFnParams){
 		return _plDefaultEventAction(orig_wnd_proc, _plCallbackFnParamsList);
 
 	p->eve->PostInit(_plCallbackFnParamsList);
-
+	
 	p->evt_handler_caller.Call(p->eve_container.get());
 	if(p->eve->GetDefaultActionStatus()){
 		p->eve->ExecuteDefaultEventAction(false);
@@ -382,7 +387,7 @@ int XEventHandler::ConnectImpl(const _plEventId id_event, \
 							const int id, XEventHandlerData evt_handler_data) {
 
 	CEvtHandlerRecEx rec;
-	CEvtHandlerConstIteratorEx p;
+	CEvtHandlerIteratorEx p;
 
 	assert(id >= 0);
 
@@ -393,8 +398,8 @@ int XEventHandler::ConnectImpl(const _plEventId id_event, \
 	rec.id_event = id_event;
 	rec.id_ncode = id_ncode;
 
-	p = std::lower_bound(evt_handlers.cbegin(), evt_handlers.cend(), rec);
-	if (p != evt_handlers.cend() && *p == rec)
+	p = std::lower_bound(evt_handlers.begin(), evt_handlers.end(), rec);
+	if (p != evt_handlers.end() && *p == rec)
 		return XEventHandlerException::W_DUPLICATE_HANDLER;
 
 	rec.eve = evt_handler_data.getEventObj();
@@ -407,6 +412,7 @@ int XEventHandler::ConnectImpl(const _plEventId id_event, \
 	rec.eve_container = evt_handler_data.getArgsContainer();
 	assert(rec.eve_container);
 
+	//evt_handlers.insert(p, std::move(rec));
 	evt_handlers.emplace_back(std::move(rec));
 	std::sort(evt_handlers.begin(), evt_handlers.end());
 	return RESULT_SUCCESS;

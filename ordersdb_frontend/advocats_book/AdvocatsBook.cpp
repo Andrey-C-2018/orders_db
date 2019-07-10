@@ -11,17 +11,18 @@
 #include <xwindows/XLabel.h>
 #include "AdvocatsBook.h"
 #include "AdvocatsGridEvtHandler.h"
+#include "PostIndexCellWidget.h"
 
 CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 								const Tchar *label, const int X, const int Y, \
 								const int width, const int height) : \
 	flt_id(nullptr), btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
-	grid(nullptr), adv_org_types_list(nullptr), \
+	grid(nullptr), examiners_list(nullptr), adv_org_types_list(nullptr), districts_list(nullptr), \
 	grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
 
 	props.open("config.ini");
 
-	initBinderControls();
+	initFilteringControls();
 
 	conn = CMySQLConnectionFactory::createConnection(props);
 	db_table = createDbTable(conn);
@@ -80,18 +81,35 @@ void CAdvocatsBook::setFieldsSizes() {
 void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 	assert(grid);
-	examiners_list = new CDbComboBoxCellWidget(conn, "exm_name", \
-												"examiners", "advocats", db_table);
-	examiners_list->AddRelation("id_examiner", "id_exm");
-	grid->SetWidgetForFieldByName("exm_name", examiners_list);
+	assert(!examiners_list);
+	assert(!districts_list);
+	assert(!adv_org_types_list);
 
-	districts_list = new CDbComboBoxCellWidget(conn, "distr_center", \
-												"districts", "advocats", db_table);
-	districts_list->AddRelation("id_distr", "id_main_district");
-	grid->SetWidgetForFieldByName("distr_center", districts_list);
+	try {
+		examiners_list = new CDbComboBoxCellWidget(conn, "exm_name", \
+			"examiners", "advocats", db_table);
+		examiners_list->AddRelation("id_examiner", "id_exm");
+		grid->SetWidgetForFieldByName("exm_name", examiners_list);
 
-	adv_org_types_list = new CComboBoxCellWidget();
-	grid->SetWidgetForFieldByName("org_type", adv_org_types_list);
+		auto post_index_widget = new CPostIndexCellWidget();
+		grid->SetWidgetForFieldByName("post_index", post_index_widget);
+
+		districts_list = new CDbComboBoxCellWidget(conn, "distr_center", \
+			"districts", "advocats", db_table);
+		districts_list->AddRelation("id_distr", "id_main_district");
+		grid->SetWidgetForFieldByName("distr_center", districts_list);
+
+		adv_org_types_list = new CComboBoxCellWidget();
+		grid->SetWidgetForFieldByName("org_type", adv_org_types_list);
+	}
+	catch (...) {
+		if (examiners_list && !examiners_list->IsCreated()) delete examiners_list;
+		if (districts_list && !districts_list->IsCreated()) delete districts_list;
+		if (adv_org_types_list && !adv_org_types_list->IsCreated())
+			delete adv_org_types_list;
+
+		throw;
+	}
 }
 
 void CAdvocatsBook::adjustUIDependentCellWidgets(CDbGrid *grid) {
@@ -237,7 +255,7 @@ void CAdvocatsBook::DisplayWidgets() {
 	adv_inserter.prepare(conn);
 }
 
-void CAdvocatsBook::initBinderControls() {
+void CAdvocatsBook::initFilteringControls() {
 
 	flt_id = new CFilteringEdit(filtering_manager);
 	std::shared_ptr<IBinder> id_binder = std::make_shared<CIntWidgetBinderControl>(flt_id);
@@ -288,11 +306,6 @@ void CAdvocatsBook::OnSize(XSizeEvent *eve) {
 }
 
 CAdvocatsBook::~CAdvocatsBook() {
-
-	if (examiners_list && !examiners_list->IsCreated()) delete examiners_list;
-	if (districts_list && !districts_list->IsCreated()) delete districts_list;
-	if (adv_org_types_list && !adv_org_types_list->IsCreated()) 
-		delete adv_org_types_list;
 
 	if (grid && !grid->IsCreated()) delete grid;
 	if (flt_id && !flt_id->IsCreated()) delete flt_id;

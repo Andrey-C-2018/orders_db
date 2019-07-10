@@ -6,6 +6,14 @@ class OnComboCellChangedAction : public IOnCellChangedAction {
 	CDbTable *dependent_table;
 	CDependentTableUpdater &updater;
 
+	inline void executeActionCommon() {
+
+		size_t sel_index = combo_cell_widget.GetCurrentSelectionIndex();
+		dependent_table->gotoCurrentRecord();
+
+		auto stmt = updater.createDepTableUpdateStmt(sel_index);
+		dependent_table->executeScalarStmt(stmt);
+	}
 public:
 	inline OnComboCellChangedAction(CDbComboBoxCellWidget &combo_cell_widget_, \
 								CDbTable *dependent_table_, \
@@ -19,12 +27,14 @@ public:
 
 	void executeAction() override {
 
-		size_t sel_index = combo_cell_widget.GetCurrentSelectionIndex();
-		dependent_table->gotoCurrentRecord();
-
-		auto stmt = updater.createDepTableUpdateStmt(sel_index);
-		dependent_table->executeScalarStmt(stmt);
+		executeActionCommon();
 	}
+
+	void executeAction(ImmutableString<Tchar> ignored) override {
+
+		executeActionCommon();
+	}
+
 	virtual ~OnComboCellChangedAction() { }
 };
 

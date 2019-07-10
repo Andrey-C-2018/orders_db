@@ -125,8 +125,9 @@ XEventHandler::MainWndProc(_plCallbackFnParams){
 
 	p = std::lower_bound(evt_handlers.begin(), evt_handlers.end(), rec);
 
-	if(!(p != evt_handlers.end() && *p == rec))
+	if (!(p != evt_handlers.end() && *p == rec)) {
 		return _plDefaultEventAction(_plCallbackFnParamsList);
+	}
 
 	p->hwnd = hwnd_backup;
 

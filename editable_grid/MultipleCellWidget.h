@@ -53,5 +53,8 @@ public:
 
 	int GetId() const override;
 
+	bool Validate() const override;
+	bool Validate(ImmutableString<Tchar> label) const override;
+
 	virtual ~CMultipleCellWidget();
 };

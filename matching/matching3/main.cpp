@@ -97,7 +97,7 @@ int main() {
 				std::wcerr << _T(", значення полів: ");
 				std::wcerr << _T("id_center = ") << id_center;
 				std::wcerr << _T(", id_order = ") << id;
-				order_date.ToStringGerman(buffer);
+				order_date.toStringGerman(buffer);
 				std::wcerr << _T(", order_date = ") << buffer;
 				std::wcerr << _T(", act_name = ") << act_name << std::endl;
 
@@ -109,7 +109,7 @@ int main() {
 				rs->gotoRecord(0);
 				std::wcout << _T("Оновлено: ");
 				std::wcout << id_center << _T('-') << id << _T("-'");
-				order_date.ToStringGerman(buffer);
+				order_date.toStringGerman(buffer);
 				std::wcout << buffer << _T("'-") << id_stage << _T('-');
 				std::wcout << cycle << _T(": '");
 
@@ -123,9 +123,9 @@ int main() {
 
 				bool is_null = false;
 				CDate payment_date_old = rs->getDate(2, is_null);
-				payment_date_old.ToStringGerman(buffer);
+				payment_date_old.toStringGerman(buffer);
 				std::wcout << (is_null ? _T("NULL") : buffer);
-				payment_date.ToStringGerman(buffer);
+				payment_date.toStringGerman(buffer);
 				std::wcout << _T("' <- '") << buffer << _T("'") << std::endl;
 			}
 

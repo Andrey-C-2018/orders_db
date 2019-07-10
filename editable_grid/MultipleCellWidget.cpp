@@ -194,6 +194,18 @@ int CMultipleCellWidget::GetId() const {
 	return curr_widget->GetId();
 }
 
+bool CMultipleCellWidget::Validate() const {
+
+	assert(curr_widget);
+	return curr_widget->Validate();
+}
+
+bool CMultipleCellWidget::Validate(ImmutableString<Tchar> label) const {
+
+	assert(curr_widget);
+	return curr_widget->Validate(label);
+}
+
 CMultipleCellWidget::~CMultipleCellWidget(){
 
 	for (auto &widget : widgets)

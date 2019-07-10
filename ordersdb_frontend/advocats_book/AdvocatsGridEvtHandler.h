@@ -4,7 +4,8 @@
 class CDbException;
 
 class CAdvocatsGridEvtHandler : public CDbGridEventsHandler {
-	void OnCellChanged(CDbException &e, IGridCellWidget *cell_widget) const;
+	void OnCellChangedCommon(IGridCellWidget *cell_widget, \
+								IOnCellChangedAction &action) const;
 
 public:
 	CAdvocatsGridEvtHandler(std::shared_ptr<CDbTable> db_table);

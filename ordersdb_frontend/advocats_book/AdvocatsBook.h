@@ -41,7 +41,7 @@ class CAdvocatsBook : public XFrame {
 	void setFieldsSizes();
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
 	void adjustUIDependentCellWidgets(CDbGrid *grid);
-	void initBinderControls();
+	void initFilteringControls();
 
 	void OnSize(XSizeEvent *eve);
 	void OnFilterButtonClick(XCommandEvent *eve);

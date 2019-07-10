@@ -2,7 +2,7 @@
 #include "IGridCellWidget.h"
 #include <xwindows/XEdit.h>
 
-class CEditableCellWidget final : public XEdit, public IGridCellWidget {
+class CEditableCellWidget : public XEdit, public IGridCellWidget {
 public:
 	CEditableCellWidget();
 
@@ -33,6 +33,9 @@ public:
 	void SetLabel(ImmutableString<Tchar> label) override;
 
 	int GetId() const override;
+
+	bool Validate() const override { return true; }
+	bool Validate(ImmutableString<Tchar> label) const override { return true; }
 
 	virtual ~CEditableCellWidget();
 

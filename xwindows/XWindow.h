@@ -100,6 +100,7 @@ public:
 	inline const Tstring &GetClassName() const{ return class_name; }
 	inline const Tchar *GetLabel();
 	inline const Tchar *GetLabel(size_t &size);
+	inline const Tchar *GetLabel(std::vector<Tchar> &label) const;
 	inline bool SetLabel(const Tchar *label);
 	inline bool SetLabel(const Tchar *label, const size_t size);
 	inline void GetClientRect(XRect &client_rect) const;
@@ -251,14 +252,7 @@ _plMoveWindow(GetInternalHandle(), x, y, width, height);
 
 const Tchar *XWindow::GetLabel(){
 
-size_t label_size = _plGetLabelSize(GetInternalHandle());
-label.resize(label_size + 1);
-
-if(label_size > 0)
-	_plGetLabel(GetInternalHandle(), &label[0], label_size + 1);
-label[label_size] = _T('\0');
-
-return &label[0];
+	return GetLabel(this->label);
 }
 
 const Tchar *XWindow::GetLabel(size_t &size){
@@ -267,6 +261,18 @@ const Tchar *XWindow::GetLabel(size_t &size){
 size = label.empty() ? 0 : label.size() - 1;
 
 return p_label;
+}
+
+const Tchar *XWindow::GetLabel(std::vector<Tchar> &label) const {
+
+	size_t label_size = _plGetLabelSize(GetInternalHandle());
+	label.resize(label_size + 1);
+
+	if (label_size > 0)
+		_plGetLabel(GetInternalHandle(), &label[0], label_size + 1);
+	label[label_size] = _T('\0');
+
+	return &label[0];
 }
 
 bool XWindow::SetLabel(const Tchar *label){
