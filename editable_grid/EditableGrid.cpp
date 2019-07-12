@@ -122,8 +122,8 @@ void CEditableGrid::InitEditableGrid() {
 	field_widgets_collection = nullptr;
 	cells_font = XFont(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas"));
 	headers_font = XFont(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Arial"));
-	cells_color = XColor(170, 170, 170);
-	headers_color = XColor(128, 128, 128);
+	cells_color = XColor(255, 255, 200);
+	headers_color = XColor(180, 180, 180);
 	grid_lines_brush = XBrush(0, 0, 200);
 	background_brush = XBrush(100, 100, 100);
 	grid_lines_pen = XPen(XPEN_SOLID, 1, 0, 0, 200);

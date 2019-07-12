@@ -63,7 +63,7 @@ public:
 	void OnActiveCellLoosesFocus(XEvent *eve);
 	void OnActiveCellKeyPressed(XKeyboardEvent *eve);
 
-	inline void OnFieldRemoved(const size_t field);
+	void OnFieldRemoved(const size_t field);
 
 	inline int EvalCellHeightByTextHeight(const int text_height) const;
 	inline int GetMarginsWidth() const;
@@ -132,23 +132,4 @@ void CDispatcherCell::SetFocus() {
 
 	assert(def_active_cell);
 	def_active_cell->SetFocus();
-}
-
-void CDispatcherCell::OnFieldRemoved(const size_t field) {
-
-	if (field <= active_field) {
-		
-		CommitChangesIfPresent();
-
-		size_t prev_active_field = active_field;
-		if (field == active_field)
-			active_field = active_field ? \
-							active_field - 1 : 1;
-		else
-			--active_field;
-
-		def_active_cell->SetCurrentField(active_field);
-
-		OnTableChanged(prev_active_field, active_record);
-	}
 }

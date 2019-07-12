@@ -273,3 +273,21 @@ void CDispatcherCell::RefreshActiveCellWidgetLabel() {
 	def_active_cell->SetLabel(label);
 	update_cell_widget_text = false;
 }
+
+void CDispatcherCell::OnFieldRemoved(const size_t field) {
+
+	assert(active_field != (size_t)-1);
+	if (field <= active_field) {
+
+		CommitChangesIfPresent();
+
+		size_t prev_active_field = active_field;
+		if (field < active_field || \
+			(field == active_field && field + 1 == table_proxy->GetFieldsCount()))
+			--active_field;
+
+		def_active_cell->SetCurrentField(active_field);
+
+		OnTableChanged(prev_active_field, active_record);
+	}
+}

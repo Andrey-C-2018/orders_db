@@ -1,10 +1,12 @@
 #include <db/IDbConnection.h>
 #include <db_ext/DbTable.h>
 #include <db_controls/DbGrid.h>
+#include <db_controls/DbNavigator.h>
 #include "AdvocatsListManager.h"
 #include "AdvocatsListEvtHandler.h"
 
-CAdvocatsListManager::CAdvocatsListManager() : grid(nullptr) { }
+CAdvocatsListManager::CAdvocatsListManager() : grid(nullptr), grid_as_window(nullptr), \
+												grid_sizer(0, 10), nav_sizer(0, 0) { }
 
 void CAdvocatsListManager::Init(std::shared_ptr<IDbConnection> conn_, XWindow *parent) {
 
@@ -13,6 +15,12 @@ void CAdvocatsListManager::Init(std::shared_ptr<IDbConnection> conn_, XWindow *p
 
 	db_table = createDbTable(conn_);
 	grid = new CDbGrid(db_table, std::make_shared<CAdvocatsListEvtHandler>(db_table));
+	grid->SetFieldLabel(1, _T("ПІБ адвоката"));
+	grid->SetFieldWidth(1, 24);
+		
+	grid_as_window = grid;
+
+	db_navigator = new CDbNavigator(db_table);
 }
 
 std::shared_ptr<CDbTable> CAdvocatsListManager::createDbTable(std::shared_ptr<IDbConnection> conn) {
@@ -35,10 +43,21 @@ void CAdvocatsListManager::CreateWidgets(XWindow *parent, const int flags, \
 										const int x, const int y, \
 										const int width, const int height) {
 
-	grid->Create(parent, flags, _T(""), x, y, width, height);
+	grid_sizer.setCoords(XPoint(x, y));
+	grid_sizer.setMinus(15);
+	XRect rc = grid_sizer.resize(XSize(width, height));
+
+	grid->Create(parent, flags, _T(""), rc.left, rc.top, \
+				rc.right - rc.left, rc.bottom - rc.top);
+	grid->HideField(0);
+
+	rc = nav_sizer.resize(&grid_sizer);
+	db_navigator->Create(parent, flags, _T(""), rc.left, rc.top, \
+							rc.right - rc.left, rc.bottom - rc.top);
 }
 
 CAdvocatsListManager::~CAdvocatsListManager() {
 
+	if (db_navigator && !db_navigator->IsCreated()) delete db_navigator;
 	if (grid && !grid->IsCreated()) delete grid;
 }

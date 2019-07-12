@@ -161,6 +161,7 @@
     <ClCompile Include="XApp.cpp" />
     <ClCompile Include="XButton.cpp" />
     <ClCompile Include="XComboBox.cpp" />
+    <ClCompile Include="XDynamicSizer.cpp" />
     <ClCompile Include="XEdit.cpp" />
     <ClCompile Include="XEvent.cpp" />
     <ClCompile Include="XEventHandler.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="XApp.h" />
     <ClInclude Include="XButton.h" />
     <ClInclude Include="XComboBox.h" />
+    <ClInclude Include="XDynamicSizer.h" />
     <ClInclude Include="XEdit.h" />
     <ClInclude Include="XEvent.h" />
     <ClInclude Include="XEventHandler.h" />

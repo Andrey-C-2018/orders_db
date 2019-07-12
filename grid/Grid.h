@@ -193,7 +193,7 @@ void CGrid::EvaluateScrollPos(const XScrollEvent *eve, \
 
 size_t CGrid::GetVisibleRecordsCount() const {
 
-	return cells->GetVisibleRecordsCount(height);
+	return cells->GetVisibleRecordsCount(height - headers_height);
 }
 
 int CGrid::GetLeftPaneSize() const {
@@ -203,7 +203,7 @@ int CGrid::GetLeftPaneSize() const {
 
 int CGrid::GetHeight() const {
 
-	return width;
+	return height;
 }
 
 int CGrid::GetHeadersHeight() const {

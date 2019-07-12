@@ -17,7 +17,7 @@ CMyFrame::CMyFrame(const Tchar *class_name,\
 	grid = new CStringGrid();
 
 	int sizes[14] = {3, 10, 5, 4, 2, 8, 15, 2, 1, 6, 25, 35, 2, 40};
-	const size_t size = 14;
+	const size_t size = 8;
 	Tchar buffer[30];
 	for (size_t i = 0; i < size; ++i)
 		grid->AddField(XConv::ToString(sizes[i], buffer), sizes[i]);
