@@ -2,13 +2,18 @@
 #include <db_ext/DbTable.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbNavigator.h>
-#include "AdvocatsListManager.h"
+#include "AdvocatsList.h"
 #include "AdvocatsListEvtHandler.h"
 
-CAdvocatsListManager::CAdvocatsListManager() : grid(nullptr), grid_as_window(nullptr), \
-												grid_sizer(0, 10), nav_sizer(0, 0) { }
+CAdvocatsList::CAdvocatsList(const int margins_, const int width_, \
+								const int db_navigator_height_) : \
+									grid(nullptr), grid_as_window(nullptr), \
+									db_navigator(nullptr), \
+									grid_sizer(margins_, 0), \
+									nav_sizer(margins_, margins_),
+									width(width_), db_navigator_height(db_navigator_height_){ }
 
-void CAdvocatsListManager::Init(std::shared_ptr<IDbConnection> conn_, XWindow *parent) {
+void CAdvocatsList::initDbTable(std::shared_ptr<IDbConnection> conn_) {
 
 	assert(!db_table);
 	assert(!grid);
@@ -17,13 +22,12 @@ void CAdvocatsListManager::Init(std::shared_ptr<IDbConnection> conn_, XWindow *p
 	grid = new CDbGrid(db_table, std::make_shared<CAdvocatsListEvtHandler>(db_table));
 	grid->SetFieldLabel(1, _T("ПІБ адвоката"));
 	grid->SetFieldWidth(1, 24);
-		
 	grid_as_window = grid;
 
 	db_navigator = new CDbNavigator(db_table);
 }
 
-std::shared_ptr<CDbTable> CAdvocatsListManager::createDbTable(std::shared_ptr<IDbConnection> conn) {
+std::shared_ptr<CDbTable> CAdvocatsList::createDbTable(std::shared_ptr<IDbConnection> conn) {
 
 	std::string query = "SELECT b.id_advocat, b.adv_name_short ";
 	query += "FROM advocats b ";
@@ -38,25 +42,15 @@ std::shared_ptr<CDbTable> CAdvocatsListManager::createDbTable(std::shared_ptr<ID
 	return db_table;
 }
 
-void CAdvocatsListManager::CreateWidgets(XWindow *parent, const int flags, \
-										const Tchar *label, \
-										const int x, const int y, \
-										const int width, const int height) {
+void CAdvocatsList::displayWidgets(XWindow *parent) {
 
-	grid_sizer.setCoords(XPoint(x, y));
-	grid_sizer.setMinus(15);
-	XRect rc = grid_sizer.resize(XSize(width, height));
+	grid_sizer.createWidget(grid_as_window, parent, FL_WINDOW_VISIBLE, _T(""));
+	nav_sizer.createWidget(db_navigator, parent, FL_WINDOW_VISIBLE, _T(""));
 
-	grid->Create(parent, flags, _T(""), rc.left, rc.top, \
-				rc.right - rc.left, rc.bottom - rc.top);
 	grid->HideField(0);
-
-	rc = nav_sizer.resize(&grid_sizer);
-	db_navigator->Create(parent, flags, _T(""), rc.left, rc.top, \
-							rc.right - rc.left, rc.bottom - rc.top);
 }
 
-CAdvocatsListManager::~CAdvocatsListManager() {
+CAdvocatsList::~CAdvocatsList() {
 
 	if (db_navigator && !db_navigator->IsCreated()) delete db_navigator;
 	if (grid && !grid->IsCreated()) delete grid;

@@ -21,10 +21,13 @@
     <ClInclude Include="ActsForm.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="AdvocatsListManager.h">
+    <ClInclude Include="AdvocatsListEvtHandler.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="AdvocatsListEvtHandler.h">
+    <ClInclude Include="OrdersList.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="AdvocatsList.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,10 +38,13 @@
     <ClCompile Include="ActsForm.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="AdvocatsListManager.cpp">
+    <ClCompile Include="AdvocatsListEvtHandler.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="AdvocatsListEvtHandler.cpp">
+    <ClCompile Include="OrdersList.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="AdvocatsList.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>

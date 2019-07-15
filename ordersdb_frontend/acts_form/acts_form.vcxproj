@@ -156,14 +156,16 @@
   <ItemGroup>
     <ClCompile Include="ActsForm.cpp" />
     <ClCompile Include="AdvocatsListEvtHandler.cpp" />
-    <ClCompile Include="AdvocatsListManager.cpp" />
+    <ClCompile Include="AdvocatsList.cpp" />
     <ClCompile Include="MyApp.cpp" />
+    <ClCompile Include="OrdersList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActsForm.h" />
     <ClInclude Include="AdvocatsListEvtHandler.h" />
-    <ClInclude Include="AdvocatsListManager.h" />
+    <ClInclude Include="AdvocatsList.h" />
     <ClInclude Include="MyApp.h" />
+    <ClInclude Include="OrdersList.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
