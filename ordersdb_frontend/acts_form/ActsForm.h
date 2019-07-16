@@ -3,6 +3,7 @@
 #include <xwindows/XFrame.h>
 #include "AdvocatsList.h"
 #include "OrdersList.h"
+#include "PaymentsList.h"
 
 struct IDbConnection;
 class CDbTable;
@@ -13,6 +14,7 @@ class CActsForm : public XFrame {
 	std::shared_ptr<IDbConnection> conn;
 	CAdvocatsList adv_list;
 	COrdersList orders_list;
+	CPaymentsList payments_list;
 
 	enum {
 		DEF_GUI_MARGIN = 10, \

@@ -1,14 +1,14 @@
 #pragma once
 #include <memory>
+#include <date/Date.h>
 #include <xwindows/XWidget.h>
 #include <xwindows/XDynamicSizer.h>
 
 struct IDbConnection;
-struct IDbTableEventsHandler;
 class CDbGrid;
 class CDbTable;
 
-class COrdersList {
+class CPaymentsList {
 	std::shared_ptr<CDbTable> db_table;
 	CDbGrid *grid;
 	XWidget *grid_as_window;
@@ -16,17 +16,19 @@ class COrdersList {
 	int db_navigator_height;
 	float multiplier;
 
-	XDynamicSizer grid_sizer, nav_sizer, *prev_sizer;
+	XDynamicSizer grid_sizer, nav_sizer;
+	const XDynamicSizer *prev_sizer;
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn, \
-											const int def_adv_id);
+											const int def_center, const int def_order, \
+											CDate def_order_date);
 public:
-	COrdersList(const int margins_, const float multiplier_, const int db_navigator_height);
+	CPaymentsList(const int margins_, const int db_navigator_height);
 
-	void initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_adv_id);
-	void initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler);
+	void initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_center, \
+						const int def_order, CDate def_order_date);
 	inline void initSizers(XPoint initial_coords, XSize parent_size, \
-							XDynamicSizer *prev_sizer);
+							const XDynamicSizer *prev_sizer);
 
 	inline XDynamicSizer &getFirstSizer();
 	inline const XDynamicSizer &getLastSizer() const;
@@ -36,48 +38,47 @@ public:
 	inline void updateSizers();
 	inline void resize();
 
-	virtual ~COrdersList();
+	virtual ~CPaymentsList();
 };
 
 //*****************************************************
 
-void COrdersList::initSizers(XPoint initial_coords, XSize size, \
-								XDynamicSizer *prev_sizer) {
+void CPaymentsList::initSizers(XPoint initial_coords, XSize size, \
+								const XDynamicSizer *prev_sizer) {
 
 	assert(prev_sizer);
 	this->prev_sizer = prev_sizer;
 
-	grid_sizer.addToHorzSizersChain(*prev_sizer);
-	grid_sizer.setHeightMultiplier(0.5F);
+	grid_sizer.addToVertSizersChain(*prev_sizer);
+	grid_sizer.setMinusY(db_navigator_height);
 
 	nav_sizer.addToVertSizersChain(grid_sizer);
-	nav_sizer.setRelativeHeight(db_navigator_height);
 	nav_sizer.freezeHeight();
 }
 
-void COrdersList::updateSizers() {
+void CPaymentsList::updateSizers() {
 
-	grid_sizer.updateHorzSizersChain(*prev_sizer);
+	grid_sizer.updateVertSizersChain(*prev_sizer);
 	nav_sizer.updateVertSizersChain(grid_sizer);
 }
 
-void COrdersList::resize() {
+void CPaymentsList::resize() {
 
 	grid_sizer.moveWidget(grid_as_window);
 	nav_sizer.moveWidget(db_navigator);
 }
 
-XDynamicSizer &COrdersList::getFirstSizer() {
+XDynamicSizer &CPaymentsList::getFirstSizer() {
 
 	return grid_sizer;
 }
 
-const XDynamicSizer &COrdersList::getLastSizer() const {
+const XDynamicSizer &CPaymentsList::getLastSizer() const {
 
 	return nav_sizer;
 }
 
-std::shared_ptr<CDbTable> COrdersList::getDbTable() {
+std::shared_ptr<CDbTable> CPaymentsList::getDbTable() {
 
 	return db_table;
 }

@@ -155,17 +155,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActsForm.cpp" />
+    <ClCompile Include="AdvDbTableEventsHandler.cpp" />
     <ClCompile Include="AdvocatsListEvtHandler.cpp" />
     <ClCompile Include="AdvocatsList.cpp" />
     <ClCompile Include="MyApp.cpp" />
+    <ClCompile Include="OrdersDbTableEventsHandler.cpp" />
     <ClCompile Include="OrdersList.cpp" />
+    <ClCompile Include="PaymentsList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActsForm.h" />
+    <ClInclude Include="AdvDbTableEventsHandler.h" />
     <ClInclude Include="AdvocatsListEvtHandler.h" />
     <ClInclude Include="AdvocatsList.h" />
     <ClInclude Include="MyApp.h" />
+    <ClInclude Include="OrdersDbTableEventsHandler.h" />
     <ClInclude Include="OrdersList.h" />
+    <ClInclude Include="PaymentsList.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

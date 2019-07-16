@@ -12,12 +12,12 @@ COrdersList::COrdersList(const int margins_, const float multiplier_, \
 								grid_sizer(margins_, 0), nav_sizer(margins_, margins_), \
 								prev_sizer(nullptr) { }
 
-void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_) {
+void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_adv_id) {
 
 	assert(!db_table);
 	assert(!grid);
 
-	db_table = createDbTable(conn_);
+	db_table = createDbTable(conn_, def_adv_id);
 	grid = new CDbGrid(db_table);
 	grid->SetFieldLabel(1, _T("Центр"));
 	grid->SetFieldWidth(1, 12);
@@ -35,16 +35,24 @@ void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_) {
 	db_navigator = new CDbNavigator(db_table);
 }
 
-std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnection> conn) {
+void COrdersList::initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler) {
+
+	db_table->ConnectEventsHandler(evt_handler);
+}
+
+std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnection> conn, \
+														const int def_adv_id) {
 
 	std::string query = "SELECT a.id_center_legalaid, cn.center_short_name, a.id, a.order_date,";
 	query += " t.type_name, a.client_name, a.bdate, a.cancel_date ";
 	query += "FROM orders a INNER JOIN centers cn ON a.id_center_legalaid = cn.id_center";
 	query += " INNER JOIN order_types t ON a.id_order_type = t.id_type ";
-	query += "WHERE a.order_date >= '2019-01-01' ";
+	query += "WHERE a.order_date >= '2019-01-01'";
+	query += " AND a.id_adv = ? ";
 	query += "ORDER BY id_center_legalaid, order_date, id";
 
 	auto stmt = conn->PrepareQuery(query.c_str());
+	stmt->bindValue(0, def_adv_id);
 
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
 	db_table->setPrimaryTableForQuery("orders");

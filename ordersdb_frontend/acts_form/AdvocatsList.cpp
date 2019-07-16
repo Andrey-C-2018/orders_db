@@ -27,6 +27,11 @@ void CAdvocatsList::initDbTable(std::shared_ptr<IDbConnection> conn_) {
 	db_navigator = new CDbNavigator(db_table);
 }
 
+void CAdvocatsList::initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler) {
+
+	db_table->ConnectEventsHandler(evt_handler);
+}
+
 std::shared_ptr<CDbTable> CAdvocatsList::createDbTable(std::shared_ptr<IDbConnection> conn) {
 
 	std::string query = "SELECT b.id_advocat, b.adv_name_short ";
@@ -39,6 +44,7 @@ std::shared_ptr<CDbTable> CAdvocatsList::createDbTable(std::shared_ptr<IDbConnec
 	db_table->setPrimaryTableForQuery("advocats");
 	db_table->markFieldAsPrimaryKey("id_advocat");
 
+	db_table->gotoCurrentRecord();
 	return db_table;
 }
 

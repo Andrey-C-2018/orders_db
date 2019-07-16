@@ -300,9 +300,11 @@ void CAdvocatsBook::OnSize(XSizeEvent *eve) {
 	int width = eve->GetWidth();
 	int height = eve->GetHeight();
 
-	if (grid) grid->MoveWindow(grid_x, grid_y, \
-		width - 2 * grid_margin_x, \
-		height - grid_y - grid_margin_y);
+	if (!(grid && width && height)) return;
+		
+	grid->MoveWindow(grid_x, grid_y, \
+					width - 2 * grid_margin_x, \
+					height - grid_y - grid_margin_y);
 }
 
 CAdvocatsBook::~CAdvocatsBook() {

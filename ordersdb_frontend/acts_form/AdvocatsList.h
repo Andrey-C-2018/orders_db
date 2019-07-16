@@ -4,6 +4,7 @@
 #include <xwindows/XDynamicSizer.h>
 
 struct IDbConnection;
+struct IDbTableEventsHandler;
 class CDbGrid;
 class CDbTable;
 
@@ -20,10 +21,12 @@ public:
 	CAdvocatsList(const int margins_, const int width_, const int db_navigator_height_);
 
 	void initDbTable(std::shared_ptr<IDbConnection> conn_);
+	void initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler);
 	inline void initSizers(XPoint initial_coords, XSize parent_size);
 
 	inline XDynamicSizer &getFirstSizer();
 	inline const XDynamicSizer &getLastSizer() const;
+	inline std::shared_ptr<const CDbTable> getDbTable() const;
 
 	void displayWidgets(XWindow *parent);
 
@@ -68,4 +71,9 @@ XDynamicSizer &CAdvocatsList::getFirstSizer() {
 const XDynamicSizer &CAdvocatsList::getLastSizer() const {
 
 	return nav_sizer;
+}
+
+std::shared_ptr<const CDbTable> CAdvocatsList::getDbTable() const {
+
+	return db_table;
 }

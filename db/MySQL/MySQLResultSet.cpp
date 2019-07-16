@@ -197,8 +197,17 @@ void CMySQLResultSet::reload() {
 	if (mysql_stmt_store_result(stmt.get()))
 		throw CMySQLResultSetException(stmt.get());
 
-	curr_record = (size_t)-1;
 	records_count = (size_t)mysql_stmt_num_rows(stmt.get());
+	if (records_count) {
+		curr_record = (curr_record >= records_count) * (records_count - 1) + \
+						(curr_record < records_count) * curr_record;
+		mysql_stmt_data_seek(stmt.get(), curr_record);
+
+		bool success = (mysql_stmt_fetch(stmt.get()) == 0);
+		assert(success);
+	}
+	else
+		curr_record = (size_t)-1;
 }
 
 void CMySQLResultSet::Release() {

@@ -124,8 +124,7 @@ void CDbTable::markFieldAsPrimaryKey(const char *field_name) {
 void CDbTable::executeScalarStmt(std::shared_ptr<IDbStatement> stmt) {
 
 	assert(stmt);
-	if (stmt->execScalar())
-		reload();
+	if (stmt->execScalar())	reload();
 }
 
 void CDbTable::rereadQueryContents() {
