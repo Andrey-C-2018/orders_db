@@ -20,8 +20,9 @@ CMyFrame::CMyFrame(const Tchar *class_name,\
 	GetClientRect(rc);
 
 	//TestStaticSizers(rc);
-	TestDynamicSizers(rc);
-	Connect(EVT_SIZE, this, &CMyFrame::OnSize);
+	//TestDynamicSizers(rc);
+	TestFocusing();
+	//Connect(EVT_SIZE, this, &CMyFrame::OnSize);
 }
 
 void CMyFrame::TestStaticSizers(const XRect &rc) {
@@ -92,6 +93,20 @@ void CMyFrame::TestDynamicSizers(const XRect &rc) {
 	button5 = new XButton();
 	sizer5.addToVertSizersChain(sizer4);
 	sizer5.createWidget(button5, this, FL_WINDOW_VISIBLE, _T("5"));
+}
+
+void CMyFrame::TestFocusing() {
+
+	button1 = new XButton(this, FL_WINDOW_VISIBLE, _T("OK"), 10, 10, 100, 40);
+	auto combo = new XComboBox(this, FL_WINDOW_VISIBLE, _T("OK"), 120, 10, 100, 40);
+
+	SetFocus();
+	bool f = combo->HasFocus();
+	combo->SetFocus();
+	f = combo->HasFocus();
+	button2->SetFocus();
+	f = combo->HasFocus();
+	f = button2->HasFocus();
 }
 
 void CMyFrame::OnSize(XSizeEvent *eve) {

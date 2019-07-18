@@ -154,6 +154,7 @@ public:
 	inline Tchar GetChar() const{ return ch; }
 	inline Tchar GetKey() const{ return key; }
 	inline int GetVKeyState(int virtual_key) noexcept{ return _plGetVKeyState(virtual_key); }
+	inline void SetKey(const int key) { this->key = key; }
 	
 	virtual ~XKeyboardEvent();
 };

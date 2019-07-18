@@ -40,8 +40,11 @@ enum Events{
 	EVT_KEYDOWN = WM_KEYDOWN,\
 	EVT_LBUTTONDOWN = WM_LBUTTONDOWN,\
 	EVT_MOUSEWHEEL = WM_MOUSEWHEEL,\
+	EVT_MOUSEMOVE = WM_MOUSEMOVE, \
+	EVT_MOUSEHOVER = WM_MOUSEHOVER, \
 	EVT_HSCROLL = WM_HSCROLL,\
-	EVT_VSCROLL = WM_VSCROLL
+	EVT_VSCROLL = WM_VSCROLL, \
+	EVT_LOOSEFOCUS = WM_KILLFOCUS
 };
 
 enum NotificationCodes{
@@ -50,6 +53,7 @@ enum NotificationCodes{
 	NCODE_EDIT_SET_FOCUS = EN_SETFOCUS, \
 	NCODE_EDIT_LOOSE_FOCUS = EN_KILLFOCUS, \
 	NCODE_COMBOBOX_SELCHANGED = CBN_SELCHANGE, \
+	NCODE_COMBOBOX_GET_FOCUS = CBN_SETFOCUS, \
 	NCODE_COMBOBOX_LOOSE_FOCUS = CBN_KILLFOCUS
 };
 
@@ -297,6 +301,8 @@ inline _plHWND _plCreateWindow(const Tchar *class_name, \
 								XWindow *this_window) noexcept;
 inline void _plWindowPostCreate(_plHWND hwnd);
 inline void _plSetFocus(_plHWND hwnd) noexcept;
+inline bool _plHasFocus(_plHWND hwnd) noexcept;
+inline bool _plComboBoxHasFocus(_plHWND hwnd) noexcept;
 inline size_t _plGetLabelSize(_plHWND hwnd) noexcept;
 inline void _plGetLabel(_plHWND hwnd, Tchar *label, const size_t max_size) noexcept;
 inline bool _plSetLabel(_plHWND hwnd, const Tchar *label) noexcept;
@@ -642,6 +648,27 @@ void _plWindowPostCreate(_plHWND hwnd) {
 void _plSetFocus(_plHWND hwnd) noexcept {
 
 	SetFocus(hwnd);
+}
+
+bool _plHasFocus(_plHWND hwnd) noexcept {
+
+	_plHWND focused_hwnd = GetFocus();
+	return focused_hwnd == hwnd;
+}
+
+bool _plComboBoxHasFocus(_plHWND hwnd) noexcept {
+
+	COMBOBOXINFO cb_info;
+
+	ZeroMemory(&cb_info, sizeof(cb_info));
+	cb_info.cbSize = sizeof(cb_info);
+	BOOL success = GetComboBoxInfo(hwnd, &cb_info);
+	assert(success);
+
+	_plHWND focused_hwnd = GetFocus();
+	return cb_info.hwndCombo == focused_hwnd || \
+			cb_info.hwndItem == focused_hwnd || \
+			cb_info.hwndList == focused_hwnd;
 }
 
 size_t _plGetLabelSize(_plHWND hwnd) noexcept {

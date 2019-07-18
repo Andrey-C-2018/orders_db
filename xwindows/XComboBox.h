@@ -4,15 +4,15 @@
 class XComboBox : public XWidget{
 	size_t items_count;
 
-	XComboBox(const XComboBox &obj) = delete;
-	XComboBox &operator=(const XComboBox &obj) = delete;
 public:
 	enum {
 		EMPTY_INDEX = (size_t) -1
 	};
 
 	XComboBox();
+	XComboBox(const XComboBox &obj) = delete;
 	XComboBox(XComboBox &&obj) = default;
+	XComboBox &operator=(const XComboBox &obj) = delete;
 	XComboBox &operator=(XComboBox &&obj) = default;
 
 	XComboBox(XWindow *parent, const int flags, \
@@ -25,9 +25,15 @@ public:
 
 	size_t GetCurrentSelectionIndex() const;
 	void SetSelectionIndex(const size_t index);
+	inline bool ComboBoxHasFocus() const;
 
 	void GetItemText(const size_t index, Tstring item_text) const;
 	void Reset();
 
 	virtual ~XComboBox();
 };
+
+bool XComboBox::ComboBoxHasFocus() const {
+
+	return _plComboBoxHasFocus(GetInternalHandle());
+}

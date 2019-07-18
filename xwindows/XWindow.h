@@ -105,6 +105,7 @@ public:
 	inline bool SetLabel(const Tchar *label, const size_t size);
 	inline void GetClientRect(XRect &client_rect) const;
 	inline void MoveWindow(const int x, const int y, const int width, const int height);
+	inline bool HasFocus() const;
 	inline void SetFocus();
 	inline void Invalidate(const XRect *rect, const bool redraw);
 	inline void Enable() { _plEnableWindow(GetInternalHandle(), true); }
@@ -237,6 +238,11 @@ _plGetClientRect(GetInternalHandle(), client_rect);
 void XWindow::SetFocus(){
 
 _plSetFocus(GetInternalHandle());
+}
+
+bool XWindow::HasFocus() const {
+
+	return _plHasFocus(GetInternalHandle());
 }
 
 void XWindow::Invalidate(const XRect *rect, const bool redraw){

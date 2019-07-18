@@ -6,12 +6,15 @@
 #include "IGridEventsHandler.h"
 
 class CGridTableProxy;
+struct ITabKeyAction;
 
 class CDispatcherCell : public IDrawable {
+	XWindow *parent;
 	IGridCellWidget *def_active_cell;
 	CTextCell unactive_cell;
+	ITabKeyAction *tab_action;
 	size_t active_field, active_record;
-	bool active_cell_reached;
+	bool active_cell_reached, active_cell_lost_focus;
 
 	ImmutableString<Tchar> active_cell_text;
 	XColor active_cell_color;
@@ -46,7 +49,7 @@ public:
 	inline size_t GetActiveRecord() const;
 
 	void SetBounds(const int left_bound, const int upper_bound) override;
-	void SetParameters(XWindow * parent, \
+	void SetParameters(XWindow * parent, ITabKeyAction *tab_action, \
 						std::shared_ptr<IGridEventsHandler> grid_events_handler, \
 						IGridCellWidget *cell_widget, \
 						std::shared_ptr<CGridTableProxy> table_proxy);
@@ -60,6 +63,7 @@ public:
 
 	void OnActiveCellTextChanged(XCommandEvent *eve);
 	void OnClick(const size_t field, const size_t record);
+	void OnActiveCellGetsFocus(XEvent *eve);
 	void OnActiveCellLoosesFocus(XEvent *eve);
 	void OnActiveCellKeyPressed(XKeyboardEvent *eve);
 
@@ -69,6 +73,7 @@ public:
 	inline int GetMarginsWidth() const;
 
 	inline void SetFocus();
+	inline bool HasActiveCellFocus() const;
 	void Reload();
 
 	virtual ~CDispatcherCell(){ }
@@ -132,4 +137,9 @@ void CDispatcherCell::SetFocus() {
 
 	assert(def_active_cell);
 	def_active_cell->SetFocus();
+}
+
+bool CDispatcherCell::HasActiveCellFocus() const {
+
+	return this->active_cell_lost_focus;
 }

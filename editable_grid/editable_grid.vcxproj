@@ -167,6 +167,7 @@
     <ClInclude Include="IGridEventsHandler.h" />
     <ClInclude Include="MultipleCellWidget.h" />
     <ClInclude Include="StringGrid.h" />
+    <ClInclude Include="ITabKeyAction.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

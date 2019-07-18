@@ -1,5 +1,6 @@
 #include "DispatcherCell.h"
 #include <grid/GridTableProxy.h>
+#include "ITabKeyAction.h"
 
 class OnCellChangedAction : public IOnCellChangedAction {
 	CGridTableProxy *table_proxy;
@@ -35,9 +36,10 @@ public:
 
 //**************************************************************
 
-CDispatcherCell::CDispatcherCell() : def_active_cell(nullptr), \
+CDispatcherCell::CDispatcherCell() : parent(nullptr), def_active_cell(nullptr), \
+									tab_action(nullptr), \
 									active_field((size_t)-1), active_record((size_t)-1), \
-									active_cell_reached(false), \
+									active_cell_reached(false), active_cell_lost_focus(true), \
 									active_cell_text(nullptr, 0), \
 									active_cell_color(255, 255, 255), \
 									def_act_cell_coords(0, 0), \
@@ -48,11 +50,13 @@ CDispatcherCell::CDispatcherCell() : def_active_cell(nullptr), \
 									changes_present(false), \
 									skip_reloading(false) { }
 
-CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : \
+CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : parent(obj.parent), \
 									def_active_cell(obj.def_active_cell), \
+									tab_action(obj.tab_action), \
 									active_field(obj.active_field), \
 									active_record(obj.active_record), \
 									active_cell_reached(obj.active_cell_reached), \
+									active_cell_lost_focus(obj.active_cell_lost_focus), \
 									active_cell_text(obj.active_cell_text), \
 									active_cell_color(255, 255, 255), \
 									def_act_cell_coords(obj.def_act_cell_coords), \
@@ -66,10 +70,13 @@ CDispatcherCell::CDispatcherCell(CDispatcherCell &&obj) : \
 									changes_present(obj.changes_present), \
 									skip_reloading(obj.skip_reloading) {
 
+	obj.parent = nullptr;
 	obj.def_active_cell = nullptr;
+	obj.tab_action = nullptr;
 	obj.active_field = (size_t)-1;
 	obj.active_record = (size_t)-1;
 	obj.active_cell_reached = false;
+	obj.active_cell_lost_focus = true;
 	obj.active_cell_text.str = nullptr;
 	obj.active_cell_text.size = 0;
 	obj.def_act_cell_coords.x = 0;
@@ -89,7 +96,7 @@ void CDispatcherCell::SetBounds(const int left_bound, const int upper_bound) {
 	bounds.top = upper_bound;
 }
 
-void CDispatcherCell::SetParameters(XWindow * parent, \
+void CDispatcherCell::SetParameters(XWindow * parent, ITabKeyAction *tab_action, \
 									std::shared_ptr<IGridEventsHandler> grid_events_handler, \
 									IGridCellWidget *cell_widget, \
 									std::shared_ptr<CGridTableProxy> table_proxy) {
@@ -102,6 +109,9 @@ void CDispatcherCell::SetParameters(XWindow * parent, \
 	def_active_cell = cell_widget;
 
 	assert(parent);
+	this->parent = parent;
+	assert(tab_action);
+	this->tab_action = tab_action;
 	assert(cell_widget);
 	assert(grid_events_handler);
 	this->event_handler = grid_events_handler;
@@ -129,6 +139,8 @@ void CDispatcherCell::SetParameters(XWindow * parent, \
 	def_active_cell->SetOnIndirectChangeHandler(cell_event_handler);
 	def_active_cell->SetOnKeyPressHandler(XEventHandlerData(this, \
 											&CDispatcherCell::OnActiveCellKeyPressed));
+	def_active_cell->SetOnGetFocusHandler(XEventHandlerData(this, \
+											&CDispatcherCell::OnActiveCellGetsFocus));
 	def_active_cell->SetOnLooseFocusHandler(XEventHandlerData(this, \
 											&CDispatcherCell::OnActiveCellLoosesFocus));
 }
@@ -189,19 +201,45 @@ void CDispatcherCell::OnActiveCellKeyPressed(XKeyboardEvent *eve) {
 	switch (eve->GetKey()) {
 	case X_VKEY_ENTER:
 		OnClick(active_field, active_record);
+
+		inside_on_click = true;
+		parent->SetFocus();
+		inside_on_click = false;
+
 		exec_def_action = false;
 		break;
 
 	case X_VKEY_ESCAPE:
 		RefreshActiveCellWidgetLabel();
+
+		inside_on_click = true;
+		parent->SetFocus();
+		inside_on_click = false;
+
+		exec_def_action = false;
+		break;
+
+	case X_VKEY_TAB:
+		tab_action->OnTabKeyPressed();
+
+		inside_on_click = true;
+		def_active_cell->SetFocus();
+		inside_on_click = false;
+
 		exec_def_action = false;
 	}
 
 	eve->ExecuteDefaultEventAction(exec_def_action);
 }
 
+void CDispatcherCell::OnActiveCellGetsFocus(XEvent *eve) {
+
+	active_cell_lost_focus = false;
+}
+
 void CDispatcherCell::OnActiveCellLoosesFocus(XEvent *eve) {
 
+	active_cell_lost_focus = true;
 	OnClick(active_field, active_record);
 }
 

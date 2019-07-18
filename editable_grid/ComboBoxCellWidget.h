@@ -22,6 +22,7 @@ public:
 
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
 	void SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> ignored);
+	void SetOnGetFocusHandler(XEventHandlerData on_get_focus) override;
 	void SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) override;
 	void SetOnKeyPressHandler(XEventHandlerData on_key_press) override;
 
@@ -32,6 +33,7 @@ public:
 	void MoveWindow(const int x, const int y, \
 					const int width, const int height) override;
 	void SetFocus() override;
+	bool HasFocus() const override;
 
 	ImmutableString<Tchar> GetLabel() override;
 	void SetLabel(ImmutableString<Tchar> label) override;

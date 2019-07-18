@@ -12,6 +12,7 @@ class CMyFrame : public XFrame{
 
 	void TestStaticSizers(const XRect &rc);
 	void TestDynamicSizers(const XRect &rc);
+	void TestFocusing();
 public:
 	CMyFrame(const Tchar *class_name,\
 			 const Tchar *label, const int X, const int Y,\

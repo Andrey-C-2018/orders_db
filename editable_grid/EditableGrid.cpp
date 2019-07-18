@@ -11,14 +11,23 @@ struct CellDrawingParams {
 };
 
 struct DispatcherCellParams {
-	XWindow *parent;
+	CEditableGrid *parent;
 	std::shared_ptr<IGridEventsHandler> events_handler;
 	std::shared_ptr<CGridTableProxy> table_proxy;
 	CMultipleCellWidget *field_widgets_collection;
 };
 
+class CGridTabHopper : public ITabKeyAction {
+	CEditableGrid *grid;
+public:
+	CGridTabHopper(CEditableGrid *grid_) : grid(grid_) { }
+	void OnTabKeyPressed() override;
+	virtual ~CGridTabHopper() { }
+};
+
 class CEConfigurator final : public CCellConfigurator {
 	XWindow *parent;
+	CGridTabHopper tab_hopper;
 	std::shared_ptr<IGridEventsHandler> events_handler;
 	std::shared_ptr<CGridTableProxy> table_proxy;
 
@@ -31,6 +40,7 @@ public:
 											drawing_params.cell_brush, \
 											drawing_params.cell_pen), \
 						parent(disp_cell_params.parent), \
+						tab_hopper(disp_cell_params.parent), \
 						events_handler(disp_cell_params.events_handler), \
 						table_proxy(disp_cell_params.table_proxy), \
 						disp_cell(nullptr), \
@@ -40,7 +50,8 @@ public:
 
 		this->disp_cell = &disp_cell_;
 		IGridCellWidget *cell_widget = field_widgets_collection;
-		this->disp_cell->SetParameters(parent, events_handler, cell_widget, table_proxy);
+		this->disp_cell->SetParameters(parent, &tab_hopper, events_handler, \
+										cell_widget, table_proxy);
 
 		SetCellHeightAndMargins(disp_cell->EvalCellHeightByTextHeight(GetTextHeight()), \
 								disp_cell->GetMarginsWidth());
@@ -119,6 +130,7 @@ public:
 
 void CEditableGrid::InitEditableGrid() {
 
+	has_focus = false;
 	field_widgets_collection = nullptr;
 	cells_font = XFont(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Consolas"));
 	headers_font = XFont(20, 0, 0, 0, RUSSIAN_CHARSET, _T("Arial"));
@@ -184,7 +196,7 @@ GridGCParamsLists CEditableGrid::CreateGCParamsLists() {
 	return GridGCParamsLists(global_params, headers_params);
 }
 
-CEditableGrid::CEditableGrid(CEditableGrid &&obj) : CGrid(std::move(obj)){
+CEditableGrid::CEditableGrid(CEditableGrid &&obj) : CGrid(std::move(obj)) {
 
 	field_widgets_collection = obj.field_widgets_collection;
 	events_handler = std::move(obj.events_handler);
@@ -232,6 +244,8 @@ LayoutObjects CEditableGrid::CreateLayoutObjects(const int kind_of_layout) {
 void CEditableGrid::OnWindowCreate() {
 
 	Connect(EVT_KEYDOWN, this, &CEditableGrid::OnKeyPress);
+	Connect(EVT_MOUSEMOVE, this, &CEditableGrid::OnMouseMove);
+	Connect(EVT_LOOSEFOCUS, this, &CEditableGrid::OnLooseFocus);
 }
 
 void CEditableGrid::SetWidgetForField(const size_t field, IGridCellWidget *field_widget) {
@@ -239,6 +253,13 @@ void CEditableGrid::SetWidgetForField(const size_t field, IGridCellWidget *field
 	assert(field_widget);
 	assert(!IsCreated());
 	field_widgets_collection->AddCellWidget(field, field_widget);
+}
+
+void CGridTabHopper::OnTabKeyPressed() {
+
+	XKeyboardEvent eve;
+	eve.SetKey(X_VKEY_TAB);
+	grid->OnKeyPress(&eve);
 }
 
 void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
@@ -312,6 +333,19 @@ void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
 
 		Invalidate(nullptr, false);
 	}
+}
+
+void CEditableGrid::OnMouseMove(XMouseEvent *eve) {
+
+	if (!has_focus && ce_configurator->GetDispatcherCell()->HasActiveCellFocus()) {
+		SetFocus();
+		has_focus = true;
+	}
+}
+
+void CEditableGrid::OnLooseFocus(XMouseEvent *eve) {
+
+	has_focus = false;
 }
 
 CEditableGrid::~CEditableGrid(){

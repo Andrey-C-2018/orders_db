@@ -22,6 +22,12 @@ void CEditableCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 
 void CEditableCellWidget::SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> ignored) { }
 
+void CEditableCellWidget::SetOnGetFocusHandler(XEventHandlerData on_get_focus) {
+
+	XEdit::GetParent()->Connect(EVT_COMMAND, NCODE_EDIT_SET_FOCUS, \
+								XEdit::GetId(), std::move(on_get_focus));
+}
+
 void CEditableCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) {
 
 	XEdit::GetParent()->Connect(EVT_COMMAND, NCODE_EDIT_LOOSE_FOCUS, \
@@ -54,6 +60,11 @@ void CEditableCellWidget::MoveWindow(const int x, const int y, \
 void CEditableCellWidget::SetFocus() {
 
 	XEdit::SetFocus();
+}
+
+bool CEditableCellWidget::HasFocus() const {
+
+	return XEdit::HasFocus();
 }
 
 ImmutableString<Tchar> CEditableCellWidget::GetLabel() {

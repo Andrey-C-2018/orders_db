@@ -1,5 +1,6 @@
 #pragma once
 #include <grid/Grid.h>
+#include "ITabKeyAction.h"
 
 struct IGridCellWidget;
 struct IGridEventsHandler;
@@ -7,7 +8,7 @@ class CMultipleCellWidget;
 class CEConfigurator;
 
 class CEditableGrid : public CGrid{
-
+	bool has_focus;
 	CMultipleCellWidget *field_widgets_collection;
 	std::shared_ptr<IGridEventsHandler> events_handler;
 	std::shared_ptr<CEConfigurator> ce_configurator;
@@ -17,7 +18,8 @@ class CEditableGrid : public CGrid{
 	XBrush grid_lines_brush, background_brush;
 	XPen grid_lines_pen, background_pen;
 
-	void OnKeyPress(XKeyboardEvent *eve);
+	void OnMouseMove(XMouseEvent *eve);
+	void OnLooseFocus(XMouseEvent *eve);
 	void InitEditableGrid();
 protected:
 	GridConfigurators CreateConfigurators() override;
@@ -41,6 +43,7 @@ public:
 	CEditableGrid &operator=(const CEditableGrid &obj) = delete;
 
 	void SetWidgetForField(const size_t field, IGridCellWidget *field_widget);
+	void OnKeyPress(XKeyboardEvent *eve);
 
 	virtual ~CEditableGrid();
 };

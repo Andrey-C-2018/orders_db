@@ -20,6 +20,13 @@ void CComboBoxCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 
 void CComboBoxCellWidget::SetOnIndirectChangeHandler(std::shared_ptr<ICellEventHandler> ignored) { }
 
+void CComboBoxCellWidget::SetOnGetFocusHandler(XEventHandlerData on_get_focus) {
+
+	XComboBox::GetParent()->Connect(EVT_COMMAND, NCODE_COMBOBOX_GET_FOCUS, \
+									XComboBox::GetId(), std::move(on_get_focus));
+	
+}
+
 void CComboBoxCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) {
 
 	XComboBox::GetParent()->Connect(EVT_COMMAND, NCODE_COMBOBOX_LOOSE_FOCUS, \
@@ -49,6 +56,11 @@ void CComboBoxCellWidget::MoveWindow(const int x, const int y, \
 void CComboBoxCellWidget::SetFocus() {
 
 	XComboBox::SetFocus();
+}
+
+bool CComboBoxCellWidget::HasFocus() const {
+
+	return XComboBox::ComboBoxHasFocus();
 }
 
 ImmutableString<Tchar> CComboBoxCellWidget::GetLabel() {

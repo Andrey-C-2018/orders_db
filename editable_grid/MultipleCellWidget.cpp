@@ -19,6 +19,8 @@ void CMultipleCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 
 	if (!this->on_change_handler.empty())
 		default_widget->SetOnChangeHandler(this->on_change_handler);
+	if (!this->on_get_focus_handler.empty())
+		default_widget->SetOnGetFocusHandler(this->on_get_focus_handler);
 	if (!this->on_loose_focus_handler.empty())
 		default_widget->SetOnLooseFocusHandler(this->on_loose_focus_handler);
 	if (!this->on_key_press_handler.empty())
@@ -36,6 +38,8 @@ void CMultipleCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 
 		if(!this->on_change_handler.empty())
 			widget.second.widget->SetOnChangeHandler(this->on_change_handler);
+		if (!this->on_get_focus_handler.empty())
+			widget.second.widget->SetOnGetFocusHandler(this->on_get_focus_handler);
 		if (!this->on_loose_focus_handler.empty())
 			widget.second.widget->SetOnLooseFocusHandler(this->on_loose_focus_handler);
 		if (!this->on_key_press_handler.empty())
@@ -66,6 +70,19 @@ void CMultipleCellWidget::SetOnIndirectChangeHandler(std::shared_ptr<ICellEventH
 
 		for (auto &widget : widgets)
 			widget.second.widget->SetOnIndirectChangeHandler(handler);
+	}
+}
+
+void CMultipleCellWidget::SetOnGetFocusHandler(XEventHandlerData on_get_focus) {
+
+	assert(default_widget);
+	this->on_get_focus_handler = on_get_focus;
+
+	if (default_widget_id != NOT_CREATED) {
+		default_widget->SetOnGetFocusHandler(std::move(on_get_focus));
+
+		for (auto &widget : widgets)
+			widget.second.widget->SetOnGetFocusHandler(this->on_get_focus_handler);
 	}
 }
 
@@ -148,6 +165,7 @@ void CMultipleCellWidget::SetCurrentField(const size_t field) {
 	if (curr_widget != prev_widget) {
 		prev_widget->Hide();
 		curr_widget->Show();
+		if (prev_widget->HasFocus()) curr_widget->SetFocus();
 	}
 }
 
@@ -174,6 +192,12 @@ void CMultipleCellWidget::SetFocus() {
 
 	assert(curr_widget);
 	curr_widget->SetFocus();
+}
+
+bool CMultipleCellWidget::HasFocus() const {
+
+	assert(curr_widget);
+	return curr_widget->HasFocus();
 }
 
 ImmutableString<Tchar> CMultipleCellWidget::GetLabel() {

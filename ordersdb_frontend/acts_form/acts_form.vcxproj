@@ -162,6 +162,7 @@
     <ClCompile Include="OrdersDbTableEventsHandler.cpp" />
     <ClCompile Include="OrdersList.cpp" />
     <ClCompile Include="PaymentsList.cpp" />
+    <ClCompile Include="PaymentsNavPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActsForm.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="OrdersDbTableEventsHandler.h" />
     <ClInclude Include="OrdersList.h" />
     <ClInclude Include="PaymentsList.h" />
+    <ClInclude Include="PaymentsNavPanel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
