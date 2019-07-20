@@ -29,6 +29,7 @@ typedef UINT _plNotificationCode;
 class XWindow;
 
 enum Events{
+	EVT_NULL = -1, \
 	EVT_CREATE = WM_CREATE,\
 	EVT_PAINT = WM_PAINT,\
 	EVT_DESTROY = WM_DESTROY,\
@@ -140,6 +141,9 @@ enum EditFlags{
 enum ComboboxFlags{
 	FL_COMBOBOX_DROPDOWN = CBS_DROPDOWN | WS_VSCROLL,\
 	FL_COMBOBOX_SIMPLE = CBS_SIMPLE
+};
+enum {
+	COMBOBOX_EXTRA_HWNDS_COUNT = 3
 };
 
 struct XPoint : public POINT {
@@ -303,6 +307,8 @@ inline void _plWindowPostCreate(_plHWND hwnd);
 inline void _plSetFocus(_plHWND hwnd) noexcept;
 inline bool _plHasFocus(_plHWND hwnd) noexcept;
 inline bool _plComboBoxHasFocus(_plHWND hwnd) noexcept;
+inline void _plGetComboBoxHWNDs(_plHWND hwnd_combo, \
+								_plHWND(&hwnds)[COMBOBOX_EXTRA_HWNDS_COUNT]) noexcept;
 inline size_t _plGetLabelSize(_plHWND hwnd) noexcept;
 inline void _plGetLabel(_plHWND hwnd, Tchar *label, const size_t max_size) noexcept;
 inline bool _plSetLabel(_plHWND hwnd, const Tchar *label) noexcept;
@@ -669,6 +675,22 @@ bool _plComboBoxHasFocus(_plHWND hwnd) noexcept {
 	return cb_info.hwndCombo == focused_hwnd || \
 			cb_info.hwndItem == focused_hwnd || \
 			cb_info.hwndList == focused_hwnd;
+}
+
+void _plGetComboBoxHWNDs(_plHWND hwnd_combo, \
+						_plHWND (&hwnds)[COMBOBOX_EXTRA_HWNDS_COUNT]) noexcept {
+
+	assert(COMBOBOX_EXTRA_HWNDS_COUNT == 3);
+	COMBOBOXINFO cb_info;
+
+	ZeroMemory(&cb_info, sizeof(cb_info));
+	cb_info.cbSize = sizeof(cb_info);
+	BOOL success = GetComboBoxInfo(hwnd_combo, &cb_info);
+	assert(success);
+
+	hwnds[0] = cb_info.hwndCombo;
+	hwnds[1] = cb_info.hwndItem;
+	hwnds[2] = cb_info.hwndList;
 }
 
 size_t _plGetLabelSize(_plHWND hwnd) noexcept {

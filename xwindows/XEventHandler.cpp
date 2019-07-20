@@ -13,56 +13,65 @@ XEventHandlerException::~XEventHandlerException(){ }
 
 //****************************************************************************
 
-XEventHandlerEmbedded::XEventHandlerEmbedded(XWindow *wnd, _plWNDPROC new_wnd_proc){
+std::vector<XEventHandlerEmbedded::CEvtHandlerRecEmbedded> XEventHandlerEmbedded::evt_handlers;
 
-	assert(wnd);
-	assert(new_wnd_proc);
-	window = wnd;
+XEventHandlerEmbedded::XEventHandlerEmbedded(XWindow *wnd) : window(wnd) {
+
 	assert(window);
+	hwnd = window->GetInternalHandle();
 	if(!window->IsCreated()){
 		XEventHandlerException e(XEventHandlerException::E_WINDOW_NOT_EXIST, \
-						_T("The window is not yet created, so its events cannot be overridden. Class name = "));
+		_T("The window is not yet created, so its events cannot be overridden. Class name = "));
 		e<< window->GetClassName();
 		throw e;
 	}
-	this->orig_wnd_proc = _plSetWindowProc(window->GetInternalHandle(), \
-											new_wnd_proc);
 }
 
-int XEventHandlerEmbedded::Connect(const _plEventId id_event, \
-									XEventHandlerData evt_handler_data) {
+_plCallbackFnRetValue _plCallbackFnModifier \
+	XEventHandlerEmbedded::OverrideFunc(_plCallbackFnParams) {
+
+	CEvtHandlerRecEmbedded rec;
+	CEvtHandlerIteratorEmb p;
+
+	rec.hwnd = _plGetWindowHandle(_plCallbackFnParamsList);
+	rec.id_event = _plGetEventId(_plCallbackFnParamsList);
+
+	p = std::lower_bound(evt_handlers.begin(), evt_handlers.end(), rec);
+	assert(p != evt_handlers.end() && *p == rec);
 	
-	return ConnectImpl(id_event, std::move(evt_handler_data));
-}
+	if(p->id_event != rec.id_event)
+		return _plDefaultEventAction(p->orig_wnd_proc, _plCallbackFnParamsList);
 
-int XEventHandlerEmbedded::Disconnect(const _plEventId id_event){
-	CEvtHandlerRec rec;
-	CEvtHandlerIterator p;
+	p->eve->PostInit(_plCallbackFnParamsList);
 
-	rec.id_event = id_event;
-	p = std::find(evt_handlers.begin(), evt_handlers.end(), rec);
-	if(p == evt_handlers.cend())
-		return XEventHandlerException::W_HANDLER_NOT_FOUND;
+	p->evt_handler_caller.Call(p->eve_container.get());
+	if (p->eve->GetDefaultActionStatus()) {
+		p->eve->ExecuteDefaultEventAction(false);
+		return _plDefaultEventAction(p->orig_wnd_proc, _plCallbackFnParamsList);
+	}
 
-	p->eve_container.reset();
-	p->evt_handler_caller.reset();
-	p->eve.reset();
-	evt_handlers.erase(p);
-	return RESULT_SUCCESS;
+	return EVT_DONT_PROCESS;
 }
 
 void XEventHandlerEmbedded::DisconnectAll(){
 
-	std::for_each(evt_handlers.begin(), evt_handlers.end(), \
-					[](CEvtHandlerRec &rec) {
-						assert(rec.eve_container);
-						assert(rec.eve);
+	CEvtHandlerRecEmbedded rec;
+	CEvtHandlerIteratorEmb p;
 
-						rec.eve_container.reset();
-						rec.evt_handler_caller.reset();
-						rec.eve.reset();
-					});
-	evt_handlers.clear();
+	rec.hwnd = window->GetInternalHandle();
+	p = std::lower_bound(evt_handlers.begin(), evt_handlers.end(), rec);
+	if (!(p != evt_handlers.end() && *p == rec))
+		return;
+
+	assert(p->eve_container);
+	assert(p->eve);
+	assert(p->orig_wnd_proc);
+
+	p->eve_container.reset();
+	p->evt_handler_caller.reset();
+	p->eve.reset();
+
+	p->id_event = EVT_NULL;
 }
 
 XEventHandlerEmbedded::~XEventHandlerEmbedded(){
@@ -173,6 +182,12 @@ int XEventHandler::Connect(const _plEventId id_event, \
 							XEventHandlerData evt_handler_data) {
 
 	return ConnectImpl(id_event, 0, 0, std::move(evt_handler_data));
+}
+
+int XEventHandler::OverrideWindowEvent(const _plEventId id_event, \
+										XEventHandlerData evt_handler_data) {
+
+	return OverrideWindowEventImpl(id_event, std::move(evt_handler_data));
 }
 
 int XEventHandler::Disconnect(_plHWND hwnd,\

@@ -40,7 +40,4 @@ public:
 	bool Validate(ImmutableString<Tchar> label) const override { return true; }
 
 	virtual ~CEditableCellWidget();
-
-	DECLARE_EVENT_OVERRIDE
 };
-

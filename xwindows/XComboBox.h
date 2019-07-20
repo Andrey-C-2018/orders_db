@@ -4,6 +4,9 @@
 class XComboBox : public XWidget{
 	size_t items_count;
 
+protected:
+	int OverrideWindowEvent(const _plEventId id_event, \
+							XEventHandlerData evt_handler_data) override;
 public:
 	enum {
 		EMPTY_INDEX = (size_t) -1

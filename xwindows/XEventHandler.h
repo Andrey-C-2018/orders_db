@@ -12,7 +12,7 @@ public:
 		E_WRONG_OBJECT = 1,\
 		E_WRONG_EVENT_TYPE = 2,\
 		E_WINDOW_NOT_EXIST = 3,\
-		E_OVERRIDE_STATEMENTS = 4
+		E_DUPLICATE_HANDLER = 4
 	};
 	enum Warnings{
 		W_DUPLICATE_HANDLER = RESULT_FAIL,\
@@ -100,56 +100,93 @@ protected:
 		std::shared_ptr<XEvent> eve;
 		std::shared_ptr<IArguments> eve_container;
 
-		inline bool operator==(const CEvtHandlerRec &obj) const{
-
-			return id_event == obj.id_event;
-		}
-		inline bool operator<(const CEvtHandlerRec &obj) const{
-
-			return id_event < obj.id_event;
-		}
-		CEvtHandlerRec() noexcept : id_event(0), eve(nullptr), \
+		CEvtHandlerRec() noexcept : id_event(EVT_NULL), eve(nullptr), \
 									eve_container(nullptr){ }
 
 		CEvtHandlerRec(const CEvtHandlerRec &obj) = delete;
+		CEvtHandlerRec(CEvtHandlerRec &&obj) noexcept : id_event(obj.id_event), \
+								evt_handler_caller(std::move(obj.evt_handler_caller)), \
+								eve(std::move(obj.eve)), \
+								eve_container(std::move(obj.eve_container)) {
 
-		CEvtHandlerRec(CEvtHandlerRec &&obj) noexcept {
-			this->id_event = obj.id_event;  obj.id_event = 0;
-			this->evt_handler_caller = std::move(obj.evt_handler_caller);
-			this->eve = std::move(obj.eve);
-			this->eve_container = std::move(obj.eve_container);
+			obj.id_event = EVT_NULL;
 		}
 
 		CEvtHandlerRec &operator=(const CEvtHandlerRec &obj) = delete;
 
-		inline CEvtHandlerRec &operator=(CEvtHandlerRec &&obj) noexcept {
-			this->id_event = obj.id_event;  obj.id_event = 0;
-			this->evt_handler_caller = std::move(obj.evt_handler_caller);
-			this->eve = std::move(obj.eve);
-			this->eve_container = std::move(obj.eve_container);
+		CEvtHandlerRec &operator=(CEvtHandlerRec &&obj) noexcept {
+
+			id_event = obj.id_event;
+			evt_handler_caller = std::move(obj.evt_handler_caller);
+			eve = std::move(obj.eve);
+			eve_container = std::move(obj.eve_container);
+
+			obj.id_event = EVT_NULL;
 			return *this;
 		}
 
+		inline bool operator==(const CEvtHandlerRec &obj) const {
+
+			return id_event == obj.id_event;
+		}
+
+		inline bool operator<(const CEvtHandlerRec &obj) const {
+
+			return id_event < obj.id_event;
+		}
+
+		virtual ~CEvtHandlerRec() { }
 	};
+
+	struct CEvtHandlerRecEmbedded : public CEvtHandlerRec {
+		_plHWND hwnd;
+		_plWNDPROC orig_wnd_proc;
+
+		CEvtHandlerRecEmbedded() noexcept : orig_wnd_proc(nullptr) { _plUnsetHWND(hwnd); }
+
+		CEvtHandlerRecEmbedded(const CEvtHandlerRecEmbedded &obj) = delete;
+
+		CEvtHandlerRecEmbedded(CEvtHandlerRecEmbedded &&obj) noexcept : \
+								CEvtHandlerRec(std::move(obj)), \
+								hwnd(obj.hwnd), orig_wnd_proc(obj.orig_wnd_proc) {
+
+			_plUnsetHWND(obj.hwnd);
+			obj.orig_wnd_proc = nullptr;
+		}
+
+		CEvtHandlerRecEmbedded &operator=(const CEvtHandlerRecEmbedded &obj) = delete;
+
+		inline CEvtHandlerRecEmbedded &operator=(CEvtHandlerRecEmbedded &&obj) noexcept {
+
+			CEvtHandlerRec::operator=(std::move(obj));
+			hwnd = obj.hwnd;
+			orig_wnd_proc = obj.orig_wnd_proc;
+			_plUnsetHWND(obj.hwnd);
+			obj.orig_wnd_proc = nullptr;
+
+			return *this;
+		}
+
+		inline bool operator==(const CEvtHandlerRecEmbedded &obj) const noexcept {
+
+			return hwnd == obj.hwnd;
+		}
+
+		inline bool operator<(const CEvtHandlerRecEmbedded &obj) const noexcept {
+
+			return hwnd < obj.hwnd;
+		}
+
+		virtual ~CEvtHandlerRecEmbedded() { }
+	};
+
 	struct CEvtHandlerRecEx : public CEvtHandlerRec{
 		_plHWND hwnd;
 		int id;
 		_plNotificationCode id_ncode;
 
-		inline bool operator==(const CEvtHandlerRecEx &obj) const{
-
-			return hwnd == obj.hwnd && id == obj.id && \
-					id_event == obj.id_event && id_ncode == obj.id_ncode;
-		}
-		inline bool operator<(const CEvtHandlerRecEx &obj) const{
-			
-			return hwnd < obj.hwnd || \
-					(hwnd == obj.hwnd && id < obj.id) || \
-					(hwnd == obj.hwnd && id == obj.id && id_event < obj.id_event) || \
-					(hwnd == obj.hwnd && id == obj.id && id_event == obj.id_event && \
-							id_ncode < obj.id_ncode);
-		}
-		CEvtHandlerRecEx() noexcept : CEvtHandlerRec(), id(-1), id_ncode(-1) { _plUnsetHWND(hwnd); }
+		CEvtHandlerRecEx() noexcept : CEvtHandlerRec(), id(-1), \
+										id_ncode(-1) { _plUnsetHWND(hwnd); }
 
 		CEvtHandlerRecEx(const CEvtHandlerRecEx &obj) = delete;
 
@@ -165,67 +202,70 @@ protected:
 		CEvtHandlerRecEx &operator=(const CEvtHandlerRecEx &obj) = delete;
 
 		CEvtHandlerRecEx &operator=(CEvtHandlerRecEx &&obj) noexcept{
+
 			CEvtHandlerRec::operator=(std::move(obj));
 			hwnd = obj.hwnd; _plUnsetHWND(obj.hwnd);
 			id = obj.id; obj.id = -1;
 			id_ncode = obj.id_ncode;
 			return *this;
 		}
+
+		inline bool operator==(const CEvtHandlerRecEx &obj) const {
+
+			return hwnd == obj.hwnd && id == obj.id && \
+				id_event == obj.id_event && id_ncode == obj.id_ncode;
+		}
+
+		inline bool operator<(const CEvtHandlerRecEx &obj) const {
+
+			return hwnd < obj.hwnd || \
+				(hwnd == obj.hwnd && id < obj.id) || \
+				(hwnd == obj.hwnd && id == obj.id && id_event < obj.id_event) || \
+				(hwnd == obj.hwnd && id == obj.id && id_event == obj.id_event && \
+					id_ncode < obj.id_ncode);
+		}
+
+		virtual ~CEvtHandlerRecEx() { }
 	};
 
 	typedef std::vector<CEvtHandlerRec>::iterator CEvtHandlerIterator;
 	typedef std::vector<CEvtHandlerRec>::const_iterator CEvtHandlerConstIterator;
+	typedef std::vector<CEvtHandlerRecEmbedded>::iterator CEvtHandlerIteratorEmb;
+	typedef std::vector<CEvtHandlerRecEmbedded>::const_iterator CEvtHandlerConstIteratorEmb;
 	typedef std::vector<CEvtHandlerRecEx>::iterator CEvtHandlerIteratorEx;
 	typedef std::vector<CEvtHandlerRecEx>::const_iterator CEvtHandlerConstIteratorEx;
 };
 
-#define DECLARE_EVENT_OVERRIDE \
-private: \
-	static XEventHandlerEmbedded **p_event_handler; \
-	static _plCallbackFnRetValue _plCallbackFnModifier OverrideFunc(_plCallbackFnParams){ \
-		return (*p_event_handler)->WndProc(_plCallbackFnParamsList); \
-	} \
-protected: \
-	XEventHandlerEmbedded *InitEventHandlerEmbedded();
-
-#define IMPLEMENT_EVENT_OVERRIDE(XWindowDerived) \
-XEventHandlerEmbedded **XWindowDerived::p_event_handler = nullptr; \
-XEventHandlerEmbedded *XWindowDerived::InitEventHandlerEmbedded(){ \
-	if(!event_handler_embedded){ \
-		p_event_handler = &event_handler_embedded; \
-		event_handler_embedded = new XEventHandlerEmbedded(this, OverrideFunc); \
-	} \
-	return *p_event_handler; \
-}
-
 class XEventHandler;
 
 class XEventHandlerEmbedded : public XEventHandlerBasic{
-	std::vector<CEvtHandlerRec> evt_handlers;
+	static std::vector<CEvtHandlerRecEmbedded> evt_handlers;
 	XWindow *window;
-	_plWNDPROC orig_wnd_proc;
+	_plHWND hwnd;
 
-	inline int ConnectImpl(const _plEventId id_event, \
-							XEventHandlerData evt_handler_data);
+	static inline int ConnectImpl(XWindow *window, _plHWND hwnd, \
+									const _plEventId id_event, \
+									XEventHandlerData evt_handler_data);
+	static _plCallbackFnRetValue _plCallbackFnModifier OverrideFunc(_plCallbackFnParams);
 public:
-	XEventHandlerEmbedded(XWindow *wnd, _plWNDPROC new_wnd_proc);
+	XEventHandlerEmbedded(XWindow *wnd);
+
 	XEventHandlerEmbedded(const XEventHandlerEmbedded &obj) = delete;
 	XEventHandlerEmbedded(XEventHandlerEmbedded &&obj) = default;
 	XEventHandlerEmbedded &operator=(const XEventHandlerEmbedded &obj) = delete;
 	XEventHandlerEmbedded &operator=(XEventHandlerEmbedded &&obj) = default;
-
-	inline _plCallbackFnRetValue _plCallbackFnModifier \
-		WndProc(_plCallbackFnParams);
 
 	template <class TObject, class TEvent> \
 		int Connect(const _plEventId id_event,\
 					TObject *obj, \
 					void (TObject::*PFunc)(TEvent *));
 
-	int Connect(const _plEventId id_event, \
-					XEventHandlerData evt_handler_data);
+	inline int Connect(const _plEventId id_event, \
+						XEventHandlerData evt_handler_data);
 
-	int Disconnect(const _plEventId id_event);
+	inline int Connect(_plHWND hwnd, const _plEventId id_event, \
+						XEventHandlerData evt_handler_data);
+
 	void DisconnectAll();
 
 	virtual ~XEventHandlerEmbedded();
@@ -237,21 +277,20 @@ class XEventHandler : public XEventHandlerBasic{
 	static std::vector<CEvtHandlerRecEx> evt_handlers;
 
 	static int max_id;
-protected:
 	XEventHandlerEmbedded *event_handler_embedded;
-	virtual XEventHandlerEmbedded *InitEventHandlerEmbedded(){
-		
-		throw XEventHandlerException(XEventHandlerException::E_OVERRIDE_STATEMENTS,\
-									_T("you forgot to define DECLARE_EVENT_OVERRIDE and/or IMPLEMENT_EVENT_OVERRIDE for the class"));
-		return nullptr;
-	}
 
+protected:
 	static _plCallbackFnRetValue _plCallbackFnModifier \
 		MainWndProc(_plCallbackFnParams);
 
 	inline int ConnectImpl(const _plEventId id_event, \
 							const _plNotificationCode id_ncode, \
 							const int id, XEventHandlerData evt_handler_data);
+
+	inline int OverrideWindowEventImpl(const _plEventId id_event, \
+										XEventHandlerData evt_handler_data);
+	inline int OverrideWindowExtraHwnd(const _plEventId id_event, \
+									_plHWND hwnd, XEventHandlerData evt_handler_data);
 
 	inline void SetInternalHandle(const _plHWND hwnd) { this->hwnd = hwnd; }
 	virtual void OnWindowCreationCompleted() = 0;
@@ -306,7 +345,7 @@ public:
 		inline int OverrideWindowEvent(const _plEventId id_event,\
 								TObject *obj, \
 								void (TObject::*PFunc)(TEvent *));
-	inline int OverrideWindowEvent(const _plEventId id_event, \
+	virtual int OverrideWindowEvent(const _plEventId id_event, \
 									XEventHandlerData evt_handler_data);
 
 	int Disconnect(_plHWND hwnd, const _plEventId id_event, const _plNotificationCode id_ncode, \
@@ -319,44 +358,27 @@ public:
 
 //****************************************************************************
 
-_plCallbackFnRetValue _plCallbackFnModifier \
-XEventHandlerEmbedded::WndProc(_plCallbackFnParams){
-	CEvtHandlerRec rec;
-	CEvtHandlerIterator p;
-
-	rec.id_event = _plGetEventId(_plCallbackFnParamsList);
-
-	p = std::find(evt_handlers.begin(), evt_handlers.end(), rec);
-
-	if(!(p != evt_handlers.end() && *p == rec))
-		return _plDefaultEventAction(orig_wnd_proc, _plCallbackFnParamsList);
-
-	p->eve->PostInit(_plCallbackFnParamsList);
-	
-	p->evt_handler_caller.Call(p->eve_container.get());
-	if(p->eve->GetDefaultActionStatus()){
-		p->eve->ExecuteDefaultEventAction(false);
-		return _plDefaultEventAction(orig_wnd_proc, _plCallbackFnParamsList);
-	}
-
-	return EVT_DONT_PROCESS;
-}
-
-int XEventHandlerEmbedded::ConnectImpl(const _plEventId id_event, \
+int XEventHandlerEmbedded::ConnectImpl(XWindow *window, _plHWND hwnd, \
+										const _plEventId id_event, \
 										XEventHandlerData evt_handler_data) {
-	CEvtHandlerRec rec;
-	CEvtHandlerConstIterator p;
 
 	if (id_event == EVT_DESTROY) {
 		throw XEventHandlerException(XEventHandlerException::E_WRONG_EVENT_TYPE, \
 			_T("the destroy event is restricted to connect. Use the dtor instead"));
 	}
 
-	rec.id_event = id_event;
+	CEvtHandlerRecEmbedded rec;
+	CEvtHandlerConstIteratorEmb p;
+	rec.hwnd = hwnd;
 
-	p = std::find(evt_handlers.cbegin(), evt_handlers.cend(), rec);
-	if (p != evt_handlers.cend() && *p == rec)
-		return XEventHandlerException::W_DUPLICATE_HANDLER;
+	p = std::lower_bound(evt_handlers.cbegin(), evt_handlers.cend(), rec);
+	if (p != evt_handlers.cend() && *p == rec) {
+		throw XEventHandlerException(XEventHandlerException::E_DUPLICATE_HANDLER, \
+			_T("only one overrided event per a subclassed window allowed"));
+	}
+
+	rec.orig_wnd_proc = _plSetWindowProc(rec.hwnd, OverrideFunc);
+	rec.id_event = id_event;
 
 	rec.eve = evt_handler_data.getEventObj();
 	assert(rec.eve);
@@ -369,7 +391,20 @@ int XEventHandlerEmbedded::ConnectImpl(const _plEventId id_event, \
 	assert(rec.eve_container);
 
 	evt_handlers.emplace_back(std::move(rec));
+	std::sort(evt_handlers.begin(), evt_handlers.end());
 	return RESULT_SUCCESS;
+}
+
+int XEventHandlerEmbedded::Connect(const _plEventId id_event, \
+										XEventHandlerData evt_handler_data) {
+
+	return ConnectImpl(window, hwnd, id_event, evt_handler_data);
+}
+
+int XEventHandlerEmbedded::Connect(_plHWND hwnd_, const _plEventId id_event, \
+										XEventHandlerData evt_handler_data) {
+
+	return ConnectImpl(window, hwnd_, id_event, evt_handler_data);
 }
 
 template <class TObject, class TEvent> \
@@ -377,7 +412,7 @@ int XEventHandlerEmbedded::Connect(const _plEventId id_event,\
 									TObject *obj, \
 									void (TObject::*PFunc)(TEvent *)){
 	
-	return ConnectImpl(id_event, XEventHandlerData(obj, PFunc));
+	return ConnectImpl(window, hwnd, id_event, XEventHandlerData(obj, PFunc));
 }
 
 //****************************************************************************
@@ -445,18 +480,25 @@ template <class TObject, class TEvent> \
 	return ConnectImpl(id_event, 0, 0, XEventHandlerData(obj, PFunc));
 }
 
+int XEventHandler::OverrideWindowEventImpl(const _plEventId id_event, \
+											XEventHandlerData evt_handler_data) {
+
+	if (!event_handler_embedded)
+		event_handler_embedded = new XEventHandlerEmbedded(GetThisAsXWindow());
+	return event_handler_embedded->Connect(id_event, std::move(evt_handler_data));
+}
+
+int XEventHandler::OverrideWindowExtraHwnd(const _plEventId id_event, \
+										_plHWND hwnd, XEventHandlerData evt_handler_data) {
+
+	assert(event_handler_embedded);
+	return event_handler_embedded->Connect(hwnd, id_event, std::move(evt_handler_data));
+}
+
 template <class TObject, class TEvent> \
 int XEventHandler::OverrideWindowEvent(const _plEventId id_event,\
 										TObject *obj, \
 										void (TObject::*PFunc)(TEvent *)){
 
-	XEventHandlerEmbedded *event_handler_embedded = InitEventHandlerEmbedded();
-	return event_handler_embedded->Connect(id_event, obj, PFunc);
-}
-
-int XEventHandler::OverrideWindowEvent(const _plEventId id_event, \
-										XEventHandlerData evt_handler_data) {
-
-	XEventHandlerEmbedded *event_handler_embedded = InitEventHandlerEmbedded();
-	return event_handler_embedded->Connect(id_event, std::move(evt_handler_data));
+	return OverrideWindowEvent(id_event, XEventHandlerData(obj, PFunc));
 }

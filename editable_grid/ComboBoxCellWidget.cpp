@@ -33,7 +33,10 @@ void CComboBoxCellWidget::SetOnLooseFocusHandler(XEventHandlerData on_loose_focu
 									XComboBox::GetId(), std::move(on_loose_focus));
 }
 
-void CComboBoxCellWidget::SetOnKeyPressHandler(XEventHandlerData on_key_press) { }
+void CComboBoxCellWidget::SetOnKeyPressHandler(XEventHandlerData on_key_press) {
+
+	XComboBox::OverrideWindowEvent(EVT_KEYDOWN, std::move(on_key_press));
+}
 
 void CComboBoxCellWidget::SetCurrentField(const size_t field) { }
 

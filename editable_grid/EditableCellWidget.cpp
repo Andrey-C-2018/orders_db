@@ -1,7 +1,5 @@
 #include "EditableCellWidget.h"
 
-IMPLEMENT_EVENT_OVERRIDE(CEditableCellWidget)
-
 CEditableCellWidget::CEditableCellWidget() { }
 
 void CEditableCellWidget::CreateCellWidget(XWindow *parent, const int flags, \

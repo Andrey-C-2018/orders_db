@@ -169,7 +169,6 @@
     <ClCompile Include="XGC.cpp" />
     <ClCompile Include="XLabel.cpp" />
     <ClCompile Include="XPanel.cpp" />
-    <ClCompile Include="XComboBoxEx.cpp" />
     <ClCompile Include="XWidget.cpp" />
     <ClCompile Include="XWindow.cpp" />
   </ItemGroup>
@@ -189,7 +188,6 @@
     <ClInclude Include="XGC.h" />
     <ClInclude Include="XLabel.h" />
     <ClInclude Include="XPanel.h" />
-    <ClInclude Include="XComboBoxEx.h" />
     <ClInclude Include="XWidget.h" />
     <ClInclude Include="XWindow.h" />
   </ItemGroup>

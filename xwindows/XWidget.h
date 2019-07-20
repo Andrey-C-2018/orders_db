@@ -14,8 +14,9 @@ class XWidget : public XWindow{
 		inline bool operator()() {
 			
 			if (!_plRegisterWidget(class_name, widget.MainWndProc)) {
+
 				XWindowException e(XWindowException::E_REGISTER_WINDOW, \
-					_T("cannot register the widget class:"));
+									_T("cannot register the widget class:"));
 				e << _T(" Class_name = ") << class_name;
 				throw e;
 			}
@@ -23,15 +24,18 @@ class XWidget : public XWindow{
 		}
 	};
 
-	XWidget(const XWidget &obj) = delete;
-	XWidget &operator=(const XWidget &obj) = delete;
 protected:
 	int InitializeId() override { return CreateUniqueId(); }
 	inline void RegisterNewWidgetClass(const Tchar *class_name);
+
 public:
 	XWidget() noexcept : XWindow() { }
+
+	XWidget(const XWidget &obj) = delete;
 	XWidget(XWidget &&obj) = default;
+	XWidget &operator=(const XWidget &obj) = delete;
 	XWidget &operator=(XWidget &&obj) = default;
+	
 	XWidget(XWindow *parent, const int flags, \
 							const Tchar *label,\
 							const int x, const int y,\

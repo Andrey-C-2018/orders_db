@@ -7,12 +7,12 @@ class CComboBoxCellWidget : public XComboBox, public IGridCellWidget {
 		DROPDOWN_PART_SIZE = 200
 	};
 
-	CComboBoxCellWidget(const CComboBoxCellWidget &obj) = delete;
-	CComboBoxCellWidget &operator=(const CComboBoxCellWidget &obj) = delete;
 public:
 	CComboBoxCellWidget();
 
+	CComboBoxCellWidget(const CComboBoxCellWidget &obj) = delete;
 	CComboBoxCellWidget(CComboBoxCellWidget &&obj) = default;
+	CComboBoxCellWidget &operator=(const CComboBoxCellWidget &obj) = delete;
 	CComboBoxCellWidget &operator=(CComboBoxCellWidget &&obj) = default;
 
 	void CreateCellWidget(XWindow *parent, const int flags, \
