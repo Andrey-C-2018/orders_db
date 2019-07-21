@@ -44,10 +44,13 @@ _plCallbackFnRetValue _plCallbackFnModifier \
 
 	p->eve->PostInit(_plCallbackFnParamsList);
 
+	XEvent *eve = p->eve.get();
+	_plWNDPROC orig_wnd_proc = p->orig_wnd_proc;
+
 	p->evt_handler_caller.Call(p->eve_container.get());
-	if (p->eve->GetDefaultActionStatus()) {
-		p->eve->ExecuteDefaultEventAction(false);
-		return _plDefaultEventAction(p->orig_wnd_proc, _plCallbackFnParamsList);
+	if (eve->GetDefaultActionStatus()) {
+		eve->ExecuteDefaultEventAction(false);
+		return _plDefaultEventAction(orig_wnd_proc, _plCallbackFnParamsList);
 	}
 
 	return EVT_DONT_PROCESS;

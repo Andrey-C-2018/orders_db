@@ -1,9 +1,9 @@
 #include <basic/PropertiesFile.h>
 #include <db_ext/FilteringManager.h>
 #include <db_ext/QueryModifier.h>
-#include <xwindows/XFrame.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
+#include <xwindows_ex/XTabStopFrame.h>
 #include "AdvocatInserter.h"
 
 struct IDbConnection;
@@ -13,7 +13,7 @@ class CComboBoxCellWidget;
 class CDbComboBoxCellWidget;
 class CFilteringEdit;
 
-class CAdvocatsBook : public XFrame {
+class CAdvocatsBook : public XTabStopFrame {
 	enum Defaults {
 		DEF_GUI_ROW_HEIGHT = 30, \
 		DEF_GUI_VERT_GAP = 5, \

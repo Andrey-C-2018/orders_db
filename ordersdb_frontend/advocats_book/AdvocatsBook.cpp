@@ -6,12 +6,15 @@
 #include <db_controls/BinderControls.h>
 #include <db_controls/FilteringEdit.h>
 #include <db_controls/DbNavigator.h>
-#include <xwindows/HorizontalSizer.h>
-#include <xwindows/VerticalSizer.h>
 #include <xwindows/XLabel.h>
+#include <xwindows_ex/HorizontalSizer.h>
+#include <xwindows_ex/VerticalSizer.h>
+#include <xwindows_ex/XTabStopWidget.h>
 #include "AdvocatsBook.h"
 #include "AdvocatsGridEvtHandler.h"
 #include "PostIndexCellWidget.h"
+
+typedef XTabStopWidget<XEdit> XTabStopEdit;
 
 CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 								const Tchar *label, const int X, const int Y, \
@@ -141,19 +144,19 @@ void CAdvocatsBook::DisplayWidgets() {
 
 		sizer.addWidget(new XLabel(), _T("ПІБ: "), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
-		XEdit *edit_adv_name = new XEdit();
+		XTabStopEdit *edit_adv_name = new XTabStopEdit(this);
 		adv_inserter.setAdvNameWidget(edit_adv_name);
 		sizer.addWidget(edit_adv_name, _T(""), edit_flags, XSize(280, DEF_GUI_ROW_HEIGHT));
-
+		
 		sizer.addWidget(new XLabel(), _T("№ свід.: "), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
-		XEdit *license_no = new XEdit();
+		XTabStopEdit *license_no = new XTabStopEdit(this);
 		adv_inserter.setLicenseNoWidget(license_no);
 		sizer.addWidget(license_no, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 
 		sizer.addWidget(new XLabel(), _T("Дата свід.: "), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
-		XEdit *license_date = new XEdit();
+		XTabStopEdit *license_date = new XTabStopEdit(this);
 		adv_inserter.setLicenseDateWidget(license_date);
 		sizer.addWidget(license_date, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(80, DEF_GUI_ROW_HEIGHT));
@@ -169,26 +172,26 @@ void CAdvocatsBook::DisplayWidgets() {
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(new XLabel(), _T("Пошт. індекс:"), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT + 10));
-		XEdit *post_index = new XEdit();
+		XTabStopEdit *post_index = new XTabStopEdit(this);
 		adv_inserter.setPostIndexWidget(post_index);
 		sizer.addWidget(post_index, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(70, DEF_GUI_ROW_HEIGHT));
 
 		sizer.addWidget(new XLabel(), _T("Адреса:"), FL_WINDOW_VISIBLE, \
 						XSize(53, DEF_GUI_ROW_HEIGHT));
-		XEdit *address = new XEdit();
+		XTabStopEdit *address = new XTabStopEdit(this);
 		adv_inserter.setAddressWidget(address);
 		sizer.addWidget(address, _T(""), edit_flags, XSize(380, DEF_GUI_ROW_HEIGHT));
 
 		sizer.addWidget(new XLabel(), _T("Дата народж:"), FL_WINDOW_VISIBLE, \
 						XSize(55, DEF_GUI_ROW_HEIGHT + 10));
-		XEdit *bdate = new XEdit();
+		XTabStopEdit *bdate = new XTabStopEdit(this);
 		adv_inserter.setBDateWidget(bdate);
 		sizer.addWidget(bdate, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 
 		sizer.addWidget(new XLabel(), _T("Тел.:"), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT));
-		XEdit *tel = new XEdit();
+		XTabStopEdit *tel = new XTabStopEdit(this);
 		adv_inserter.setTelWidget(tel);
 		sizer.addWidget(tel, _T(""), edit_flags, XSize(200, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
@@ -196,7 +199,7 @@ void CAdvocatsBook::DisplayWidgets() {
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(new XLabel(), _T("E-mail:"), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT));
-		XEdit *email = new XEdit();
+		XTabStopEdit *email = new XTabStopEdit(this);
 		adv_inserter.setEmailWidget(email);
 		sizer.addWidget(email, _T(""), edit_flags, XSize(200, DEF_GUI_ROW_HEIGHT));
 
@@ -209,7 +212,7 @@ void CAdvocatsBook::DisplayWidgets() {
 
 		sizer.addWidget(new XLabel(), _T("Назва орг.:"), FL_WINDOW_VISIBLE, \
 						XSize(45, DEF_GUI_ROW_HEIGHT + 10));
-		XEdit *org = new XEdit();
+		XTabStopEdit *org = new XTabStopEdit(this);
 		adv_inserter.setOrgNameWidget(org);
 		sizer.addWidget(org, _T(""), edit_flags, XSize(200, DEF_GUI_ROW_HEIGHT));
 

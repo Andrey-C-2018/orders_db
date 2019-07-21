@@ -36,6 +36,8 @@ public:
 	virtual ~XComboBox();
 };
 
+//*************************************************************
+
 bool XComboBox::ComboBoxHasFocus() const {
 
 	return _plComboBoxHasFocus(GetInternalHandle());

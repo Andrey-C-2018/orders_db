@@ -2,7 +2,7 @@
 #include <memory>
 #include <date/Date.h>
 #include <xwindows/XWidget.h>
-#include <xwindows/XDynamicSizer.h>
+#include <xwindows_ex/XDynamicSizer.h>
 
 struct IDbConnection;
 class CDbGrid;

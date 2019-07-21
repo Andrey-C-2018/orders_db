@@ -40,6 +40,7 @@ public:
 							const Tchar *label,\
 							const int x, const int y,\
 							const int width, const int height);
+
 	virtual void Create(XWindow *parent, const int flags, \
 							const Tchar *label,\
 							const int x, const int y,\

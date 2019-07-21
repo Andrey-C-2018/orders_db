@@ -23,19 +23,22 @@ class XFrame : public XWindow{
 		}
 	};
 
-	XFrame(const XFrame &obj) = delete;
-	XFrame &operator=(const XFrame &obj) = delete;
 	void OnCreate(XEvent *eve);
 	void OnDestroy(XEvent *eve);
 protected:
 	int InitializeId() override { return SetIdToNull(); }
 public:
 	XFrame() noexcept;
+
 	XFrame(XFrame &&obj) = default;
+	XFrame(const XFrame &obj) = delete;
+	XFrame &operator=(const XFrame &obj) = delete;
 	XFrame &operator=(XFrame &&obj) = default;
+
 	XFrame(const Tchar *class_name, const int flags, \
 					 const Tchar *label, const int x, const int y,\
 					 const int width, const int height);
+
 	void Create(const Tchar *class_name, const int flags, \
 					 const Tchar *label, const int x, const int y,\
 					 const int width, const int height);

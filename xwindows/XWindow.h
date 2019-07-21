@@ -34,11 +34,11 @@ class XWindow : public XEventHandler{
 		CChildWindow(CChildWindow &&obj) noexcept = default;
 		CChildWindow &operator=(const CChildWindow &obj) noexcept = default;
 		CChildWindow &operator=(CChildWindow &&obj) noexcept = default;
-		inline bool operator<(const CChildWindow &obj) const{
+		inline bool operator<(const CChildWindow &obj) const noexcept {
 			
 			return id < obj.id;
 		}
-		inline bool operator==(const CChildWindow &obj) const{
+		inline bool operator==(const CChildWindow &obj) const noexcept {
 			
 			return id == obj.id;
 		}
@@ -92,6 +92,8 @@ public:
 	XWindow &operator=(XWindow &&obj);
 
 	inline XWindow *GetChildById(const int id) const;
+	inline size_t GetChildrenCount() const;
+
 	inline bool IsCreated() const{ return is_created; }
 	inline XWindow *GetParent(){ return parent; }
 	inline const XWindow *GetParent() const { return parent; }
@@ -228,6 +230,11 @@ if(p != child_windows.cend() && rec == *p)
 	return p->window;
 
 return nullptr;
+}
+
+size_t XWindow::GetChildrenCount() const {
+
+	return child_windows.size();
 }
 
 void XWindow::GetClientRect(XRect &client_rect) const{

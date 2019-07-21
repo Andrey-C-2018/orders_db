@@ -992,12 +992,12 @@ int _plMessageBoxYesNo(const Tchar *message) noexcept {
 
 void ErrorBox(const Tchar *message) noexcept {
 
-	MessageBox(0, message, _T("Error"), MB_OK | MB_ICONERROR);
+	MessageBox(0, message, _T("Error"), MB_OK | MB_ICONERROR | MB_TASKMODAL);
 }
 
 void ErrorBoxANSI(const char *message) noexcept {
 
-	MessageBoxA(0, message, "Error", MB_OK | MB_ICONERROR);
+	MessageBoxA(0, message, "Error", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 }
 
 _plHFONT _plCreateFont(int size, int rotation_angle, int symbols_angle, \

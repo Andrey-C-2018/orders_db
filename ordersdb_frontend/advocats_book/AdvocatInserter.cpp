@@ -36,6 +36,7 @@ public:
 				params.error_str += _T("Введене значення для ID адвоката не є числом: ");
 				params.error_str += id_advocat_str;
 				params.error_str += _T('\n');
+				++params.param_no;
 				return false;
 			}
 			binding_target->bindValue(params.param_no, id);

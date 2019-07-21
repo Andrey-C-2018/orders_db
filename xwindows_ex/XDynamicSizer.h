@@ -1,5 +1,5 @@
 #pragma once
-#include "XWidget.h"
+#include <xwindows/XWidget.h>
 
 class XDynamicSizer final {
 	XPoint initial_coords;
