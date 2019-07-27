@@ -4,12 +4,12 @@ bool XPanel::is_class_registered = false;
 
 XPanel::XPanel() {
 
-if (!is_class_registered) {
-	RegisterNewWidgetClass(_T("XPANEL"));
-	is_class_registered = true;
-}
-else 
-	CheckAndInitWindowClassName(_T("XPANEL"));
+	if (!is_class_registered) {
+		RegisterNewWidgetClass(_T("XPANEL"));
+		is_class_registered = true;
+	}
+	else 
+		CheckAndInitWindowClassName(_T("XPANEL"));
 }
 
 XPanel::XPanel(XWindow *parent, const int flags, \
@@ -17,13 +17,13 @@ XPanel::XPanel(XWindow *parent, const int flags, \
 				const int x, const int y, \
 				const int width, const int height){
 
-if (!is_class_registered) {
-	RegisterNewWidgetClass(_T("XPANEL"));
-	is_class_registered = true;
-}
-else
-	CheckAndInitWindowClassName(_T("XPANEL"));
-Create(parent, flags, label, x, y, width, height);
+	if (!is_class_registered) {
+		RegisterNewWidgetClass(_T("XPANEL"));
+		is_class_registered = true;
+	}
+	else
+		CheckAndInitWindowClassName(_T("XPANEL"));
+	Create(parent, flags, label, x, y, width, height);
 }
 
 XPanel::~XPanel(){ }

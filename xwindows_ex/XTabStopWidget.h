@@ -58,8 +58,8 @@ void XTabStopWidget<TWidget>::Create(XWindow *parent, const int flags, \
 	assert(manager);
 	manager->RegisterTabStopControl(this);
 
-	XEdit::Create(parent, flags, label, x, y, width, height);
-	OverrideWindowEvent(EVT_KEYDOWN, this, &XTabStopEdit::OnKeyPress);
+	TWidget::Create(parent, flags, label, x, y, width, height);
+	OverrideWindowEvent(EVT_KEYDOWN, XEventHandlerData(this, &XTabStopWidget::OnKeyPress));
 }
 
 template <class TWidget> \

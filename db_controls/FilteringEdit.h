@@ -1,9 +1,10 @@
 #pragma once
 #include <xwindows/XEdit.h>
+#include <xwindows_ex/XTabStopWidget.h>
 
 class CFilteringManager;
 
-class CFilteringEdit : public XEdit {
+class CFilteringEdit : public XTabStopWidget<XEdit> {
 	bool is_changed;
 	int id_expr;
 	CFilteringManager &filtering_manager;
@@ -11,7 +12,7 @@ class CFilteringEdit : public XEdit {
 	void OnChange(XCommandEvent *eve);
 	void OnLooseFocus(XCommandEvent *eve);
 public:
-	CFilteringEdit(CFilteringManager &filtering_manager_);
+	CFilteringEdit(CFilteringManager &filtering_manager_, ITabStopManager *manager);
 
 	CFilteringEdit(const CFilteringEdit &obj) = delete;
 	CFilteringEdit(CFilteringEdit &&obj) = default;

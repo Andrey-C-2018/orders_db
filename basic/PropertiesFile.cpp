@@ -1,10 +1,17 @@
 #include <codecvt>
+#include "locale_init.h"
 #include "PropertiesFile.h"
 #include "XConv.h"
 
 CPropertiesFileException::CPropertiesFileException(const int err_code, \
 													const Tchar *err_descr) : \
 													XException(err_code, err_descr) { }
+
+CPropertiesFileException::CPropertiesFileException(const int err_code, \
+													const Tchar *err_descr, \
+													const Tchar *prop_name_) : \
+													XException(err_code, err_descr), \
+													prop_name(prop_name_) { }
 
 CPropertiesFileException::CPropertiesFileException(const CPropertiesFileException &obj) : \
 													XException(obj) { }
@@ -28,8 +35,7 @@ void CPropertiesFile::open(const char *path) {
 			_T("Config file cannot be opened"));
 
 	f.unsetf(std::ios::skipws);
-	std::locale loc("ukr_ukr.1251");
-	//std::locale loc(std::locale::classic(), new std::codecvt_utf8<wchar_t>);
+	std::locale loc(getOS_Locale());
 	f.imbue(loc);
 }
 
@@ -63,7 +69,7 @@ const Tchar *CPropertiesFile::getStringProperty(const Tchar *name, Tstring &buff
 		Tstring::size_type pos_value = buffer.find_first_of(_T('='), pos + Tstrlen(name));
 		if (pos_value == Tstring::npos) {
 			CPropertiesFileException e(CPropertiesFileException::E_WRONG_FILE_FORMAT, \
-				_T("Invalid config file format: property name - "));
+				_T("Invalid config file format: property name - "), name);
 			e << name;
 			throw e;
 		}
@@ -83,15 +89,41 @@ const Tchar *CPropertiesFile::getStringPropertyThreadUnsafe(const Tchar *name){
 int CPropertiesFile::getIntProperty(const Tchar *name, Tstring &buffer) const {
 
 	const Tchar *p = getStringProperty(name, buffer);
+	if (!p) {
+		CPropertiesFileException e(CPropertiesFileException::E_PROPERTY_NOT_FOUND, \
+									_T("Property name was not found: '"), name);
+		e << name << "'";
+		throw e;
+	}
 	int error = 0;
 	int value = XConv::ToInt(p, error);
 
 	if (error) {
 		CPropertiesFileException e(CPropertiesFileException::E_WRONG_VALUE, \
-									_T("Invalid integer value: '"));
-		if (p) e << p;
-		else e << _T("NULL'");
-		e << _T("' for parameter name '" << name << "'");
+									_T("Invalid integer value: '"), name);
+		e << p << _T("' for property name '" << name << "'");
+		throw e;
+	}
+	return value;
+}
+
+int CPropertiesFile::getIntProperty(const Tchar *name, Tstring &buffer, \
+									bool &not_found) const {
+
+	const Tchar *p = getStringProperty(name, buffer);
+	if (!p) {
+		not_found = true;
+		return 0;
+	}
+	not_found = false;
+
+	int error = 0;
+	int value = XConv::ToInt(p, error);
+
+	if (error) {
+		CPropertiesFileException e(CPropertiesFileException::E_WRONG_VALUE, \
+			_T("Invalid integer value: '"), name);
+		e << p << _T("' for property name '" << name << "'");
 		throw e;
 	}
 	return value;

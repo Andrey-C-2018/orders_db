@@ -166,6 +166,7 @@
     <ClCompile Include="Matching.cpp" />
     <ClCompile Include="MatchingResultsTable.cpp" />
     <ClCompile Include="OutputWrapper.cpp" />
+    <ClCompile Include="ParametersManager.cpp" />
     <ClCompile Include="StandartDistanceCalcs.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +179,7 @@
     <ClInclude Include="Matching.h" />
     <ClInclude Include="MatchingResultsTable.h" />
     <ClInclude Include="OutputWrapper.h" />
+    <ClInclude Include="ParametersManager.h" />
     <ClInclude Include="StandartDistanceCalcs.h" />
     <ClInclude Include="wagnerfisheralgo.h" />
   </ItemGroup>

@@ -48,7 +48,7 @@ void COrdersList::initSizers(XPoint initial_coords, XSize size, \
 	this->prev_sizer = prev_sizer;
 
 	grid_sizer.addToHorzSizersChain(*prev_sizer);
-	grid_sizer.setHeightMultiplier(0.5F);
+	grid_sizer.setHeightMultiplier(0.4F);
 
 	nav_sizer.addToVertSizersChain(grid_sizer);
 	nav_sizer.setRelativeHeight(db_navigator_height);

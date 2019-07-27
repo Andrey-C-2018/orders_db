@@ -2,14 +2,17 @@
 #include <xwindows/XComboBox.h>
 
 struct IDbResultSet;
+struct ITabStopManager;
 
 class CDbComboBox : public XComboBox {
 	std::shared_ptr<const IDbResultSet> result_set;
 	size_t field_to_display, sel_index, empty_value_added;
 	const size_t prim_key;
-	
+	ITabStopManager *manager;
+
 	void fillComboBox();
 	void OnItemChoosed(XCommandEvent *eve);
+	void OnKeyPress(XKeyboardEvent *eve);
 
 public:
 	CDbComboBox(std::shared_ptr<const IDbResultSet> result_set, \
@@ -25,6 +28,7 @@ public:
 				const int x, const int y, \
 				const int width, const int height) override;
 
+	void setTabStopManager(ITabStopManager *manager_);
 	inline std::shared_ptr<const IDbResultSet> getResultSet() const;
 	int getPrimaryKeyAsInteger() const;
 	inline bool isEmpty() const;

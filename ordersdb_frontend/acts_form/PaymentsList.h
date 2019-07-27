@@ -3,6 +3,7 @@
 #include <date/Date.h>
 #include <xwindows/XWidget.h>
 #include <xwindows_ex/XDynamicSizer.h>
+#include "PaymentsNavPanel.h"
 
 struct IDbConnection;
 class CDbGrid;
@@ -13,10 +14,15 @@ class CPaymentsList {
 	CDbGrid *grid;
 	XWidget *grid_as_window;
 	XWidget *db_navigator;
+	CPaymentsNavPanel *panel;
+
+	enum {
+		DEF_PANEL_HEIGHT = 80
+	};
 	int db_navigator_height;
 	float multiplier;
 
-	XDynamicSizer grid_sizer, nav_sizer;
+	XDynamicSizer grid_sizer, nav_sizer, panel_sizer;
 	const XDynamicSizer *prev_sizer;
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn, \
@@ -50,9 +56,13 @@ void CPaymentsList::initSizers(XPoint initial_coords, XSize size, \
 	this->prev_sizer = prev_sizer;
 
 	grid_sizer.addToVertSizersChain(*prev_sizer);
-	grid_sizer.setMinusY(db_navigator_height);
+	grid_sizer.setMinusY(db_navigator_height + DEF_PANEL_HEIGHT);
 
 	nav_sizer.addToVertSizersChain(grid_sizer);
+	nav_sizer.setRelativeHeight(db_navigator_height);
+	nav_sizer.freezeHeight();
+
+	panel_sizer.addToVertSizersChain(nav_sizer);
 	nav_sizer.freezeHeight();
 }
 
@@ -60,12 +70,14 @@ void CPaymentsList::updateSizers() {
 
 	grid_sizer.updateVertSizersChain(*prev_sizer);
 	nav_sizer.updateVertSizersChain(grid_sizer);
+	panel_sizer.updateVertSizersChain(nav_sizer);
 }
 
 void CPaymentsList::resize() {
 
 	grid_sizer.moveWidget(grid_as_window);
 	nav_sizer.moveWidget(db_navigator);
+	panel_sizer.moveWidget(panel);
 }
 
 XDynamicSizer &CPaymentsList::getFirstSizer() {
@@ -75,7 +87,7 @@ XDynamicSizer &CPaymentsList::getFirstSizer() {
 
 const XDynamicSizer &CPaymentsList::getLastSizer() const {
 
-	return nav_sizer;
+	return panel_sizer;
 }
 
 std::shared_ptr<CDbTable> CPaymentsList::getDbTable() {

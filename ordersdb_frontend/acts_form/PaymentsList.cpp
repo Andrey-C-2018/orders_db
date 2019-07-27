@@ -2,13 +2,14 @@
 #include <db_ext/DbTable.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbNavigator.h>
+#include <xwindows/XButton.h>
 
 CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_) : \
 								grid(nullptr), grid_as_window(nullptr), \
-								db_navigator(nullptr), \
+								db_navigator(nullptr), panel(nullptr), \
 								db_navigator_height(db_navigator_height_), \
 								grid_sizer(margins_, 0), nav_sizer(margins_, margins_), \
-								prev_sizer(nullptr) { } 
+								panel_sizer(margins_, margins_), prev_sizer(nullptr) { }
 
 void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_center, \
 								const int def_order, CDate def_order_date) {
@@ -40,6 +41,7 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	grid_as_window = grid;
 
 	db_navigator = new CDbNavigator(db_table);
+	panel = new CPaymentsNavPanel(conn_);
 }
 
 std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnection> conn, \
@@ -75,6 +77,7 @@ void CPaymentsList::displayWidgets(XWindow *parent) {
 
 	grid_sizer.createWidget(grid_as_window, parent, FL_WINDOW_VISIBLE, _T(""));
 	nav_sizer.createWidget(db_navigator, parent, FL_WINDOW_VISIBLE, _T(""));
+	panel_sizer.createWidget(panel, parent, FL_WINDOW_VISIBLE, _T(""));
 
 	grid->HideField(0);
 	grid->HideField(1);
@@ -84,6 +87,7 @@ void CPaymentsList::displayWidgets(XWindow *parent) {
 
 CPaymentsList::~CPaymentsList() {
 
+	if (panel && !panel->IsCreated()) delete panel;
 	if (db_navigator && !db_navigator->IsCreated()) delete db_navigator;
 	if (grid && !grid->IsCreated()) delete grid;
 }

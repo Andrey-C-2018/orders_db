@@ -1,9 +1,11 @@
 #include "FilteringEdit.h"
 #include <db_ext/FilteringManager.h>
 
-CFilteringEdit::CFilteringEdit(CFilteringManager &filtering_manager_) : \
-								is_changed(false), id_expr(-1), \
-								filtering_manager(filtering_manager_) { }
+CFilteringEdit::CFilteringEdit(CFilteringManager &filtering_manager_, \
+								ITabStopManager *manager) : \
+							XTabStopWidget<XEdit>(manager), \
+							is_changed(false), id_expr(-1), \
+							filtering_manager(filtering_manager_) { }
 
 void CFilteringEdit::Create(XWindow *parent, const int flags, \
 							const Tchar *label, \
@@ -13,9 +15,10 @@ void CFilteringEdit::Create(XWindow *parent, const int flags, \
 	assert(!IsCreated());
 	assert(id_expr != -1);
 
-	XEdit::Create(parent, flags | FL_WINDOW_BORDERED | FL_WINDOW_CLIPSIBLINGS | \
-									FL_EDIT_AUTOHSCROLL, \
-					label, x, y, width, height);
+	XTabStopWidget<XEdit>::Create(parent, flags | FL_WINDOW_BORDERED | \
+												FL_WINDOW_CLIPSIBLINGS | \
+												FL_EDIT_AUTOHSCROLL, \
+									label, x, y, width, height);
 	parent->Connect(EVT_COMMAND, NCODE_EDIT_CHANGED, \
 					GetId(), this, &CFilteringEdit::OnChange);
 	parent->Connect(EVT_COMMAND, NCODE_EDIT_LOOSE_FOCUS, \

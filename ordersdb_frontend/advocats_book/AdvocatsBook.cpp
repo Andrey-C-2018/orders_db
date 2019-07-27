@@ -10,11 +10,12 @@
 #include <xwindows_ex/HorizontalSizer.h>
 #include <xwindows_ex/VerticalSizer.h>
 #include <xwindows_ex/XTabStopWidget.h>
+#include <xwindows_ex/XTabStopEdit.h>
 #include "AdvocatsBook.h"
 #include "AdvocatsGridEvtHandler.h"
 #include "PostIndexCellWidget.h"
 
-typedef XTabStopWidget<XEdit> XTabStopEdit;
+typedef XTabStopWidget<XComboBox> XTabStopComboBox;
 
 CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 								const Tchar *label, const int X, const int Y, \
@@ -90,7 +91,7 @@ void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 	try {
 		examiners_list = new CDbComboBoxCellWidget(conn, "exm_name", \
-			"examiners", "advocats", db_table);
+										"examiners", "advocats", db_table);
 		examiners_list->AddRelation("id_examiner", "id_exm");
 		grid->SetWidgetForFieldByName("exm_name", examiners_list);
 
@@ -98,7 +99,7 @@ void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("post_index", post_index_widget);
 
 		districts_list = new CDbComboBoxCellWidget(conn, "distr_center", \
-			"districts", "advocats", db_table);
+										"districts", "advocats", db_table);
 		districts_list->AddRelation("id_distr", "id_main_district");
 		grid->SetWidgetForFieldByName("distr_center", districts_list);
 
@@ -167,6 +168,7 @@ void CAdvocatsBook::DisplayWidgets() {
 		adv_inserter.setExaminerWidget(examiner);
 		sizer.addResizeableWidget(examiner, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(250, DEF_GUI_ROW_HEIGHT), 150);
+		examiner->setTabStopManager(this);
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -218,7 +220,7 @@ void CAdvocatsBook::DisplayWidgets() {
 
 		sizer.addWidget(new XLabel(), _T("“ип орг.:"), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
-		XComboBox *org_type = new XComboBox();
+		XTabStopComboBox *org_type = new XTabStopComboBox(this);
 		adv_inserter.setOrgTypeWidget(org_type);
 		sizer.addResizeableWidget(org_type, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
 									FL_COMBOBOX_DROPDOWN, XSize(50, DEF_GUI_ROW_HEIGHT), 150);
@@ -260,7 +262,7 @@ void CAdvocatsBook::DisplayWidgets() {
 
 void CAdvocatsBook::initFilteringControls() {
 
-	flt_id = new CFilteringEdit(filtering_manager);
+	flt_id = new CFilteringEdit(filtering_manager, this);
 	std::shared_ptr<IBinder> id_binder = std::make_shared<CIntWidgetBinderControl>(flt_id);
 	
 	ImmutableString<char> expr("b.id_advocat = ?", sizeof("b.id_advocat = ?") - 1);

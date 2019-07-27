@@ -1,10 +1,12 @@
 #include "DbComboBox.h"
 #include <db/IDbResultSet.h>
+#include <xwindows_ex/ITabStopManager.h>
 
 CDbComboBox::CDbComboBox(std::shared_ptr<const IDbResultSet> result_set_, \
 							const size_t field_to_display_, const size_t prim_key_) : \
 					result_set(result_set_), field_to_display(field_to_display_), \
-					sel_index((size_t)-1), prim_key(prim_key_), empty_value_added(0) { }
+					sel_index((size_t)-1), prim_key(prim_key_), empty_value_added(0), \
+					manager(nullptr) { }
 
 void CDbComboBox::fillComboBox() {
 
@@ -30,6 +32,25 @@ void CDbComboBox::Create(XWindow *parent, const int flags, \
 void CDbComboBox::OnItemChoosed(XCommandEvent *eve) {
 
 	sel_index = GetCurrentSelectionIndex() - empty_value_added;
+}
+
+void CDbComboBox::OnKeyPress(XKeyboardEvent *eve) {
+
+	if (!manager || eve->GetKey() != X_VKEY_TAB) {
+		eve->ExecuteDefaultEventAction(true);
+		return;
+	}
+	manager->TabPressedOnControl(this);
+}
+
+void CDbComboBox::setTabStopManager(ITabStopManager *manager_) {
+
+	assert(manager_);
+	this->manager = manager_;
+	manager->RegisterTabStopControl(this);
+
+	XComboBox::OverrideWindowEvent(EVT_KEYDOWN, \
+		XEventHandlerData(this, &CDbComboBox::OnKeyPress));
 }
 
 int CDbComboBox::getPrimaryKeyAsInteger() const {

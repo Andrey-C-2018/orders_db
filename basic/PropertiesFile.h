@@ -3,17 +3,24 @@
 #include "Exception.h"
 
 class BASIC_DLL_EXPORT CPropertiesFileException : public XException {
+	Tstring prop_name;
 public:
 	enum {
 		E_FILE_NOT_FOUND = 1, \
 		E_FILE_NOT_OPENED = 2, \
 		E_WRONG_NAME = 3, \
 		E_WRONG_FILE_FORMAT = 4, \
-		E_WRONG_VALUE = 5
+		E_WRONG_VALUE = 5, \
+		E_PROPERTY_NOT_FOUND = 6
 	};
 	CPropertiesFileException(const int err_code, const Tchar *err_descr);
+	CPropertiesFileException(const int err_code, const Tchar *err_descr, \
+								const Tchar *prop_name_);
 	CPropertiesFileException(const CPropertiesFileException &obj);
 	CPropertiesFileException(CPropertiesFileException &&obj) = default;
+
+	inline const Tchar *getPropertyName() const { return prop_name.c_str(); }
+
 	~CPropertiesFileException() throw();
 };
 
@@ -28,5 +35,6 @@ public:
 	const Tchar *getStringProperty(const Tchar *name, Tstring &buffer) const;
 	const Tchar *getStringPropertyThreadUnsafe(const Tchar *name);
 	int getIntProperty(const Tchar *name, Tstring &buffer) const;
+	int getIntProperty(const Tchar *name, Tstring &buffer, bool &not_found) const;
 	virtual ~CPropertiesFile();
 };

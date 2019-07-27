@@ -162,6 +162,8 @@
     <ClInclude Include="Sizer.h" />
     <ClInclude Include="VerticalSizer.h" />
     <ClInclude Include="XDynamicSizer.h" />
+    <ClInclude Include="XTabStopEdit.h" />
+    <ClInclude Include="XTabStopPanel.h" />
     <ClInclude Include="XTabStopWidget.h" />
     <ClInclude Include="XTabStopManager.h" />
     <ClInclude Include="XTabStopFrame.h" />
