@@ -23,6 +23,7 @@ class CActsForm : public XFrame {
 	};
 
 	void OnSize(XSizeEvent *eve);
+	void OnMaximizeOrRestore(XWindowButtonsEvent *eve);
 
 public:
 	CActsForm(const Tchar *class_name, \

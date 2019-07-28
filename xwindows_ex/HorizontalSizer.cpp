@@ -25,6 +25,7 @@ void CHorizontalSizer::onParametersChanged(const int new_x, const int new_y, \
 									const int new_width, const int new_height) noexcept {
 
 	x_initial = new_x;
+	max_widget_height = 0;
 }
 
 void CHorizontalSizer::addWidget(XWidget *widget, const Tchar *label, \

@@ -58,7 +58,9 @@ CActsForm::CActsForm(const Tchar *class_name, \
 	adv_list.displayWidgets(this);
 	orders_list.displayWidgets(this);
 	payments_list.displayWidgets(this);
+
 	Connect(EVT_SIZE, this, &CActsForm::OnSize);
+	//Connect(EVT_WINDOWBUTTONS, this, &CActsForm::OnMaximizeOrRestore);
 }
 
 void CActsForm::OnSize(XSizeEvent *eve) {
@@ -70,6 +72,14 @@ void CActsForm::OnSize(XSizeEvent *eve) {
 	adv_list.resize();
 	orders_list.resize();
 	payments_list.resize();
+}
+
+void CActsForm::OnMaximizeOrRestore(XWindowButtonsEvent *eve) {
+
+	auto button = eve->GetWindowButtonType();
+	if (button == WND_BTN_MAXIMIZE || button == WND_BTN_RESTORE) {
+		this->Invalidate(nullptr, true);
+	}
 }
 
 CActsForm::~CActsForm() { }

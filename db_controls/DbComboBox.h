@@ -33,6 +33,8 @@ public:
 	int getPrimaryKeyAsInteger() const;
 	inline bool isEmpty() const;
 	inline void addEmptyValue();
+	void SetCurrRecord(std::shared_ptr<const IDbResultSet> rs, \
+						const size_t prim_key_no_in_rs, int prim_key_type_hint);
 
 	virtual ~CDbComboBox();
 };

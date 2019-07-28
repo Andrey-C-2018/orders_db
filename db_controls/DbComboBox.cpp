@@ -68,4 +68,28 @@ int CDbComboBox::getPrimaryKeyAsInteger() const {
 	return prim_key_value;
 }
 
+void CDbComboBox::SetCurrRecord(std::shared_ptr<const IDbResultSet> rs, \
+								const size_t prim_key_no_in_rs, int prim_key_type_hint) {
+
+	bool is_null;
+	int value = rs->getInt(prim_key_no_in_rs, is_null);
+
+	size_t records_count = result_set->getRecordsCount();
+	bool Found = false;
+	size_t i = 0;
+	for (; i < records_count && !Found; ++i) {
+
+		result_set->gotoRecord(i);
+		Found = (result_set->getInt(prim_key, is_null) == value);
+	}
+	if (!Found) {
+		XException e(0, _T("DBComboBox: no such prim key value: "));
+		e << value;
+		throw e;
+	}
+
+	--i;
+	this->SetSelectionIndex(i);
+}
+
 CDbComboBox::~CDbComboBox() { }

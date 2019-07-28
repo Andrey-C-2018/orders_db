@@ -217,3 +217,27 @@ void XScrollEventEx::PostInit(_plCallbackFnParams) {
 }
 
 XScrollEventEx::~XScrollEventEx(){ }
+
+//****************************************************************************
+
+XWindowButtonsEvent::XWindowButtonsEvent() noexcept : button(-1) {
+
+	ExecuteDefaultEventAction(true);
+}
+
+std::shared_ptr<XEvent> XWindowButtonsEvent::clone() const noexcept {
+
+	return std::make_shared<XWindowButtonsEvent>();
+}
+
+EvtPair XWindowButtonsEvent::cloneAndCreateArgsWrapper() const noexcept {
+
+	return cloneTemplate<XWindowButtonsEvent>();
+}
+
+void XWindowButtonsEvent::PostInit(_plCallbackFnParams) {
+
+	button = _plGetWindowButtonType(_plCallbackFnParamsList);
+}
+
+XWindowButtonsEvent::~XWindowButtonsEvent() { }

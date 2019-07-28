@@ -45,7 +45,8 @@ enum Events{
 	EVT_MOUSEHOVER = WM_MOUSEHOVER, \
 	EVT_HSCROLL = WM_HSCROLL,\
 	EVT_VSCROLL = WM_VSCROLL, \
-	EVT_LOOSEFOCUS = WM_KILLFOCUS
+	EVT_LOOSEFOCUS = WM_KILLFOCUS, \
+	EVT_WINDOWBUTTONS = WM_SYSCOMMAND
 };
 
 enum NotificationCodes{
@@ -128,6 +129,12 @@ enum WindowFlags{
 	FL_WINDOW_BORDERED = WS_BORDER,\
 	FL_WINDOW_CLIPCHILDREN = WS_CLIPCHILDREN,\
 	FL_WINDOW_CLIPSIBLINGS = WS_CLIPSIBLINGS
+};
+
+enum LabelFlags {
+	FL_LABEL_LEFT = SS_LEFT, \
+	FL_LABEL_CENTER = SS_CENTER, \
+	FL_LABEL_RIGHT = SS_RIGHT
 };
 
 enum EditFlags{
@@ -322,6 +329,14 @@ inline void _plGetClientRect(_plHWND hwnd, XRect &rc) noexcept;
 inline void _plMoveWindow(_plHWND hwnd, int x, int y, int width, int height) noexcept;
 inline void _plShowWindow(_plHWND hwnd, bool show) noexcept;
 
+enum WindowButtons {
+	WND_BTN_MINIMIZE = SC_MINIMIZE, \
+	WND_BTN_MAXIMIZE = SC_MAXIMIZE, \
+	WND_BTN_RESTORE = SC_RESTORE
+};
+inline unsigned _plGetWindowButtonType(_plCallbackFnParams) noexcept;
+inline XSize _plGetScreenSize() noexcept;
+
 enum XVirtualKeys{
 	X_VKEY_CTRL = MK_CONTROL,\
 	X_VKEY_SHIFT = MK_SHIFT,\
@@ -478,6 +493,7 @@ inline void _plComboBoxReset(_plHWND hwnd) noexcept;
 inline void _plMessageBox(const Tchar *message) noexcept;
 inline void _plMessageBoxANSI(const char *message) noexcept;
 inline int _plMessageBoxYesNo(const Tchar *message) noexcept;
+inline void WarningBox(const Tchar *message) noexcept;
 inline void ErrorBox(const Tchar *message) noexcept;
 inline void ErrorBoxANSI(const char *message) noexcept;
 
@@ -753,6 +769,19 @@ void _plShowWindow(_plHWND hwnd, bool show) noexcept {
 	ShowWindow(hwnd, (!show && SW_HIDE) || (show && SW_SHOW));
 }
 
+unsigned _plGetWindowButtonType(_plCallbackFnParams) noexcept {
+
+	return (unsigned)wParam;
+}
+
+XSize _plGetScreenSize() noexcept {
+
+	int width = GetSystemMetrics(SM_CXSCREEN);
+	int height = GetSystemMetrics(SM_CYSCREEN);
+
+	return XSize(width, height);
+}
+
 int _plGetX(_plCallbackFnParams) noexcept {
 
 	return LOWORD(lParam);
@@ -988,6 +1017,11 @@ void _plMessageBoxANSI(const char *message) noexcept {
 int _plMessageBoxYesNo(const Tchar *message) noexcept {
 
 	return MessageBox(0, message, _T("Info"), MB_YESNO | MB_ICONQUESTION);
+}
+
+void WarningBox(const Tchar *message) noexcept {
+
+	MessageBox(0, message, _T("Warning"), MB_OK | MB_ICONWARNING | MB_TASKMODAL);
 }
 
 void ErrorBox(const Tchar *message) noexcept {

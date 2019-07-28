@@ -33,6 +33,9 @@
     <ClCompile Include="XTabStopManager.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="XNullWidget.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HorizontalSizer.h">
@@ -63,6 +66,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="XTabStopEdit.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="XNullWidget.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

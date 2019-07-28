@@ -1,7 +1,7 @@
 #include "AdvocatsListEvtHandler.h"
 #include <xwindows/platform_specific.h>
 
-const Tchar msg[] = _T("÷€ таблиц€ - т≥льки дл€ читанн€");
+const Tchar msg[] = _T("ƒан≥ адвоката не можуть бути зм≥нен≥ через цю форму");
 
 CAdvocatsListEvtHandler::CAdvocatsListEvtHandler(std::shared_ptr<CDbTable> db_table) : \
 													CDbGridEventsHandler(db_table) { }
@@ -9,13 +9,13 @@ CAdvocatsListEvtHandler::CAdvocatsListEvtHandler(std::shared_ptr<CDbTable> db_ta
 void CAdvocatsListEvtHandler::OnCellChanged(IGridCellWidget *cell_widget, \
 											IOnCellChangedAction &action) {
 
-	_plMessageBox(msg);
+	WarningBox(msg);
 }
 
 void CAdvocatsListEvtHandler::OnCellChangedIndirectly(IGridCellWidget *cell_widget, \
 														IOnCellChangedAction &action) {
 
-	_plMessageBox(msg);
+	WarningBox(msg);
 }
 
 CAdvocatsListEvtHandler::~CAdvocatsListEvtHandler() { }

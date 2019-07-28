@@ -154,6 +154,7 @@
     <ClCompile Include="Sizer.cpp" />
     <ClCompile Include="VerticalSizer.cpp" />
     <ClCompile Include="XDynamicSizer.cpp" />
+    <ClCompile Include="XNullWidget.cpp" />
     <ClCompile Include="XTabStopManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +163,7 @@
     <ClInclude Include="Sizer.h" />
     <ClInclude Include="VerticalSizer.h" />
     <ClInclude Include="XDynamicSizer.h" />
+    <ClInclude Include="XNullWidget.h" />
     <ClInclude Include="XTabStopEdit.h" />
     <ClInclude Include="XTabStopPanel.h" />
     <ClInclude Include="XTabStopWidget.h" />

@@ -144,6 +144,7 @@ XEventHandler::MainWndProc(_plCallbackFnParams){
 	p->hwnd = hwnd_backup;
 
 	p->eve->PostInit(_plCallbackFnParamsList);
+	bool def_action = p->eve->GetDefaultActionStatus(); // !!!
 
 	if (rec.id_event != EVT_CREATE) 
 		p->evt_handler_caller.Call(p->eve_container.get());
@@ -164,6 +165,9 @@ XEventHandler::MainWndProc(_plCallbackFnParams){
 			PostQuitMessage(RESULT_FAIL);
 		}
 	}
+
+	if(def_action)
+		return _plDefaultEventAction(_plCallbackFnParamsList);
 
 	return 0;
 }

@@ -17,7 +17,7 @@ class CPaymentsList {
 	CPaymentsNavPanel *panel;
 
 	enum {
-		DEF_PANEL_HEIGHT = 80
+		DEF_PANEL_HEIGHT = 120
 	};
 	int db_navigator_height;
 	float multiplier;

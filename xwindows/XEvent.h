@@ -188,3 +188,19 @@ public:
 
 	virtual ~XScrollEventEx() noexcept;
 };
+
+class XWindowButtonsEvent : public XEvent {
+protected:
+	unsigned button;
+public:
+	XWindowButtonsEvent() noexcept;
+
+	std::shared_ptr<XEvent> clone() const noexcept override;
+	EvtPair cloneAndCreateArgsWrapper() const noexcept override;
+
+	void PostInit(_plCallbackFnParams) override;
+
+	inline unsigned GetWindowButtonType() const noexcept { return button; }
+
+	virtual ~XWindowButtonsEvent();
+};
