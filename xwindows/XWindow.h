@@ -121,14 +121,14 @@ public:
 
 void XWindow::CheckAndInitWindowClassName(const Tchar *class_name) {
 
-if (!this->class_name.empty()) {
-	XWindowException e(XWindowException::E_REGISTER_WINDOW, \
-		_T("An attempt to re-register the window class '"));
-	e << class_name << _T("' again. The present Class_name = ");
-	e << this->class_name;
-	throw e;
-}
-this->class_name = class_name;
+	if (!this->class_name.empty()) {
+		XWindowException e(XWindowException::E_REGISTER_WINDOW, \
+			_T("An attempt to re-register the window class '"));
+		e << class_name << _T("' again. The present Class_name = ");
+		e << this->class_name;
+		throw e;
+	}
+	this->class_name = class_name;
 }
 
 template <typename RegisterFunc> \
