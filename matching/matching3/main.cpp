@@ -18,6 +18,8 @@ typedef IRecord<wchar_t> TRecord;
 std::shared_ptr<TTable> openCSV(const char *path);
 std::map<std::wstring, size_t> createFieldNamesMap(std::shared_ptr<TTable> csv);
 int convAndCheckIntCell(std::shared_ptr<TRecord> rec, const wchar_t *field_name, bool &is_empty);
+inline void printOrderDetails(const int id_center, const int id, \
+								const CDate &order_date, const std::wstring &act_name);
 
 int main() {
 
@@ -95,12 +97,14 @@ int main() {
 				
 				std::wcerr << _T("Немає такого доручення: рядок ") << i;
 				std::wcerr << _T(", значення полів: ");
-				std::wcerr << _T("id_center = ") << id_center;
-				std::wcerr << _T(", id_order = ") << id;
-				order_date.toStringGerman(buffer);
-				std::wcerr << _T(", order_date = ") << buffer;
-				std::wcerr << _T(", act_name = ") << act_name << std::endl;
+				printOrderDetails(id_center, id, order_date, act_name);
+				continue;
+			}
 
+			if (payment_date.isNull()) {
+				std::wcerr << _T("Дата оплати не може бути порожньою: рядок ") << i;
+				std::wcerr << _T(", значення полів: ");
+				printOrderDetails(id_center, id, order_date, act_name);
 				continue;
 			}
 
@@ -157,8 +161,8 @@ std::map<std::wstring, size_t> createFieldNamesMap(std::shared_ptr<TTable> csv) 
 		auto p = fields.lower_bound(name);
 		if (p == fields.end() || fields.key_comp()(p->first, name)) {
 
-			XException e(0, _T("the input csv does not contain '"));
-			e << name << _T("' field");
+			XException e(0, _T("csv-файл не містить поля '"));
+			e << name << _T("'");
 			throw e;
 		}
 	};
@@ -197,11 +201,22 @@ int convAndCheckIntCell(std::shared_ptr<TRecord> rec, const wchar_t *field_name,
 
 	if (error) {
 		int a = 0;
-		XException e(0, _T("Wrong field value: '"));
-		e << value << _T("' of field '") << field_name;
-		e << _T("'. The field must contain numbers only");
+		XException e(0, _T("Невірне значення: '"));
+		e << value << _T("' поля '") << field_name;
+		e << _T("'. Це поле може містити тільки числа");
 		throw e;
 	}
 
 	return int_value;
+}
+
+void printOrderDetails(const int id_center, const int id, \
+						const CDate &order_date, const std::wstring &act_name) {
+	wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1];
+
+	std::wcerr << _T("id_center = ") << id_center;
+	std::wcerr << _T(", id_order = ") << id;
+	order_date.toStringGerman(buffer);
+	std::wcerr << _T(", order_date = ") << buffer;
+	std::wcerr << _T(", act_name = ") << act_name << std::endl;
 }

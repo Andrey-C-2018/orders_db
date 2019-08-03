@@ -169,7 +169,7 @@ XEventHandler::MainWndProc(_plCallbackFnParams){
 	if(def_action)
 		return _plDefaultEventAction(_plCallbackFnParamsList);
 
-	return 0;
+	return EVT_DONT_PROCESS;
 }
 
 int XEventHandler::Connect(const _plEventId id_event, \

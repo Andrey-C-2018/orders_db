@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <ostream>
+#include <assert.h>
 
 class CMatchingResultsTable;
 
@@ -43,9 +44,14 @@ public:
 
 std::ostream &CCsvOutputWrapper::writeCSValue(const char *value, std::ostream &out) const{
 
-auto p = strchr(value, ',');
-if (p) out << '"' << value << '"';
-else out << value;
+	if (!value) {
+		out << "NULL";
+		return out;
+	}
 
-return out;
+	auto p = strchr(value, ',');
+	if (p) out << '"' << value << '"';
+	else out << value;
+
+	return out;
 }

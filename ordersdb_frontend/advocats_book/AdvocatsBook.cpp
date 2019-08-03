@@ -1,5 +1,6 @@
 #include <db/MySQL/MySQLConnectionFactory.h>
 #include <db/IDbConnection.h>
+#include <editable_grid/DateCellWidget.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbComboBox.h>
 #include <db_controls/DbComboBoxCellWidget.h>
@@ -11,6 +12,7 @@
 #include <xwindows_ex/VerticalSizer.h>
 #include <xwindows_ex/XTabStopWidget.h>
 #include <xwindows_ex/XTabStopEdit.h>
+#include <xwindows_ex/XDateField.h>
 #include "AdvocatsBook.h"
 #include "AdvocatsGridEvtHandler.h"
 #include "PostIndexCellWidget.h"
@@ -88,29 +90,49 @@ void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	assert(!examiners_list);
 	assert(!districts_list);
 	assert(!adv_org_types_list);
+	CPostIndexCellWidget *post_index_widget = nullptr;
+	CDateCellWidget *date_widget = nullptr;
 
+	bool exm = false, post = false, distr = false;
+	bool adv = false, date = false;
 	try {
 		examiners_list = new CDbComboBoxCellWidget(conn, "exm_name", \
 										"examiners", "advocats", db_table);
 		examiners_list->AddRelation("id_examiner", "id_exm");
 		grid->SetWidgetForFieldByName("exm_name", examiners_list);
+		exm = true;
 
-		auto post_index_widget = new CPostIndexCellWidget();
+		post_index_widget = new CPostIndexCellWidget();
 		grid->SetWidgetForFieldByName("post_index", post_index_widget);
+		post = true;
 
 		districts_list = new CDbComboBoxCellWidget(conn, "distr_center", \
 										"districts", "advocats", db_table);
 		districts_list->AddRelation("id_distr", "id_main_district");
 		grid->SetWidgetForFieldByName("distr_center", districts_list);
+		distr = true;
 
 		adv_org_types_list = new CComboBoxCellWidget();
 		grid->SetWidgetForFieldByName("org_type", adv_org_types_list);
+		adv = true;
+
+		date_widget = new CDateCellWidget();
+		grid->SetWidgetForFieldByName("license_date", date_widget);
+		date = true;
+
+		grid->SetWidgetForFieldByName("adv_bdate", date_widget);
 	}
 	catch (...) {
-		if (examiners_list && !examiners_list->IsCreated()) delete examiners_list;
-		if (districts_list && !districts_list->IsCreated()) delete districts_list;
-		if (adv_org_types_list && !adv_org_types_list->IsCreated())
+		if (!exm && examiners_list && !examiners_list->IsCreated()) 
+			delete examiners_list;
+		if (!post && post_index_widget && !post_index_widget->IsCreated())
+			delete post_index_widget;
+		if (!distr && districts_list && !districts_list->IsCreated()) 
+			delete districts_list;
+		if (!adv && adv_org_types_list && !adv_org_types_list->IsCreated())
 			delete adv_org_types_list;
+		if (!date && date_widget && !date_widget->IsCreated())
+			delete date_widget;
 
 		throw;
 	}
@@ -157,7 +179,7 @@ void CAdvocatsBook::DisplayWidgets() {
 
 		sizer.addWidget(new XLabel(), _T("Дата свід.: "), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
-		XTabStopEdit *license_date = new XTabStopEdit(this);
+		XDateField *license_date = new XDateField(this);
 		adv_inserter.setLicenseDateWidget(license_date);
 		sizer.addWidget(license_date, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(80, DEF_GUI_ROW_HEIGHT));
@@ -187,7 +209,7 @@ void CAdvocatsBook::DisplayWidgets() {
 
 		sizer.addWidget(new XLabel(), _T("Дата народж:"), FL_WINDOW_VISIBLE, \
 						XSize(55, DEF_GUI_ROW_HEIGHT + 10));
-		XTabStopEdit *bdate = new XTabStopEdit(this);
+		XDateField *bdate = new XDateField(this);
 		adv_inserter.setBDateWidget(bdate);
 		sizer.addWidget(bdate, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 

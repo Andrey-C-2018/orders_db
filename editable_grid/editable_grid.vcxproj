@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ComboBoxCellWidget.cpp" />
+    <ClCompile Include="DateCellWidget.cpp" />
     <ClCompile Include="DispatcherCell.cpp" />
     <ClCompile Include="EditableCellWidget.cpp" />
     <ClCompile Include="EditableGrid.cpp" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComboBoxCellWidget.h" />
+    <ClInclude Include="DateCellWidget.h" />
     <ClInclude Include="DispatcherCell.h" />
     <ClInclude Include="EditableCellWidget.h" />
     <ClInclude Include="EditableGrid.h" />

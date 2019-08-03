@@ -5,15 +5,24 @@
 
 class CMultipleCellWidget : public IGridCellWidget {
 	enum {
-		NOT_CREATED = -1
+		NOT_CREATED = -1, 
+		DEF_WIDGETS_COUNT = 10
 	};
 
 	struct CCellWidget {
 		IGridCellWidget *widget;
 		int id;
+		size_t ref_counter;
+
+		inline bool operator==(const CCellWidget &obj) const {
+
+			return widget == obj.widget;
+		}
 	};
 
-	std::map<size_t, CCellWidget> widgets;
+	std::vector<CCellWidget> widgets;
+	size_t widgets_count;
+	std::map<size_t, size_t> assignments;
 	IGridCellWidget *curr_widget, *default_widget;
 	int default_widget_id;
 	size_t curr_field;
@@ -25,6 +34,8 @@ class CMultipleCellWidget : public IGridCellWidget {
 						on_loose_focus_handler, \
 						on_key_press_handler;
 	std::shared_ptr<ICellEventHandler> on_indirect_change_handler;
+
+	inline void SetEvtHandlers(IGridCellWidget *widget);
 
 public:
 	CMultipleCellWidget();
@@ -40,6 +51,10 @@ public:
 	void SetOnLooseFocusHandler(XEventHandlerData on_loose_focus) override;
 	void SetOnKeyPressHandler(XEventHandlerData on_key_press) override;
 
+	inline const IGridCellWidget *GetWidget(const size_t field) const;
+	inline const IGridCellWidget *GetCurrentWidget() const;
+	inline size_t GetWidgetsCount() const;
+	inline size_t GetAssignmentsCount() const;
 	void SetDefaultWidget(IGridCellWidget *widget);
 	void AddCellWidget(const size_t field, IGridCellWidget *widget);
 	void SetCurrentField(const size_t field) override;
@@ -61,3 +76,41 @@ public:
 
 	virtual ~CMultipleCellWidget();
 };
+
+//*****************************************************
+
+void CMultipleCellWidget::SetEvtHandlers(IGridCellWidget *widget) {
+
+	if (!this->on_change_handler.empty())
+		widget->SetOnChangeHandler(this->on_change_handler);
+	if (!this->on_get_focus_handler.empty())
+		widget->SetOnGetFocusHandler(this->on_get_focus_handler);
+	if (!this->on_loose_focus_handler.empty())
+		widget->SetOnLooseFocusHandler(this->on_loose_focus_handler);
+	if (!this->on_key_press_handler.empty())
+		widget->SetOnKeyPressHandler(this->on_key_press_handler);
+}
+
+const IGridCellWidget *CMultipleCellWidget::GetWidget(const size_t field) const {
+
+	auto p = assignments.lower_bound(field);
+	if (p != assignments.cend() && !assignments.key_comp()(field, p->first))
+		return widgets[p->second].widget;
+	
+	return nullptr;
+}
+
+const IGridCellWidget *CMultipleCellWidget::GetCurrentWidget() const {
+
+	return curr_widget;
+}
+
+size_t CMultipleCellWidget::GetWidgetsCount() const {
+
+	return widgets_count;
+}
+
+size_t CMultipleCellWidget::GetAssignmentsCount() const {
+
+	return assignments.size();
+}

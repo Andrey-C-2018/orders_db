@@ -94,6 +94,15 @@ int main() {
 			dbf_table.open(dbf_dir.getFileName());
 			checkDbfFileStructure(dbf_table, fields, dbf_dir.getFileName());
 			CDate payment_date = getPaymentDateFromFileName(dbf_dir.getFileName());
+			if (payment_date.isNull()) {
+
+				std::wcerr << _T("Невірний формат імені файлу: '");
+				std::wcerr << dbf_dir.getFileName();
+				std::wcerr << _T("', по ньому неможливо визначити дату оплати\n");
+
+				not_end = dbf_dir.getNextFile();
+				continue;
+			}
 
 			bool not_eot = dbf_table.gotoFirstRecord();
 			size_t record_no = 0;
@@ -195,9 +204,9 @@ void checkDbfFileStructure(const CDbfTable &table, const std::map<std::wstring, 
 	for (auto field_item : fields) {
 
 		if (field_item.second >= dbf_fields_count) {
-			XException e(0, _T("there are no such field: '"));
-			e << field_item.first << _T("' at position ");
-			e << field_item.second << _T(". Check the file '");
+			XException e(0, _T("Немає такого поля: '"));
+			e << field_item.first << _T("' у позиції ");
+			e << field_item.second << _T(". Перевірте структуру файлу '");
 			e << dbf_file_name;
 			throw e;
 		}
@@ -214,10 +223,10 @@ void checkDbfFileStructure(const CDbfTable &table, const std::map<std::wstring, 
 					return std::toupper(l) == std::toupper(r);
 				}))) {
 
-			XException e(0, _T("the field at position "));
-			e << field_item.second << _T(" is not '") << field_item.first;
-			e << _T("', as it should be. Its name is '") << dbf_field_name;
-			e << _T("' in the file '") << dbf_file_name << _T("'");
+			XException e(0, _T("Поле у позиції "));
+			e << field_item.second << _T(" не є '") << field_item.first;
+			e << _T("', як це має бути. Його ім'я - '") << dbf_field_name;
+			e << _T("' у файлі '") << dbf_file_name << _T("'");
 			throw e;
 		}
 	}
@@ -230,9 +239,9 @@ CDate getPaymentDateFromFileName(const wchar_t *file_name) {
 	size_t file_name_len = wcsnlen(file_name, MAX_DBF_FILE_NAME_LEN);
 	
 	if (file_name[file_name_len] != L'\0') {
-		XException e(0, _T("the length in chars of this file name: '"));
-		e << file_name << _T("' exceeds the limit of ") << MAX_DBF_FILE_NAME_LEN;
-		e << _T(" chars");
+		XException e(0, _T("Довжина імені цього файлу: '"));
+		e << file_name << _T("' перевищує ліміт у ") << MAX_DBF_FILE_NAME_LEN;
+		e << _T(" символів");
 		throw e;
 	}
 
@@ -259,9 +268,9 @@ const wchar_t *checkIfIsEmptyAndConvert(const char *value, \
 	assert(dbf_file_name);
 
 	if (!value || (value && value[0] == '\0')) {
-		XException e(0, _T("the value of field '"));
-		e << field_name << _T("' is NULL or empty at record ");
-		e << record_no << _T(" in file '") << dbf_file_name << _T("'");
+		XException e(0, _T("Поле '"));
+		e << field_name << _T("' = NULL або порожнє, Рядок ");
+		e << record_no << _T(" у файлі '") << dbf_file_name << _T("'");
 		throw e;
 	}
 

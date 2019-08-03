@@ -6,7 +6,10 @@ template <class TWidget> \
 class XTabStopWidget : public TWidget {
 	ITabStopManager *manager;
 
-	void OnKeyPress(XKeyboardEvent *eve);
+protected:
+	inline void OnKeyPressInternal(XKeyboardEvent *eve);
+	virtual void OnKeyPress(XKeyboardEvent *eve);
+
 public:
 	XTabStopWidget(ITabStopManager *manager_) noexcept;
 
@@ -46,7 +49,7 @@ XTabStopWidget<TWidget>::XTabStopWidget(ITabStopManager *manager_, XWindow *pare
 	assert(manager);
 	manager->RegisterTabStopControl(this);
 
-	OverrideWindowEvent(EVT_KEYDOWN, this, &XTabStopEdit::OnKeyPress);
+	OverrideWindowEvent(EVT_KEYDOWN, XEventHandlerData(this, &XTabStopWidget::OnKeyPress));
 }
 
 template <class TWidget> \
@@ -63,13 +66,20 @@ void XTabStopWidget<TWidget>::Create(XWindow *parent, const int flags, \
 }
 
 template <class TWidget> \
-void XTabStopWidget<TWidget>::OnKeyPress(XKeyboardEvent *eve) {
+void XTabStopWidget<TWidget>::OnKeyPressInternal(XKeyboardEvent *eve) {
 
 	if (eve->GetKey() != X_VKEY_TAB) {
 		eve->ExecuteDefaultEventAction(true);
 		return;
 	}
 	manager->TabPressedOnControl(this);
+}
+
+
+template <class TWidget> \
+void XTabStopWidget<TWidget>::OnKeyPress(XKeyboardEvent *eve) {
+
+	OnKeyPressInternal(eve);
 }
 
 template <class TWidget> \
