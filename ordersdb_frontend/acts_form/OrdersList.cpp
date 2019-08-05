@@ -1,5 +1,6 @@
 #include "OrdersList.h"
 #include <db_ext/DbTable.h>
+#include <editable_grid/DateCellWidget.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbNavigator.h>
 
@@ -32,6 +33,8 @@ void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int de
 	grid->SetFieldLabel(7, _T("Дата скс."));
 	grid_as_window = grid;
 
+	createCellWidgetsAndAttachToGrid(grid);
+
 	db_navigator = new CDbNavigator(db_table);
 }
 
@@ -61,6 +64,27 @@ std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnecti
 	db_table->markFieldAsPrimaryKey("order_date");
 
 	return db_table;
+}
+
+void COrdersList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
+
+	assert(grid);
+	CDateCellWidget *date_widget = nullptr;
+	bool date = false;
+	try {
+		date_widget = new CDateCellWidget();
+		grid->SetWidgetForFieldByName("order_date", date_widget);
+		date = true;
+
+		grid->SetWidgetForFieldByName("bdate", date_widget);
+		grid->SetWidgetForFieldByName("cancel_date", date_widget);
+	}
+	catch (...) {
+		if (!date && date_widget && !date_widget->IsCreated())
+			delete date_widget;
+
+		throw;
+	}
 }
 
 void COrdersList::displayWidgets(XWindow *parent) {

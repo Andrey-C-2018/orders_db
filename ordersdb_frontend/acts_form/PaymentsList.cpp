@@ -1,5 +1,7 @@
 #include "PaymentsList.h"
 #include <db_ext/DbTable.h>
+#include <editable_grid/CurrencyCellWidget.h>
+#include <editable_grid/DateCellWidget.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbNavigator.h>
 #include <xwindows/XButton.h>
@@ -68,6 +70,7 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	grid->SetFieldWidth(30, 20);
 
 	grid_as_window = grid;
+	createCellWidgetsAndAttachToGrid(grid);
 
 	db_navigator = new CDbNavigator(db_table);
 	panel = new CPaymentsNavPanel(conn_);
@@ -104,6 +107,33 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 	db_table->markFieldAsPrimaryKey("id_stage");
 
 	return db_table;
+}
+
+void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
+
+	assert(grid);
+	CCurrencyCellWidget *currency_widget = nullptr;
+	CDateCellWidget *date_widget = nullptr;
+	bool fee = false, date = false;
+	try {
+		currency_widget = new CCurrencyCellWidget();
+		grid->SetWidgetForFieldByName("fee", currency_widget);
+		fee = true;
+
+		grid->SetWidgetForFieldByName("outgoings", currency_widget);
+
+		date_widget = new CDateCellWidget();
+		grid->SetWidgetForFieldByName("act_reg_date", date_widget);
+		date = true;
+
+		grid->SetWidgetForFieldByName("act_date", date_widget);
+	}
+	catch (...) {
+		if (!date && date_widget && !date_widget->IsCreated())
+			delete date_widget;
+
+		throw;
+	}
 }
 
 void CPaymentsList::displayWidgets(XWindow *parent) {

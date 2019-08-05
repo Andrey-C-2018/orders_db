@@ -2,8 +2,8 @@
 #include <xwindows_ex/XCtrlInputFilter.h>
 #include "EditableCellWidget.h"
 
-class CDateCellWidget : public CEditableCellWidget {
-	XCtrlInputFilter date_filter;
+class CCurrencyCellWidget : public CEditableCellWidget {
+	XCtrlInputFilter currency_filter;
 	CDelegate on_change_caller;
 	std::shared_ptr<XEvent> eve;
 	std::shared_ptr<IArguments> args_container;
@@ -11,12 +11,12 @@ class CDateCellWidget : public CEditableCellWidget {
 	void OnChange(XCommandEvent *eve);
 
 public:
-	CDateCellWidget();
+	CCurrencyCellWidget();
 
-	CDateCellWidget(const CDateCellWidget &obj) = delete;
-	CDateCellWidget(CDateCellWidget &&obj) = default;
-	CDateCellWidget &operator=(CDateCellWidget &&obj) = default;
-	CDateCellWidget &operator=(const CDateCellWidget &obj) = delete;
+	CCurrencyCellWidget(const CCurrencyCellWidget &obj) = delete;
+	CCurrencyCellWidget(CCurrencyCellWidget &&obj) = default;
+	CCurrencyCellWidget &operator=(CCurrencyCellWidget &&obj) = default;
+	CCurrencyCellWidget &operator=(const CCurrencyCellWidget &obj) = delete;
 
 	void CreateCellWidget(XWindow *parent, const int flags, \
 							const Tchar *label, \
@@ -25,6 +25,6 @@ public:
 
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
 
-	virtual ~CDateCellWidget();
+	virtual ~CCurrencyCellWidget();
 };
 

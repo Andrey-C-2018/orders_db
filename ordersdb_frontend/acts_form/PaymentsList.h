@@ -28,6 +28,7 @@ class CPaymentsList {
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn, \
 											const int def_center, const int def_order, \
 											CDate def_order_date);
+	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
 public:
 	CPaymentsList(const int margins_, const int db_navigator_height);
 

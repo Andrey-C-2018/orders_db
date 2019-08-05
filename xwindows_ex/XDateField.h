@@ -1,10 +1,10 @@
 #pragma once
 #include "XTabStopWidget.h"
 #include <date/Date.h>
-#include "XDateCtrlManager.h"
+#include "XCtrlInputFilter.h"
 
 class XDateField : public XTabStopWidget<XEdit> {
-	XDateCtrlManager date_manager;
+	XCtrlInputFilter filter;
 	
 	inline void CreateInternal(XWindow *parent, const int flags, \
 						const Tchar *label, \
@@ -32,6 +32,8 @@ public:
 
 	virtual ~XDateField();
 };
+
+//*****************************************************
 
 void XDateField::CreateInternal(XWindow *parent, const int flags, \
 								const Tchar *label, \

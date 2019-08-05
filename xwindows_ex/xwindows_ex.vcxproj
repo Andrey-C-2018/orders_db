@@ -153,6 +153,7 @@
     <ClCompile Include="HorizontalSizer.cpp" />
     <ClCompile Include="Sizer.cpp" />
     <ClCompile Include="VerticalSizer.cpp" />
+    <ClCompile Include="XCurrencyField.cpp" />
     <ClCompile Include="XDateField.cpp" />
     <ClCompile Include="XDynamicSizer.cpp" />
     <ClCompile Include="XNullWidget.cpp" />
@@ -163,7 +164,8 @@
     <ClInclude Include="ITabStopManager.h" />
     <ClInclude Include="Sizer.h" />
     <ClInclude Include="VerticalSizer.h" />
-    <ClInclude Include="XDateCtrlManager.h" />
+    <ClInclude Include="XCurrencyField.h" />
+    <ClInclude Include="XCtrlInputFilter.h" />
     <ClInclude Include="XDateField.h" />
     <ClInclude Include="XDynamicSizer.h" />
     <ClInclude Include="XNullWidget.h" />

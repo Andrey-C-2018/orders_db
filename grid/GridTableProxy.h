@@ -28,6 +28,7 @@ public:
 
 	inline size_t GetFieldsCount() const;
 	inline size_t GetAbsoluteFieldsCount() const;
+	inline size_t GetAbsoluteFieldIndex(const size_t field) const;
 	inline size_t GetRecordsCount() const;
 	inline ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const;
 	inline void SetCell(const size_t field, const size_t record, const Tchar *value);
@@ -211,6 +212,11 @@ size_t CGridTableProxy::GetFieldsCount() const {
 size_t CGridTableProxy::GetAbsoluteFieldsCount() const {
 
 	return fields_props->GetAbsoluteFieldsCount();
+}
+
+size_t CGridTableProxy::GetAbsoluteFieldIndex(const size_t field) const {
+
+	return fields_props->GetFieldIndex(field);
 }
 
 size_t CGridTableProxy::GetRecordsCount() const {

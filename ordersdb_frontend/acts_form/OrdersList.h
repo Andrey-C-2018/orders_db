@@ -20,6 +20,7 @@ class COrdersList {
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn, \
 											const int def_adv_id);
+	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
 public:
 	COrdersList(const int margins_, const float multiplier_, const int db_navigator_height);
 

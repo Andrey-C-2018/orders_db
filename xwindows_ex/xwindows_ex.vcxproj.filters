@@ -39,6 +39,9 @@
     <ClCompile Include="XDateField.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="XCurrencyField.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HorizontalSizer.h">
@@ -77,7 +80,10 @@
     <ClInclude Include="XDateField.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="XDateCtrlManager.h">
+    <ClInclude Include="XCurrencyField.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="XCtrlInputFilter.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

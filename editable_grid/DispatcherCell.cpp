@@ -254,7 +254,7 @@ void CDispatcherCell::OnClick(const size_t field, const size_t record) {
 	size_t prev_active_record = active_record;
 
 	active_field = field;
-	def_active_cell->SetCurrentField(active_field);
+	def_active_cell->SetCurrentField(table_proxy->GetAbsoluteFieldIndex(active_field));
 
 	active_record = record;
 	OnTableChanged(prev_active_field, prev_active_record);
@@ -324,7 +324,7 @@ void CDispatcherCell::OnFieldRemoved(const size_t field) {
 			(field == active_field && field + 1 == table_proxy->GetFieldsCount()))
 			--active_field;
 
-		def_active_cell->SetCurrentField(active_field);
+		def_active_cell->SetCurrentField(table_proxy->GetAbsoluteFieldIndex(active_field));
 
 		OnTableChanged(prev_active_field, active_record);
 	}

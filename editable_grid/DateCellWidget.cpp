@@ -1,6 +1,7 @@
 #include "DateCellWidget.h"
+#include <date/Date.h>
 
-CDateCellWidget::CDateCellWidget() : date_manager(this) { }
+CDateCellWidget::CDateCellWidget() : date_filter(this, _T(','), _T('.')) { }
 
 void CDateCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 										const Tchar *label, \
@@ -25,7 +26,7 @@ void CDateCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 
 void CDateCellWidget::OnChange(XCommandEvent *eve) {
 
-	if (date_manager.OnChange(eve)) 
+	if (date_filter.OnChange(eve))
 		on_change_caller.Call(args_container.get());
 }
 
