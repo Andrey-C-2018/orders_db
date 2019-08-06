@@ -26,6 +26,12 @@ class CAdvocatInserter : public CDbInserter {
 
 public:
 	CAdvocatInserter();
+
+	CAdvocatInserter(const CAdvocatInserter &obj) = delete;
+	CAdvocatInserter(CAdvocatInserter &&obj) = delete;
+	CAdvocatInserter &operator=(const CAdvocatInserter &obj) = delete;
+	CAdvocatInserter &operator=(CAdvocatInserter &&obj) = delete;
+
 	inline void setDbConnection(std::shared_ptr<IDbConnection> conn);
 
 	inline void setIdAdvocatWidget(XWidget *id_advocat) { this->id_advocat = id_advocat; }

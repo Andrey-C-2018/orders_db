@@ -1,8 +1,9 @@
-#include "OrdersList.h"
 #include <db_ext/DbTable.h>
 #include <editable_grid/DateCellWidget.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbNavigator.h>
+#include "OrdersGridEvtHandler.h"
+#include "OrdersList.h"
 
 COrdersList::COrdersList(const int margins_, const float multiplier_, \
 							const int db_navigator_height_) : \
@@ -19,7 +20,7 @@ void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int de
 	assert(!grid);
 
 	db_table = createDbTable(conn_, def_adv_id);
-	grid = new CDbGrid(db_table);
+	grid = new CDbGrid(db_table, std::make_shared<COrdersGridEvtHandler>(db_table));
 	grid->SetFieldLabel(1, _T("Центр"));
 	grid->SetFieldWidth(1, 12);
 	grid->SetFieldLabel(2, _T("№"));

@@ -26,8 +26,37 @@ void CDateCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 
 void CDateCellWidget::OnChange(XCommandEvent *eve) {
 
-	if (date_filter.OnChange(eve))
+	if (date_filter.OnChange(eve)) 
 		on_change_caller.Call(args_container.get());
+}
+
+bool CDateCellWidget::Validate() const {
+
+	auto validated_label = date_filter.getCachedLabel();
+	CDate dt(validated_label.str, CDate::GERMAN_FORMAT);
+
+	if (dt.isNull()) {
+		Tstring err_str = _T("Невірний формат дати: '");
+		err_str += validated_label.str;
+		err_str += _T("'");
+		ErrorBox(err_str.c_str());
+	}
+
+	return !dt.isNull();
+}
+
+bool CDateCellWidget::Validate(ImmutableString<Tchar> label) const {
+
+	CDate dt(label.str, CDate::GERMAN_FORMAT);
+
+	if (dt.isNull()) {
+		Tstring err_str = _T("Невірний формат дати: '");
+		err_str += label.str;
+		err_str += _T("'");
+		ErrorBox(err_str.c_str());
+	}
+
+	return !dt.isNull();
 }
 
 CDateCellWidget::~CDateCellWidget() { }

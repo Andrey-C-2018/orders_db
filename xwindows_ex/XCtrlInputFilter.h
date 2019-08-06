@@ -1,4 +1,5 @@
 #pragma once
+#include <basic/ImmutableString.h>
 #include <xwindows/XEdit.h>
 
 class XCtrlInputFilter {
@@ -18,6 +19,8 @@ public:
 	XCtrlInputFilter &operator=(XCtrlInputFilter &&obj) = default;
 
 	inline bool OnChange(XEvent *eve);
+	inline ImmutableString<Tchar> getCachedLabel() const;
+
 	virtual ~XCtrlInputFilter() { }
 };
 
@@ -42,4 +45,9 @@ bool XCtrlInputFilter::OnChange(XEvent *eve) {
 	}
 
 	return true;
+}
+
+ImmutableString<Tchar> XCtrlInputFilter::getCachedLabel() const {
+
+	return ImmutableString<Tchar>(&label[0], label.size());
 }

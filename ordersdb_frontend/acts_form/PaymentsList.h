@@ -8,8 +8,10 @@
 struct IDbConnection;
 class CDbGrid;
 class CDbTable;
+class CDbComboBoxCellWidget;
 
 class CPaymentsList {
+	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
 	CDbGrid *grid;
 	XWidget *grid_as_window;
@@ -24,6 +26,8 @@ class CPaymentsList {
 
 	XDynamicSizer grid_sizer, nav_sizer, panel_sizer;
 	const XDynamicSizer *prev_sizer;
+
+	CDbComboBoxCellWidget *stages_list, *informers_list, *checkers_list;
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn, \
 											const int def_center, const int def_order, \

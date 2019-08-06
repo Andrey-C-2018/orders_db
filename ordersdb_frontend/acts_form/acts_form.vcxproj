@@ -160,7 +160,10 @@
     <ClCompile Include="AdvocatsList.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="OrdersDbTableEventsHandler.cpp" />
+    <ClCompile Include="OrdersGridEvtHandler.cpp" />
     <ClCompile Include="OrdersList.cpp" />
+    <ClCompile Include="PaymentsGridEvtHandler.cpp" />
+    <ClCompile Include="PaymentsInserter.cpp" />
     <ClCompile Include="PaymentsList.cpp" />
     <ClCompile Include="PaymentsNavPanel.cpp" />
   </ItemGroup>
@@ -171,7 +174,10 @@
     <ClInclude Include="AdvocatsList.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="OrdersDbTableEventsHandler.h" />
+    <ClInclude Include="OrdersGridEvtHandler.h" />
     <ClInclude Include="OrdersList.h" />
+    <ClInclude Include="PaymentsGridEvtHandler.h" />
+    <ClInclude Include="PaymentsInserter.h" />
     <ClInclude Include="PaymentsList.h" />
     <ClInclude Include="PaymentsNavPanel.h" />
   </ItemGroup>

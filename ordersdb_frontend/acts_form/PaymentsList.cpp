@@ -1,17 +1,21 @@
-#include "PaymentsList.h"
 #include <db_ext/DbTable.h>
 #include <editable_grid/CurrencyCellWidget.h>
 #include <editable_grid/DateCellWidget.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbNavigator.h>
+#include <db_controls/DbComboBoxCellWidget.h>
 #include <xwindows/XButton.h>
+#include "PaymentsList.h"
+#include "PaymentsGridEvtHandler.h"
 
 CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_) : \
 								grid(nullptr), grid_as_window(nullptr), \
 								db_navigator(nullptr), panel(nullptr), \
 								db_navigator_height(db_navigator_height_), \
 								grid_sizer(margins_, 0), nav_sizer(margins_, margins_), \
-								panel_sizer(margins_, margins_), prev_sizer(nullptr) { }
+								panel_sizer(margins_, margins_), prev_sizer(nullptr), \
+								stages_list(nullptr), informers_list(nullptr), \
+								checkers_list(nullptr) { }
 
 void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_center, \
 								const int def_order, CDate def_order_date) {
@@ -19,8 +23,10 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	assert(!db_table);
 	assert(!grid);
 
+	this->conn = conn_;
 	db_table = createDbTable(conn_, def_center, def_order, def_order_date);
-	grid = new CDbGrid(db_table);
+	grid = new CDbGrid(db_table, std::make_shared<CPaymentsGridEvtHandler>(db_table));
+
 	grid->SetFieldLabel(3, _T("Опл."));
 	grid->SetFieldWidth(3, 4);
 	grid->SetFieldLabel(5, _T("Стадія"));
@@ -73,7 +79,9 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	createCellWidgetsAndAttachToGrid(grid);
 
 	db_navigator = new CDbNavigator(db_table);
-	panel = new CPaymentsNavPanel(conn_);
+	panel = new CPaymentsNavPanel(conn_, stages_list->getMasterResultSet(), \
+									informers_list->getMasterResultSet(), \
+									checkers_list->getMasterResultSet());
 	panel->setPaymentsDbTable(db_table);
 }
 
@@ -114,23 +122,54 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	assert(grid);
 	CCurrencyCellWidget *currency_widget = nullptr;
 	CDateCellWidget *date_widget = nullptr;
-	bool fee = false, date = false;
+
+	bool stages = false, fee = false, inf = false, date = false, chk = false;
 	try {
+		stages_list = new CDbComboBoxCellWidget(conn, "stage_name", \
+											"stages", "payments", db_table);
+		stages_list->AddRelation("id_stage", "id_st");
+		grid->SetWidgetForFieldByName("stage_name", stages_list);
+		stages = true;
+
 		currency_widget = new CCurrencyCellWidget();
 		grid->SetWidgetForFieldByName("fee", currency_widget);
 		fee = true;
 
 		grid->SetWidgetForFieldByName("outgoings", currency_widget);
 
+		informers_list = new CDbComboBoxCellWidget(conn, "informer_name", \
+												"informers", "payments", db_table);
+		informers_list->AddRelation("id_informer", "id_inf");
+		grid->SetWidgetForFieldByName("informer_name", informers_list);
+		inf = true;
+
 		date_widget = new CDateCellWidget();
 		grid->SetWidgetForFieldByName("act_reg_date", date_widget);
 		date = true;
 
 		grid->SetWidgetForFieldByName("act_date", date_widget);
+
+		auto chk_stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE user_full_name IS NOT NULL ORDER BY user_name");
+		auto chk_rs = chk_stmt->exec();
+		checkers_list = new CDbComboBoxCellWidget(conn, 1, chk_rs, \
+													 chk_stmt->getResultSetMetadata(), \
+													"payments", db_table);
+		checkers_list->AddRelation("id_checker", "id_user");
+		grid->SetWidgetForFieldByName("user_full_name", checkers_list);
+		chk = true;
 	}
 	catch (...) {
-		if (!date && date_widget && !date_widget->IsCreated())
-			delete date_widget;
+		if (!chk && checkers_list && !checkers_list->IsCreated())
+			delete checkers_list;
+
+		if (!inf && informers_list && !informers_list->IsCreated())
+			delete informers_list;
+
+		if (!fee && currency_widget && !currency_widget->IsCreated())
+			delete currency_widget;
+
+		if (!stages && stages_list && !stages_list->IsCreated())
+			delete stages_list;
 
 		throw;
 	}

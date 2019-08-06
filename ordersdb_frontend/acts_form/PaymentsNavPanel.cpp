@@ -1,6 +1,4 @@
-#include <basic/XConv.h>
 #include <db/IDbConnection.h>
-#include <db/IDbStatement.h>
 #include <db_ext/DbTable.h>
 #include <db_controls/DbComboBox.h>
 #include <xwindows/XEdit.h>
@@ -11,93 +9,16 @@
 #include <xwindows_ex/XNullWidget.h>
 #include "PaymentsNavPanel.h"
 
-enum {
-	MAX_INT_FIELD_LEN = getDigitsCountOfType<int>() + 1
-};
+CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn, \
+										std::shared_ptr<const IDbResultSet> rs_stages_, \
+										std::shared_ptr<const IDbResultSet> rs_inf_, \
+										std::shared_ptr<const IDbResultSet> rs_checkers_) : \
+					btn_get_curr(nullptr), btn_add(nullptr), btn_remove(nullptr), \
+					rs_stages(rs_stages_), rs_inf(rs_inf_), rs_checkers(rs_checkers_) {
 
-inline const Tchar *getIntFieldAsString(std::shared_ptr<const IDbResultSet> rs, \
-										const size_t field_no, \
-										Tchar (&buffer)[MAX_INT_FIELD_LEN]) {
-
-	bool is_null;
-	int value = rs->getInt(field_no, is_null);
-	assert(!is_null);
-
-	return XConv::ToString(value, buffer);
-}
-
-inline ImmutableString<char> getFieldAsString(std::shared_ptr<const IDbResultSet> rs, \
-											const size_t field_no, \
-											char type_hint) {
-
-	return rs->getImmutableString(field_no);
-}
-
-inline ImmutableString<wchar_t> getFieldAsString(std::shared_ptr<const IDbResultSet> rs, \
-												const size_t field_no, \
-												wchar_t type_hint) {
-
-	return rs->getImmutableWString(field_no);
-}
-
-//*****************************************************
-
-CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn) : \
-					stage(nullptr), informer(nullptr), cycle(nullptr), article(nullptr), \
-					fee(nullptr), outgoings(nullptr), id_act(nullptr), act_date(nullptr), \
-					act_reg_date(nullptr), btn_get_curr(nullptr), btn_add(nullptr), \
-					btn_remove(nullptr), age(nullptr), inv(nullptr), lang(nullptr), ill(nullptr), \
-					zek(nullptr), vpr(nullptr), reduce(nullptr), change(nullptr), \
-					close(nullptr), zv(nullptr), min_penalty(nullptr), nm_suv(nullptr), \
-					zv_kr(nullptr), no_ch_Ist(nullptr), Koef(nullptr), checker(nullptr) {
-
-	try {
-		auto stmt = conn->PrepareQuery("SELECT id_st,stage_name FROM stages ORDER BY id_st");
-		auto rs = stmt->exec();
-		stage = new CDbComboBox(rs, 1, 0);
-
-		stmt = conn->PrepareQuery("SELECT id_inf,informer_name FROM informers ORDER BY id_inf");
-		rs = stmt->exec();
-		informer = new CDbComboBox(rs, 1, 0);
-
-		stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE user_full_name IS NOT NULL ORDER BY user_name");
-		rs = stmt->exec();
-		checker = new CDbComboBox(rs, 1, 0);
-
-		cycle = new XTabStopEdit(this);
-		article = new XTabStopEdit(this);
-		fee = new XTabStopEdit(this);
-		outgoings = new XTabStopEdit(this);
-
-		id_act = new XTabStopEdit(this);
-		act_date = new XTabStopEdit(this);
-		act_reg_date = new XTabStopEdit(this);
-
-		btn_get_curr = new XButton();
-		btn_add = new XButton();
-		btn_remove = new XButton();
-
-		age = new XTabStopEdit(this);
-		inv = new XTabStopEdit(this);
-		lang = new XTabStopEdit(this);
-		ill = new XTabStopEdit(this);
-		zek = new XTabStopEdit(this);
-		vpr = new XTabStopEdit(this);
-		reduce = new XTabStopEdit(this);
-		change = new XTabStopEdit(this);
-		close = new XTabStopEdit(this);
-		zv = new XTabStopEdit(this);
-		min_penalty = new XTabStopEdit(this);
-		nm_suv = new XTabStopEdit(this);
-		zv_kr = new XTabStopEdit(this);
-		no_ch_Ist = new XTabStopEdit(this);
-		Koef = new XTabStopEdit(this);
-	}
-	catch (...) {
-
-		Dispose();
-		throw;
-	}
+	btn_get_curr = new XButton();
+	btn_add = new XButton();
+	btn_remove = new XButton();
 }
 
 void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
@@ -119,20 +40,45 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 	
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(btn_get_curr, _T("->"), FL_WINDOW_VISIBLE, XSize(20, DEF_HEIGHT));
+
+		auto stage = new CDbComboBox(rs_stages, 1, 0);
+		inserter.setStageWidget(stage);
 		sizer.addResizeableWidget(stage, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 									XSize(90, DEF_HEIGHT), 150);
 		stage->setTabStopManager(this);
 
+		auto cycle = new XTabStopEdit(this);
+		inserter.setCycleWidget(cycle);
 		sizer.addWidget(cycle, _T(""), edit_flags, XSize(25, DEF_HEIGHT));
+
+		auto article = new XTabStopEdit(this);
+		inserter.setArticleWidget(article);
 		sizer.addWidget(article, _T(""), edit_flags, XSize(150, DEF_HEIGHT));
+
+		auto fee = new XTabStopEdit(this);
+		inserter.setFeeWidget(fee);
 		sizer.addWidget(fee, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
+
+		auto outgoings = new XTabStopEdit(this);
+		inserter.setOutgoingsWidget(outgoings);
 		sizer.addWidget(outgoings, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
+
+		auto informer = new CDbComboBox(rs_inf, 1, 0);
+		inserter.setInformerWidget(informer);
 		sizer.addResizeableWidget(informer, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 									XSize(180, DEF_HEIGHT), 150);
 		informer->setTabStopManager(this);
 
+		auto id_act = new XTabStopEdit(this);
+		inserter.setActWidget(id_act);
 		sizer.addWidget(id_act, _T(""), edit_flags, XSize(80, DEF_HEIGHT));
+
+		auto act_date = new XTabStopEdit(this);
+		inserter.setActDateWidget(act_date);
 		sizer.addWidget(act_date, _T(""), edit_flags, XSize(80, DEF_HEIGHT));
+
+		auto act_reg_date = new XTabStopEdit(this);
+		inserter.setActRegDateWidget(act_reg_date);
 		sizer.addWidget(act_reg_date, _T(""), edit_flags, XSize(80, DEF_HEIGHT));
 
 		sizer.addWidget(btn_add, _T("+"), FL_WINDOW_VISIBLE, XSize(20, DEF_HEIGHT));
@@ -163,22 +109,68 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(&null_widget, _T(""), 0, XSize(20, DEF_HEIGHT));
 
+		auto age = new XTabStopEdit(this);
+		inserter.setAgeWidget(age);
 		sizer.addWidget(age, _T(""), edit_flags, XSize(25, DEF_HEIGHT));
+
+		auto inv = new XTabStopEdit(this);
+		inserter.setInvWidget(inv);
 		sizer.addWidget(inv, _T(""), edit_flags, XSize(35, DEF_HEIGHT));
+
+		auto lang = new XTabStopEdit(this);
+		inserter.setLangWidget(lang);
 		sizer.addWidget(lang, _T(""), edit_flags, XSize(35, DEF_HEIGHT));
+
+		auto ill = new XTabStopEdit(this);
+		inserter.setIllWidget(ill);
 		sizer.addWidget(ill, _T(""), edit_flags, XSize(58, DEF_HEIGHT));
+
+		auto zek = new XTabStopEdit(this);
+		inserter.setZekWidget(zek);
 		sizer.addWidget(zek, _T(""), edit_flags, XSize(30, DEF_HEIGHT));
+
+		auto vpr = new XTabStopEdit(this);
+		inserter.setVprWidget(vpr);
 		sizer.addWidget(vpr, _T(""), edit_flags, XSize(40, DEF_HEIGHT));
+
+		auto reduce = new XTabStopEdit(this);
+		inserter.setReduceWidget(reduce);
 		sizer.addWidget(reduce, _T(""), edit_flags, XSize(47, DEF_HEIGHT));
+
+		auto change = new XTabStopEdit(this);
+		inserter.setChangeWidget(change);
 		sizer.addWidget(change, _T(""), edit_flags, XSize(40, DEF_HEIGHT));
+
+		auto close = new XTabStopEdit(this);
+		inserter.setCloseWidget(close);
 		sizer.addWidget(close, _T(""), edit_flags, XSize(40, DEF_HEIGHT));
+
+		auto zv = new XTabStopEdit(this);
+		inserter.setZvilnWidget(zv);
 		sizer.addWidget(zv, _T(""), edit_flags, XSize(55, DEF_HEIGHT));
+
+		auto min_penalty = new XTabStopEdit(this);
+		inserter.setMinPenaltyWidget(min_penalty);
 		sizer.addWidget(min_penalty, _T(""), edit_flags, XSize(35, DEF_HEIGHT));
+
+		auto nm_suv = new XTabStopEdit(this);
+		inserter.setNmSuvWidget(nm_suv);
 		sizer.addWidget(nm_suv, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
+
+		auto zv_kr = new XTabStopEdit(this);
+		inserter.setZvilnKrWidget(zv_kr);
 		sizer.addWidget(zv_kr, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
+
+		auto no_ch_Ist = new XTabStopEdit(this);
+		inserter.setNoCh1instWidget(no_ch_Ist);
 		sizer.addWidget(no_ch_Ist, _T(""), edit_flags, XSize(90, DEF_HEIGHT));
+
+		auto Koef = new XTabStopEdit(this);
+		inserter.setKoeffWidget(Koef);
 		sizer.addWidget(Koef, _T(""), edit_flags, XSize(40, DEF_HEIGHT));
 		
+		auto checker = new CDbComboBox(rs_checkers, 1, 0);
+		inserter.setCheckerWidget(checker);
 		sizer.addResizeableWidget(checker, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 									XSize(108, DEF_HEIGHT), 200);
 		checker->setTabStopManager(this);
@@ -189,41 +181,8 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 }
 
 void CPaymentsNavPanel::OnGetCurrRecordButtonClick(XCommandEvent *eve) {
-	enum {
-		INT_TYPE_HINT = -1
-	};
 
-	assert(db_table);
-	
-	auto rs = db_table->getResultSet();
-	if (!rs->getRecordsCount()) {
-		ErrorBox(_T("Таблиця порожня. Неможливо зчитати поточний запис"));
-		return;
-	}
-
-	db_table->gotoCurrentRecord();
-	auto meta_info = db_table->getQuery().getMetaInfo();
-	stage->SetCurrRecord(rs, meta_info.getFieldIndexByName("id_stage"), INT_TYPE_HINT);
-
-	Tchar buffer[MAX_INT_FIELD_LEN];
-	size_t field_no = meta_info.getFieldIndexByName("cycle");
-	cycle->SetLabel(getIntFieldAsString(rs, field_no, buffer));
-
-	field_no = meta_info.getFieldIndexByName("article");
-	auto label = getFieldAsString(rs, field_no, Tchar());
-	article->SetLabel(label.str, label.size);
-
-	field_no = meta_info.getFieldIndexByName("fee");
-	label = getFieldAsString(rs, field_no, Tchar());
-	fee->SetLabel(label.str, label.size);
-
-	field_no = meta_info.getFieldIndexByName("outgoings");
-	label = getFieldAsString(rs, field_no, Tchar());
-	outgoings->SetLabel(label.str, label.size);
-
-	field_no = meta_info.getFieldIndexByName("id_act");
-	label = getFieldAsString(rs, field_no, Tchar());
-	id_act->SetLabel(label.str, label.size);
+	inserter.getCurrRecord(db_table);
 }
 
 void CPaymentsNavPanel::OnAddRecordButtonClick(XCommandEvent *eve) {
@@ -236,70 +195,14 @@ void CPaymentsNavPanel::OnRemoveButtonClick(XCommandEvent *eve) {
 
 }
 
-void CPaymentsNavPanel::Dispose() {
-	
-	if (Koef && !Koef->IsCreated()) delete Koef;
-	Koef = nullptr;
-	if (no_ch_Ist && !no_ch_Ist->IsCreated()) delete no_ch_Ist;
-	no_ch_Ist = nullptr;
-	if (zv_kr && !zv_kr->IsCreated()) delete zv_kr;
-	zv_kr = nullptr;
-	if (nm_suv && !nm_suv->IsCreated()) delete nm_suv;
-	nm_suv = nullptr;
-	if (min_penalty && !min_penalty->IsCreated()) delete min_penalty;
-	min_penalty = nullptr;
-	if (zv && !zv->IsCreated()) delete zv;
-	zv = nullptr;
-	if (close && !close->IsCreated()) delete close;
-	close = nullptr;
-	if (change && !change->IsCreated()) delete change;
-	change = nullptr;
-	if (reduce && !reduce->IsCreated()) delete reduce;
-	reduce = nullptr;
-	if (vpr && !vpr->IsCreated()) delete vpr;
-	vpr = nullptr;
-	if (zek && !zek->IsCreated()) delete zek;
-	zek = nullptr;
-	if (ill && !ill->IsCreated()) delete ill;
-	ill = nullptr;
-	if (lang && !lang->IsCreated()) delete lang;
-	lang = nullptr;
-	if (inv && !inv->IsCreated()) delete inv;
-	inv = nullptr;
-	if (age && !age->IsCreated()) delete age;
-	age = nullptr;
+CPaymentsNavPanel::~CPaymentsNavPanel() {
 
 	if (btn_add && !btn_add->IsCreated()) delete btn_add;
 	btn_add = nullptr;
+
 	if (btn_remove && !btn_remove->IsCreated()) delete btn_remove;
 	btn_remove = nullptr;
+
 	if (btn_get_curr && !btn_get_curr->IsCreated()) delete btn_get_curr;
 	btn_get_curr = nullptr;
-
-	if (act_reg_date && !act_reg_date->IsCreated()) delete act_reg_date;
-	act_reg_date = nullptr;
-	if (act_date && !act_date->IsCreated()) delete act_date;
-	act_date = nullptr;
-	if (id_act && !id_act->IsCreated()) delete id_act;
-	id_act = nullptr;
-	if (outgoings && !outgoings->IsCreated()) delete outgoings;
-	outgoings = nullptr;
-	if (fee && !fee->IsCreated()) delete fee;
-	fee = nullptr;
-	if (article && !article->IsCreated()) delete article;
-	article = nullptr;
-	if (cycle && !cycle->IsCreated()) delete cycle;
-	cycle = nullptr;
-
-	if (checker && !checker->IsCreated()) delete checker;
-	checker = nullptr;
-	if (informer && !informer->IsCreated()) delete informer;
-	informer = nullptr;
-	if (stage && !stage->IsCreated()) delete stage;
-	stage = nullptr;
-}
-
-CPaymentsNavPanel::~CPaymentsNavPanel() {
-
-	Dispose();
 }
