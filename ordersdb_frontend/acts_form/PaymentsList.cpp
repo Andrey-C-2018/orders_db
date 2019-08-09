@@ -136,6 +136,7 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		fee = true;
 
 		grid->SetWidgetForFieldByName("outgoings", currency_widget);
+		grid->SetWidgetForFieldByName("Koef", currency_widget);
 
 		informers_list = new CDbComboBoxCellWidget(conn, "informer_name", \
 												"informers", "payments", db_table);

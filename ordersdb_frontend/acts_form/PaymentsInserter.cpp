@@ -33,6 +33,14 @@ inline ImmutableString<wchar_t> getFieldAsString(std::shared_ptr<const IDbResult
 	return rs->getImmutableWString(field_no);
 }
 
+inline void setIntWidgetLabel(XWidget *widget, std::shared_ptr<const IDbResultSet> rs, \
+								const CMetaInfo &meta_info, const char *field_name, \
+								Tchar(&buffer)[MAX_INT_FIELD_LEN]) {
+
+	size_t field_no = meta_info.getFieldIndexByName(field_name);
+	widget->SetLabel(getIntFieldAsString(rs, field_no, buffer));
+}
+
 inline void setStrWidgetLabel(XWidget *widget, std::shared_ptr<const IDbResultSet> rs, \
 								const CMetaInfo &meta_info, const char *field_name) {
 
@@ -92,8 +100,7 @@ void CPaymentsInserter::getCurrRecord(std::shared_ptr<CDbTable> db_table) {
 													MAX_INT_FIELD_LEN : \
 													CDate::GERMAN_FORMAT_LEN + 1;
 	Tchar buffer[BUFFER_SIZE];
-	size_t field_no = meta_info.getFieldIndexByName("cycle");
-	cycle->SetLabel(getIntFieldAsString(rs, field_no, buffer));
+	setIntWidgetLabel(cycle, rs, meta_info, "cycle", buffer);
 
 	setStrWidgetLabel(article, rs, meta_info, "article");
 	setStrWidgetLabel(fee, rs, meta_info, "fee");
@@ -103,6 +110,25 @@ void CPaymentsInserter::getCurrRecord(std::shared_ptr<CDbTable> db_table) {
 
 	setStrWidgetLabel(id_act, rs, meta_info, "id_act");
 	setDateWidgetLabel(act_date, rs, meta_info, "act_date", buffer);
+	setDateWidgetLabel(act_reg_date, rs, meta_info, "act_reg_date", buffer);
+
+	setIntWidgetLabel(age, rs, meta_info, "age", buffer);
+	setIntWidgetLabel(inv, rs, meta_info, "inv", buffer);
+	setIntWidgetLabel(lang, rs, meta_info, "lang", buffer);
+	setIntWidgetLabel(ill, rs, meta_info, "ill", buffer);
+	setIntWidgetLabel(zek, rs, meta_info, "zek", buffer);
+	setIntWidgetLabel(vpr, rs, meta_info, "vpr", buffer);
+	setIntWidgetLabel(reduce, rs, meta_info, "reduce", buffer);
+	setIntWidgetLabel(change, rs, meta_info, "change_", buffer);
+	setIntWidgetLabel(close, rs, meta_info, "close", buffer);
+	setIntWidgetLabel(zv, rs, meta_info, "zv", buffer);
+	setIntWidgetLabel(min_penalty, rs, meta_info, "min", buffer);
+	setIntWidgetLabel(nm_suv, rs, meta_info, "nm_suv", buffer);
+	setIntWidgetLabel(zv_kr, rs, meta_info, "zv_kr", buffer);
+	setIntWidgetLabel(no_ch_Ist, rs, meta_info, "No_Ch_Ist", buffer);
+
+	setStrWidgetLabel(Koef, rs, meta_info, "Koef");
+	checker->SetCurrRecord(rs, meta_info.getFieldIndexByName("id_checker"), INT_TYPE_HINT);
 }
 
 void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {

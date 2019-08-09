@@ -71,10 +71,6 @@ compile_flags.txt
 _libs/
 _old/
 _scripts/
-diff_backup/
-orders/
+_work/
 /.metadata/
 *.ini
-matching_main/config.ini
-matching_main/result.csv
-matching3/result.csv
