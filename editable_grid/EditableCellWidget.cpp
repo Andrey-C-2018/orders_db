@@ -1,6 +1,8 @@
 #include "EditableCellWidget.h"
 
-CEditableCellWidget::CEditableCellWidget() { }
+CEditableCellWidget::CEditableCellWidget() : def_readonly(false) { }
+
+CEditableCellWidget::CEditableCellWidget(const bool def_readonly_) : def_readonly(def_readonly_) { }
 
 void CEditableCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 								const Tchar *label, \
@@ -8,8 +10,11 @@ void CEditableCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 								const int width, const int height) {
 
 	assert(!IsCreated());
-	XEdit::Create(parent, flags | FL_WINDOW_CLIPSIBLINGS | FL_EDIT_AUTOHSCROLL | \
-								FL_WINDOW_BORDERED, label, x, y, width, height);
+	int fl = flags | FL_WINDOW_CLIPSIBLINGS | FL_EDIT_AUTOHSCROLL | FL_WINDOW_BORDERED;
+	if (def_readonly)
+		fl |= FL_EDIT_READONLY;
+
+	XEdit::Create(parent, fl, label, x, y, width, height);
 }
 
 void CEditableCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
@@ -70,6 +75,12 @@ ImmutableString<Tchar> CEditableCellWidget::GetLabel() {
 
 	const Tchar *label = XEdit::GetLabel(size);
 	return ImmutableString<Tchar>(label, size);
+}
+
+ImmutableString<Tchar> CEditableCellWidget::GetLabel(std::vector<Tchar> &label) const {
+
+	const Tchar *l = XEdit::GetLabel(label);
+	return ImmutableString<Tchar>(l, label.size());
 }
 
 void CEditableCellWidget::SetLabel(ImmutableString<Tchar> label) {

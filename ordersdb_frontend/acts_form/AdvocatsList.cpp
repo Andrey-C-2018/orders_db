@@ -9,6 +9,7 @@ CAdvocatsList::CAdvocatsList(const int margins_, const int width_, \
 								const int db_navigator_height_) : \
 									grid(nullptr), grid_as_window(nullptr), \
 									db_navigator(nullptr), \
+									cr_grid(false), cr_navigator(false), \
 									grid_sizer(margins_, 0), \
 									nav_sizer(margins_, margins_),
 									width(width_), db_navigator_height(db_navigator_height_){ }
@@ -51,13 +52,15 @@ std::shared_ptr<CDbTable> CAdvocatsList::createDbTable(std::shared_ptr<IDbConnec
 void CAdvocatsList::displayWidgets(XWindow *parent) {
 
 	grid_sizer.createWidget(grid_as_window, parent, FL_WINDOW_VISIBLE, _T(""));
+	cr_grid = true;
 	nav_sizer.createWidget(db_navigator, parent, FL_WINDOW_VISIBLE, _T(""));
+	cr_navigator = true;
 
 	grid->HideField(0);
 }
 
 CAdvocatsList::~CAdvocatsList() {
 
-	if (db_navigator && !db_navigator->IsCreated()) delete db_navigator;
-	if (grid && !grid->IsCreated()) delete grid;
+	if (db_navigator && !cr_navigator) delete db_navigator;
+	if (grid && !cr_grid) delete grid;
 }

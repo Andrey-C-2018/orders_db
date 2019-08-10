@@ -15,10 +15,17 @@ class CAdvocatsList {
 	XWidget *db_navigator;
 	int width, db_navigator_height;
 
+	bool cr_grid, cr_navigator;
+
 	XDynamicSizer grid_sizer, nav_sizer;
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 public:
 	CAdvocatsList(const int margins_, const int width_, const int db_navigator_height_);
+
+	CAdvocatsList(const CAdvocatsList &obj) = delete;
+	CAdvocatsList(CAdvocatsList &&obj) = delete;
+	CAdvocatsList &operator=(const CAdvocatsList &obj) = delete;
+	CAdvocatsList &operator=(CAdvocatsList &&obj) = delete;
 
 	void initDbTable(std::shared_ptr<IDbConnection> conn_);
 	void initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler);

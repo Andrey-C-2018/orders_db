@@ -156,6 +156,7 @@
     <ClCompile Include="DispatcherCell.cpp" />
     <ClCompile Include="EditableCellWidget.cpp" />
     <ClCompile Include="EditableGrid.cpp" />
+    <ClCompile Include="IntegerCellWidget.cpp" />
     <ClCompile Include="MultipleCellWidget.cpp" />
     <ClCompile Include="StringGrid.cpp" />
   </ItemGroup>
@@ -169,6 +170,7 @@
     <ClInclude Include="ICellEventHandler.h" />
     <ClInclude Include="IGridCellWidget.h" />
     <ClInclude Include="IGridEventsHandler.h" />
+    <ClInclude Include="IntegerCellWidget.h" />
     <ClInclude Include="MultipleCellWidget.h" />
     <ClInclude Include="StringGrid.h" />
     <ClInclude Include="ITabKeyAction.h" />

@@ -18,6 +18,8 @@ class CPaymentsList {
 	XWidget *db_navigator;
 	CPaymentsNavPanel *panel;
 
+	bool cr_grid, cr_navigator, cr_panel;
+
 	enum {
 		DEF_PANEL_HEIGHT = 120
 	};
@@ -35,6 +37,11 @@ class CPaymentsList {
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
 public:
 	CPaymentsList(const int margins_, const int db_navigator_height);
+
+	CPaymentsList(const CPaymentsList &obj) = delete;
+	CPaymentsList(CPaymentsList &&obj) = delete;
+	CPaymentsList &operator=(const CPaymentsList &obj) = delete;
+	CPaymentsList &operator=(CPaymentsList &&obj) = delete;
 
 	void initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_center, \
 						const int def_order, CDate def_order_date);

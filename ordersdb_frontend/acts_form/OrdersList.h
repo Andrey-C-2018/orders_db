@@ -16,6 +16,8 @@ class COrdersList {
 	int db_navigator_height;
 	float multiplier;
 
+	bool cr_grid, cr_navigator;
+
 	XDynamicSizer grid_sizer, nav_sizer, *prev_sizer;
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn, \
@@ -23,6 +25,11 @@ class COrdersList {
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
 public:
 	COrdersList(const int margins_, const float multiplier_, const int db_navigator_height);
+
+	COrdersList(const COrdersList &obj) = delete;
+	COrdersList(COrdersList &&obj) = delete;
+	COrdersList &operator=(const COrdersList &obj) = delete;
+	COrdersList &operator=(COrdersList &&obj) = delete;
 
 	void initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_adv_id);
 	void initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler);

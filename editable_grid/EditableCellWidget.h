@@ -3,8 +3,10 @@
 #include <xwindows/XEdit.h>
 
 class CEditableCellWidget : public XEdit, public IGridCellWidget {
+	const bool def_readonly;
 public:
 	CEditableCellWidget();
+	CEditableCellWidget(const bool def_readonly_);
 
 	CEditableCellWidget(const CEditableCellWidget &obj) = delete;
 	CEditableCellWidget(CEditableCellWidget &&obj) = default;
@@ -32,6 +34,7 @@ public:
 	bool HasFocus() const override;
 
 	ImmutableString<Tchar> GetLabel() override;
+	ImmutableString<Tchar> GetLabel(std::vector<Tchar> &label) const;
 	void SetLabel(ImmutableString<Tchar> label) override;
 
 	int GetId() const override;

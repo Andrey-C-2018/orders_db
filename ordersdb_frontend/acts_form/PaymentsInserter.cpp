@@ -197,4 +197,7 @@ void CPaymentsInserter::Dispose() {
 	stage = nullptr;
 }
 
-CPaymentsInserter::~CPaymentsInserter() { }
+CPaymentsInserter::~CPaymentsInserter() {
+
+	Dispose();
+}

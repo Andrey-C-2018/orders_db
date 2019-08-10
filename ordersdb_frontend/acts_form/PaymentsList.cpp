@@ -1,4 +1,5 @@
 #include <db_ext/DbTable.h>
+#include <editable_grid/IntegerCellWidget.h>
 #include <editable_grid/CurrencyCellWidget.h>
 #include <editable_grid/DateCellWidget.h>
 #include <db_controls/DbGrid.h>
@@ -11,6 +12,7 @@
 CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_) : \
 								grid(nullptr), grid_as_window(nullptr), \
 								db_navigator(nullptr), panel(nullptr), \
+								cr_grid(false), cr_navigator(false), cr_panel(false), \
 								db_navigator_height(db_navigator_height_), \
 								grid_sizer(margins_, 0), nav_sizer(margins_, margins_), \
 								panel_sizer(margins_, margins_), prev_sizer(nullptr), \
@@ -118,13 +120,20 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 }
 
 void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
+	enum { CYCLE_MAX_LEN = 3, QA_MAX_LEN = 1};
 
 	assert(grid);
+	CIntegerCellWidget *cycle_widget = nullptr, *qa_widget = nullptr;
 	CCurrencyCellWidget *currency_widget = nullptr;
 	CDateCellWidget *date_widget = nullptr;
 
-	bool stages = false, fee = false, inf = false, date = false, chk = false;
+	bool cycle = false, stages = false, fee = false;
+	bool inf = false, date = false, chk = false, qa = false;
 	try {
+		cycle_widget = new CIntegerCellWidget(CYCLE_MAX_LEN);
+		grid->SetWidgetForFieldByName("cycle", cycle_widget);
+		cycle = true;
+
 		stages_list = new CDbComboBoxCellWidget(conn, "stage_name", \
 											"stages", "payments", db_table);
 		stages_list->AddRelation("id_stage", "id_st");
@@ -150,6 +159,13 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 		grid->SetWidgetForFieldByName("act_date", date_widget);
 
+		qa_widget = new CIntegerCellWidget(QA_MAX_LEN);
+		grid->SetWidgetForFieldByName("age", qa_widget);
+		qa = true;
+
+		grid->SetWidgetForFieldByName("inv", qa_widget);
+		grid->SetWidgetForFieldByName("lang", qa_widget);
+
 		auto chk_stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE user_full_name IS NOT NULL ORDER BY user_name");
 		auto chk_rs = chk_stmt->exec();
 		checkers_list = new CDbComboBoxCellWidget(conn, 1, chk_rs, \
@@ -163,6 +179,12 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		if (!chk && checkers_list && !checkers_list->IsCreated())
 			delete checkers_list;
 
+		if (!qa && qa_widget && !qa_widget->IsCreated())
+			delete qa_widget;
+
+		if (!date && date_widget && !date_widget->IsCreated())
+			delete date_widget;
+
 		if (!inf && informers_list && !informers_list->IsCreated())
 			delete informers_list;
 
@@ -172,6 +194,9 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		if (!stages && stages_list && !stages_list->IsCreated())
 			delete stages_list;
 
+		if (!cycle && cycle_widget && !cycle_widget->IsCreated())
+			delete cycle_widget;
+
 		throw;
 	}
 }
@@ -179,8 +204,11 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 void CPaymentsList::displayWidgets(XWindow *parent) {
 
 	grid_sizer.createWidget(grid_as_window, parent, FL_WINDOW_VISIBLE, _T(""));
+	cr_grid = true;
 	nav_sizer.createWidget(db_navigator, parent, FL_WINDOW_VISIBLE, _T(""));
+	cr_navigator = true;
 	panel_sizer.createWidget(panel, parent, FL_WINDOW_VISIBLE, _T(""));
+	cr_panel = true;
 
 	grid->HideField(0);
 	grid->HideField(1);
@@ -192,7 +220,7 @@ void CPaymentsList::displayWidgets(XWindow *parent) {
 
 CPaymentsList::~CPaymentsList() {
 
-	if (panel && !panel->IsCreated()) delete panel;
-	if (db_navigator && !db_navigator->IsCreated()) delete db_navigator;
-	if (grid && !grid->IsCreated()) delete grid;
+	if (panel && !cr_panel) delete panel;
+	if (db_navigator && !cr_navigator) delete db_navigator;
+	if (grid && !cr_grid) delete grid;
 }
