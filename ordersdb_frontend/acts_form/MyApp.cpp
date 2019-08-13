@@ -8,7 +8,7 @@ void CMyApp::OnInit(){
 	frame = nullptr;
 	XSize screen_size = _plGetScreenSize();
 
-	frame = new CActsForm(_T("ORDERSDB_ACTS_FORM"), \
+	frame = new CMyFrame(_T("ORDERSDB_ACTS_FORM"), \
 					_T("Форма внесення актів"), \
 				   5, 0,\
 					screen_size.width - 10, screen_size.height - 50);

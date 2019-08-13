@@ -24,6 +24,7 @@ class CPaymentsNavPanel : public XTabStopPanel {
 
 public:
 	CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn, \
+						std::shared_ptr<CDbTable> db_table_, \
 						std::shared_ptr<const IDbResultSet> rs_stages, \
 						std::shared_ptr<const IDbResultSet> rs_inf, \
 						std::shared_ptr<const IDbResultSet> rs_checkers);
@@ -38,14 +39,5 @@ public:
 				const int x, const int y, \
 				const int width, const int height) override;
 
-	inline void setPaymentsDbTable(std::shared_ptr<CDbTable> db_table);
-
 	virtual ~CPaymentsNavPanel();
 };
-
-//*****************************************************
-
-void CPaymentsNavPanel::setPaymentsDbTable(std::shared_ptr<CDbTable> db_table) {
-
-	this->db_table = db_table;
-}

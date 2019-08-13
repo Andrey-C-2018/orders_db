@@ -42,7 +42,7 @@ bool UITextInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, 
 		params.error_str += field_name;
 		params.error_str += _T(" не може бути порожнім\n");
 		++params.param_no;
-		return false;
+		return true;
 	}
 
 	std::string text_utf8;
@@ -64,13 +64,21 @@ UIDateInsertBinder::UIDateInsertBinder(XWidget *widget_, \
 bool UIDateInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 								Params &params, const Tchar *field_name) {
 
-	CDate date(widget->GetLabel(), CDate::GERMAN_FORMAT);
+	size_t size;
+	auto date_str = widget->GetLabel(size);
+	if (size == 0) {
+		++params.param_no;
+		binding_target->bindNull(params.param_no);
+		return true;
+	}
+
+	CDate date(date_str, CDate::GERMAN_FORMAT);
 	if (date.isNull()) {
 
 		params.error_str += field_name;
 		params.error_str += _T(": невірний формат дати\n");
 		++params.param_no;
-		return false;
+		return true;
 	}
 	if (date > CDate::now()) {
 
@@ -83,7 +91,7 @@ bool UIDateInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, 
 
 		params.error_str += _T("' дата в майбутньому\n");
 		++params.param_no;
-		return false;
+		return true;
 	}
 
 	binding_target->bindValue(params.param_no, date);
@@ -107,7 +115,7 @@ bool CDbComboBoxInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_tar
 		params.error_str += field_name;
 		params.error_str += _T(": значення із списку не вибрано\n");
 		++params.param_no;
-		return false;
+		return true;
 	}
 
 	binding_target->bindValue(params.param_no, db_combo->getPrimaryKeyAsInteger());

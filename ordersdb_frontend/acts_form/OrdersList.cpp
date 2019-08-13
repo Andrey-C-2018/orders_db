@@ -21,7 +21,7 @@ void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int de
 	assert(!grid);
 
 	db_table = createDbTable(conn_, def_adv_id);
-	grid = new CDbGrid(db_table, std::make_shared<COrdersGridEvtHandler>(db_table));
+	grid = new CDbGrid(true, db_table, std::make_shared<COrdersGridEvtHandler>(db_table));
 	grid->SetFieldLabel(1, _T("Центр"));
 	grid->SetFieldWidth(1, 12);
 	grid->SetFieldLabel(2, _T("№"));
@@ -72,18 +72,25 @@ void COrdersList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 	assert(grid);
 	CDateCellWidget *date_widget = nullptr;
-	bool date = false;
+	CEditableCellWidget *client_widget = nullptr;
+	bool cli = false, date = false;
 	try {
+		client_widget = new CEditableCellWidget(false);
+		grid->SetWidgetForFieldByName("client_name", client_widget);
+		cli = true;
+
 		date_widget = new CDateCellWidget();
-		grid->SetWidgetForFieldByName("order_date", date_widget);
+		grid->SetWidgetForFieldByName("bdate", date_widget);
 		date = true;
 
-		grid->SetWidgetForFieldByName("bdate", date_widget);
 		grid->SetWidgetForFieldByName("cancel_date", date_widget);
 	}
 	catch (...) {
 		if (!date && date_widget && !date_widget->IsCreated())
 			delete date_widget;
+
+		if (!cli && client_widget && !client_widget->IsCreated())
+			delete client_widget;
 
 		throw;
 	}

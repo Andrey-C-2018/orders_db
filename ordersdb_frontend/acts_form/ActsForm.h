@@ -1,6 +1,6 @@
 #pragma once
 #include <basic/PropertiesFile.h>
-#include <xwindows/XFrame.h>
+#include <xwindows_ex/XTabStopPanel.h>
 #include "AdvocatsList.h"
 #include "OrdersList.h"
 #include "PaymentsList.h"
@@ -8,7 +8,7 @@
 struct IDbConnection;
 class CDbTable;
 
-class CActsForm : public XFrame {
+class CActsForm : public XTabStopPanel {
 	CPropertiesFile props;
 
 	std::shared_ptr<IDbConnection> conn;
@@ -22,13 +22,14 @@ class CActsForm : public XFrame {
 		DEF_DBNAVIGATOR_HEIGHT = 40
 	};
 
-	void OnSize(XSizeEvent *eve);
-	void OnMaximizeOrRestore(XWindowButtonsEvent *eve);
-
 public:
-	CActsForm(const Tchar *class_name, \
-				const Tchar *label, const int X, const int Y, \
+	CActsForm(XWindow *parent, const int flags, \
+				const Tchar *label, \
+				const int x, const int y, \
 				const int width, const int height);
+
+	void OnSize(XSizeEvent *eve);
+
 	virtual ~CActsForm();
 };
 

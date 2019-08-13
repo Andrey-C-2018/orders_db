@@ -65,15 +65,18 @@ void CDbInserter::insert() {
 	IInsertBinder::Params params;
 	params.param_no = 0;
 
-	for (auto &item : binders) {
+	bool cancel = false;
+	for (auto p_item = binders.begin(); !cancel && p_item != binders.end(); ++p_item) {
 		auto param_no = params.param_no;
 		auto err_str_size = params.error_str.size();
 
-		item.binder->bind(stmt, params, item.field_name);
+		cancel = !p_item->binder->bind(stmt, params, p_item->field_name);
 		assert(param_no < params.param_no);
 		assert(params.param_no <= fields_count);
 		assert(err_str_size <= params.error_str.size());
 	}
+
+	if (cancel) return;
 
 	if (!params.error_str.empty())
 		throw CDbInserterException(CDbInserterException::E_INSERT, \

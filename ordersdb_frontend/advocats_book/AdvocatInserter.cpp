@@ -5,6 +5,7 @@
 #include <db/DbException.h>
 #include <xwindows/XWidget.h>
 #include <xwindows/XComboBox.h>
+#include <db_controls/DbComboBox.h>
 #include "AdvocatInserter.h"
 
 class CAdvocatIdBinder : public CVisualInsertBinder {
@@ -37,7 +38,7 @@ public:
 				params.error_str += id_advocat_str;
 				params.error_str += _T('\n');
 				++params.param_no;
-				return false;
+				return true;
 			}
 			binding_target->bindValue(params.param_no, id);
 		}
@@ -64,17 +65,17 @@ public:
 		size_t size;
 		auto adv_name_str = widget->GetLabel(size);
 		auto p = Tstrchr(adv_name_str, _T(' '));
-		if (!p) { params.error_str += err; return false;	}
+		if (!p) { params.error_str += err; return true;	}
 		UCS16_ToUTF8(adv_name_str, (int)(p - adv_name_str), adv_surname);
 
 		while (*p == _T(' ')) ++p;
 
 		auto p2 = Tstrchr(p, _T(' '));
-		if (!p2) { params.error_str += err; return false; }
+		if (!p2) { params.error_str += err; return true; }
 		UCS16_ToUTF8(p, (int)(p2 - p), adv_name_full);
 
 		while (*p2 == _T(' ')) ++p2;
-		if (*p2 == _T('\0')) { params.error_str += err; return false; }
+		if (*p2 == _T('\0')) { params.error_str += err; return true; }
 		UCS16_ToUTF8(p2, (int)(adv_name_str + size - p2), adv_patr);
 
 		adv_surname += ' ';
@@ -115,7 +116,7 @@ public:
 		if (size < 3 || size > 5) {
 			++params.param_no;
 			params.error_str += _T("Кількість цифр у поштовому індексі - від 3 до 5\n");
-			return false;
+			return true;
 		}
 
 		binding_target->bindValue(params.param_no, post_index_str);
@@ -153,12 +154,12 @@ public:
 				params.error_str += _T("Невірне знаяення типу організації: ");
 				params.error_str += org_type_str;
 				params.error_str += _T("Має бути: АО, АБ або ІНД\n");
-				return false;
+				return true;
 			}
 
 			if (org_name_str && org_name_str[0] == _T('\0')) {
 				params.error_str += _T("Назва адвокатського бюро або об'єднання не може бути порожньою\n");
-				return false;
+				return true;
 			}
 		}
 		else {
@@ -216,20 +217,20 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(org_type);
 	
 	addBinder(0, _T("ID"), std::make_shared<CAdvocatIdBinder>(conn, id_advocat, false));
-	addBinder(1, _T("ПІБ"), std::make_shared<CAdvNameBinder>(adv_name, true));
+	addBinder(1, _T("ПІБ"), std::make_shared<CAdvNameBinder>(adv_name, false));
 	addBinder(3, _T("mark"), std::make_shared<CIntInsertBinder>(0));
-	addBinder(4, _T("Номер свідоцтва"), std::make_shared<UITextInsertBinder>(license_no, true));
-	addBinder(5, _T("Дата свідоцтва"), std::make_shared<UIDateInsertBinder>(license_date, true));
-	addBinder(6, _T("Екзаменатор"), std::make_shared<CDbComboBoxInsertBinder>(examiner, true));
-	addBinder(7, _T("Поштовий індекс"), std::make_shared<CPostIndexBinder>(post_index, true));
-	addBinder(8, _T("Адреса"), std::make_shared<UITextInsertBinder>(address, true));
-	addBinder(9, _T("Телефон"), std::make_shared<UITextInsertBinder>(tel, true));
-	addBinder(10, _T("E-mail"), std::make_shared<UITextInsertBinder>(email, true));
-	addBinder(11, _T("Дата народження"), std::make_shared<UIDateInsertBinder>(adv_bdate, true));
+	addBinder(4, _T("Номер свідоцтва"), std::make_shared<UITextInsertBinder>(license_no, false));
+	addBinder(5, _T("Дата свідоцтва"), std::make_shared<UIDateInsertBinder>(license_date, false));
+	addBinder(6, _T("Екзаменатор"), std::make_shared<CDbComboBoxInsertBinder>(examiner, false));
+	addBinder(7, _T("Поштовий індекс"), std::make_shared<CPostIndexBinder>(post_index, false));
+	addBinder(8, _T("Адреса"), std::make_shared<UITextInsertBinder>(address, false));
+	addBinder(9, _T("Телефон"), std::make_shared<UITextInsertBinder>(tel, false));
+	addBinder(10, _T("E-mail"), std::make_shared<UITextInsertBinder>(email, false));
+	addBinder(11, _T("Дата народження"), std::make_shared<UIDateInsertBinder>(adv_bdate, false));
 	addBinder(12, _T("Основний район роботи"), \
-				std::make_shared<CDbComboBoxInsertBinder>(district, true));
+				std::make_shared<CDbComboBoxInsertBinder>(district, false));
 	addBinder(13, _T("Організація"), \
-				std::make_shared<CAdvOrgBinder>(org_name, org_type, true, true));
+				std::make_shared<CAdvOrgBinder>(org_name, org_type, false, false));
 
 	CDbInserter::prepare(conn);
 }
@@ -254,4 +255,19 @@ void CAdvocatInserter::insert() {
 	}
 }
 
-CAdvocatInserter::~CAdvocatInserter() { }
+CAdvocatInserter::~CAdvocatInserter() {
+
+	if (org_type && !org_type->IsCreated()) delete org_type;
+	if (org_name && !org_name->IsCreated()) delete org_name;
+	if (district && !district->IsCreated()) delete district;
+	if (adv_bdate && !adv_bdate->IsCreated()) delete adv_bdate;
+	if (email && !email->IsCreated()) delete email;
+	if (tel && !tel->IsCreated()) delete tel;
+	if (address && !address->IsCreated()) delete address;
+	if (post_index && !post_index->IsCreated()) delete post_index;
+
+	if (examiner && !examiner->IsCreated()) delete examiner;
+	if (license_date && !license_date->IsCreated()) delete license_date;
+	if (license_no && !license_no->IsCreated()) delete license_no;
+	if (adv_name && !adv_name->IsCreated()) delete adv_name;
+}

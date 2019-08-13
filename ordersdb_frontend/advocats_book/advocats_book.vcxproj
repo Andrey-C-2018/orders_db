@@ -158,12 +158,14 @@
     <ClCompile Include="AdvocatsBook.cpp" />
     <ClCompile Include="AdvocatsGridEvtHandler.cpp" />
     <ClCompile Include="MyApp.cpp" />
+    <ClCompile Include="MyFrame.cpp" />
     <ClCompile Include="PostIndexCellWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdvocatInserter.h" />
     <ClInclude Include="AdvocatsBook.h" />
     <ClInclude Include="AdvocatsGridEvtHandler.h" />
+    <ClInclude Include="MyFrame.h" />
     <ClInclude Include="Validators.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="PostIndexCellWidget.h" />

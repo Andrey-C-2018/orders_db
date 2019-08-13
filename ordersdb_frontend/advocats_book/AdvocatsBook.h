@@ -3,7 +3,7 @@
 #include <db_ext/QueryModifier.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
-#include <xwindows_ex/XTabStopFrame.h>
+#include <xwindows_ex/XTabStopPanel.h>
 #include "AdvocatInserter.h"
 
 struct IDbConnection;
@@ -13,7 +13,7 @@ class CComboBoxCellWidget;
 class CDbComboBoxCellWidget;
 class CFilteringEdit;
 
-class CAdvocatsBook : public XTabStopFrame {
+class CAdvocatsBook : public XTabStopPanel {
 	enum Defaults {
 		DEF_GUI_ROW_HEIGHT = 30, \
 		DEF_GUI_VERT_GAP = 5, \
@@ -43,15 +43,16 @@ class CAdvocatsBook : public XTabStopFrame {
 	void adjustUIDependentCellWidgets(CDbGrid *grid);
 	void initFilteringControls();
 
-	void OnSize(XSizeEvent *eve);
 	void OnFilterButtonClick(XCommandEvent *eve);
 	void OnAddRecordButtonClick(XCommandEvent *eve);
 	void OnRemoveButtonClick(XCommandEvent *eve);
 public:
-	CAdvocatsBook(const Tchar *class_name, \
-					const Tchar *label, const int X, const int Y, \
+	CAdvocatsBook(XWindow *parent, const int flags, \
+					const Tchar *label, \
+					const int x, const int y, \
 					const int width, const int height);
 	void DisplayWidgets();
+	void OnSize(XSizeEvent *eve);
 
 	virtual ~CAdvocatsBook();
 };

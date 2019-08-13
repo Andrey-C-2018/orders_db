@@ -30,6 +30,9 @@
     <ClCompile Include="PostIndexCellWidget.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="MyFrame.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyApp.h">
@@ -48,6 +51,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Validators.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="MyFrame.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

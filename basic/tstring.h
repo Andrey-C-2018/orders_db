@@ -97,3 +97,23 @@ inline const wchar_t *Tstrchr(const wchar_t *str1, const wchar_t ch) noexcept {
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+
+inline int ToUpper(const int ch) {
+
+	return toupper(ch);
+}
+
+inline wchar_t ToUpper(const wchar_t ch) {
+
+	return towupper(ch);
+}
+
+inline int ToLower(const int ch) {
+
+	return tolower(ch);
+}
+
+inline wchar_t ToLower(const wchar_t ch) {
+
+	return towlower(ch);
+}

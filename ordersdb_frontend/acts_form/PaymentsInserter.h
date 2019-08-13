@@ -10,6 +10,7 @@ class CPaymentsInserter : public CDbInserter {
 		FIELDS_COUNT = 25
 	};
 	std::shared_ptr<IDbConnection> conn;
+	std::shared_ptr<CDbTable> db_table;
 
 	CDbComboBox *stage;
 	XWidget *cycle;
@@ -28,7 +29,7 @@ class CPaymentsInserter : public CDbInserter {
 	CDbComboBox *checker;
 
 public:
-	CPaymentsInserter();
+	CPaymentsInserter(std::shared_ptr<CDbTable> db_table_);
 	
 	CPaymentsInserter(const CPaymentsInserter &obj) = delete;
 	CPaymentsInserter(CPaymentsInserter &&obj) = delete;
@@ -63,7 +64,7 @@ public:
 	inline void setKoeffWidget(XWidget *Koef) { this->Koef = Koef; }
 	inline void setCheckerWidget(CDbComboBox *checker) { this->checker = checker; }
 
-	void getCurrRecord(std::shared_ptr<CDbTable> db_table);
+	void getCurrRecord();
 
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
 	void insert() override;

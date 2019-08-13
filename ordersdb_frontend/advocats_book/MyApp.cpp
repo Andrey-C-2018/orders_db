@@ -8,7 +8,7 @@ void CMyApp::OnInit(){
 	frame = nullptr;
 	XSize screen_size = _plGetScreenSize();
 
-	frame = new CAdvocatsBook(_T("ORDERSDB_ADV_REFERNCE"), \
+	frame = new CMyFrame(_T("ORDERSDB_ADV_REFERNCE"), \
 					_T("Довідник адвокатів"), \
 					5, 0, \
 					screen_size.width - 10, screen_size.height - 50);

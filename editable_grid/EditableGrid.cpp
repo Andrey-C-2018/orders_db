@@ -128,7 +128,7 @@ public:
 
 //**************************************************************
 
-void CEditableGrid::InitEditableGrid() {
+void CEditableGrid::InitEditableGrid(const bool readonly) {
 
 	has_focus = false;
 	field_widgets_collection = nullptr;
@@ -142,19 +142,32 @@ void CEditableGrid::InitEditableGrid() {
 	background_pen = XPen(XPEN_SOLID, 1, 100, 100, 100);
 
 	field_widgets_collection = new CMultipleCellWidget();
-	field_widgets_collection->SetDefaultWidget(new CEditableCellWidget());
+	field_widgets_collection->SetDefaultWidget(new CEditableCellWidget(readonly));
 }
 
 CEditableGrid::CEditableGrid() {
 
-	InitEditableGrid();
+	InitEditableGrid(false);
+}
+
+CEditableGrid::CEditableGrid(const bool readonly) {
+
+	InitEditableGrid(readonly);
 }
 
 CEditableGrid::CEditableGrid(std::shared_ptr<IGridEventsHandler> events_handler_) : \
 									events_handler(events_handler_) {
 
 	assert(events_handler);
-	InitEditableGrid();
+	InitEditableGrid(false);
+}
+
+CEditableGrid::CEditableGrid(const bool readonly, \
+							std::shared_ptr<IGridEventsHandler> events_handler_) : \
+								events_handler(events_handler_) {
+
+	assert(events_handler);
+	InitEditableGrid(readonly);
 }
 
 GridConfigurators CEditableGrid::CreateConfigurators() {

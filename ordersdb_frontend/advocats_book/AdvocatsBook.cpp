@@ -19,9 +19,10 @@
 
 typedef XTabStopWidget<XComboBox> XTabStopComboBox;
 
-CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
-								const Tchar *label, const int X, const int Y, \
-								const int width, const int height) : \
+CAdvocatsBook::CAdvocatsBook(XWindow *parent, const int flags, \
+							const Tchar *label, \
+							const int X, const int Y, \
+							const int width, const int height) : \
 	flt_id(nullptr), btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
 	grid(nullptr), examiners_list(nullptr), adv_org_types_list(nullptr), districts_list(nullptr), \
 	grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
@@ -33,16 +34,15 @@ CAdvocatsBook::CAdvocatsBook(const Tchar *class_name, \
 	conn = CMySQLConnectionFactory::createConnection(props);
 	db_table = createDbTable(conn);
 	
-	grid = new CDbGrid(db_table, std::make_shared<CAdvocatsGridEvtHandler>(db_table));
+	grid = new CDbGrid(false, db_table, std::make_shared<CAdvocatsGridEvtHandler>(db_table));
 	setFieldsSizes();
 	createCellWidgetsAndAttachToGrid(grid);
 
-	Create(class_name, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
+	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
 			label, X, Y, width, height);
 	DisplayWidgets();
 	adjustUIDependentCellWidgets(grid);
 
-	Connect(EVT_SIZE, this, &CAdvocatsBook::OnSize);
 	Connect(EVT_COMMAND, btn_apply_filter->GetId(), this, &CAdvocatsBook::OnFilterButtonClick);
 	Connect(EVT_COMMAND, btn_add->GetId(), this, &CAdvocatsBook::OnAddRecordButtonClick);
 	Connect(EVT_COMMAND, btn_remove->GetId(), this, &CAdvocatsBook::OnRemoveButtonClick);

@@ -163,6 +163,7 @@
     <ClCompile Include="AdvocatsListEvtHandler.cpp" />
     <ClCompile Include="AdvocatsList.cpp" />
     <ClCompile Include="MyApp.cpp" />
+    <ClCompile Include="MyFrame.cpp" />
     <ClCompile Include="OrdersDbTableEventsHandler.cpp" />
     <ClCompile Include="OrdersGridEvtHandler.cpp" />
     <ClCompile Include="OrdersList.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="AdvocatsListEvtHandler.h" />
     <ClInclude Include="AdvocatsList.h" />
     <ClInclude Include="MyApp.h" />
+    <ClInclude Include="MyFrame.h" />
     <ClInclude Include="OrdersDbTableEventsHandler.h" />
     <ClInclude Include="OrdersGridEvtHandler.h" />
     <ClInclude Include="OrdersList.h" />

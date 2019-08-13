@@ -20,7 +20,7 @@ class CEditableGrid : public CGrid{
 
 	void OnMouseMove(XMouseEvent *eve);
 	void OnLooseFocus(XMouseEvent *eve);
-	void InitEditableGrid();
+	void InitEditableGrid(const bool readonly);
 protected:
 	GridConfigurators CreateConfigurators() override;
 	GridGCParamsLists CreateGCParamsLists() override;
@@ -35,7 +35,9 @@ protected:
 	}
 public:
 	CEditableGrid();
+	CEditableGrid(const bool readonly);
 	CEditableGrid(std::shared_ptr<IGridEventsHandler> events_handler_);
+	CEditableGrid(const bool readonly, std::shared_ptr<IGridEventsHandler> events_handler_);
 
 	CEditableGrid(CEditableGrid &&obj);
 	CEditableGrid(const CEditableGrid &obj) = delete;

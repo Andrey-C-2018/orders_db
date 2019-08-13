@@ -1020,17 +1020,17 @@ void _plSetEditControlSelection(_plHWND hwnd, const size_t begin, const size_t e
 
 void _plMessageBox(const Tchar *message) noexcept {
 
-	MessageBox(0, message, _T("Info"), MB_OK);
+	MessageBox(0, message, _T("Info"), MB_OK | MB_TASKMODAL);
 }
 
 void _plMessageBoxANSI(const char *message) noexcept {
 
-	MessageBoxA(0, message, "Info", MB_OK);
+	MessageBoxA(0, message, "Info", MB_OK | MB_TASKMODAL);
 }
 
 int _plMessageBoxYesNo(const Tchar *message) noexcept {
 
-	return MessageBox(0, message, _T("Info"), MB_YESNO | MB_ICONQUESTION);
+	return MessageBox(0, message, _T("Info"), MB_YESNO | MB_ICONQUESTION | MB_TASKMODAL);
 }
 
 void WarningBox(const Tchar *message) noexcept {

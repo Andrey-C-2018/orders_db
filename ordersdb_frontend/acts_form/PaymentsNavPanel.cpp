@@ -10,11 +10,14 @@
 #include "PaymentsNavPanel.h"
 
 CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn, \
+										std::shared_ptr<CDbTable> db_table_, \
 										std::shared_ptr<const IDbResultSet> rs_stages_, \
 										std::shared_ptr<const IDbResultSet> rs_inf_, \
 										std::shared_ptr<const IDbResultSet> rs_checkers_) : \
 					btn_get_curr(nullptr), btn_add(nullptr), btn_remove(nullptr), \
-					rs_stages(rs_stages_), rs_inf(rs_inf_), rs_checkers(rs_checkers_) {
+					db_table(db_table_), \
+					rs_stages(rs_stages_), rs_inf(rs_inf_), rs_checkers(rs_checkers_), \
+					inserter(db_table_) {
 
 	btn_get_curr = new XButton();
 	btn_add = new XButton();
@@ -182,7 +185,7 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 
 void CPaymentsNavPanel::OnGetCurrRecordButtonClick(XCommandEvent *eve) {
 
-	inserter.getCurrRecord(db_table);
+	inserter.getCurrRecord();
 }
 
 void CPaymentsNavPanel::OnAddRecordButtonClick(XCommandEvent *eve) {

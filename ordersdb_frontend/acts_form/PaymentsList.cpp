@@ -27,7 +27,7 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 
 	this->conn = conn_;
 	db_table = createDbTable(conn_, def_center, def_order, def_order_date);
-	grid = new CDbGrid(db_table, std::make_shared<CPaymentsGridEvtHandler>(db_table));
+	grid = new CDbGrid(false, db_table, std::make_shared<CPaymentsGridEvtHandler>(db_table));
 
 	grid->SetFieldLabel(3, _T("Îïë."));
 	grid->SetFieldWidth(3, 4);
@@ -81,10 +81,9 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	createCellWidgetsAndAttachToGrid(grid);
 
 	db_navigator = new CDbNavigator(db_table);
-	panel = new CPaymentsNavPanel(conn_, stages_list->getMasterResultSet(), \
+	panel = new CPaymentsNavPanel(conn_, db_table, stages_list->getMasterResultSet(), \
 									informers_list->getMasterResultSet(), \
 									checkers_list->getMasterResultSet());
-	panel->setPaymentsDbTable(db_table);
 }
 
 std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnection> conn, \

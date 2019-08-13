@@ -10,8 +10,8 @@ class CDbGrid :	public CEditableGrid{
 
 	void DrawLeftPane(XGC &gc) const override;
 public:
-	CDbGrid(std::shared_ptr<CDbTable> db_table_);
-	CDbGrid(std::shared_ptr<CDbTable> db_table_, \
+	CDbGrid(const bool readonly, std::shared_ptr<CDbTable> db_table_);
+	CDbGrid(const bool readonly, std::shared_ptr<CDbTable> db_table_, \
 			std::shared_ptr<CDbGridEventsHandler> dbgrid_evt_handler);
 
 	CDbGrid(const CDbGrid &obj) = delete;

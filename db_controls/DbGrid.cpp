@@ -2,7 +2,7 @@
 #include <db/DbException.h>
 #include <grid/TextCell.h>
 
-CDbGrid::CDbGrid(std::shared_ptr<CDbTable> db_table_) : \
+CDbGrid::CDbGrid(const bool readonly, std::shared_ptr<CDbTable> db_table_) : CEditableGrid(readonly), \
 					dbgrid_event_handler(std::make_shared<CDbGridEventsHandler>(db_table_)), \
 					db_table(db_table_), pointer_brush(0, 255, 0) {
 
@@ -10,8 +10,8 @@ CDbGrid::CDbGrid(std::shared_ptr<CDbTable> db_table_) : \
 	Init(db_table, LAYOUT_FIELD);
 }
 
-CDbGrid::CDbGrid(std::shared_ptr<CDbTable> db_table_, \
-					std::shared_ptr<CDbGridEventsHandler> dbgrid_evt_handler) : \
+CDbGrid::CDbGrid(const bool readonly, std::shared_ptr<CDbTable> db_table_, \
+					std::shared_ptr<CDbGridEventsHandler> dbgrid_evt_handler) : CEditableGrid(readonly), \
 				db_table(db_table_), dbgrid_event_handler(dbgrid_evt_handler), \
 				pointer_brush(0, 255, 0) {
 

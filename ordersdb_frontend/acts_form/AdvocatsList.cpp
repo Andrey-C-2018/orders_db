@@ -20,7 +20,7 @@ void CAdvocatsList::initDbTable(std::shared_ptr<IDbConnection> conn_) {
 	assert(!grid);
 
 	db_table = createDbTable(conn_);
-	grid = new CDbGrid(db_table, std::make_shared<CAdvocatsListEvtHandler>(db_table));
+	grid = new CDbGrid(true, db_table, std::make_shared<CAdvocatsListEvtHandler>(db_table));
 	grid->SetFieldLabel(1, _T("ПІБ адвоката"));
 	grid->SetFieldWidth(1, 24);
 	grid_as_window = grid;

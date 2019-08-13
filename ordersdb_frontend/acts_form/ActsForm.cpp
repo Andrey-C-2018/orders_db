@@ -6,9 +6,10 @@
 #include "AdvDbTableEventsHandler.h"
 #include "OrdersDbTableEventsHandler.h"
 
-CActsForm::CActsForm(const Tchar *class_name, \
-						const Tchar *label, const int X, const int Y, \
-						const int width, const int height) : \
+CActsForm::CActsForm(XWindow *parent, const int flags, \
+					const Tchar *label, \
+					const int X, const int Y, \
+					const int width, const int height) : \
 				adv_list(DEF_GUI_MARGIN, ADV_LIST_WIDTH, DEF_DBNAVIGATOR_HEIGHT), \
 				orders_list(DEF_GUI_MARGIN, 0.5F, DEF_DBNAVIGATOR_HEIGHT), \
 				payments_list(DEF_GUI_MARGIN, DEF_DBNAVIGATOR_HEIGHT) {
@@ -42,7 +43,7 @@ CActsForm::CActsForm(const Tchar *class_name, \
 													payments_db_table, orders_prim_key, params);
 	orders_list.initDbTableEvtHandler(orders_evt_handler);
 
-	Create(class_name, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
+	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
 			label, X, Y, width, height);
 
 	XRect rc;
@@ -58,9 +59,6 @@ CActsForm::CActsForm(const Tchar *class_name, \
 	adv_list.displayWidgets(this);
 	orders_list.displayWidgets(this);
 	payments_list.displayWidgets(this);
-
-	Connect(EVT_SIZE, this, &CActsForm::OnSize);
-	//Connect(EVT_WINDOWBUTTONS, this, &CActsForm::OnMaximizeOrRestore);
 }
 
 void CActsForm::OnSize(XSizeEvent *eve) {
@@ -72,14 +70,6 @@ void CActsForm::OnSize(XSizeEvent *eve) {
 	adv_list.resize();
 	orders_list.resize();
 	payments_list.resize();
-}
-
-void CActsForm::OnMaximizeOrRestore(XWindowButtonsEvent *eve) {
-
-	auto button = eve->GetWindowButtonType();
-	if (button == WND_BTN_MAXIMIZE || button == WND_BTN_RESTORE) {
-		this->Invalidate(nullptr, true);
-	}
 }
 
 CActsForm::~CActsForm() { }
