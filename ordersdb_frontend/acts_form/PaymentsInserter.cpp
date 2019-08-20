@@ -364,6 +364,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	addBinder(6, _T("Інформатор"), std::make_shared<CDbComboBoxInsertBinder>(informer, false));
 	addBinder(7, _T("Акт"), std::make_shared<CActNameBinder>(id_act, false));
 	addBinder(8, _T("Дата акта"), std::make_shared<CActDateBinder>(db_table, act_date, false, act_reg_date));
+	addBinder(9, _T("Цикл"), std::make_shared<UIIntInsertBinder>(cycle, false));
 
 	CDbInserter::prepare(conn);
 }

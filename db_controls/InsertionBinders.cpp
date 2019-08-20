@@ -1,4 +1,5 @@
 #include <basic/TextConv.h>
+#include <basic/XConv.h>
 #include <db/IDbBindingTarget.h>
 #include <xwindows/XWidget.h>
 #include "DbComboBox.h"
@@ -25,6 +26,35 @@ CVisualInsertBinder::~CVisualInsertBinder() {
 
 	if (deallocate_widget_object && widget && !widget->IsCreated()) delete widget;
 }
+
+//*****************************************************
+
+UIIntInsertBinder::UIIntInsertBinder(XWidget *widget_, const bool deallocate_widget_object_) : \
+										CVisualInsertBinder(widget_, deallocate_widget_object_) { }
+
+bool UIIntInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+								Params &params, const Tchar *field_name) {
+
+	size_t size;
+	auto text = widget->GetLabel(size);
+
+	int error;
+	int value = XConv::ToInt(text, error);
+	if (error) {
+		params.error_str += field_name;
+		params.error_str += _T(": введене значення не є числом:");
+		params.error_str += text;
+		params.error_str += _T('\n');
+		++params.param_no;
+		return true;
+	}
+
+	binding_target->bindValue(params.param_no, value);
+	++params.param_no;
+	return true;
+}
+
+UIIntInsertBinder::~UIIntInsertBinder() { }
 
 //*****************************************************
 
