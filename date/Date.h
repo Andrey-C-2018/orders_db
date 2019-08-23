@@ -1,21 +1,11 @@
 #pragma once
 #include <assert.h>
+#include <basic/chars.h>
 
 class CDate {
 	unsigned day;
 	unsigned month;
 	unsigned year;
-
-	inline char ZERO(char) const { return '0'; }
-	inline wchar_t ZERO(wchar_t) const { return L'0'; }
-	inline char ONE(char) const { return '1'; }
-	inline wchar_t ONE(wchar_t) const { return L'1'; }
-	inline char NINE(char) const { return '9'; }
-	inline wchar_t NINE(wchar_t) const { return L'9'; }
-	inline char MINUS(char) const { return '-'; }
-	inline wchar_t MINUS(wchar_t) const { return L'-'; }
-	inline char DOT(char) const { return '.'; }
-	inline wchar_t DOT(wchar_t) const { return L'.'; }
 
 public:
 	enum Formats {
@@ -139,9 +129,10 @@ template <typename Tchar> \
 bool CDate::setDateSQL(const Tchar *date_str) noexcept {
 	bool key = false;
 	unsigned Day(day), Month(month), Year(year);
-	const Tchar _0 = ZERO(Tchar());
-	const Tchar _1 = ONE(Tchar());
-	const Tchar _9 = NINE(Tchar());
+	const Tchar _0 = getZeroChar(Tchar());
+	const Tchar _1 = getOneChar(Tchar());
+	const Tchar _9 = getNineChar(Tchar());
+	const Tchar _minus = getMinusChar(Tchar());
 
 	key = date_str[0] >= _0 && date_str[0] <= _9;
 	key = key && (date_str[1] >= _0 && date_str[1] <= _9);
@@ -149,12 +140,12 @@ bool CDate::setDateSQL(const Tchar *date_str) noexcept {
 	key = key && (date_str[3] >= _0 && date_str[3] <= _9);
 	Year = 1000 * (date_str[0] - _0) + 100 * (date_str[1] - _0);
 	Year += 10 * (date_str[2] - _0) + date_str[3] - _0;
-	key = key && (date_str[4] == MINUS(Tchar()));
+	key = key && (date_str[4] == _minus);
 
 	key = key && (date_str[5] >= _0 && date_str[5] <= _1);
 	key = key && (date_str[6] >= _0 && date_str[6] <= _9);
 	Month = 10 * (date_str[5] - _0) + date_str[6] - _0;
-	key = key && (date_str[7] == MINUS(Tchar()));
+	key = key && (date_str[7] == _minus);
 
 	key = key && (date_str[8] >= _0 && date_str[8] <= _9);
 	key = key && (date_str[9] >= _0 && date_str[9] <= _9);
@@ -169,19 +160,20 @@ template <typename Tchar> \
 bool CDate::setDateGerman(const Tchar *date_str) noexcept {
 	bool key = false;
 	unsigned Day(day), Month(month), Year(year);
-	const Tchar _0 = ZERO(Tchar());
-	const Tchar _1 = ONE(Tchar());
-	const Tchar _9 = NINE(Tchar());
+	const Tchar _0 = getZeroChar(Tchar());
+	const Tchar _1 = getOneChar(Tchar());
+	const Tchar _9 = getNineChar(Tchar());
+	const Tchar _dot = getDotChar(Tchar());
 
 	key = date_str[0] >= _0 && date_str[0] <= _9;
 	key = key && (date_str[1] >= _0 && date_str[1] <= _9);
 	Day = 10 * (date_str[0] - _0) + date_str[1] - _0;
-	key = key && (date_str[2] == DOT(Tchar()));
+	key = key && (date_str[2] == _dot);
 
 	key = key && (date_str[3] >= _0 && date_str[3] <= _1);
 	key = key && (date_str[4] >= _0 && date_str[4] <= _9);
 	Month = 10 * (date_str[3] - _0) + date_str[4] - _0;
-	key = key && (date_str[5] == DOT(Tchar()));
+	key = key && (date_str[5] == _dot);
 
 	key = key && (date_str[6] >= _0 && date_str[6] <= _9);
 	key = key && (date_str[7] >= _0 && date_str[7] <= _9);
@@ -198,16 +190,17 @@ bool CDate::setDateGerman(const Tchar *date_str) noexcept {
 
 template <typename Tchar> \
 void CDate::toStringGerman(Tchar *buffer) const noexcept {
-	const Tchar _0 = ZERO(Tchar());
+	const Tchar _0 = getZeroChar(Tchar());
+	const Tchar _dot = getDotChar(Tchar());
 
 	assert(buffer);
 	buffer[0] = _0 + day / 10;
 	buffer[1] = _0 + day % 10;
-	buffer[2] = DOT(Tchar());
+	buffer[2] = _dot;
 
 	buffer[3] = _0 + month / 10;
 	buffer[4] = _0 + month % 10;
-	buffer[5] = DOT(Tchar());
+	buffer[5] = _dot;
 
 	unsigned Year = year;
 	buffer[9] = _0 + Year % 10;
@@ -224,7 +217,8 @@ void CDate::toStringGerman(Tchar *buffer) const noexcept {
 template <typename Tchar> \
 void CDate::toStringSQL(Tchar *buffer) const noexcept {
 	unsigned Year = year;
-	const Tchar _0 = ZERO(Tchar());
+	const Tchar _0 = getZeroChar(Tchar());
+	const Tchar _minus = getMinusChar(Tchar());
 
 	assert(buffer);
 	buffer[3] = _0 + Year % 10;
@@ -234,11 +228,11 @@ void CDate::toStringSQL(Tchar *buffer) const noexcept {
 	buffer[1] = _0 + Year % 10;
 	Year /= 10;
 	buffer[0] = _0 + Year % 10;
-	buffer[4] = MINUS(Tchar());
+	buffer[4] = _minus;
 
 	buffer[5] = _0 + month / 10;
 	buffer[6] = _0 + month % 10;
-	buffer[7] = MINUS(Tchar());
+	buffer[7] = _minus;
 
 	buffer[8] = _0 + day / 10;
 	buffer[9] = _0 + day % 10;

@@ -146,24 +146,20 @@ XEventHandler::MainWndProc(_plCallbackFnParams){
 	p->eve->PostInit(_plCallbackFnParamsList);
 	bool def_action = p->eve->GetDefaultActionStatus(); // !!!
 
-	if (rec.id_event != EVT_CREATE) 
+	try {
 		p->evt_handler_caller.Call(p->eve_container.get());
-	else{
-		try {
-			p->evt_handler_caller.Call(p->eve_container.get());
-		}
-		catch (XException &e) {
-			ErrorBox(e.what());
-			PostQuitMessage(RESULT_FAIL);
-		}
-		catch (std::exception &e) {
-			ErrorBoxANSI(e.what());
-			PostQuitMessage(RESULT_FAIL);
-		}
-		catch (...) {
-			ErrorBox(_T("undefined exception"));
-			PostQuitMessage(RESULT_FAIL);
-		}
+	}
+	catch (XException &e) {
+		ErrorBox(e.what());
+		PostQuitMessage(RESULT_FAIL);
+	}
+	catch (std::exception &e) {
+		ErrorBoxANSI(e.what());
+		PostQuitMessage(RESULT_FAIL);
+	}
+	catch (...) {
+		ErrorBox(_T("undefined exception"));
+		PostQuitMessage(RESULT_FAIL);
 	}
 
 	if(def_action)

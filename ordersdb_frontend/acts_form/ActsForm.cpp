@@ -5,6 +5,7 @@
 #include "ActsForm.h"
 #include "AdvDbTableEventsHandler.h"
 #include "OrdersDbTableEventsHandler.h"
+#include "ParametersManager.h"
 
 CActsForm::CActsForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
@@ -16,6 +17,7 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 
 	props.open("config.ini");
 	conn = CMySQLConnectionFactory::createConnection(props);
+	CParametersManager::init(&props);
 
 	adv_list.initDbTable(conn);
 	auto adv_db_table = adv_list.getDbTable();

@@ -135,7 +135,7 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 		stages_list = new CDbComboBoxCellWidget(conn, "stage_name", \
 											"stages", "payments", db_table);
-		stages_list->AddRelation("id_stage", "id_st");
+		stages_list->AddRelation("id_st", "id_stage");
 		grid->SetWidgetForFieldByName("stage_name", stages_list);
 		stages = true;
 
@@ -148,7 +148,7 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 		informers_list = new CDbComboBoxCellWidget(conn, "informer_name", \
 												"informers", "payments", db_table);
-		informers_list->AddRelation("id_informer", "id_inf");
+		informers_list->AddRelation("id_inf", "id_informer");
 		grid->SetWidgetForFieldByName("informer_name", informers_list);
 		inf = true;
 
@@ -170,7 +170,7 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		checkers_list = new CDbComboBoxCellWidget(conn, 1, chk_rs, \
 													 chk_stmt->getResultSetMetadata(), \
 													"payments", db_table);
-		checkers_list->AddRelation("id_checker", "id_user");
+		checkers_list->AddRelation("id_user", "id_checker");
 		grid->SetWidgetForFieldByName("user_full_name", checkers_list);
 		chk = true;
 	}

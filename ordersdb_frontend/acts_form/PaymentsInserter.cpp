@@ -1,8 +1,10 @@
 #include <basic/XConv.h>
+#include <db/DbException.h>
 #include <db_ext/DbTable.h>
 #include <xwindows/XWidget.h>
 #include <db_controls/DbComboBox.h>
 #include "PaymentsInserter.h"
+#include "ParametersManager.h"
 
 enum {
 	MAX_INT_FIELD_LEN = getDigitsCountOfType<int>() + 1
@@ -32,15 +34,15 @@ public:
 
 		bool is_null;
 		int v = rs->getInt(order_params[0], is_null);
-		assert(is_null);
+		assert(!is_null);
 		binding_target->bindValue(params.param_no - 3, v);
 		
 		v = rs->getInt(order_params[1], is_null);
-		assert(is_null);
+		assert(!is_null);
 		binding_target->bindValue(params.param_no - 2, v);
 
 		CDate dt = rs->getDate(order_params[2], is_null);
-		assert(is_null);
+		assert(!is_null);
 		binding_target->bindValue(params.param_no - 1, dt);
 		
 		return true;
@@ -127,7 +129,7 @@ public:
 	virtual ~CActNameBinder() { }
 };
 
-class CActDateBinder : public UIDateInsertBinder {
+class CActDateBinder : public CVisualInsertBinder {
 	enum { INVALID_FIELD_INDEX = (size_t)-1 };
 
 	std::shared_ptr<CDbTable> db_table;
@@ -137,7 +139,7 @@ public:
 	CActDateBinder(std::shared_ptr<CDbTable> db_table_, \
 					XWidget *act_date_holder, bool free_widget, \
 					XWidget *act_reg_date_holder) : \
-						UIDateInsertBinder(act_date_holder, free_widget), \
+						CVisualInsertBinder(act_date_holder, free_widget), \
 						db_table(db_table_), \
 						act_reg_date_widget(act_reg_date_holder), \
 						order_date_no(INVALID_FIELD_INDEX) {
@@ -177,7 +179,7 @@ public:
 		assert(!is_null);
 		if (date < order_date) {
 			params.error_str += field_name;
-			params.error_str += _T(": дата акта не може бути меншою за дату доручення\n");
+			params.error_str += _T(": не може бути меншою за дату доручення\n");
 			++params.param_no;
 			return true;
 		}
@@ -189,7 +191,7 @@ public:
 		CDate act_reg_date(act_reg_date_widget->GetLabel(), CDate::GERMAN_FORMAT);
 		if (!act_reg_date.isNull() && date < act_reg_date) {
 			params.error_str += field_name;
-			params.error_str += _T(": дата акта не може бути меншою за дату прийняття акта\n");
+			params.error_str += _T(": не може бути меншою за дату прийняття акта\n");
 			++params.param_no;
 			return true;
 		}
@@ -200,6 +202,140 @@ public:
 	}
 
 	virtual ~CActDateBinder() { }
+};
+
+class CActRegDateBinder : public CVisualInsertBinder {
+	enum { INVALID_FIELD_INDEX = (size_t)-1 };
+
+	std::shared_ptr<CDbTable> db_table;
+	size_t order_date_no;
+public:
+	CActRegDateBinder(std::shared_ptr<CDbTable> db_table_, \
+						XWidget *act_date_holder, bool free_widget) : \
+						CVisualInsertBinder(act_date_holder, free_widget), \
+					db_table(db_table_), \
+					order_date_no(INVALID_FIELD_INDEX) {
+
+		const CMetaInfo &meta_info = db_table->getQuery().getMetaInfo();
+		order_date_no = meta_info.getFieldIndexByName("order_date");
+	}
+
+	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+				Params &params, const Tchar *field_name) override {
+
+		size_t size;
+		auto date_str = widget->GetLabel(size);
+		if (size == 0) {
+			++params.param_no;
+			binding_target->bindNull(params.param_no);
+			return true;
+		}
+
+		CDate date(date_str, CDate::GERMAN_FORMAT);
+		if (date.isNull()) {
+
+			params.error_str += field_name;
+			params.error_str += _T(": невірний формат дати\n");
+			++params.param_no;
+			return true;
+		}
+		if (date > CDate::now()) {
+			int option = _plMessageBoxYesNo(_T("Дата прийняття акта в майбутньому. Продовжувати?"));
+			if (option == IDNO) return false;
+		}
+
+		auto rs = db_table->getResultSet();
+		bool is_null;
+		CDate order_date = rs->getDate(order_date_no, is_null);
+		assert(!is_null);
+		if (date < order_date) {
+			params.error_str += field_name;
+			params.error_str += _T(": не може бути меншою за дату доручення\n");
+			++params.param_no;
+			return true;
+		}
+		if (date == order_date) {
+			int option = _plMessageBoxYesNo(_T("Дата прийняття акта співпадає із датою доручення. \nПродовжувати?"));
+			if (option == IDNO) return false;
+		}
+
+		binding_target->bindValue(params.param_no, date);
+		++params.param_no;
+		return true;
+	}
+
+	virtual ~CActRegDateBinder() { }
+};
+
+class CQaParamBinder : public CVisualInsertBinder {
+public:
+	CQaParamBinder(XWidget *qa_param_holder, bool free_widget) : \
+					CVisualInsertBinder(qa_param_holder, free_widget) { }
+
+	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+				Params &params, const Tchar *field_name) override {
+
+		size_t size;
+		auto qa_param_str = widget->GetLabel(size);
+		if (size == 0) {
+			params.error_str += field_name;
+			params.error_str += _T(": не може бути порожнім\n");
+			++params.param_no;
+			return true;
+		}
+
+		if (qa_param_str[0] != _T('0') && qa_param_str[0] != _T('1')) {
+			params.error_str += field_name;
+			params.error_str += _T(": допустимі значення - 0 або 1\n");
+			++params.param_no;
+			return true;
+		}
+
+		binding_target->bindValue(params.param_no, (int)(qa_param_str[0] - _T('0')));
+		++params.param_no;
+		return true;
+	}
+
+	virtual ~CQaParamBinder() { }
+};
+
+class CQaKoefBinder : public CVisualInsertBinder {
+public:
+	CQaKoefBinder(XWidget *qa_koef_holder, bool free_widget) : \
+					CVisualInsertBinder(qa_koef_holder, free_widget) { }
+
+	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+				Params &params, const Tchar *field_name) override {
+
+		size_t size;
+		auto qa_koef_str = widget->GetLabel(size);
+		if (size == 0) {
+			params.error_str += field_name;
+			params.error_str += _T(": не може бути порожнім\n");
+			++params.param_no;
+			return true;
+		}
+
+		Tchar *end = nullptr;
+		float value = wcstof(qa_koef_str, &end);
+		
+		if (end - qa_koef_str > 4 || \
+			!(value <= 1e-6 || (value - 0.25F) <= 1e-6 || \
+			(value - 0.5F) <= 1e-6 || (value - 0.75F) <= 1e-6 || \
+			(value - 1.0F) <= 1e-6)) {
+
+			params.error_str += field_name;
+			params.error_str += _T(": допустимі значення - 0, 0.25, 0.5, 0.75 або 1\n");
+			++params.param_no;
+			return true;
+		}
+
+		binding_target->bindValue(params.param_no, qa_koef_str);
+		++params.param_no;
+		return true;
+	}
+
+	virtual ~CQaKoefBinder() { }
 };
 
 //*****************************************************
@@ -357,6 +493,10 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(Koef);
 	assert(checker);
 
+	auto &params_manager = CParametersManager::getInstance();
+	int id_user = params_manager.getIdUser();
+	assert(id_user != -1);
+
 	addBinder(0, _T("Реквізити доручення"), std::make_shared<COrderParamsBinder>(db_table));
 	addBinder(3, _T("Сума"), std::make_shared<CFeeBinder>(fee, false));
 	addBinder(4, _T("Стадія"), std::make_shared<CDbComboBoxInsertBinder>(stage, false));
@@ -365,13 +505,55 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	addBinder(7, _T("Акт"), std::make_shared<CActNameBinder>(id_act, false));
 	addBinder(8, _T("Дата акта"), std::make_shared<CActDateBinder>(db_table, act_date, false, act_reg_date));
 	addBinder(9, _T("Цикл"), std::make_shared<UIIntInsertBinder>(cycle, false));
+	addBinder(10, _T("Користувач"), std::make_shared<CIntInsertBinder>(id_user));
+	defStaticInsertion(11, "NOW()");
+	defStaticInsertion(12, "NULL");
+	defStaticInsertion(13, "NULL"); 
+	addBinder(14, _T("Дата акта"), std::make_shared<CActRegDateBinder>(db_table, act_reg_date, false));
+	defStaticInsertion(15, "NULL");
+	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false));
+	defStaticInsertion(17, "0.0");
 
+	addBinder(18, _T("Вік"), std::make_shared<CQaParamBinder>(age, false));
+	addBinder(19, _T("Вади"), std::make_shared<CQaParamBinder>(inv, false));
+	addBinder(20, _T("Мова"), std::make_shared<CQaParamBinder>(lang, false));
+	addBinder(21, _T("Хвороба"), std::make_shared<CQaParamBinder>(ill, false));
+	addBinder(22, _T("ЗЕК"), std::make_shared<CQaParamBinder>(zek, false));
+	addBinder(23, _T("Випр."), std::make_shared<CQaParamBinder>(vpr, false));
+	addBinder(24, _T("Зменш."), std::make_shared<CQaParamBinder>(reduce, false));
+	addBinder(25, _T("Зміни"), std::make_shared<CQaParamBinder>(change, false));
+	addBinder(26, _T("Закр."), std::make_shared<CQaParamBinder>(close, false));
+	addBinder(27, _T("Звільн."), std::make_shared<CQaParamBinder>(zv, false));
+	addBinder(28, _T("Мін."), std::make_shared<CQaParamBinder>(min_penalty, false));
+	addBinder(29, _T("Найм. сув."), std::make_shared<CQaParamBinder>(nm_suv, false));
+	addBinder(30, _T("Звільн. крим."), std::make_shared<CQaParamBinder>(zv_kr, false));
+	addBinder(31, _T("Без зм. 1 інст."), std::make_shared<CQaParamBinder>(no_ch_Ist, false));
+
+	addBinder(32, _T("Коеф."), std::make_shared<CQaKoefBinder>(Koef, false));
+	addBinder(33, _T("Дата реєстр. в ДКС"), std::make_shared<UIDateInsertBinder>(act_date, false));
+	addBinder(34, _T("Перевірив"), std::make_shared<CDbComboBoxInsertBinder>(checker, false));
+	
 	CDbInserter::prepare(conn);
 }
 
 void CPaymentsInserter::insert() {
 
-	CDbInserter::insert();
+	try {
+		CDbInserter::insert();
+	}
+	catch (CDbInserterException &e) {
+
+		ErrorBox(e.what());
+	}
+	catch (CDbException &e) {
+
+		if (e.GetErrorCode() == CDbException::E_DB_PRIMARY_KEY_DUPLICATE) {
+			Tstring error_str = _T("Така стадія уже існує в цьому дорученні: ");
+			error_str += stage->GetLabel();
+			ErrorBox(error_str.c_str());
+		}
+		else throw;
+	}
 }
 
 void CPaymentsInserter::Dispose() {

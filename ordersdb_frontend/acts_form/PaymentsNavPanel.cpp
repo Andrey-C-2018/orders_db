@@ -9,13 +9,13 @@
 #include <xwindows_ex/XNullWidget.h>
 #include "PaymentsNavPanel.h"
 
-CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn, \
+CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn_, \
 										std::shared_ptr<CDbTable> db_table_, \
 										std::shared_ptr<const IDbResultSet> rs_stages_, \
 										std::shared_ptr<const IDbResultSet> rs_inf_, \
 										std::shared_ptr<const IDbResultSet> rs_checkers_) : \
 					btn_get_curr(nullptr), btn_add(nullptr), btn_remove(nullptr), \
-					db_table(db_table_), \
+					conn(conn_), db_table(db_table_), \
 					rs_stages(rs_stages_), rs_inf(rs_inf_), rs_checkers(rs_checkers_), \
 					inserter(db_table_) {
 
@@ -179,8 +179,14 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		checker->setTabStopManager(this);
 	main_sizer.popNestedSizer();
 
+	inserter.prepare(conn);
+
 	Connect(EVT_COMMAND, btn_get_curr->GetId(), this, \
 			&CPaymentsNavPanel::OnGetCurrRecordButtonClick);
+	Connect(EVT_COMMAND, btn_add->GetId(), this, \
+			&CPaymentsNavPanel::OnAddRecordButtonClick);
+	Connect(EVT_COMMAND, btn_remove->GetId(), this, \
+			&CPaymentsNavPanel::OnRemoveButtonClick);
 }
 
 void CPaymentsNavPanel::OnGetCurrRecordButtonClick(XCommandEvent *eve) {
@@ -190,12 +196,15 @@ void CPaymentsNavPanel::OnGetCurrRecordButtonClick(XCommandEvent *eve) {
 
 void CPaymentsNavPanel::OnAddRecordButtonClick(XCommandEvent *eve) {
 
-
+	inserter.insert();
+	db_table->reload();
 }
 
 void CPaymentsNavPanel::OnRemoveButtonClick(XCommandEvent *eve) {
 
-
+	int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
+	if (option == IDYES)
+		db_table->removeCurrentRecord();
 }
 
 CPaymentsNavPanel::~CPaymentsNavPanel() {

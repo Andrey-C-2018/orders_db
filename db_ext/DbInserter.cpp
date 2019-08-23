@@ -40,8 +40,18 @@ void CDbInserter::addBinder(const size_t field_no, \
 	binders.emplace_back(item);
 }
 
+void CDbInserter::defStaticInsertion(const size_t field_no, const char *expr) {
+
+	assert(field_no < fields_count);
+	static_insertions[field_no] = std::string(expr);
+}
+
 void CDbInserter::prepare(std::shared_ptr<IDbConnection> conn) {
-	const size_t QUERY_RESERVED_SIZE = 50;
+	const size_t QUERY_RESERVED_SIZE = 70;
+	auto appendToStr = [](std::string &str1, const char *str2, const size_t times) {
+
+		for (size_t i = 0; i < times; ++i)	str1 += str2;
+	};
 
 	assert(!binders.empty());
 	assert(fields_count);
@@ -50,10 +60,23 @@ void CDbInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	
 	query = "INSERT INTO ";
 	query += table_name;
-	query += " VALUES(?";
-	for (size_t i = 1; i < fields_count; ++i)
-		query += ",?";
-	query += ')';
+	query += " VALUES(";
+
+	auto p = static_insertions.cbegin();
+	size_t start = 0;
+	while (p != static_insertions.cend()) {
+			
+		size_t end = p->first;
+		appendToStr(query, "?,", end - start);
+		query += p->second;
+		query += ',';
+
+		start = end + 1;
+		++p;
+	}
+
+	appendToStr(query, "?,", fields_count - start);
+	query[query.size() - 1] = ')';
 
 	stmt = conn->PrepareQuery(query.c_str());
 
@@ -62,6 +85,7 @@ void CDbInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
 void CDbInserter::insert() {
 
+	assert(stmt);
 	IInsertBinder::Params params;
 	params.param_no = 0;
 
@@ -80,7 +104,7 @@ void CDbInserter::insert() {
 
 	if (!params.error_str.empty())
 		throw CDbInserterException(CDbInserterException::E_INSERT, \
-			std::move(params.error_str));
+									std::move(params.error_str));
 	else
 		stmt->execScalar();
 }

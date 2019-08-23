@@ -20,9 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Date.cpp" />
+    <ClCompile Include="DateTime.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Date.h" />
+    <ClInclude Include="DateTime.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E80E0509-21D7-4A1E-AE33-C16633261EF4}</ProjectGuid>

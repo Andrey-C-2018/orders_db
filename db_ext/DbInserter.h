@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <map>
 #include <basic/Exception.h>
 #include <db/IDbStatement.h>
 #include "IInsertBinder.h"
@@ -31,6 +32,7 @@ class CDbInserter {
 		inline bool operator<(const Binders &obj) const { return field_no < obj.field_no; }
 	};
 	std::vector<Binders> binders;
+	std::map<size_t, std::string> static_insertions;
 
 public:
 	CDbInserter(const char *table_name, const size_t fields_count_);
@@ -43,6 +45,8 @@ public:
 	inline const std::string &getTableName() const { return table_name; }
 	void addBinder(const size_t field_no, const Tchar *field_name, \
 							std::shared_ptr<IInsertBinder> binder);
+	void defStaticInsertion(const size_t field_no, const char *expr);
+
 	virtual void prepare(std::shared_ptr<IDbConnection> conn);
 	virtual void insert();
 

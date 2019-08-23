@@ -90,6 +90,7 @@ void CDbComboBox::SetCurrRecord(std::shared_ptr<const IDbResultSet> rs, \
 
 	--i;
 	this->SetSelectionIndex(i);
+	sel_index = i;
 }
 
 CDbComboBox::~CDbComboBox() { }

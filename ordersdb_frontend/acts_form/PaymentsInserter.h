@@ -7,7 +7,7 @@ class CDbTable;
 
 class CPaymentsInserter : public CDbInserter {
 	enum {
-		FIELDS_COUNT = 25
+		FIELDS_COUNT = 35
 	};
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
