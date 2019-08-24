@@ -25,4 +25,9 @@ void XEdit::SetSelection(const size_t begin, const size_t end) {
 	_plSetEditControlSelection(GetInternalHandle(), begin, end);
 }
 
+void XEdit::SelectAll() {
+
+	_plSetEditControlSelection(GetInternalHandle());
+}
+
 XEdit::~XEdit(){ }

@@ -324,7 +324,12 @@ void CDispatcherCell::OnFieldRemoved(const size_t field) {
 			(field == active_field && field + 1 == table_proxy->GetFieldsCount()))
 			--active_field;
 
-		def_active_cell->SetCurrentField(table_proxy->GetAbsoluteFieldIndex(active_field));
+		size_t index = 0;
+		if (prev_active_field == field) {
+			if (field + 1 == table_proxy->GetFieldsCount()) index = prev_active_field - 1;
+			if (!field) index = 1;
+		}
+		def_active_cell->SetCurrentField(table_proxy->GetAbsoluteFieldIndex(index));
 
 		OnTableChanged(prev_active_field, active_record);
 	}

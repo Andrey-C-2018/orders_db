@@ -337,6 +337,8 @@ void CEditableGrid::OnKeyPress(XKeyboardEvent *eve) {
 				new_field != active_field)) {
 		
 		disp_cell->OnClick(new_field, new_record);
+		if(eve->GetKey() == X_VKEY_TAB)
+			field_widgets_collection->SelectAll();
 
 		if(new_record != active_record)
 			FocusOnRecord(new_record);

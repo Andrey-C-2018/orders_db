@@ -493,6 +493,7 @@ inline void _plComboBoxReset(_plHWND hwnd) noexcept;
 
 inline void _plSetEditMaxLength(_plHWND hwnd, const size_t max_len) noexcept;
 inline void _plSetEditControlSelection(_plHWND hwnd, const size_t begin, const size_t end) noexcept;
+inline void _plSetEditControlSelection(_plHWND hwnd) noexcept;
 
 inline void _plMessageBox(const Tchar *message) noexcept;
 inline void _plMessageBoxANSI(const char *message) noexcept;
@@ -1016,6 +1017,11 @@ void _plSetEditMaxLength(_plHWND hwnd, const size_t max_len) noexcept {
 void _plSetEditControlSelection(_plHWND hwnd, const size_t begin, const size_t end) noexcept {
 
 	SendMessage(hwnd, EM_SETSEL, (WPARAM)begin, (LPARAM)end);
+}
+
+void _plSetEditControlSelection(_plHWND hwnd) noexcept {
+
+	SendMessage(hwnd, EM_SETSEL, (WPARAM)0, (LPARAM)-1);
 }
 
 void _plMessageBox(const Tchar *message) noexcept {

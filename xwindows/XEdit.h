@@ -17,6 +17,7 @@ public:
 
 	void SetEditMaxLength(const size_t max_len);
 	void SetSelection(const size_t begin, const size_t end);
+	void SelectAll();
 
 	virtual ~XEdit();
 };

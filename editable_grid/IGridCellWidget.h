@@ -27,6 +27,7 @@ struct IGridCellWidget {
 							const int width, const int height) = 0;
 	virtual void SetFocus() = 0;
 	virtual bool HasFocus() const = 0;
+	virtual void SelectAll() = 0;
 
 	virtual ImmutableString<Tchar> GetLabel() = 0;
 	virtual void SetLabel(ImmutableString<Tchar> label) = 0;

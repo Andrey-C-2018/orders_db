@@ -16,7 +16,16 @@ void CMultipleCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 	assert(default_widget);
 	assert(default_widget_id == NOT_CREATED);
 
-	default_widget->CreateCellWidget(parent, flags, label, x, y, width, height);
+	auto p = assignments.lower_bound(curr_field);
+	int def_widget_flags = flags;
+	if (p != assignments.cend() && !assignments.key_comp()(curr_field, p->first)) {
+		curr_widget = widgets[p->second].widget;
+		def_widget_flags &= (~FL_WINDOW_VISIBLE);
+	}
+	else
+		curr_widget = default_widget;
+
+	default_widget->CreateCellWidget(parent, def_widget_flags, label, x, y, width, height);
 	this->parent = parent;
 	this->default_widget_id = default_widget->GetId();
 	this->flags = flags;
@@ -212,6 +221,12 @@ bool CMultipleCellWidget::HasFocus() const {
 
 	assert(curr_widget);
 	return curr_widget->HasFocus();
+}
+
+void CMultipleCellWidget::SelectAll() {
+
+	assert(curr_widget);
+	return curr_widget->SelectAll();
 }
 
 ImmutableString<Tchar> CMultipleCellWidget::GetLabel() {

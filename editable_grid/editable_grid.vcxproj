@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BooleanCellWidget.cpp" />
     <ClCompile Include="ComboBoxCellWidget.cpp" />
     <ClCompile Include="CurrencyCellWidget.cpp" />
     <ClCompile Include="DateCellWidget.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="StringGrid.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BooleanCellWidget.h" />
     <ClInclude Include="ComboBoxCellWidget.h" />
     <ClInclude Include="CurrencyCellWidget.h" />
     <ClInclude Include="DateCellWidget.h" />

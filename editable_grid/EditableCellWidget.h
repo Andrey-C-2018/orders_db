@@ -32,6 +32,7 @@ public:
 					const int width, const int height) override;
 	void SetFocus() override;
 	bool HasFocus() const override;
+	void SelectAll() override;
 
 	ImmutableString<Tchar> GetLabel() override;
 	ImmutableString<Tchar> GetLabel(std::vector<Tchar> &label) const;

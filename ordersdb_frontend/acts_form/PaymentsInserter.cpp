@@ -62,11 +62,33 @@ public:
 		size_t size;
 		auto fee_str = widget->GetLabel(size);
 
+		if (!size) {
+			++params.param_no;
+			params.error_str += field_name;
+			params.error_str += _T(": не може бути порожнім\n");
+			return true;
+		}
+
+		size_t i = 0;
+		while (i < size && \
+			((fee_str[i] >= _T('0') && fee_str[i] <= _T('9')) || \
+				fee_str[i] == _T('.'))) ++i;
+
+		if (i < size) {
+			++params.param_no;
+			params.error_str += field_name;
+			params.error_str += _T(": невірний формат: ");
+			params.error_str += fee_str;
+			params.error_str += _T('\n');
+			return true;
+		}
+
 		auto p = Tstrchr(fee_str, _T('.'));
-		if (p) size -= (p - fee_str);
+		if (p) size = (p - fee_str);
 		if (size > 6) {
 			++params.param_no;
-			params.error_str += _T("Сума акта або витрати не можуть перевищувати 1 млн. грн.\n");
+			params.error_str += field_name;
+			params.error_str += _T(": не може перевищувати 1 млн. грн.\n");
 			return true;
 		}
 

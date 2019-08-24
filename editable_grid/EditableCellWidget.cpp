@@ -70,6 +70,11 @@ bool CEditableCellWidget::HasFocus() const {
 	return XEdit::HasFocus();
 }
 
+void CEditableCellWidget::SelectAll() {
+
+	XEdit::SelectAll();
+}
+
 ImmutableString<Tchar> CEditableCellWidget::GetLabel() {
 	size_t size(0);
 

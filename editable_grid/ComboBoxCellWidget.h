@@ -34,6 +34,7 @@ public:
 					const int width, const int height) override;
 	void SetFocus() override;
 	bool HasFocus() const override;
+	void SelectAll() override { }
 
 	ImmutableString<Tchar> GetLabel() override;
 	void SetLabel(ImmutableString<Tchar> label) override;

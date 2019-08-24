@@ -1,5 +1,6 @@
 #include <db_ext/DbTable.h>
 #include <editable_grid/IntegerCellWidget.h>
+#include <editable_grid/BooleanCellWidget.h>
 #include <editable_grid/CurrencyCellWidget.h>
 #include <editable_grid/DateCellWidget.h>
 #include <db_controls/DbGrid.h>
@@ -122,13 +123,19 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	enum { CYCLE_MAX_LEN = 3, QA_MAX_LEN = 1};
 
 	assert(grid);
-	CIntegerCellWidget *cycle_widget = nullptr, *qa_widget = nullptr;
+	CEditableCellWidget *is_paid_widget = nullptr;
+	CIntegerCellWidget *cycle_widget = nullptr;
+	CBooleanCellWidget *qa_widget = nullptr;
 	CCurrencyCellWidget *currency_widget = nullptr;
 	CDateCellWidget *date_widget = nullptr;
 
-	bool cycle = false, stages = false, fee = false;
+	bool is_paid = false, cycle = false, stages = false, fee = false;
 	bool inf = false, date = false, chk = false, qa = false;
 	try {
+		is_paid_widget = new CEditableCellWidget(true);
+		grid->SetWidgetForFieldByName("is_paid", is_paid_widget);
+		is_paid = true;
+
 		cycle_widget = new CIntegerCellWidget(CYCLE_MAX_LEN);
 		grid->SetWidgetForFieldByName("cycle", cycle_widget);
 		cycle = true;
@@ -158,12 +165,23 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 		grid->SetWidgetForFieldByName("act_date", date_widget);
 
-		qa_widget = new CIntegerCellWidget(QA_MAX_LEN);
+		qa_widget = new CBooleanCellWidget();
 		grid->SetWidgetForFieldByName("age", qa_widget);
 		qa = true;
 
 		grid->SetWidgetForFieldByName("inv", qa_widget);
 		grid->SetWidgetForFieldByName("lang", qa_widget);
+		grid->SetWidgetForFieldByName("ill", qa_widget);
+		grid->SetWidgetForFieldByName("zek", qa_widget);
+		grid->SetWidgetForFieldByName("vpr", qa_widget);
+		grid->SetWidgetForFieldByName("reduce", qa_widget);
+		grid->SetWidgetForFieldByName("change_", qa_widget);
+		grid->SetWidgetForFieldByName("close", qa_widget);
+		grid->SetWidgetForFieldByName("zv", qa_widget);
+		grid->SetWidgetForFieldByName("min", qa_widget);
+		grid->SetWidgetForFieldByName("nm_suv", qa_widget);
+		grid->SetWidgetForFieldByName("zv_kr", qa_widget);
+		grid->SetWidgetForFieldByName("No_Ch_Ist", qa_widget);
 
 		auto chk_stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE user_full_name IS NOT NULL ORDER BY user_name");
 		auto chk_rs = chk_stmt->exec();
@@ -195,6 +213,9 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 		if (!cycle && cycle_widget && !cycle_widget->IsCreated())
 			delete cycle_widget;
+
+		if (!is_paid && is_paid_widget && !is_paid_widget->IsCreated())
+			delete is_paid_widget;
 
 		throw;
 	}

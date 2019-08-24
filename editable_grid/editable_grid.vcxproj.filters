@@ -45,6 +45,9 @@
     <ClCompile Include="IntegerCellWidget.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="BooleanCellWidget.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComboBoxCellWidget.h">
@@ -84,6 +87,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="IntegerCellWidget.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="BooleanCellWidget.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
