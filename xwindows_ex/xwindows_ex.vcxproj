@@ -161,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HorizontalSizer.h" />
+    <ClInclude Include="ITabStopAction.h" />
     <ClInclude Include="ITabStopManager.h" />
     <ClInclude Include="Sizer.h" />
     <ClInclude Include="VerticalSizer.h" />

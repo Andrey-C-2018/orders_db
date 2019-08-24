@@ -202,9 +202,14 @@ void CPaymentsNavPanel::OnAddRecordButtonClick(XCommandEvent *eve) {
 
 void CPaymentsNavPanel::OnRemoveButtonClick(XCommandEvent *eve) {
 
-	int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
-	if (option == IDYES)
-		db_table->removeCurrentRecord();
+	if (db_table->GetRecordsCount() == 1) {
+		ErrorBox(_T("Доручення містить лише одну стадію, її видалення неможливе"));
+	}
+	else {
+		int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
+		if (option == IDYES)
+			db_table->removeCurrentRecord();
+	}
 }
 
 CPaymentsNavPanel::~CPaymentsNavPanel() {

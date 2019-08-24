@@ -75,7 +75,6 @@ void XTabStopWidget<TWidget>::OnKeyPressInternal(XKeyboardEvent *eve) {
 	manager->TabPressedOnControl(this);
 }
 
-
 template <class TWidget> \
 void XTabStopWidget<TWidget>::OnKeyPress(XKeyboardEvent *eve) {
 
