@@ -52,6 +52,8 @@ public:
 
 //*************************************************************
 
+std::string CMetaInfo::constant_modifier;
+
 CMetaInfo::CMetaInfo() : primary_table_id(-1){
 
 	fields.reserve(DEF_FIELDS_COUNT);
@@ -85,6 +87,11 @@ void CMetaInfo::setPrimaryTable(const char *table_name) {
 
 	primary_table_name = p_table->table_name;
 	primary_table_id = p_table->id;
+}
+
+void CMetaInfo::setQueryConstantModifier(ImmutableString<char> modifier) {
+
+	constant_modifier = modifier.str;
 }
 
 CMetaInfo::id_type CMetaInfo::addTableRecord(std::string &table_name) {
@@ -251,6 +258,10 @@ void CMetaInfo::getUpdateQueryForField(const size_t field, std::string &query) c
 	query += tables[*p_table].table_name;
 	
 	query += " SET ";
+	if (!constant_modifier.empty()) {
+		query += constant_modifier;
+		query += ',';
+	}
 	query += fields[field].field_name;
 	query += " = ? WHERE ";
 

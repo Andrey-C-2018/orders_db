@@ -42,6 +42,9 @@
     <ClCompile Include="XCurrencyField.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="XTabStopEdit.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HorizontalSizer.h">

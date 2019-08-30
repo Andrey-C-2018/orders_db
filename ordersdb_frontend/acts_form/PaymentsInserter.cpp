@@ -72,7 +72,7 @@ public:
 		size_t i = 0;
 		while (i < size && \
 			((fee_str[i] >= _T('0') && fee_str[i] <= _T('9')) || \
-				fee_str[i] == _T('.'))) ++i;
+				fee_str[i] == _T('.') || fee_str[i] == _T(','))) ++i;
 
 		if (i < size) {
 			++params.param_no;
@@ -84,6 +84,12 @@ public:
 		}
 
 		auto p = Tstrchr(fee_str, _T('.'));
+		const Tchar *p2 = nullptr;
+		if (!p) {
+			p2 = Tstrchr(fee_str, _T(','));
+			p = p2;
+		}
+
 		if (p) size = (p - fee_str);
 		if (size > 6) {
 			++params.param_no;
@@ -92,7 +98,18 @@ public:
 			return true;
 		}
 
-		binding_target->bindValue(params.param_no, fee_str);
+		if (p2) {
+			Tchar fee[10];
+			Tstrncpy(fee, fee_str, 6);
+			size_t fee_size = Tstrlen(fee);
+			fee[fee_size] = _T('.');
+			++fee_size;
+			Tstrncpy(fee + fee_size, fee_str + fee_size, 2);
+			fee[fee_size + 2] = _T('\0');
+			binding_target->bindValue(params.param_no, fee);
+		}
+		else
+			binding_target->bindValue(params.param_no, fee_str);
 		++params.param_no;
 		return true;
 	}
@@ -131,10 +148,12 @@ public:
 
 			if (!((ch >= _T('0') && ch <= _T('9')) || \
 				(ch >= _T('А') && ch <= _T('Я')) || \
-				ch == _T('.'))) {
+				ch == _T('.') || ch == _T('І'))) {
 
 				++params.param_no;
-				params.error_str += _T("Невірне ім'я акта\n");
+				params.error_str += _T("Невірне ім'я акта: ");
+				params.error_str += act_str;
+				params.error_str += _T('\n');
 				return true;
 			}
 			act_name += ch;
@@ -531,7 +550,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	defStaticInsertion(11, "NOW()");
 	defStaticInsertion(12, "NULL");
 	defStaticInsertion(13, "NULL"); 
-	addBinder(14, _T("Дата акта"), std::make_shared<CActRegDateBinder>(db_table, act_reg_date, false));
+	addBinder(14, _T("Дата прийняття акта"), std::make_shared<CActRegDateBinder>(db_table, act_reg_date, false));
 	defStaticInsertion(15, "NULL");
 	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false));
 	defStaticInsertion(17, "0.0");

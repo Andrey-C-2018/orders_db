@@ -40,7 +40,7 @@ private:
 	static bool is_class_registered;
 	
 	enum Defaults {
-		DEF_LEFT_PANE_WIDTH = 30, \
+		DEF_LEFT_PANE_WIDTH = 20, \
 		DEF_HEADERS_HEIGHT = 30, \
 		WHEEL_STEP = 20
 	};

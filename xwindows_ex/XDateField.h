@@ -1,9 +1,9 @@
 #pragma once
-#include "XTabStopWidget.h"
+#include "XTabStopEdit.h"
 #include <date/Date.h>
 #include "XCtrlInputFilter.h"
 
-class XDateField : public XTabStopWidget<XEdit> {
+class XDateField : public XTabStopEdit {
 	XCtrlInputFilter filter;
 	
 	inline void CreateInternal(XWindow *parent, const int flags, \

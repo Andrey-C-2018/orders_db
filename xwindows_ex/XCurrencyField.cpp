@@ -1,14 +1,14 @@
 #include "XCurrencyField.h"
 
 XCurrencyField::XCurrencyField(ITabStopManager *manager) noexcept : \
-									XTabStopWidget<XEdit>(manager), \
+									XTabStopEdit(manager), \
 									filter(this, _T(','), _T('.')) { }
 
 XCurrencyField::XCurrencyField(ITabStopManager *manager, XWindow *parent, \
 								const int flags, const Tchar *label, \
 								const int x, const int y, \
 								const int width, const int height) : \
-									XTabStopWidget<XEdit>(manager) , \
+									XTabStopEdit(manager) , \
 									filter(this, _T(','), _T('.')) {
 
 	CreateInternal(parent, flags, label, x, y, width, height);

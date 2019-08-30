@@ -22,6 +22,9 @@ public:
 	void RegisterTabStopControl(XWidget *widget) override {
 		manager.RegisterTabStopControl(widget);
 	}
+	void RegisterTabStopControl(XWidget *widget, ITabStopAction *action) override {
+		manager.RegisterTabStopControl(widget, action);
+	}
 	void TabPressedOnControl(XWidget *widget) override {
 		manager.TabPressedOnControl(widget);
 	}

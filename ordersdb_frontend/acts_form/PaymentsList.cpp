@@ -37,7 +37,7 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	grid->SetFieldLabel(6, _T("Цикл"));
 	grid->SetFieldWidth(6, 4);
 	grid->SetFieldLabel(7, _T("Стаття"));
-	grid->SetFieldWidth(7, 30);
+	grid->SetFieldWidth(7, 20);
 	grid->SetFieldLabel(8, _T("Сума"));
 	grid->SetFieldWidth(8, 8);
 	grid->SetFieldLabel(9, _T("Витрати"));

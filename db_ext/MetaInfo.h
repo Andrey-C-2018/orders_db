@@ -101,6 +101,7 @@ private:
 
 	id_type primary_table_id;
 	std::string primary_table_name;
+	static std::string constant_modifier;
 
 	inline ConstIndexIterator findFieldRecord(const char *field_name) const;
 	inline ConstIndexIterator findFieldRecord(const id_type id_field) const;
@@ -150,6 +151,7 @@ public:
 	inline bool isPrimaryKey(const size_t field) const noexcept;
 
 	void setPrimaryTable(const char *table_name);
+	static void setQueryConstantModifier(ImmutableString<char> modifier);
 
 	void addField(std::shared_ptr<IDbField> field, const size_t new_field_index);
 	void markFieldAsPrimaryKey(const size_t field);

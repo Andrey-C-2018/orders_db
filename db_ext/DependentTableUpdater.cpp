@@ -1,5 +1,7 @@
 #include "DependentTableUpdater.h"
 
+std::string CDependentTableUpdater::constant_modifier;
+
 CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> conn_, \
 											const char *master_table_name, \
 											const char *dependent_table_name, \
@@ -26,6 +28,10 @@ CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> co
 	query += dependent_table_name;
 	query += " d SET ";
 	update_query_preamble = std::move(query);
+	if (!constant_modifier.empty()) {
+		update_query_preamble += constant_modifier;
+		update_query_preamble += ',';
+	}
 }
 
 CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> conn_, \
@@ -52,6 +58,15 @@ CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> co
 	update_query_preamble += " m, ";
 	update_query_preamble += dependent_table_name;
 	update_query_preamble += " d SET ";
+	if (!constant_modifier.empty()) {
+		update_query_preamble += constant_modifier;
+		update_query_preamble += ',';
+	}
+}
+
+void CDependentTableUpdater::setQueryConstantModifier(ImmutableString<char> modifier) {
+
+	constant_modifier = modifier.str;
 }
 
 void CDependentTableUpdater::AddRelation(const char *master_field, const char *dependent_field) {

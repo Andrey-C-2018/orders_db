@@ -26,6 +26,4 @@ void CParametersManager::init(CPropertiesFile *props) {
 		throw XException(0, _T("Клас CParametersManager уже було ініціалізовано"));
 }
 
-
-
 CParametersManager::~CParametersManager() { }

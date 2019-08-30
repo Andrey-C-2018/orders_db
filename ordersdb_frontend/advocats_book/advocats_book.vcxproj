@@ -170,6 +170,9 @@
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="PostIndexCellWidget.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\acts_form\acts_form.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

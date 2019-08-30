@@ -1,8 +1,8 @@
 #pragma once
-#include "XTabStopWidget.h"
+#include "XTabStopEdit.h"
 #include "XCtrlInputFilter.h"
 
-class XCurrencyField : public XTabStopWidget<XEdit> {
+class XCurrencyField : public XTabStopEdit {
 	XCtrlInputFilter filter;
 
 	inline void CreateInternal(XWindow *parent, const int flags, \

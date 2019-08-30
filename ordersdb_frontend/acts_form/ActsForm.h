@@ -18,7 +18,7 @@ class CActsForm : public XTabStopPanel {
 
 	enum {
 		DEF_GUI_MARGIN = 10, \
-		ADV_LIST_WIDTH = 300, \
+		ADV_LIST_WIDTH = 220, \
 		DEF_DBNAVIGATOR_HEIGHT = 40
 	};
 

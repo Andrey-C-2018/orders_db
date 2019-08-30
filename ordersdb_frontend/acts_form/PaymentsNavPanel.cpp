@@ -1,12 +1,13 @@
 #include <db/IDbConnection.h>
 #include <db_ext/DbTable.h>
 #include <db_controls/DbComboBox.h>
-#include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
 #include <xwindows/XLabel.h>
 #include <xwindows_ex/HorizontalSizer.h>
 #include <xwindows_ex/VerticalSizer.h>
 #include <xwindows_ex/XNullWidget.h>
+#include <xwindows_ex/XDateField.h>
+#include <xwindows_ex/XCurrencyField.h>
 #include "PaymentsNavPanel.h"
 
 CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn_, \
@@ -58,11 +59,11 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		inserter.setArticleWidget(article);
 		sizer.addWidget(article, _T(""), edit_flags, XSize(150, DEF_HEIGHT));
 
-		auto fee = new XTabStopEdit(this);
+		auto fee = new XCurrencyField(this);
 		inserter.setFeeWidget(fee);
 		sizer.addWidget(fee, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
 
-		auto outgoings = new XTabStopEdit(this);
+		auto outgoings = new XCurrencyField(this);
 		inserter.setOutgoingsWidget(outgoings);
 		sizer.addWidget(outgoings, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
 
@@ -76,11 +77,11 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		inserter.setActWidget(id_act);
 		sizer.addWidget(id_act, _T(""), edit_flags, XSize(80, DEF_HEIGHT));
 
-		auto act_date = new XTabStopEdit(this);
+		auto act_date = new XDateField(this);
 		inserter.setActDateWidget(act_date);
 		sizer.addWidget(act_date, _T(""), edit_flags, XSize(80, DEF_HEIGHT));
 
-		auto act_reg_date = new XTabStopEdit(this);
+		auto act_reg_date = new XDateField(this);
 		inserter.setActRegDateWidget(act_reg_date);
 		sizer.addWidget(act_reg_date, _T(""), edit_flags, XSize(80, DEF_HEIGHT));
 

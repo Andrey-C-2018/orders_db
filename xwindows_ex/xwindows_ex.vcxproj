@@ -157,6 +157,7 @@
     <ClCompile Include="XDateField.cpp" />
     <ClCompile Include="XDynamicSizer.cpp" />
     <ClCompile Include="XNullWidget.cpp" />
+    <ClCompile Include="XTabStopEdit.cpp" />
     <ClCompile Include="XTabStopManager.cpp" />
   </ItemGroup>
   <ItemGroup>
