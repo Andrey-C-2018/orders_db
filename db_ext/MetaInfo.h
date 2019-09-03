@@ -157,8 +157,9 @@ public:
 	void markFieldAsPrimaryKey(const size_t field);
 	void clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fields);
 
-	size_t appendWherePartOfUpdateQuery(std::string &query) const;
-	size_t appendWherePartOfUpdateQuery(const char *table_name, std::string &query) const;
+	size_t appendWherePartOfUpdateQuery(std::string &query, const char *table_alias) const;
+	size_t appendWherePartOfUpdateQuery(const char *table_name, std::string &query, \
+										const char *table_alias) const;
 
 	void getUpdateQueryForField(const size_t field, std::string &query) const;
 	void getDeleteQuery(std::string &query) const;

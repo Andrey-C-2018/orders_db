@@ -13,6 +13,7 @@
 #include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
+#include <db/DbException.h>
 #include "DbfTable.h"
 #include "Directory.h"
 
@@ -20,6 +21,16 @@ enum Defaults {
 	MAX_DBF_FILE_NAME_LEN = 30, \
 	MAX_DBF_FIELD_NAME_LEN = 50
 };
+
+constexpr const char FIELD_ID[] = "ND";
+constexpr const char FIELD_ADV[] = "POLUT";
+constexpr const char FIELD_ACT[] = "NDOC";
+constexpr const char FIELD_FEE[] = "S";
+
+constexpr const wchar_t FIELD_ID_w[] = L"ND";
+constexpr const wchar_t FIELD_ADV_w[] = L"POLUT";
+constexpr const wchar_t FIELD_ACT_w[] = L"NDOC";
+constexpr const wchar_t FIELD_FEE_w[] = L"S";
 
 std::map<std::wstring, size_t> createFieldsMap();
 std::shared_ptr<IDbConnection> createSQLiteConnection(const CPropertiesFile &props);
@@ -65,6 +76,9 @@ int main() {
 		query += "VALUES(?, ?, ?, ?, ?, ?)";
 		auto ins_stmt = sqlite_conn->PrepareQuery(query.c_str());
 
+		query = "SELECT id FROM payments_1c WHERE id = ?";
+		auto check_stmt = sqlite_conn->PrepareQuery(query.c_str());
+
 		query = "SELECT adv_name FROM adv_aliases WHERE adv_name_1c = ?";
 		auto adv_check_stmt = sqlite_conn->PrepareQuery(query.c_str());
 
@@ -109,26 +123,35 @@ int main() {
 			while (not_eot) {
 				bool is_null = false;
 
-				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[L"ND"]), \
-					"ND", record_no, dbf_dir.getFileName(), buffer_w);
-				int error;
-				ins_stmt->bindValue(0, XConv::ToInt(&buffer_w[0], error));
+				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[FIELD_ID_w]), \
+					FIELD_ID, record_no, dbf_dir.getFileName(), buffer_w);
+				int error, v;
+				v = XConv::ToInt(&buffer_w[0], error);
+				check_stmt->bindValue(0, v);
+				auto rs = check_stmt->exec();
+				if (!rs->empty()) {
+					XException e(0, _T("–€док з ID = "));
+					e << v << _T(" уже було додано в acts.db");
+					throw e;
+				}
 
-				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[L"POLUT"]), \
-					"POLUT", record_no, dbf_dir.getFileName(), buffer_w);
+				ins_stmt->bindValue(0, v);
+
+				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[FIELD_ADV_w]), \
+					FIELD_ADV, record_no, dbf_dir.getFileName(), buffer_w);
 				rtrimSpaces(buffer_w);
 
 				replaceAdvNameIfNecessary(buffer_w, adv_check_stmt);
 				ins_stmt->bindValue(1, &buffer_w[0]);
 
-				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[L"NDOC"]), \
-					"NDOC", record_no, dbf_dir.getFileName(), buffer_w);
+				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[FIELD_ACT_w]), \
+					FIELD_ACT, record_no, dbf_dir.getFileName(), buffer_w);
 				rtrimSpaces(buffer_w);
 				ins_stmt->bindValue(2, &buffer_w[0]);
 
 				buffer.resize(12);
-				const char *fee = dbf_table.getNumericCellValue(fields[L"S"], &buffer[0], 10);
-				checkIfIsEmptyAndConvert(fee, "S", record_no, dbf_dir.getFileName(), buffer_w);
+				const char *fee = dbf_table.getNumericCellValue(fields[FIELD_FEE_w], &buffer[0], 10);
+				checkIfIsEmptyAndConvert(fee, FIELD_FEE, record_no, dbf_dir.getFileName(), buffer_w);
 				rtrimSpaces(buffer_w);
 				ins_stmt->bindValue(3, &buffer_w[0]);
 
@@ -164,10 +187,10 @@ int main() {
 std::map<std::wstring, size_t> createFieldsMap() {
 
 	std::map<std::wstring, size_t> fields;
-	fields[L"ND"] = 1;
-	fields[L"POLUT"] = 36;
-	fields[L"NDOC"] = 45;
-	fields[L"S"] = 14;
+	fields[FIELD_ID_w] = 1;
+	fields[FIELD_ADV_w] = 36;
+	fields[FIELD_ACT_w] = 45;
+	fields[FIELD_FEE_w] = 14;
 
 	return fields;
 }

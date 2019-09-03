@@ -19,7 +19,7 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 
 	props.open("config.ini");
 	conn = CMySQLConnectionFactory::createConnection(props);
-	CParametersManager::init(&props);
+	CParametersManager::init(&props, conn);
 
 	std::string last_user_query = "d.id_user = ";
 	int id_user = CParametersManager::getInstance().getIdUser();

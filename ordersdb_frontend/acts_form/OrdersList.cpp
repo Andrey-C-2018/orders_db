@@ -52,8 +52,7 @@ std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnecti
 	query += " t.type_name, a.client_name, a.bdate, a.cancel_date ";
 	query += "FROM orders a INNER JOIN centers cn ON a.id_center_legalaid = cn.id_center";
 	query += " INNER JOIN order_types t ON a.id_order_type = t.id_type ";
-	query += "WHERE a.order_date >= '2019-01-01'";
-	query += " AND a.id_adv = ? ";
+	query += "WHERE a.id_adv = ? ";
 	query += "ORDER BY id_center_legalaid, order_date, id";
 
 	auto stmt = conn->PrepareQuery(query.c_str());

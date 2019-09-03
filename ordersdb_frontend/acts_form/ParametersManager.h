@@ -1,17 +1,19 @@
 #pragma once
+#include <memory>
 
 class CPropertiesFile;
+struct IDbConnection;
 
 class CParametersManager {
 	int id_user;
 	static CParametersManager inst;
 
 	CParametersManager();
-	void getParamsValuesFromFile(CPropertiesFile *props);
+	void getParamsValuesFromFile(CPropertiesFile *props, std::shared_ptr<IDbConnection> conn);
 	inline bool areParamsInitilized() const { return id_user != -1; }
 public:
 	
-	static void init(CPropertiesFile *props);
+	static void init(CPropertiesFile *props, std::shared_ptr<IDbConnection> conn);
 
 	CParametersManager(const CParametersManager &obj) = default;
 	CParametersManager(CParametersManager &&obj) = default;

@@ -47,6 +47,7 @@ CDependentTableUpdater::CDependentTableUpdater(std::shared_ptr<IDbConnection> co
 	assert(master_metadata);
 	assert(dependent_table);
 	assert(dependent_table_name);
+	this->dependent_table_name = dependent_table_name;
 
 	master_meta_info.clearAndAddFields(master_metadata);
 	assert(master_meta_info.getTablesCount() == 1);
@@ -100,9 +101,9 @@ CDependentTableUpdater::createDepTableUpdateStmt(const size_t master_record_inde
 	size_t master_primkey_params_count = 0;
 	const CMetaInfo &dependent_meta_info = getDependentMetaInfo();
 	query += " WHERE ";
-	master_primkey_params_count = master_meta_info.appendWherePartOfUpdateQuery(query);
+	master_primkey_params_count = master_meta_info.appendWherePartOfUpdateQuery(query, "m");
 	query += " AND ";
-	dependent_meta_info.appendWherePartOfUpdateQuery(dependent_table_name.c_str(), query);
+	dependent_meta_info.appendWherePartOfUpdateQuery(dependent_table_name.c_str(), query, "d");
 
 	std::shared_ptr<IDbStatement> upd_stmt = conn->PrepareQuery(query.c_str());
 

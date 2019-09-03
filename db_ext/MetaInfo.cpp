@@ -15,13 +15,19 @@ CMetaInfoException::~CMetaInfoException() { }
 class AddPrimKeyToWhereStmt {
 	const CMetaInfo &meta_info;
 	std::string &query;
+	const char *table_alias;
 
 public:
-	AddPrimKeyToWhereStmt(const CMetaInfo &meta_info_, std::string &query_) : \
-							meta_info(meta_info_), query(query_){ }
+	AddPrimKeyToWhereStmt(const CMetaInfo &meta_info_, std::string &query_, \
+							const char *table_alias_) : \
+							meta_info(meta_info_), query(query_), table_alias(table_alias_){ }
 
 	inline void operator()(const size_t field) {
 		
+		if (table_alias) {
+			query += table_alias;
+			query += '.';
+		}
 		query += meta_info.getFieldName(field).str;
 		query += " = ? AND ";
 	}
@@ -222,23 +228,25 @@ void CMetaInfo::clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fi
 	refreshFieldIndexes();
 }
 
-size_t CMetaInfo::appendWherePartOfUpdateQuery(std::string &query) const {
+size_t CMetaInfo::appendWherePartOfUpdateQuery(std::string &query, \
+												const char *table_alias) const {
 
 	assert(primary_table_id != -1);
 	size_t prim_key_size = enumeratePrimKey(primary_table_id, \
-										AddPrimKeyToWhereStmt(*this, query));
+										AddPrimKeyToWhereStmt(*this, query, table_alias));
 	removeEmptyAndStmt(query);
 
 	return prim_key_size;
 }
 
-size_t CMetaInfo::appendWherePartOfUpdateQuery(const char *table_name, std::string &query) const {
+size_t CMetaInfo::appendWherePartOfUpdateQuery(const char *table_name, std::string &query, \
+												const char *table_alias) const {
 
 	auto p_table = findTableRecord(table_name);
 	assert(isTableRecordFound(p_table, table_name));
 
 	size_t table_key_size = enumeratePrimKey(tables[*p_table].id, \
-										AddPrimKeyToWhereStmt(*this, query));
+										AddPrimKeyToWhereStmt(*this, query, table_alias));
 	removeEmptyAndStmt(query);
 
 	return table_key_size;
@@ -265,7 +273,7 @@ void CMetaInfo::getUpdateQueryForField(const size_t field, std::string &query) c
 	query += fields[field].field_name;
 	query += " = ? WHERE ";
 
-	enumeratePrimKey(tables[*p_table].id, AddPrimKeyToWhereStmt(*this, query));
+	enumeratePrimKey(tables[*p_table].id, AddPrimKeyToWhereStmt(*this, query, nullptr));
 
 	removeEmptyAndStmt(query);
 }
@@ -278,7 +286,7 @@ void CMetaInfo::getDeleteQuery(std::string &query) const {
 	query += primary_table_name;
 	
 	query += " WHERE ";
-	enumeratePrimKey(primary_table_id, AddPrimKeyToWhereStmt(*this, query));
+	enumeratePrimKey(primary_table_id, AddPrimKeyToWhereStmt(*this, query, nullptr));
 
 	removeEmptyAndStmt(query);
 }
