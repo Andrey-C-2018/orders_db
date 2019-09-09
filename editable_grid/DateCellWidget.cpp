@@ -1,7 +1,11 @@
 #include "DateCellWidget.h"
-#include <date/Date.h>
 
-CDateCellWidget::CDateCellWidget() : date_filter(this, _T(','), _T('.')) { }
+CDateCellWidget::CDateCellWidget() : date_filter(this, _T(','), _T('.')), \
+									null_value_allowed(false) { }
+
+CDateCellWidget::CDateCellWidget(const bool null_value_allowed_) : \
+									date_filter(this, _T(','), _T('.')), \
+									null_value_allowed(null_value_allowed_) { }
 
 void CDateCellWidget::CreateCellWidget(XWindow *parent, const int flags, \
 										const Tchar *label, \
@@ -32,31 +36,12 @@ void CDateCellWidget::OnChange(XCommandEvent *eve) {
 
 bool CDateCellWidget::Validate() const {
 
-	auto validated_label = date_filter.getCachedLabel();
-	CDate dt(validated_label.str, CDate::GERMAN_FORMAT);
-
-	if (dt.isNull()) {
-		Tstring err_str = _T("Невірний формат дати: '");
-		err_str += validated_label.str;
-		err_str += _T("'");
-		ErrorBox(err_str.c_str());
-	}
-
-	return !dt.isNull();
+	return InternalValidate(date_filter.getCachedLabel());
 }
 
 bool CDateCellWidget::Validate(ImmutableString<Tchar> label) const {
 
-	CDate dt(label.str, CDate::GERMAN_FORMAT);
-
-	if (dt.isNull()) {
-		Tstring err_str = _T("Невірний формат дати: '");
-		err_str += label.str;
-		err_str += _T("'");
-		ErrorBox(err_str.c_str());
-	}
-
-	return !dt.isNull();
+	return InternalValidate(label);
 }
 
 CDateCellWidget::~CDateCellWidget() { }

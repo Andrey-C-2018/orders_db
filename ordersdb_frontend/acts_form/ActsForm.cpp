@@ -47,11 +47,18 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 																orders_db_table, id_advocat, 0);
 	adv_list.initDbTableEvtHandler(adv_evt_handler);
 
-	payments_list.initDbTable(conn, 1, 1, CDate(1, 1, 1901));
 	size_t orders_prim_key[3];
 	orders_prim_key[0] = orders_db_table->getQuery().getMetaInfo().getFieldIndexByName("id_center_legalaid");
 	orders_prim_key[1] = orders_db_table->getQuery().getMetaInfo().getFieldIndexByName("id");
 	orders_prim_key[2] = orders_db_table->getQuery().getMetaInfo().getFieldIndexByName("order_date");
+	
+	const int def_center = orders_db_table->getResultSet()->getInt(orders_prim_key[0], is_null);
+	assert(!is_null);
+	const int def_order_no = orders_db_table->getResultSet()->getInt(orders_prim_key[1], is_null);
+	assert(!is_null);
+	const CDate def_order_date = orders_db_table->getResultSet()->getDate(orders_prim_key[2], is_null);
+	assert(!is_null);
+	payments_list.initDbTable(conn, def_center, def_order_no, def_order_date);
 
 	size_t params[3] = {0, 1, 2};
 	auto payments_db_table = payments_list.getDbTable();

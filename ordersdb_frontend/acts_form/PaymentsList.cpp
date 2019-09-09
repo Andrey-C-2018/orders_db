@@ -9,6 +9,7 @@
 #include <xwindows/XButton.h>
 #include "PaymentsList.h"
 #include "PaymentsGridEvtHandler.h"
+#include "ActNameCellWidget.h"
 
 CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_) : \
 								grid(nullptr), grid_as_window(nullptr), \
@@ -128,9 +129,10 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	CBooleanCellWidget *qa_widget = nullptr;
 	CCurrencyCellWidget *currency_widget = nullptr;
 	CDateCellWidget *date_widget = nullptr;
+	CActNameCellWidget *act_name_widget = nullptr;
 
 	bool is_paid = false, cycle = false, stages = false, fee = false;
-	bool inf = false, date = false, chk = false, qa = false;
+	bool inf = false, act_name = false, date = false, chk = false, qa = false;
 	try {
 		is_paid_widget = new CEditableCellWidget(true);
 		grid->SetWidgetForFieldByName("is_paid", is_paid_widget);
@@ -159,7 +161,11 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("informer_name", informers_list);
 		inf = true;
 
-		date_widget = new CDateCellWidget();
+		act_name_widget = new CActNameCellWidget();
+		grid->SetWidgetForFieldByName("id_act", act_name_widget);
+		act_name = true;
+
+		date_widget = new CDateCellWidget(true);
 		grid->SetWidgetForFieldByName("act_reg_date", date_widget);
 		date = true;
 
@@ -207,6 +213,9 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 		if (!fee && currency_widget && !currency_widget->IsCreated())
 			delete currency_widget;
+
+		if (!act_name && act_name_widget && !act_name_widget->IsCreated())
+			delete act_name_widget;
 
 		if (!stages && stages_list && !stages_list->IsCreated())
 			delete stages_list;

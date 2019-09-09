@@ -1,9 +1,12 @@
 ﻿#include "MyApp.h"
+#include <basic/locale_init.h>
 #include <xwindows/platform_specific.h>
 
 IMPLEMENT_APP(CMyApp)
 
 void CMyApp::OnInit(){
+
+	setLocaleToCurrOS_Locale();
 
 	frame = nullptr;
 	XSize screen_size = _plGetScreenSize();

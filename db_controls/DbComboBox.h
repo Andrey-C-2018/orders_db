@@ -9,6 +9,7 @@ class CDbComboBox : public XComboBox {
 	size_t field_to_display, sel_index, empty_value_added;
 	const size_t prim_key;
 	ITabStopManager *manager;
+	int def_null_value;
 
 	void fillComboBox();
 	void OnItemChoosed(XCommandEvent *eve);
@@ -33,6 +34,8 @@ public:
 	int getPrimaryKeyAsInteger() const;
 	inline bool isEmpty() const;
 	inline void addEmptyValue();
+
+	void SetCurrRecord(const size_t prim_key_value);
 	void SetCurrRecord(std::shared_ptr<const IDbResultSet> rs, \
 						const size_t prim_key_no_in_rs, int prim_key_type_hint);
 

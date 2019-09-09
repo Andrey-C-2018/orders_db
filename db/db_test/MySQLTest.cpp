@@ -40,7 +40,7 @@ protected:
 
 	void dropTable(const char *table_name) {
 
-		query = u8"DROP TABLE IF EXISTS ";
+		query = "DROP TABLE IF EXISTS ";
 		query += table_name;
 
 		try {
@@ -55,10 +55,11 @@ protected:
 
 	void createTableOrders() {
 
-		query = u8"CREATE TABLE orders(id_center_legalaid INT(4) NOT NULL,";
-		query += u8" id INT(6) NOT NULL, order_date DATE NOT NULL, id_adv INT(6) NOT NULL,";
-		query += u8" client_name VARCHAR(255), order_type ENUM('КЗ','ЗЗП','АДМ'), ";
-		query += u8" fee DECIMAL(8,2), PRIMARY KEY (id_center_legalaid, id, order_date))";
+		query = "CREATE TABLE orders(id_center_legalaid INT(4) NOT NULL,";
+		query += " id INT(6) NOT NULL, order_date DATE NOT NULL, id_adv INT(6) NOT NULL,";
+		query += " client_name VARCHAR(255), client_bdate DATE,";
+		query += " order_type ENUM('КЗ', 'ЗЗП', 'АДМ'), fee DECIMAL(8,2), ";
+		query += " PRIMARY KEY(id_center_legalaid, id, order_date))";
 
 		try {
 			conn->ExecScalarQuery(query.c_str());
@@ -71,8 +72,8 @@ protected:
 
 	record_t insertIntoOrders(const char *id_center, const char *id, \
 								const char *order_date, const char *id_adv, \
-								const char *client_name, const char *order_type, 
-								const char *fee) {
+								const char *client_name, const char *bdate, \
+								const char *order_type, const char *fee) {
 
 		query = "INSERT INTO orders VALUES (";
 		query += id_center;
@@ -84,7 +85,15 @@ protected:
 		query += id_adv;
 		query += ", '";
 		query += client_name;
-		query += "', '";
+		query += "', ";
+		if (bdate) {
+			query += "'";
+			query += bdate;
+			query += "'";
+		}
+		else
+			query += "NULL";
+		query += ", '";
 		query += order_type;
 		query += "', ";
 		query += fee;
@@ -107,7 +116,7 @@ protected:
 
 		std::shared_ptr<IDbStatement> stmt;
 		try {
-			stmt = conn->PrepareQuery("INSERT INTO orders VALUES (?,?,?,?,?,?,?)");
+			stmt = conn->PrepareQuery("INSERT INTO orders VALUES (?,?,?,?,?,?,?,?)");
 		}
 		catch (XException &e) {
 
@@ -120,9 +129,9 @@ protected:
 
 	record_t insertIntoOrders(std::shared_ptr<IDbStatement> stmt, \
 							const int id_center, const int id, \
-							const CDate order_date, const int id_adv, \
-							const char *client_name, const char *order_type,
-							const char *fee) {
+							CDate order_date, const int id_adv, \
+							const char *client_name, CDate bdate, \
+							const char *order_type,	const char *fee) {
 
 		if (!stmt) return 0;
 
@@ -133,8 +142,12 @@ protected:
 			stmt->bindValue(2, order_date);
 			stmt->bindValue(3, id_adv);
 			stmt->bindValue(4, client_name);
-			stmt->bindValue(5, order_type);
-			stmt->bindValue(6, fee);
+			if (bdate.isNull())
+				stmt->bindNull(5);
+			else
+				stmt->bindValue(5, bdate);
+			stmt->bindValue(6, order_type);
+			stmt->bindValue(7, fee);
 
 			inserted_recs_count = stmt->execScalar();
 		}
@@ -145,6 +158,16 @@ protected:
 		}
 
 		return inserted_recs_count;
+	}
+
+	void clearOrdersTable() {
+
+		conn->ExecScalarQuery("DELETE FROM orders");
+	}
+
+	std::shared_ptr<const IDbResultSet> getOrdersTableContents() const {
+
+		return conn->ExecQuery("SELECT * FROM orders");
 	}
 
 public:
@@ -170,17 +193,42 @@ SUITE(MySQL_tests) {
 
 	TEST_FIXTURE(CMySQLTest, InsertIntoTable) {
 
+		clearOrdersTable();
 		auto recs_count = insertIntoOrders("1", "1", "1991-01-01", "1", \
-											u8"Петров І. І.", u8"КЗ", "1234.56");
+											"Петров І. І.", "1970-05-06", \
+											"КЗ", "1234.56");
 		CHECK_EQUAL(1, recs_count);
+
+		recs_count = insertIntoOrders("1", "95", "2016-11-23", "65", \
+											"Іванов І. І.", nullptr, \
+											"ЗЗП", "0.0");
+		CHECK_EQUAL(1, recs_count);
+
+		auto rs = getOrdersTableContents();
+		rs->gotoRecord(1);
+		bool is_null;
+		CDate bdate = rs->getDate(5, is_null);
+		CHECK(is_null);
 	}
 
 	TEST_FIXTURE(CMySQLTest, InsertIntoTableWithParams) {
 
+		clearOrdersTable();
 		auto stmt = getInsertionStmtOrders();
 
 		auto recs_count = insertIntoOrders(stmt, 1, 2, CDate(5, 2, 1992), 1, \
-											u8"Іванов А. А.", u8"ЗЗП", "503.7");
+											"Іванов А. А.", CDate(5, 6, 1970), \
+											"ЗЗП", "503.7");
 		CHECK_EQUAL(1, recs_count);
+		recs_count = insertIntoOrders(stmt, 1, 2, CDate(1, 1, 2013), 1, \
+											"Іванов А. А.", CDate(), \
+											"ЗЗП", "503.7");
+		CHECK_EQUAL(1, recs_count);
+
+		auto rs = getOrdersTableContents();
+		rs->gotoRecord(1);
+		bool is_null;
+		CDate bdate = rs->getDate(5, is_null);
+		CHECK(is_null);
 	}
 }

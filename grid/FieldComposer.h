@@ -80,8 +80,8 @@ public:
 														const int height) {
 
 		int all_records_size = (int)new_items_count * record_height;
-		if (offset && offset + height > all_records_size) {
-			offset = height - (all_records_size - offset);
+		if (offset > all_records_size - height) {
+			offset = all_records_size >= height ? all_records_size - height : 0;
 			RecalcInitialItemAndShift();
 		}
 

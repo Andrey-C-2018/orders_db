@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <string>
 #include <string.h>
+#include <cwctype>
+#include <cctype>
 #include "dll_definitions.h"
 
 #ifdef UNICODE
@@ -100,12 +102,12 @@ inline const wchar_t *Tstrchr(const wchar_t *str1, const wchar_t ch) noexcept {
 
 inline int ToUpper(const int ch) {
 
-	return toupper(ch);
+	return std::toupper(ch);
 }
 
 inline wchar_t ToUpper(const wchar_t ch) {
 
-	return towupper(ch);
+	return std::towupper((std::wint_t)ch);
 }
 
 inline int ToLower(const int ch) {

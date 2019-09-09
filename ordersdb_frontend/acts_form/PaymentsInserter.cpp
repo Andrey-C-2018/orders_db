@@ -5,6 +5,7 @@
 #include <db_controls/DbComboBox.h>
 #include "PaymentsInserter.h"
 #include "ParametersManager.h"
+#include "Validators.h"
 
 enum {
 	MAX_INT_FIELD_LEN = getDigitsCountOfType<int>() + 1
@@ -120,7 +121,7 @@ public:
 class CActNameBinder : public CVisualInsertBinder {
 	enum {MAX_ACT_NAME_LEN = 25};
 
-	Tstring act_name;
+	CActNameValidator validator;
 public:
 	CActNameBinder(XWidget *act_name_holder, bool free_widget) : \
 					CVisualInsertBinder(act_name_holder, free_widget) { }
@@ -130,39 +131,20 @@ public:
 
 		size_t size;
 		auto act_str = widget->GetLabel(size);
-		if (size > MAX_ACT_NAME_LEN) {
-			++params.param_no;
-			params.error_str += _T("Ім'я акта не може бути довшим за ");
-			Tchar buffer[3];
-			params.error_str += XConv::ToString((size_t)MAX_ACT_NAME_LEN, buffer);
-			params.error_str += _T(" симв.\n");
-			return true;
-		}
-		act_name.clear();
-		act_name.reserve(size);
+	
+		size_t err_str_size = params.error_str.size();
+		if (!validator.validate(ImmutableString<Tchar>(act_str, size), params.error_str))
+			return false;
 
-		for (size_t i = 0; i < size; ++i) {
-			Tchar ch = ToUpper(act_str[i]);
+		if (err_str_size == params.error_str.size()) {
 
-			if (ch == _T(' ')) continue;
-
-			if (!((ch >= _T('0') && ch <= _T('9')) || \
-				(ch >= _T('А') && ch <= _T('Я')) || \
-				ch == _T('.') || ch == _T('І'))) {
-
-				++params.param_no;
-				params.error_str += _T("Невірне ім'я акта: ");
-				params.error_str += act_str;
-				params.error_str += _T('\n');
-				return true;
-			}
-			act_name += ch;
+			const Tchar *act_name = validator.getActName();
+			if (!act_name || (act_name && act_name[0] == _T('\0')))
+				binding_target->bindNull(params.param_no);
+			else
+				binding_target->bindValue(params.param_no, act_name);
 		}
 
-		if(act_name.empty())
-			binding_target->bindValue(params.param_no, _T(""));
-		else
-			binding_target->bindValue(params.param_no, act_name.c_str());
 		++params.param_no;
 		return true;
 	}
@@ -196,8 +178,8 @@ public:
 		size_t size;
 		auto date_str = widget->GetLabel(size);
 		if (size == 0) {
-			++params.param_no;
 			binding_target->bindNull(params.param_no);
+			++params.param_no;
 			return true;
 		}
 
@@ -267,8 +249,8 @@ public:
 		size_t size;
 		auto date_str = widget->GetLabel(size);
 		if (size == 0) {
-			++params.param_no;
 			binding_target->bindNull(params.param_no);
+			++params.param_no;
 			return true;
 		}
 
@@ -387,9 +369,8 @@ inline const Tchar *getIntFieldAsString(std::shared_ptr<const IDbResultSet> rs, 
 
 	bool is_null;
 	int value = rs->getInt(field_no, is_null);
-	assert(!is_null);
 
-	return XConv::ToString(value, buffer);
+	return is_null ? _T("") : XConv::ToString(value, buffer);
 }
 
 inline ImmutableString<char> getFieldAsString(std::shared_ptr<const IDbResultSet> rs, \
@@ -455,7 +436,8 @@ CPaymentsInserter::CPaymentsInserter(std::shared_ptr<CDbTable> db_table_) : db_t
 
 void CPaymentsInserter::getCurrRecord() {
 	enum {
-		INT_TYPE_HINT = -1
+		INT_TYPE_HINT = -1, \
+		NULL_CHECKER_INDEX = 0
 	};
 
 	assert(db_table);
@@ -502,7 +484,12 @@ void CPaymentsInserter::getCurrRecord() {
 	setIntWidgetLabel(no_ch_Ist, rs, meta_info, "No_Ch_Ist", buffer);
 
 	setStrWidgetLabel(Koef, rs, meta_info, "Koef");
-	checker->SetCurrRecord(rs, meta_info.getFieldIndexByName("id_checker"), INT_TYPE_HINT);
+	const size_t checker_name_index = meta_info.getFieldIndexByName("user_full_name");
+	const char *checker_name = rs->getString(checker_name_index);
+	if (checker_name)
+		checker->SetCurrRecord(rs, meta_info.getFieldIndexByName("id_checker"), INT_TYPE_HINT);
+	else
+		checker->SetCurrRecord(NULL_CHECKER_INDEX);
 }
 
 void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {

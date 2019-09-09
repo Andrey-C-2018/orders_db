@@ -64,6 +64,7 @@ std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnecti
 	db_table->markFieldAsPrimaryKey("id");
 	db_table->markFieldAsPrimaryKey("order_date");
 
+	db_table->gotoCurrentRecord();
 	return db_table;
 }
 

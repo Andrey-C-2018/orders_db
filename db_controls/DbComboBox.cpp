@@ -6,7 +6,7 @@ CDbComboBox::CDbComboBox(std::shared_ptr<const IDbResultSet> result_set_, \
 							const size_t field_to_display_, const size_t prim_key_) : \
 					result_set(result_set_), field_to_display(field_to_display_), \
 					sel_index((size_t)-1), prim_key(prim_key_), empty_value_added(0), \
-					manager(nullptr) { }
+					manager(nullptr), def_null_value(0) { }
 
 void CDbComboBox::fillComboBox() {
 
@@ -68,29 +68,35 @@ int CDbComboBox::getPrimaryKeyAsInteger() const {
 	return prim_key_value;
 }
 
-void CDbComboBox::SetCurrRecord(std::shared_ptr<const IDbResultSet> rs, \
-								const size_t prim_key_no_in_rs, int prim_key_type_hint) {
-
-	bool is_null;
-	int value = rs->getInt(prim_key_no_in_rs, is_null);
+void CDbComboBox::SetCurrRecord(const size_t prim_key_value) {
 
 	size_t records_count = result_set->getRecordsCount();
-	bool Found = false;
+	bool Found = false, is_null;
 	size_t i = 0;
 	for (; i < records_count && !Found; ++i) {
 
 		result_set->gotoRecord(i);
-		Found = (result_set->getInt(prim_key, is_null) == value);
+		Found = (result_set->getInt(prim_key, is_null) == prim_key_value);
 	}
 	if (!Found) {
 		XException e(0, _T("DBComboBox: no such prim key value: "));
-		e << value;
+		e << prim_key_value;
 		throw e;
 	}
 
 	--i;
 	this->SetSelectionIndex(i);
 	sel_index = i;
+}
+
+void CDbComboBox::SetCurrRecord(std::shared_ptr<const IDbResultSet> rs, \
+								const size_t prim_key_no_in_rs, int prim_key_type_hint) {
+
+	bool is_null;
+	int value = rs->getInt(prim_key_no_in_rs, is_null);
+	if (is_null) value = def_null_value;
+
+	SetCurrRecord(value);
 }
 
 CDbComboBox::~CDbComboBox() { }
