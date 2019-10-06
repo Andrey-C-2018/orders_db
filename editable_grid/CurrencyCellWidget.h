@@ -18,11 +18,6 @@ public:
 	CCurrencyCellWidget &operator=(CCurrencyCellWidget &&obj) = default;
 	CCurrencyCellWidget &operator=(const CCurrencyCellWidget &obj) = delete;
 
-	void CreateCellWidget(XWindow *parent, const int flags, \
-							const Tchar *label, \
-							const int x, const int y, \
-							const int width, const int height) override;
-
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
 
 	virtual ~CCurrencyCellWidget();

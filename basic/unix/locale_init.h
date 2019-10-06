@@ -1,6 +1,6 @@
 #include <locale.h>
 
-inline void setLocaleToCurrOS_Locale() {
+inline const char *getOS_Locale() {
 
-	setlocale(LC_ALL, "uk_UA.UTF-8");
+	return "uk_UA.UTF-8";
 }

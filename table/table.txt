@@ -1,1 +1,0 @@
-./Debug/EventsHandlersContainer.cpp.o ./Debug/StringTable.cpp.o

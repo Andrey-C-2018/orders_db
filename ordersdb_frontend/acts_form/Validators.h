@@ -1,8 +1,10 @@
 #pragma once
 #include <basic/XConv.h>
+#include <date/Date.h>
+#include <db_ext/DbTable.h>
 #include <xwindows/XWidget.h>
 
-class CActNameValidator {
+class CActNameValidator final {
 	enum { MAX_ACT_NAME_LEN = 25 };
 
 	Tstring act_name;
@@ -68,4 +70,84 @@ public:
 	}
 
 	inline const Tchar *getActName() const { return act_name.c_str(); }
+};
+
+//*****************************************************
+
+class CActDateValidator final {
+	enum { INVALID_FIELD_INDEX = (size_t)-1 };
+
+	std::shared_ptr<CDbTable> db_table;
+	XWidget *act_reg_date_widget;
+	size_t order_date_no, act_reg_dt_no;
+public:
+	CActDateValidator(std::shared_ptr<CDbTable> db_table_, \
+						XWidget *act_reg_date_widget_) : \
+			db_table(db_table_), act_reg_date_widget(act_reg_date_widget_), \
+			order_date_no(INVALID_FIELD_INDEX), \
+			act_reg_dt_no(INVALID_FIELD_INDEX) {
+	
+		const CMetaInfo &meta_info = db_table->getQuery().getMetaInfo();
+		order_date_no = meta_info.getFieldIndexByName("order_date");
+
+		if (!act_reg_date_widget) 
+			act_reg_dt_no = meta_info.getFieldIndexByName("act_reg_date");
+	}
+
+	CActDateValidator(const CActDateValidator &obj) = default;
+	CActDateValidator(CActDateValidator &&obj) = default;
+	CActDateValidator &operator=(const CActDateValidator &obj) = default;
+	CActDateValidator &operator=(CActDateValidator &&obj) = default;
+
+	inline bool validate(ImmutableString<Tchar> date_str, \
+							const CDate &date, \
+							Tstring &error_str, \
+							const Tchar *error_str_prefix) const {
+
+		assert(order_date_no != INVALID_FIELD_INDEX);
+		if (date.isNull()) {
+
+			error_str += error_str_prefix;
+			error_str += _T(": невірний формат дати: ");
+			error_str += date_str.str;
+			error_str += _T('\n');
+			return true;
+		}
+		if (date > CDate::now()) {
+			int option = _plMessageBoxYesNo(_T("Дата акта в майбутньому. Продовжувати?"));
+			if (option == IDNO) return false;
+		}
+
+		auto rs = db_table->getResultSet();
+		db_table->gotoCurrentRecord();
+
+		bool is_null;
+		CDate order_date = rs->getDate(order_date_no, is_null);
+		assert(!is_null);
+		if (date < order_date) {
+			error_str += error_str_prefix;
+			error_str += _T(": не може бути меншою за дату доручення\n");
+			return true;
+		}
+		if (date == order_date) {
+			int option = _plMessageBoxYesNo(_T("Дата акта співпадає із датою доручення.\n Малоімовірно, що акт був прийнятий в той же день.\n Продовжувати?"));
+			if (option == IDNO) return false;
+		}
+
+		CDate act_reg_date;
+		if (act_reg_date_widget) {
+			act_reg_date.setDateGerman(act_reg_date_widget->GetLabel());
+			is_null = act_reg_date.isNull();
+		}
+		else {
+			assert(act_reg_dt_no != INVALID_FIELD_INDEX);
+			act_reg_date = rs->getDate(act_reg_dt_no, is_null);
+		}
+		if (!is_null && date < act_reg_date) {
+			error_str += error_str_prefix;
+			error_str += _T(": не може бути меншою за дату прийняття акта\n");
+		}
+
+		return true;
+	}
 };

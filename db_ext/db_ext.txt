@@ -1,1 +1,1 @@
-./Debug/Query.cpp.o ./Debug/main.cpp.o ./Debug/FilteringManager.cpp.o ./Debug/DependentTableUpdater.cpp.o ./Debug/MetaInfo.cpp.o ./Debug/DbTable.cpp.o
+./Debug/DbInserter.cpp.o ./Debug/DbTable.cpp.o ./Debug/MetaInfo.cpp.o ./Debug/DependentTableUpdater.cpp.o ./Debug/main.cpp.o ./Debug/QueryModifier.cpp.o ./Debug/Query.cpp.o ./Debug/FilteringManager.cpp.o

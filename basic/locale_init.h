@@ -5,3 +5,8 @@
 #else
 #include "unix/locale_init.h"
 #endif
+
+inline void setLocaleToCurrOS_Locale() {
+
+	setlocale(LC_ALL, getOS_Locale());
+}

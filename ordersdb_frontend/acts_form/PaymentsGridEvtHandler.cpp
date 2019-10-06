@@ -6,8 +6,8 @@ CPaymentsGridEvtHandler::CPaymentsGridEvtHandler(std::shared_ptr<CDbTable> db_ta
 													CDbGridEventsHandler(db_table) { }
 
 void CPaymentsGridEvtHandler::OnCellChangedCommon(IGridCellWidget *cell_widget, \
-	IOnCellChangedAction &action) const {
-	auto label = cell_widget->GetLabel();
+													IOnCellChangedAction &action) const {
+													auto label = cell_widget->GetLabel();
 
 	try {
 		if (cell_widget->Validate(label))

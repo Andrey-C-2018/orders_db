@@ -158,6 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ActDateCellWidget.cpp" />
     <ClCompile Include="ActNameCellWidget.cpp" />
     <ClCompile Include="ActsForm.cpp" />
     <ClCompile Include="AdvDbTableEventsHandler.cpp" />
@@ -175,6 +176,7 @@
     <ClCompile Include="PaymentsNavPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActDateCellWidget.h" />
     <ClInclude Include="ActNameCellWidget.h" />
     <ClInclude Include="ActsForm.h" />
     <ClInclude Include="AdvDbTableEventsHandler.h" />

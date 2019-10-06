@@ -26,25 +26,27 @@ public:
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
-		params.param_no += 3;
+		CInsParamNoGuard param_no_guard(params.param_no, 3);
+
 		auto rs = db_table->getResultSet();
 		if (rs->empty()) {
 			params.error_str += _T("У дорученні відсутні стадії\n");
 			return true;
 		}
+		db_table->gotoCurrentRecord();
 
 		bool is_null;
 		int v = rs->getInt(order_params[0], is_null);
 		assert(!is_null);
-		binding_target->bindValue(params.param_no - 3, v);
+		binding_target->bindValue(params.param_no, v);
 		
 		v = rs->getInt(order_params[1], is_null);
 		assert(!is_null);
-		binding_target->bindValue(params.param_no - 2, v);
+		binding_target->bindValue(params.param_no + 1, v);
 
 		CDate dt = rs->getDate(order_params[2], is_null);
 		assert(!is_null);
-		binding_target->bindValue(params.param_no - 1, dt);
+		binding_target->bindValue(params.param_no + 2, dt);
 		
 		return true;
 	}
@@ -60,11 +62,12 @@ public:
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
+
 		size_t size;
 		auto fee_str = widget->GetLabel(size);
 
 		if (!size) {
-			++params.param_no;
 			params.error_str += field_name;
 			params.error_str += _T(": не може бути порожнім\n");
 			return true;
@@ -76,7 +79,6 @@ public:
 				fee_str[i] == _T('.') || fee_str[i] == _T(','))) ++i;
 
 		if (i < size) {
-			++params.param_no;
 			params.error_str += field_name;
 			params.error_str += _T(": невірний формат: ");
 			params.error_str += fee_str;
@@ -93,7 +95,6 @@ public:
 
 		if (p) size = (p - fee_str);
 		if (size > 6) {
-			++params.param_no;
 			params.error_str += field_name;
 			params.error_str += _T(": не може перевищувати 1 млн. грн.\n");
 			return true;
@@ -111,7 +112,7 @@ public:
 		}
 		else
 			binding_target->bindValue(params.param_no, fee_str);
-		++params.param_no;
+
 		return true;
 	}
 
@@ -119,7 +120,6 @@ public:
 };
 
 class CActNameBinder : public CVisualInsertBinder {
-	enum {MAX_ACT_NAME_LEN = 25};
 
 	CActNameValidator validator;
 public:
@@ -128,6 +128,8 @@ public:
 
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
+
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
 
 		size_t size;
 		auto act_str = widget->GetLabel(size);
@@ -145,7 +147,6 @@ public:
 				binding_target->bindValue(params.param_no, act_name);
 		}
 
-		++params.param_no;
 		return true;
 	}
 
@@ -153,74 +154,36 @@ public:
 };
 
 class CActDateBinder : public CVisualInsertBinder {
-	enum { INVALID_FIELD_INDEX = (size_t)-1 };
 
-	std::shared_ptr<CDbTable> db_table;
-	XWidget *act_reg_date_widget;
-	size_t order_date_no;
+	CActDateValidator validator;
 public:
 	CActDateBinder(std::shared_ptr<CDbTable> db_table_, \
 					XWidget *act_date_holder, bool free_widget, \
 					XWidget *act_reg_date_holder) : \
 						CVisualInsertBinder(act_date_holder, free_widget), \
-						db_table(db_table_), \
-						act_reg_date_widget(act_reg_date_holder), \
-						order_date_no(INVALID_FIELD_INDEX) {
-	
-		assert(act_reg_date_widget);
-		const CMetaInfo &meta_info = db_table->getQuery().getMetaInfo();
-		order_date_no = meta_info.getFieldIndexByName("order_date");
-	}
+						validator(db_table_, act_reg_date_holder) {	}
 
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
+
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
 
 		size_t size;
 		auto date_str = widget->GetLabel(size);
 		if (size == 0) {
 			binding_target->bindNull(params.param_no);
-			++params.param_no;
 			return true;
 		}
 
+		size_t err_str_size = params.error_str.size();
 		CDate date(date_str, CDate::GERMAN_FORMAT);
-		if (date.isNull()) {
 
-			params.error_str += field_name;
-			params.error_str += _T(": невірний формат дати\n");
-			++params.param_no;
-			return true;
-		}
-		if (date > CDate::now()) {
-			int option = _plMessageBoxYesNo(_T("Дата акта в майбутньому. Продовжувати?"));
-			if (option == IDNO) return false;
-		}
-		
-		auto rs = db_table->getResultSet();
-		bool is_null;
-		CDate order_date = rs->getDate(order_date_no, is_null);
-		assert(!is_null);
-		if (date < order_date) {
-			params.error_str += field_name;
-			params.error_str += _T(": не може бути меншою за дату доручення\n");
-			++params.param_no;
-			return true;
-		}
-		if (date == order_date) {
-			int option = _plMessageBoxYesNo(_T("Дата акта співпадає із датою доручення.\n Малоімовірно, що акт був прийнятий в той же день.\n Продовжувати?"));
-			if (option == IDNO) return false;
-		}
+		if(!validator.validate(ImmutableString<Tchar>(date_str, size), \
+							date, params.error_str, field_name)) return false;
 
-		CDate act_reg_date(act_reg_date_widget->GetLabel(), CDate::GERMAN_FORMAT);
-		if (!act_reg_date.isNull() && date < act_reg_date) {
-			params.error_str += field_name;
-			params.error_str += _T(": не може бути меншою за дату прийняття акта\n");
-			++params.param_no;
-			return true;
-		}
+		if (err_str_size == params.error_str.size()) 
+			binding_target->bindValue(params.param_no, date);
 
-		binding_target->bindValue(params.param_no, date);
-		++params.param_no;
 		return true;
 	}
 
@@ -246,11 +209,12 @@ public:
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
+
 		size_t size;
 		auto date_str = widget->GetLabel(size);
 		if (size == 0) {
 			binding_target->bindNull(params.param_no);
-			++params.param_no;
 			return true;
 		}
 
@@ -259,7 +223,6 @@ public:
 
 			params.error_str += field_name;
 			params.error_str += _T(": невірний формат дати\n");
-			++params.param_no;
 			return true;
 		}
 		if (date > CDate::now()) {
@@ -268,13 +231,14 @@ public:
 		}
 
 		auto rs = db_table->getResultSet();
+		db_table->gotoCurrentRecord();
+
 		bool is_null;
 		CDate order_date = rs->getDate(order_date_no, is_null);
 		assert(!is_null);
 		if (date < order_date) {
 			params.error_str += field_name;
 			params.error_str += _T(": не може бути меншою за дату доручення\n");
-			++params.param_no;
 			return true;
 		}
 		if (date == order_date) {
@@ -283,7 +247,6 @@ public:
 		}
 
 		binding_target->bindValue(params.param_no, date);
-		++params.param_no;
 		return true;
 	}
 
@@ -298,24 +261,23 @@ public:
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
+
 		size_t size;
 		auto qa_param_str = widget->GetLabel(size);
 		if (size == 0) {
 			params.error_str += field_name;
 			params.error_str += _T(": не може бути порожнім\n");
-			++params.param_no;
 			return true;
 		}
 
 		if (qa_param_str[0] != _T('0') && qa_param_str[0] != _T('1')) {
 			params.error_str += field_name;
 			params.error_str += _T(": допустимі значення - 0 або 1\n");
-			++params.param_no;
 			return true;
 		}
 
 		binding_target->bindValue(params.param_no, (int)(qa_param_str[0] - _T('0')));
-		++params.param_no;
 		return true;
 	}
 
@@ -330,12 +292,13 @@ public:
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
+
 		size_t size;
 		auto qa_koef_str = widget->GetLabel(size);
 		if (size == 0) {
 			params.error_str += field_name;
 			params.error_str += _T(": не може бути порожнім\n");
-			++params.param_no;
 			return true;
 		}
 
@@ -349,12 +312,10 @@ public:
 
 			params.error_str += field_name;
 			params.error_str += _T(": допустимі значення - 0, 0.25, 0.5, 0.75 або 1\n");
-			++params.param_no;
 			return true;
 		}
 
 		binding_target->bindValue(params.param_no, qa_koef_str);
-		++params.param_no;
 		return true;
 	}
 

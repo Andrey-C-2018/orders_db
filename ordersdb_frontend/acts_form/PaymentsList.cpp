@@ -10,6 +10,7 @@
 #include "PaymentsList.h"
 #include "PaymentsGridEvtHandler.h"
 #include "ActNameCellWidget.h"
+#include "ActDateCellWidget.h"
 
 CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_) : \
 								grid(nullptr), grid_as_window(nullptr), \
@@ -130,9 +131,11 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	CCurrencyCellWidget *currency_widget = nullptr;
 	CDateCellWidget *date_widget = nullptr;
 	CActNameCellWidget *act_name_widget = nullptr;
+	CActDateCellWidget *act_date_widget = nullptr;
 
 	bool is_paid = false, cycle = false, stages = false, fee = false;
 	bool inf = false, act_name = false, date = false, chk = false, qa = false;
+	bool act_date = false;
 	try {
 		is_paid_widget = new CEditableCellWidget(true);
 		grid->SetWidgetForFieldByName("is_paid", is_paid_widget);
@@ -169,7 +172,9 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("act_reg_date", date_widget);
 		date = true;
 
-		grid->SetWidgetForFieldByName("act_date", date_widget);
+		act_date_widget = new CActDateCellWidget(db_table);
+		grid->SetWidgetForFieldByName("act_date", act_date_widget);
+		act_date = true;
 
 		qa_widget = new CBooleanCellWidget();
 		grid->SetWidgetForFieldByName("age", qa_widget);
@@ -204,6 +209,9 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 		if (!qa && qa_widget && !qa_widget->IsCreated())
 			delete qa_widget;
+
+		if (!act_date && act_date && !act_date_widget->IsCreated())
+			delete act_date_widget;
 
 		if (!date && date_widget && !date_widget->IsCreated())
 			delete date_widget;

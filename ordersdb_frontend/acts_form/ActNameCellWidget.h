@@ -12,6 +12,7 @@ class CActNameCellWidget : public CEditableCellWidget {
 	std::shared_ptr<IArguments> args_container;
 
 	void OnChange(XCommandEvent *eve);
+	inline bool InternalValidate(ImmutableString<Tchar> act_name) const;
 public:
 	CActNameCellWidget();
 
@@ -20,11 +21,6 @@ public:
 	CActNameCellWidget &operator=(const CActNameCellWidget &obj) = delete;
 	CActNameCellWidget &operator=(CActNameCellWidget &&obj) = default;
 	
-	void CreateCellWidget(XWindow *parent, const int flags, \
-							const Tchar *label, \
-							const int x, const int y, \
-							const int width, const int height) override;
-
 	void SetOnChangeHandler(XEventHandlerData on_change) override;
 
 	bool Validate() const;
@@ -33,3 +29,17 @@ public:
 	virtual ~CActNameCellWidget();
 };
 
+//*****************************************************
+
+bool CActNameCellWidget::InternalValidate(ImmutableString<Tchar> act_name) const {
+
+	Tstring error_str;
+	bool cancel = !validator.validate(act_name, error_str);
+	if (cancel || !error_str.empty()) {
+		if (!error_str.empty()) ErrorBox(error_str.c_str());
+		return false;
+	}
+
+	validator.refreshActNameWidget(ignore_change_event);
+	return true;
+}
