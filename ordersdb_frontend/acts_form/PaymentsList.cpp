@@ -23,14 +23,17 @@ CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_)
 								checkers_list(nullptr) { }
 
 void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_center, \
-								const int def_order, CDate def_order_date) {
+								const int def_order, CDate def_order_date, \
+								std::shared_ptr<CPaymentsConstraints> constraints) {
 
 	assert(!db_table);
 	assert(!grid);
+	assert(constraints);
 
 	this->conn = conn_;
 	db_table = createDbTable(conn_, def_center, def_order, def_order_date);
-	grid = new CDbGrid(false, db_table, std::make_shared<CPaymentsGridEvtHandler>(db_table));
+	grid = new CDbGrid(false, db_table, \
+						std::make_shared<CPaymentsGridEvtHandler>(db_table, constraints));
 
 	grid->SetFieldLabel(3, _T("Îïë."));
 	grid->SetFieldWidth(3, 4);
@@ -89,6 +92,11 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 									checkers_list->getMasterResultSet());
 }
 
+void CPaymentsList::initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler) {
+
+	db_table->ConnectEventsHandler(evt_handler);
+}
+
 std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnection> conn, \
 														const int def_center, \
 														const int def_order, \
@@ -128,14 +136,14 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	CEditableCellWidget *is_paid_widget = nullptr;
 	CIntegerCellWidget *cycle_widget = nullptr;
 	CBooleanCellWidget *qa_widget = nullptr;
-	CCurrencyCellWidget *currency_widget = nullptr;
+	CCurrencyCellWidget *currency_widget = nullptr, *koef_widget = nullptr;
 	CDateCellWidget *date_widget = nullptr;
 	CActNameCellWidget *act_name_widget = nullptr;
 	CActDateCellWidget *act_date_widget = nullptr;
 
 	bool is_paid = false, cycle = false, stages = false, fee = false;
 	bool inf = false, act_name = false, date = false, chk = false, qa = false;
-	bool act_date = false;
+	bool act_date = false, koef = false;
 	try {
 		is_paid_widget = new CEditableCellWidget(true);
 		grid->SetWidgetForFieldByName("is_paid", is_paid_widget);
@@ -151,13 +159,12 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("stage_name", stages_list);
 		stages = true;
 
-		currency_widget = new CCurrencyCellWidget();
+		currency_widget = new CCurrencyCellWidget(false);
 		grid->SetWidgetForFieldByName("fee", currency_widget);
 		fee = true;
 
 		grid->SetWidgetForFieldByName("outgoings", currency_widget);
-		grid->SetWidgetForFieldByName("Koef", currency_widget);
-
+		
 		informers_list = new CDbComboBoxCellWidget(conn, "informer_name", \
 												"informers", "payments", db_table);
 		informers_list->AddRelation("id_inf", "id_informer");
@@ -194,6 +201,10 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("zv_kr", qa_widget);
 		grid->SetWidgetForFieldByName("No_Ch_Ist", qa_widget);
 
+		koef_widget = new CCurrencyCellWidget(true);
+		grid->SetWidgetForFieldByName("Koef", koef_widget);
+		koef = true;
+
 		auto chk_stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE user_full_name IS NOT NULL ORDER BY user_name");
 		auto chk_rs = chk_stmt->exec();
 		checkers_list = new CDbComboBoxCellWidget(conn, 1, chk_rs, \
@@ -206,6 +217,9 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	catch (...) {
 		if (!chk && checkers_list && !checkers_list->IsCreated())
 			delete checkers_list;
+
+		if (!koef && koef_widget && !koef_widget->IsCreated())
+			delete koef_widget;
 
 		if (!qa && qa_widget && !qa_widget->IsCreated())
 			delete qa_widget;

@@ -7,6 +7,7 @@
 #include "ActsForm.h"
 #include "AdvDbTableEventsHandler.h"
 #include "OrdersDbTableEventsHandler.h"
+#include "PaymentsDbTableEvtHandler.h"
 #include "ParametersManager.h"
 
 CActsForm::CActsForm(XWindow *parent, const int flags, \
@@ -52,19 +53,27 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 	orders_prim_key[1] = orders_db_table->getQuery().getMetaInfo().getFieldIndexByName("id");
 	orders_prim_key[2] = orders_db_table->getQuery().getMetaInfo().getFieldIndexByName("order_date");
 	
+	constraints = std::make_shared<CPaymentsConstraints>();
+	constraints->old_stage_locked = true;
+	constraints->wrong_zone = true;
+
 	const int def_center = orders_db_table->getResultSet()->getInt(orders_prim_key[0], is_null);
 	assert(!is_null);
 	const int def_order_no = orders_db_table->getResultSet()->getInt(orders_prim_key[1], is_null);
 	assert(!is_null);
 	const CDate def_order_date = orders_db_table->getResultSet()->getDate(orders_prim_key[2], is_null);
 	assert(!is_null);
-	payments_list.initDbTable(conn, def_center, def_order_no, def_order_date);
+	payments_list.initDbTable(conn, def_center, def_order_no, def_order_date, constraints);
 
 	size_t params[3] = {0, 1, 2};
 	auto payments_db_table = payments_list.getDbTable();
 	auto orders_evt_handler = std::make_shared<COrdersDbTableEventsHandler>(orders_db_table, \
 													payments_db_table, orders_prim_key, params);
 	orders_list.initDbTableEvtHandler(orders_evt_handler);
+
+	auto payments_evt_handler = std::make_shared<CPaymentsDbTableEvtHandler>(payments_db_table, \
+										CPaymentsDbTableEvtHandler::REGIONAL, true, constraints);
+	payments_list.initDbTableEvtHandler(payments_evt_handler);
 
 	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
 			label, X, Y, width, height);

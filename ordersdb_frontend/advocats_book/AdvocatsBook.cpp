@@ -51,7 +51,7 @@ CAdvocatsBook::CAdvocatsBook(XWindow *parent, const int flags, \
 std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnection> conn) {
 
 	std::string query = "SELECT b.id_advocat, b.adv_name, b.license_no, b.license_date,";
-	query += " e.exm_name, b.post_index, b.address, b.adv_bdate,";
+	query += " e.exm_name, b.post_index, b.address, b.tel, b.adv_bdate,";
 	query += " d.distr_center, b.org_name, b.org_type ";
 	query += "FROM advocats b INNER JOIN examiners e ON b.id_exm = e.id_examiner";
 	query += " INNER JOIN districts d ON b.id_main_district = d.id_distr";
@@ -80,8 +80,9 @@ void CAdvocatsBook::setFieldsSizes() {
 	grid->SetFieldLabel(4, _T("Орган, який видав свідоцтво"));
 	grid->SetFieldWidth(5, 6);
 	grid->SetFieldWidth(6, 75);
-	grid->SetFieldWidth(8, 25);
-	grid->SetFieldWidth(9, 55);
+	grid->SetFieldWidth(7, 25);
+	grid->SetFieldWidth(9, 25);
+	grid->SetFieldWidth(10, 55);
 }
 
 void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {

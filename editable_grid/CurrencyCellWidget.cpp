@@ -1,6 +1,7 @@
 #include "CurrencyCellWidget.h"
 
-CCurrencyCellWidget::CCurrencyCellWidget() : currency_filter(this, _T(','), _T('.')) { }
+CCurrencyCellWidget::CCurrencyCellWidget(const bool null_allowed_) : \
+				currency_filter(this, _T(','), _T('.'), null_allowed_, _T("0.0")) { }
 
 void CCurrencyCellWidget::SetOnChangeHandler(XEventHandlerData on_change) {
 

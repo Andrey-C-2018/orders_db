@@ -9,6 +9,7 @@ struct IDbConnection;
 class CDbGrid;
 class CDbTable;
 class CDbComboBoxCellWidget;
+struct CPaymentsConstraints;
 
 class CPaymentsList {
 	std::shared_ptr<IDbConnection> conn;
@@ -44,7 +45,9 @@ public:
 	CPaymentsList &operator=(CPaymentsList &&obj) = delete;
 
 	void initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_center, \
-						const int def_order, CDate def_order_date);
+						const int def_order, CDate def_order_date, \
+						std::shared_ptr<CPaymentsConstraints> constraints);
+	void initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler);
 	inline void initSizers(XPoint initial_coords, XSize parent_size, \
 							const XDynamicSizer *prev_sizer);
 

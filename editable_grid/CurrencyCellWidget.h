@@ -11,7 +11,7 @@ class CCurrencyCellWidget : public CEditableCellWidget {
 	void OnChange(XCommandEvent *eve);
 
 public:
-	CCurrencyCellWidget();
+	CCurrencyCellWidget(const bool null_allowed);
 
 	CCurrencyCellWidget(const CCurrencyCellWidget &obj) = delete;
 	CCurrencyCellWidget(CCurrencyCellWidget &&obj) = default;

@@ -1,10 +1,10 @@
 #include "DateCellWidget.h"
 
-CDateCellWidget::CDateCellWidget() : date_filter(this, _T(','), _T('.')), \
+CDateCellWidget::CDateCellWidget() : date_filter(this, _T(','), _T('.'), true, nullptr), \
 									null_value_allowed(false) { }
 
 CDateCellWidget::CDateCellWidget(const bool null_value_allowed_) : \
-									date_filter(this, _T(','), _T('.')), \
+									date_filter(this, _T(','), _T('.'), true, nullptr), \
 									null_value_allowed(null_value_allowed_) { }
 
 void CDateCellWidget::CreateCellWidget(XWindow *parent, const int flags, \

@@ -7,6 +7,7 @@
 
 struct IDbConnection;
 class CDbTable;
+struct CPaymentsConstraints;
 
 class CActsForm : public XTabStopPanel {
 	CPropertiesFile props;
@@ -15,6 +16,7 @@ class CActsForm : public XTabStopPanel {
 	CAdvocatsList adv_list;
 	COrdersList orders_list;
 	CPaymentsList payments_list;
+	std::shared_ptr<CPaymentsConstraints> constraints;
 
 	enum {
 		DEF_GUI_MARGIN = 10, \

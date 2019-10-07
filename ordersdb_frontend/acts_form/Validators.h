@@ -117,6 +117,11 @@ public:
 			int option = _plMessageBoxYesNo(_T("Дата акта в майбутньому. Продовжувати?"));
 			if (option == IDNO) return false;
 		}
+		if (date < CDate(1, 1, 2013)) {
+			error_str += error_str_prefix;
+			error_str += _T(": не може бути меншою за 01.01.2013\n");
+			return true;
+		}
 
 		auto rs = db_table->getResultSet();
 		db_table->gotoCurrentRecord();

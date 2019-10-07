@@ -18,6 +18,8 @@ public:
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
+
 		auto id_advocat_str = widget->GetLabel();
 		if (id_advocat_str && id_advocat_str[0] == _T('\0')) {
 
@@ -37,13 +39,11 @@ public:
 				params.error_str += _T("Введене значення для ID адвоката не є числом: ");
 				params.error_str += id_advocat_str;
 				params.error_str += _T('\n');
-				++params.param_no;
 				return true;
 			}
 			binding_target->bindValue(params.param_no, id);
 		}
 
-		++params.param_no;
 		return true;
 	}
 
@@ -59,8 +59,9 @@ public:
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
+		CInsParamNoGuard param_no_guard(params.param_no, 2);
+
 		auto err = _T("Невірний формат імені адвоката, має бути: '{Прізвище} {Імя} {По-батькові}'\n");
-		params.param_no += 2;
 
 		size_t size;
 		auto adv_name_str = widget->GetLabel(size);
@@ -83,7 +84,7 @@ public:
 		adv_surname += adv_name_full;
 		adv_surname += ' ';
 		adv_surname += adv_patr;
-		binding_target->bindValue(params.param_no - 2, adv_surname.c_str());
+		binding_target->bindValue(params.param_no, adv_surname.c_str());
 
 		adv_surname.erase(adv_surname_size, adv_surname.size() - adv_surname_size);
 		size_t ln = getUnicodeSymbolLength(adv_name_full[0]);
@@ -94,7 +95,7 @@ public:
 		for (size_t i = 0; i < ln && i < 4; ++i)
 			adv_surname += adv_patr[i];
 		adv_surname += '.';
-		binding_target->bindValue(params.param_no - 1, adv_surname.c_str());
+		binding_target->bindValue(params.param_no + 1, adv_surname.c_str());
 
 		return true;
 	}
@@ -110,17 +111,17 @@ public:
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
+
 		size_t size;
 		auto post_index_str = widget->GetLabel(size);
 
 		if (size < 3 || size > 5) {
-			++params.param_no;
 			params.error_str += _T("Кількість цифр у поштовому індексі - від 3 до 5\n");
 			return true;
 		}
 
 		binding_target->bindValue(params.param_no, post_index_str);
-		++params.param_no;
 		return true;
 	}
 
@@ -141,11 +142,12 @@ public:
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
+		CInsParamNoGuard param_no_guard(params.param_no, 2);
+
 		size_t name_size;
 		auto org_name_str = org_name->GetLabel(name_size);
 		size_t type_size;
 		auto org_type_str = org_type->GetLabel(type_size);
-		params.param_no += 2;
 
 		if (Tstrncmp(org_type_str, _T("ІНД"), type_size)) {
 			if (Tstrncmp(org_type_str, _T("АО"), type_size) && \
@@ -170,17 +172,17 @@ public:
 		std::string utf8_buffer;
 		if (name_size) {
 			UCS16_ToUTF8(org_name_str, (int)name_size, utf8_buffer);
-			binding_target->bindValue(params.param_no - 2, utf8_buffer.c_str());
+			binding_target->bindValue(params.param_no, utf8_buffer.c_str());
 		}
 		else
-			binding_target->bindNull(params.param_no - 2);
+			binding_target->bindNull(params.param_no);
 
 		if (!type_size) {
 			org_type_str = _T("ІНД");
 			type_size = 3;
 		}
 		UCS16_ToUTF8(org_type_str, (int)type_size, utf8_buffer);
-		binding_target->bindValue(params.param_no - 1, utf8_buffer.c_str());
+		binding_target->bindValue(params.param_no + 1, utf8_buffer.c_str());
 		return true;
 	}
 
