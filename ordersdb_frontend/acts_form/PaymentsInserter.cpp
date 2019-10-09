@@ -527,6 +527,11 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
 void CPaymentsInserter::insert() {
 
+	if (db_table->empty()) {
+		ErrorBox(_T("Неможливо додати стадію: доручення не вибране"));
+		return;
+	}
+
 	try {
 		CDbInserter::insert();
 	}

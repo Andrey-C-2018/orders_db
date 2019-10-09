@@ -64,7 +64,8 @@ CDbTable::CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_) : \
 bool CDbTable::empty() const {
 
 	bool no_fields = query.getMetaInfo().empty();
-	return no_fields && !result_set->getRecordsCount();
+	bool no_records = result_set->empty();
+	return no_fields || no_records;
 }
 
 size_t CDbTable::GetFieldsCount() const{

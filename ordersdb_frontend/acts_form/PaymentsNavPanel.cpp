@@ -9,14 +9,16 @@
 #include <xwindows_ex/XDateField.h>
 #include <xwindows_ex/XCurrencyField.h>
 #include "PaymentsNavPanel.h"
+#include "Constraints.h"
 
 CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn_, \
 										std::shared_ptr<CDbTable> db_table_, \
+										std::shared_ptr<CPaymentsConstraints> constraints_, \
 										std::shared_ptr<const IDbResultSet> rs_stages_, \
 										std::shared_ptr<const IDbResultSet> rs_inf_, \
 										std::shared_ptr<const IDbResultSet> rs_checkers_) : \
 					btn_get_curr(nullptr), btn_add(nullptr), btn_remove(nullptr), \
-					conn(conn_), db_table(db_table_), \
+					conn(conn_), db_table(db_table_), constraints(constraints_), \
 					rs_stages(rs_stages_), rs_inf(rs_inf_), rs_checkers(rs_checkers_), \
 					inserter(db_table_) {
 
@@ -203,14 +205,29 @@ void CPaymentsNavPanel::OnAddRecordButtonClick(XCommandEvent *eve) {
 
 void CPaymentsNavPanel::OnRemoveButtonClick(XCommandEvent *eve) {
 
+	if (db_table->empty()) {
+		ErrorBox(_T("Видалення неможливе: відсутні стадії"));
+		return;
+	}
+
 	if (db_table->GetRecordsCount() == 1) {
 		ErrorBox(_T("Доручення містить лише одну стадію, її видалення неможливе"));
+		return;
 	}
-	else {
-		int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
-		if (option == IDYES)
-			db_table->removeCurrentRecord();
+
+	if (constraints->old_stage_locked) {
+		ErrorBox(_T("Неможливо видалити цю стадію, оскільки вона належить до минулого періоду"));
+		return;
 	}
+
+	if (constraints->wrong_zone) {
+		ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до іншого центру"));
+		return;
+	}
+	
+	int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
+	if (option == IDYES)
+		db_table->removeCurrentRecord();
 }
 
 CPaymentsNavPanel::~CPaymentsNavPanel() {

@@ -87,7 +87,8 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	createCellWidgetsAndAttachToGrid(grid);
 
 	db_navigator = new CDbNavigator(db_table);
-	panel = new CPaymentsNavPanel(conn_, db_table, stages_list->getMasterResultSet(), \
+	panel = new CPaymentsNavPanel(conn_, db_table, constraints, \
+									stages_list->getMasterResultSet(), \
 									informers_list->getMasterResultSet(), \
 									checkers_list->getMasterResultSet());
 }

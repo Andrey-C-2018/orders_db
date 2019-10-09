@@ -57,12 +57,16 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 	constraints->old_stage_locked = true;
 	constraints->wrong_zone = true;
 
-	const int def_center = orders_db_table->getResultSet()->getInt(orders_prim_key[0], is_null);
-	assert(!is_null);
-	const int def_order_no = orders_db_table->getResultSet()->getInt(orders_prim_key[1], is_null);
-	assert(!is_null);
-	const CDate def_order_date = orders_db_table->getResultSet()->getDate(orders_prim_key[2], is_null);
-	assert(!is_null);
+	int def_center = 0, def_order_no = 0;
+	CDate def_order_date;
+	if (!orders_db_table->empty()) {
+		const int def_center = orders_db_table->getResultSet()->getInt(orders_prim_key[0], is_null);
+		assert(!is_null);
+		const int def_order_no = orders_db_table->getResultSet()->getInt(orders_prim_key[1], is_null);
+		assert(!is_null);
+		const CDate def_order_date = orders_db_table->getResultSet()->getDate(orders_prim_key[2], is_null);
+		assert(!is_null);
+	}
 	payments_list.initDbTable(conn, def_center, def_order_no, def_order_date, constraints);
 
 	size_t params[3] = {0, 1, 2};

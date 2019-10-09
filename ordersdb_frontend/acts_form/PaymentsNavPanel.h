@@ -6,12 +6,14 @@
 struct IDbResultSet;
 class CDbTable;
 class XButton;
+struct CPaymentsConstraints;
 
 class CPaymentsNavPanel : public XTabStopPanel {
 	
 	XButton *btn_get_curr, *btn_add, *btn_remove;
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
+	std::shared_ptr<CPaymentsConstraints> constraints;
 
 	std::shared_ptr<const IDbResultSet> rs_stages;
 	std::shared_ptr<const IDbResultSet> rs_inf;
@@ -26,6 +28,7 @@ class CPaymentsNavPanel : public XTabStopPanel {
 public:
 	CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn_, \
 						std::shared_ptr<CDbTable> db_table_, \
+						std::shared_ptr<CPaymentsConstraints> constraints_, \
 						std::shared_ptr<const IDbResultSet> rs_stages, \
 						std::shared_ptr<const IDbResultSet> rs_inf, \
 						std::shared_ptr<const IDbResultSet> rs_checkers);
