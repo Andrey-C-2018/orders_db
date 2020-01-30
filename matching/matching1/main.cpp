@@ -96,18 +96,21 @@ int main() {
 			dbf_folder_str += dbf_dir.getFileName();
 
 			if (!checkFileExt(dbf_folder_str)) {
+				std::wcerr << L"Невірний тип файлу: " << dbf_folder_str << std::endl;
 				not_end = dbf_dir.getNextFile();
 				continue;
 			}
 
+			CDate payment_date = getPaymentDateFromFileName(dbf_dir.getFileName());
+
 			if (!checkFileExists(dbf_folder_str.c_str())) {
+				std::wcerr << L"Неможливо відкрити: " << dbf_folder_str << std::endl;
 				not_end = dbf_dir.getNextFile();
 				continue;
 			}
 
 			dbf_table.open(dbf_dir.getFileName());
 			checkDbfFileStructure(dbf_table, fields, dbf_dir.getFileName());
-			CDate payment_date = getPaymentDateFromFileName(dbf_dir.getFileName());
 			if (payment_date.isNull()) {
 
 				std::wcerr << _T("Невірний формат імені файлу: '");
@@ -213,10 +216,18 @@ std::shared_ptr<IDbConnection> createSQLiteConnection(const CPropertiesFile &pro
 bool checkFileExt(std::wstring &file_name) {
 
 	auto p = file_name.rfind(L'.');
-	if (p == std::wstring::npos) return false;
+	if (p == std::wstring::npos || \
+		(p != std::wstring::npos && file_name.size() - p < 4)) return false;
 
-	size_t len = file_name.size() - p;
-	return !file_name.compare(p, len, L".dbf");
+	bool valid = file_name[p] == L'.';
+	++p;
+	valid = valid && file_name[p] == L'd' || file_name[p] == L'D';
+	++p;
+	valid = valid && file_name[p] == L'b' || file_name[p] == L'B';
+	++p;
+	valid = valid && file_name[p] == L'f' || file_name[p] == L'F';
+
+	return valid;
 }
 
 void checkDbfFileStructure(const CDbfTable &table, const std::map<std::wstring, size_t> &fields, \

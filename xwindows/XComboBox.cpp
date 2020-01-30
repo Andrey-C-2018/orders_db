@@ -54,9 +54,9 @@ int XComboBox::OverrideWindowEvent(const _plEventId id_event, \
 	assert(hwnds[0] == GetInternalHandle());
 
 	int ret_value;
-	ret_value = OverrideWindowEventImpl(EVT_KEYDOWN, evt_handler_data);
+	ret_value = OverrideWindowEventImpl(id_event, evt_handler_data);
 	for(size_t i = 1; i < COMBOBOX_EXTRA_HWNDS_COUNT; ++i)
-		ret_value &= OverrideWindowExtraHwnd(EVT_KEYDOWN, hwnds[i], evt_handler_data);
+		ret_value &= OverrideWindowExtraHwnd(id_event, hwnds[i], evt_handler_data);
 
 	return ret_value;
 }

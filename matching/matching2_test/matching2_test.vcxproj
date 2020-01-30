@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E94BA609-7AD3-467B-B124-CCF96167F3BF}</ProjectGuid>
+    <ProjectGuid>{BD604B7C-A8F0-4D25-82BC-550F1868D77E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>advocats_book</RootNamespace>
+    <RootNamespace>matching2_test</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -87,14 +87,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X32_PATH%\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;%UNITTEST_INCLUDE_PATH%;../matching2</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/Debug;%(AdditionalLibraryDirectories);%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basic.lib;date.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%UNITTEST_LIB_PATH_X32%\Debug;../../0libs/Debug</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -103,14 +103,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X64_PATH%\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;%UNITTEST_INCLUDE_PATH%;../matching2</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basic.lib;date.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%UNITTEST_LIB_PATH_X64%\Debug;../../0libs/x64/Debug</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,16 +121,16 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X32_PATH%\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;%UNITTEST_INCLUDE_PATH%;../matching2</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/Release;%(AdditionalLibraryDirectories);%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basic.lib;date.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%UNITTEST_LIB_PATH_X32%\Release;../../0libs/Release</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,38 +141,22 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X64_PATH%\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;%UNITTEST_INCLUDE_PATH%;../matching2</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/x64/Release;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;libmysql.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basic.lib;date.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%UNITTEST_LIB_PATH_X64%\Release;../../0libs/x64/Release</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AdvocatInserter.cpp" />
-    <ClCompile Include="AdvocatsBook.cpp" />
-    <ClCompile Include="AdvocatsGridEvtHandler.cpp" />
-    <ClCompile Include="MyApp.cpp" />
-    <ClCompile Include="MyFrame.cpp" />
-    <ClCompile Include="PostIndexCellWidget.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="AdvocatInserter.h" />
-    <ClInclude Include="AdvocatsBook.h" />
-    <ClInclude Include="AdvocatsGridEvtHandler.h" />
-    <ClInclude Include="MyFrame.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="Validators.h" />
-    <ClInclude Include="MyApp.h" />
-    <ClInclude Include="PostIndexCellWidget.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="advocats_book.rc" />
+    <ClCompile Include="..\matching2\ParametersManager.cpp" />
+    <ClCompile Include="ParametersManagerTests.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

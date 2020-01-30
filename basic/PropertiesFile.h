@@ -31,10 +31,17 @@ class BASIC_DLL_EXPORT CPropertiesFile{
 public:
 	CPropertiesFile();
 	CPropertiesFile(const char *path);
+
+	CPropertiesFile(const CPropertiesFile &obj) = delete;
+	CPropertiesFile(CPropertiesFile &&obj) = default;
+	CPropertiesFile &operator=(const CPropertiesFile &obj) = delete;
+	CPropertiesFile &operator=(CPropertiesFile &&obj) = default;
+
 	void open(const char *path);
 	const Tchar *getStringProperty(const Tchar *name, Tstring &buffer) const;
 	const Tchar *getStringPropertyThreadUnsafe(const Tchar *name);
 	int getIntProperty(const Tchar *name, Tstring &buffer) const;
 	int getIntProperty(const Tchar *name, Tstring &buffer, bool &not_found) const;
+
 	virtual ~CPropertiesFile();
 };
