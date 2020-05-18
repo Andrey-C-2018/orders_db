@@ -1,23 +1,21 @@
+#pragma once
 #include <basic/PropertiesFile.h>
 #include <db_ext/FilteringManager.h>
 #include <db_ext/QueryModifier.h>
+#include <xwindows_ex/XTabStopPanel.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
-#include <xwindows_ex/XTabStopPanel.h>
-#include "AdvocatInserter.h"
 
 struct IDbConnection;
 class CDbTable;
 class CDbGrid;
-class CComboBoxCellWidget;
-class CDbComboBoxCellWidget;
+struct CPaymentsConstraints;
 class CFilteringEdit;
 
-class CAdvocatsBook : public XTabStopPanel {
-	enum Defaults {
-		DEF_GUI_ROW_HEIGHT = 30, \
-		DEF_GUI_VERT_GAP = 5, \
-		DEF_GUI_HORZ_GAP = 5
+class CSearchForm : public XTabStopPanel {
+	enum {
+		DEF_GUI_MARGIN = 10, \
+		DEF_DBNAVIGATOR_HEIGHT = 40
 	};
 
 	CPropertiesFile props;
@@ -27,20 +25,16 @@ class CAdvocatsBook : public XTabStopPanel {
 	CQueryModifier query_modifier;
 	CFilteringManager filtering_manager;
 	CFilteringEdit *flt_id;
-	
+
 	CDbGrid *grid;
-	CDbComboBoxCellWidget *examiners_list, *districts_list;
-	CComboBoxCellWidget *adv_org_types_list;
-	int grid_x, grid_y;
-	int grid_margin_x, grid_margin_y;
 
 	XButton *btn_apply_filter, *btn_add, *btn_remove;
-	CAdvocatInserter adv_inserter;
+	//CAdvocatInserter adv_inserter;
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 	void setFieldsSizes();
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
-	void DisplayWidgets();
+	void displayInputWidgets();
 	void adjustUIDependentCellWidgets(CDbGrid *grid);
 	void initFilteringControls();
 
@@ -50,10 +44,14 @@ class CAdvocatsBook : public XTabStopPanel {
 	void OnSize(XSizeEvent *eve);
 
 public:
-	CAdvocatsBook(XWindow *parent, const int flags, \
-					const Tchar *label, \
-					const int x, const int y, \
-					const int width, const int height);
+	CSearchForm(XWindow *parent, const int flags, \
+				const Tchar *label, \
+				const int x, const int y, \
+				const int width, const int height);
+
 	
-	virtual ~CAdvocatsBook();
+
+	virtual ~CSearchForm();
 };
+
+//*****************************************************

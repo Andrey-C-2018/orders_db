@@ -151,7 +151,7 @@ int main() {
 
 std::shared_ptr<TTable> openCSV(const char *path) {
 
-	return std::make_shared<TTable>(path, getOS_Locale(), L',', true, true);
+	return std::make_shared<TTable>(path, getOS_Locale(), L',', true, false);
 }
 
 std::map<std::wstring, size_t> createFieldNamesMap(std::shared_ptr<TTable> csv) {

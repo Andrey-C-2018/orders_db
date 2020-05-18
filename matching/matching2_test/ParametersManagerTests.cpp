@@ -51,9 +51,9 @@ public:
 		}
 		catch (XException &e) {
 			Tcerr << e.what() << std::endl;
-			return;
+			return false;
 		}
-		processExceptions(&CParamsManagerTest::testCopyCtorAndRvalue);
+		return processExceptions(&CParamsManagerTest::testCopyCtorAndRvalue);
 	}
 
 	inline bool isInitialized() const {	return initialized;	}
