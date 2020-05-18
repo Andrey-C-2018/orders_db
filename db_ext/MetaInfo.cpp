@@ -20,7 +20,8 @@ class AddPrimKeyToWhereStmt {
 public:
 	AddPrimKeyToWhereStmt(const CMetaInfo &meta_info_, std::string &query_, \
 							const char *table_alias_) : \
-							meta_info(meta_info_), query(query_), table_alias(table_alias_){ }
+							meta_info(meta_info_), query(query_), \
+							table_alias(table_alias_){ }
 
 	inline void operator()(const size_t field) {
 		
@@ -100,7 +101,7 @@ void CMetaInfo::setQueryConstantModifier(ImmutableString<char> modifier) {
 	constant_modifier = modifier.str;
 }
 
-CMetaInfo::id_type CMetaInfo::addTableRecord(std::string &table_name) {
+CMetaInfo::id_type CMetaInfo::addTableRecord(std::string table_name) {
 	auto p_table_name = findTableRecord(table_name.c_str());
 	id_type table_id = 0;
 	
@@ -122,55 +123,53 @@ CMetaInfo::id_type CMetaInfo::addTableRecord(std::string &table_name) {
 	return table_id;
 }
 
-void CMetaInfo::addKeyIndex(const id_type id_table, const id_type id_field) {
+void CMetaInfo::addKeyIndex(const id_type id_table, const IndexType field_index) {
 	
-	auto p_keys = findTableKeys(id_table);
-	auto p_new_key = p_keys.second == keys_index_table.cend() ? \
-						keys_index_table.cend() : p_keys.second + 1;
+	auto p_last_key = findTableLastKey(id_table);
+	auto p_new_key = p_last_key == keys_index_table.cend() ? \
+						keys_index_table.cend() : p_last_key + 1;
 
-	keys_index_table.insert(p_new_key, id_field);
+	keys_index_table.insert(p_new_key, field_index);
 }
 
-void CMetaInfo::addField(std::shared_ptr<IDbField> field, const size_t new_field_index) {
+void CMetaInfo::addField(std::shared_ptr<IDbField> field) {
 	CFieldRecord rec;
 	std::string new_field_name = field->getFieldName();
+	std::string new_table_name = field->getTableName();
 
-	assert(new_field_index <= fields.size());
+	ConstIndexIterator p_field_nm = findFieldRecord(new_field_name.c_str());
+	if (isFieldRecordFound(p_field_nm, new_field_name.c_str())) {
 
-	ConstIndexIterator p_field = findFieldRecord(new_field_name.c_str());
-	if (isFieldRecordFound(p_field, new_field_name.c_str())) {
-		CMetaInfoException e(CMetaInfoException::E_FIELD_EXISTS, \
-							_T("the field '"));
+		id_type id_table = fields[*p_field_nm].id_table;
+		auto p_table = findTableRecord(id_table);
+		assert(isTableRecordFound(p_table, id_table));
 
-		e << fields[*p_field].field_name << _T("' is already added. Table: '");
-		e << field->getTableName() << _T("'");
-		throw e;
+		if (tables[*p_table].table_name == new_table_name) {
+			CMetaInfoException e(CMetaInfoException::E_FIELD_EXISTS, \
+								_T("the field '"));
+
+			e << fields[*p_field_nm].field_name << _T("' is already added. Table: '");
+			e << field->getTableName() << _T("'");
+			throw e;
+		}
 	}
 
-	size_t fields_old_count = fields.size();
-	rec.id = (id_type)fields_old_count;
+	size_t new_field_index = fields.size();
+	rec.id = (id_type)new_field_index;
 	rec.field = field;
 	rec.field_name = std::move(new_field_name);
 	rec.field_size = field->getFieldMaxLength();
-			
-	std::string table_name = field->getTableName();
-	rec.id_table = addTableRecord(table_name);
+				
+	rec.id_table = addTableRecord(std::move(new_table_name));
 
 	rec.is_primary_key = field->isPrimaryKey();
-	fields.insert(fields.begin() + new_field_index, rec);
+	fields.emplace_back(rec);
 
-	if (new_field_index == fields.size() - 1) {
-		fields_index_id.insert(p_field, fields_old_count);
-		fields_index_name.insert(p_field, fields_old_count);
-	}
-	else{
-		fields_index_id.push_back(fields_old_count);
-		fields_index_name.push_back(fields_old_count);
-		refreshFieldIndexes();
-	}
+	fields_index_id.push_back(new_field_index);
+	fields_index_name.insert(p_field_nm, new_field_index);
 
 	if (rec.is_primary_key) 
-		addKeyIndex(rec.id_table, (id_type)new_field_index);
+		addKeyIndex(rec.id_table, new_field_index);
 }
 
 void CMetaInfo::markFieldAsPrimaryKey(const size_t field) {
@@ -211,13 +210,13 @@ void CMetaInfo::clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fi
 		std::string table_name = rec.field->getTableName();
 
 		rec.id = (id_type)i;
-		rec.id_table = addTableRecord(table_name);
+		rec.id_table = addTableRecord(std::move(table_name));
 		rec.field_name = rec.field->getFieldName(); // TO DO: add name check
 		rec.field_size = rec.field->getFieldMaxLength();
 		rec.is_primary_key = rec.field->isPrimaryKey();
 	
 		if (rec.is_primary_key)
-			addKeyIndex(rec.id_table, (id_type)i);
+			addKeyIndex(rec.id_table, i);
 
 		this->fields.emplace_back(rec);
 		

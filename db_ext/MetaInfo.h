@@ -107,6 +107,7 @@ private:
 	inline ConstIndexIterator findFieldRecord(const id_type id_field) const;
 	inline ConstIndexIterator findTableRecord(const char *table_name) const;
 	inline ConstIndexIterator findTableRecord(const id_type id_table) const;
+	inline ConstIndexIterator findTableLastKey(const id_type id_table) const;
 	inline std::pair<ConstIndexIterator, ConstIndexIterator> \
 							findTableKeys(const id_type id_table) const;
 
@@ -119,8 +120,8 @@ private:
 	inline bool isTableRecordFound(const ConstIndexIterator p_table_id, \
 									const id_type id_table) const;
 
-	id_type addTableRecord(std::string &table_name);
-	void addKeyIndex(const id_type id_table, const id_type id_field);
+	id_type addTableRecord(std::string table_name);
+	void addKeyIndex(const id_type id_table, const IndexType field_index);
 	void refreshFieldIndexes();
 
 	template <class FieldPredicate> \
@@ -153,7 +154,7 @@ public:
 	void setPrimaryTable(const char *table_name);
 	static void setQueryConstantModifier(ImmutableString<char> modifier);
 
-	void addField(std::shared_ptr<IDbField> field, const size_t new_field_index);
+	void addField(std::shared_ptr<IDbField> field);
 	void markFieldAsPrimaryKey(const size_t field);
 	void clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fields);
 
@@ -331,6 +332,17 @@ CMetaInfo::ConstIndexIterator CMetaInfo::findTableRecord(const id_type id_table)
 	return std::lower_bound(tables_index_id.cbegin(), \
 							tables_index_id.cend(), \
 							id_table, predTableId);
+}
+
+CMetaInfo::ConstIndexIterator CMetaInfo::findTableLastKey(const id_type id_table) const {
+	typedef CIndexedValueSearchPredicate<id_type, IndexType, \
+										std::vector<CFieldRecord>, \
+										CGetTableIdFromKeysByIndex> Pred;
+	Pred predKeyTableId(fields);
+
+	return std::lower_bound(keys_index_table.cbegin(), \
+							keys_index_table.cend(), \
+							id_table, predKeyTableId);
 }
 
 std::pair<CMetaInfo::ConstIndexIterator, CMetaInfo::ConstIndexIterator> \

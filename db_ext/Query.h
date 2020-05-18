@@ -24,7 +24,6 @@ public:
 	inline const CMetaInfo &getMetaInfo() const noexcept;
 	inline void setPrimaryTable(const char *table_name);
 	inline void markFieldAsPrimaryKey(const size_t field);
-	inline void setUpdateQueryConstantModifier(ImmutableString<char> modifier);
 
 	std::shared_ptr<IDbStatement> \
 		getUpdateStmt(const size_t updated_field, \

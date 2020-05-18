@@ -29,7 +29,7 @@ class CSearchForm : public XTabStopPanel {
 	CDbGrid *grid;
 
 	XButton *btn_apply_filter, *btn_add, *btn_remove;
-	//CAdvocatInserter adv_inserter;
+	//CPaymentsInserter inserter;
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 	void setFieldsSizes();
@@ -41,15 +41,14 @@ class CSearchForm : public XTabStopPanel {
 	void OnFilterButtonClick(XCommandEvent *eve);
 	void OnAddRecordButtonClick(XCommandEvent *eve);
 	void OnRemoveButtonClick(XCommandEvent *eve);
-	void OnSize(XSizeEvent *eve);
-
+	
 public:
 	CSearchForm(XWindow *parent, const int flags, \
 				const Tchar *label, \
 				const int x, const int y, \
 				const int width, const int height);
 
-	
+	void OnSize(XSizeEvent *eve);
 
 	virtual ~CSearchForm();
 };

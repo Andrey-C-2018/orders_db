@@ -24,9 +24,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="MetaInfo.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="Query.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
@@ -42,15 +39,15 @@
     <ClCompile Include="QueryModifier.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="MetaInfo.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbTable.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Query.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="MetaInfo.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="IndexedSearchPredicates.h">
@@ -78,6 +75,9 @@
       <Filter>interfaces</Filter>
     </ClInclude>
     <ClInclude Include="DbEventsHandlersContainer.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaInfo.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

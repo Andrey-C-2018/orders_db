@@ -36,6 +36,12 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 }
 
+void CSearchForm::setFieldsSizes() {}
+
+void CSearchForm::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {}
+
+void CSearchForm::adjustUIDependentCellWidgets(CDbGrid *grid) {}
+
 void CSearchForm::initFilteringControls() {
 
 	flt_id = new CFilteringEdit(filtering_manager, this);
