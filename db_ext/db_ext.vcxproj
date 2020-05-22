@@ -162,8 +162,8 @@
     <ClCompile Include="DbTable.cpp" />
     <ClCompile Include="DependentTableUpdater.cpp" />
     <ClCompile Include="FilteringManager.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="MetaInfo.cpp" />
+    <ClCompile Include="MetaInfoBasic.cpp" />
     <ClCompile Include="Query.cpp" />
     <ClCompile Include="QueryModifier.cpp" />
   </ItemGroup>
@@ -178,6 +178,7 @@
     <ClInclude Include="IInsertBinder.h" />
     <ClInclude Include="IndexedSearchPredicates.h" />
     <ClInclude Include="MetaInfo.h" />
+    <ClInclude Include="MetaInfoBasic.h" />
     <ClInclude Include="Query.h" />
     <ClInclude Include="QueryModifier.h" />
   </ItemGroup>

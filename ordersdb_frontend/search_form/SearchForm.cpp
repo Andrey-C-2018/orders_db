@@ -73,18 +73,18 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable(std::shared_ptr<IDbConnecti
 
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
 	db_table->setPrimaryTableForQuery("payments");
-	db_table->markFieldAsPrimaryKey("id_center_legalaid");
-	db_table->markFieldAsPrimaryKey("id");
-	db_table->markFieldAsPrimaryKey("order_date");
+	db_table->markFieldAsPrimaryKey("id_center_legalaid", "orders");
+	db_table->markFieldAsPrimaryKey("id", "orders");
+	db_table->markFieldAsPrimaryKey("order_date", "orders");
 
 	//db_table->markFieldAsPrimaryKey("id_center", "payments", \
 	//								"id_center_legalaid", "orders");
-	//db_table->markFieldAsPrimaryKey("id_order", "payments", \
+	//db_table->addPrimaryKeyAsRef("id_order", "payments", \
 	//								"id", "orders");
-	//db_table->markFieldAsPrimaryKey("order_date", "payments", \
+	//db_table->addPrimaryKeyAsRef("order_date", "payments", \
 	//								"order_date", "orders");
-	db_table->markFieldAsPrimaryKey("id_stage");
-	db_table->markFieldAsPrimaryKey("cycle");
+	db_table->markFieldAsPrimaryKey("id_stage", "payments");
+	db_table->markFieldAsPrimaryKey("cycle", "payments");
 	
 	return db_table;
 }

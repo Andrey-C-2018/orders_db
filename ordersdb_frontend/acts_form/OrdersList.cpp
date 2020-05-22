@@ -60,9 +60,9 @@ std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnecti
 
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
 	db_table->setPrimaryTableForQuery("orders");
-	db_table->markFieldAsPrimaryKey("id_center_legalaid");
-	db_table->markFieldAsPrimaryKey("id");
-	db_table->markFieldAsPrimaryKey("order_date");
+	db_table->markFieldAsPrimaryKey("id_center_legalaid", "orders");
+	db_table->markFieldAsPrimaryKey("id", "orders");
+	db_table->markFieldAsPrimaryKey("order_date", "orders");
 
 	if(!db_table->empty())
 		db_table->gotoCurrentRecord();

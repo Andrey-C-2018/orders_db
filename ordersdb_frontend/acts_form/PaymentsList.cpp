@@ -121,11 +121,11 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
 	db_table->setPrimaryTableForQuery("payments");
-	db_table->markFieldAsPrimaryKey("id_center");
-	db_table->markFieldAsPrimaryKey("id_order");
-	db_table->markFieldAsPrimaryKey("order_date");
-	db_table->markFieldAsPrimaryKey("cycle");
-	db_table->markFieldAsPrimaryKey("id_stage");
+	db_table->markFieldAsPrimaryKey("id_center", "payments");
+	db_table->markFieldAsPrimaryKey("id_order", "payments");
+	db_table->markFieldAsPrimaryKey("order_date", "payments");
+	db_table->markFieldAsPrimaryKey("cycle", "payments");
+	db_table->markFieldAsPrimaryKey("id_stage", "payments");
 
 	return db_table;
 }

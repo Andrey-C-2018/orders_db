@@ -24,7 +24,7 @@ struct CIndexedTextSearchPredicate {
 	}
 };
 
-template <typename TInt, typename IndexType, class TRegistry, class GetValueByIndex> \
+template <typename TType, typename IndexType, class TRegistry, class GetValueByIndex> \
 struct CIndexedValueSearchPredicate {
 	const TRegistry &reg;
 	GetValueByIndex getValueByIndex;
@@ -34,11 +34,11 @@ struct CIndexedValueSearchPredicate {
 
 		return getValueByIndex(reg, l) < getValueByIndex(reg, r);
 	}
-	inline bool operator()(IndexType l, TInt r) const {
+	inline bool operator()(IndexType l, TType r) const {
 
 		return getValueByIndex(reg, l) < r;
 	}
-	inline bool operator()(TInt l, IndexType r) const {
+	inline bool operator()(TType l, IndexType r) const {
 
 		return l < getValueByIndex(reg, r);
 	}

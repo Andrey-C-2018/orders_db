@@ -45,7 +45,8 @@ public:
 	inline std::shared_ptr<IDbBindingTarget> getBindingTarget();
 	inline void setPrimaryTableForQuery(const char *table_name);
 	inline void markFieldAsPrimaryKeyByIndex(const size_t field);
-	inline void markFieldAsPrimaryKey(const char *field_name);
+	inline void markFieldAsPrimaryKey(const char *field_name, \
+										const char *table_name);
 
 	bool empty() const override;
 	size_t GetFieldsCount() const override;
@@ -115,9 +116,10 @@ void CDbTable::markFieldAsPrimaryKeyByIndex(const size_t field) {
 	query.markFieldAsPrimaryKey(field);
 }
 
-void CDbTable::markFieldAsPrimaryKey(const char *field_name) {
+void CDbTable::markFieldAsPrimaryKey(const char *field_name, \
+										const char *table_name) {
 	
-	size_t field = query.getMetaInfo().getFieldIndexByName(field_name);
+	size_t field = query.getMetaInfo().getFieldIndexByName(field_name, table_name);
 	query.markFieldAsPrimaryKey(field);
 }
 
