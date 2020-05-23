@@ -47,6 +47,9 @@ public:
 	inline void markFieldAsPrimaryKeyByIndex(const size_t field);
 	inline void markFieldAsPrimaryKey(const char *field_name, \
 										const char *table_name);
+	inline void addPrimaryKeyAsRef(const char *field_name, const char *table_name, \
+									const char *referenved_field_name, \
+									const char *referenced_table_name);
 
 	bool empty() const override;
 	size_t GetFieldsCount() const override;
@@ -121,6 +124,14 @@ void CDbTable::markFieldAsPrimaryKey(const char *field_name, \
 	
 	size_t field = query.getMetaInfo().getFieldIndexByName(field_name, table_name);
 	query.markFieldAsPrimaryKey(field);
+}
+
+void CDbTable::addPrimaryKeyAsRef(const char *field_name, const char *table_name, \
+									const char *referenved_field_name, \
+									const char *referenced_table_name) {
+
+	query.addPrimaryKeyAsRef(field_name, table_name, \
+							referenved_field_name, referenced_table_name);
 }
 
 void CDbTable::executeScalarStmt(std::shared_ptr<IDbStatement> stmt) {

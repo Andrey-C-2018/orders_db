@@ -22,7 +22,7 @@ std::shared_ptr<IDbStatement> CQuery::getUpdateStmt(const size_t updated_field, 
 	else
 		update_stmt = p->second;
 
-	meta_info.bindPrimaryKeyValues(updated_field, result_set, update_stmt);
+	meta_info.bindPrimaryKeyValuesWithOffset(updated_field, 1, result_set, update_stmt);
 	return update_stmt;
 }
 

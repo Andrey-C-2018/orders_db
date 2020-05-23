@@ -12,6 +12,8 @@ class CDependentTableUpdater {
 	struct CFieldsRelation {
 		std::string master_field_name;
 		std::string dependent_field_name;
+		size_t master_field_index;
+		size_t dependent_field_index;
 	};	
 	std::vector<CFieldsRelation> fields_relations;
 

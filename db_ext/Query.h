@@ -24,6 +24,9 @@ public:
 	inline const CMetaInfo &getMetaInfo() const noexcept;
 	inline void setPrimaryTable(const char *table_name);
 	inline void markFieldAsPrimaryKey(const size_t field);
+	inline void addPrimaryKeyAsRef(const char *field_name, const char *table_name, \
+									const char *referenved_field_name, \
+									const char *referenced_table_name);
 
 	std::shared_ptr<IDbStatement> \
 		getUpdateStmt(const size_t updated_field, \
@@ -54,6 +57,15 @@ void CQuery::setPrimaryTable(const char *table_name) {
 void CQuery::markFieldAsPrimaryKey(const size_t field) {
 
 	meta_info.markFieldAsPrimaryKey(field);
+}
+
+void CQuery::addPrimaryKeyAsRef(const char *field_name, const char *table_name, \
+								const char *referenved_field_name, \
+								const char *referenced_table_name) {
+
+	meta_info.addInvisibleFieldAsRef(field_name, table_name, \
+									referenved_field_name, 
+									referenced_table_name, true);
 }
 
 std::shared_ptr<IDbBindingTarget> CQuery::getBindingTarget() {

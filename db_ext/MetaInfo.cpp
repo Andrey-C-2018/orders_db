@@ -1,9 +1,6 @@
 #include "MetaInfo.h"
 
-CMetaInfo::CMetaInfo() {
-
-	visible_fields.reserve(CMetaInfoBasic::DEF_FIELDS_COUNT);
-}
+CMetaInfo::CMetaInfo() : invisible_fields_count(0) { }
 
 void CMetaInfo::addInvisibleFieldAsRef(const char *field_name, const char *table_name, \
 								const char *ref_field_name, const char *ref_table_name, \
@@ -15,6 +12,7 @@ void CMetaInfo::addInvisibleFieldAsRef(const char *field_name, const char *table
 	size_t index = meta_info.addField(field_name, table_name, db_field_ptr);
 		
 	meta_info.markFieldAsPrimaryKey(index);
+	++invisible_fields_count;
 }
 
 CMetaInfo::~CMetaInfo() { }

@@ -25,16 +25,17 @@ class CMetaInfoBasic{
 public:
 	typedef int id_type;
 
-	enum {
-		DEF_FIELDS_COUNT = 10, \
-		DEF_TABLES_COUNT = 3, \
-		DEF_TABLE_KEY_SIZE = 5
-	};
 private:
 	typedef size_t IndexType;
 	
 	typedef std::vector<IndexType>::iterator IndexIterator;
 	typedef std::vector<IndexType>::const_iterator ConstIndexIterator;
+
+	enum {
+		DEF_FIELDS_COUNT = 10, \
+		DEF_TABLES_COUNT = 3, \
+		DEF_TABLE_KEY_SIZE = 5
+	};
 
 	struct CFieldRecord {
 		id_type id;
@@ -168,6 +169,7 @@ public:
 	inline size_t getFieldSize(const size_t field) const noexcept;
 	inline bool isPrimaryKey(const size_t field) const noexcept;
 
+	inline const char *getPrimaryTableName() const;
 	void setPrimaryTable(const char *table_name);
 	static void setQueryConstantModifier(ImmutableString<char> modifier);
 
@@ -183,12 +185,14 @@ public:
 	void getUpdateQueryForField(const size_t field, std::string &query) const;
 	void getDeleteQuery(std::string &query) const;
 
-	void bindPrimaryKeyValues(const size_t field, \
-								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
-								std::shared_ptr<IDbBindingTarget> binding_target) const;
 	void bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 								std::shared_ptr<IDbBindingTarget> binding_target) const;
-	void bindPrimaryKeyValuesWithOffset(const size_t params_offset, \
+
+	inline void bindPrimaryKeyValues(const size_t field, \
+								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+								std::shared_ptr<IDbBindingTarget> binding_target) const;
+
+	void bindPrimaryKeyValuesWithOffset(const size_t field, const size_t params_offset, \
 								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 								std::shared_ptr<IDbBindingTarget> binding_target) const;
 
@@ -294,6 +298,11 @@ bool CMetaInfoBasic::isPrimaryKey(const size_t field) const noexcept {
 	return fields[field].is_primary_key;
 }
 
+const char *CMetaInfoBasic::getPrimaryTableName() const {
+
+	return primary_table_name.c_str();
+}
+
 template <class FieldPredicate> \
 size_t CMetaInfoBasic::enumeratePrimKey(const id_type table_id, \
 									FieldPredicate field_pred) const {
@@ -312,6 +321,13 @@ size_t CMetaInfoBasic::enumeratePrimKey(const id_type table_id, \
 			_T("There are no foreign keys for the table the id field belongs to"));
 
 	return keys_counter;
+}
+
+void CMetaInfoBasic::bindPrimaryKeyValues(const size_t field, \
+								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+								std::shared_ptr<IDbBindingTarget> binding_target) const {
+
+	bindPrimaryKeyValuesWithOffset(field, 0, prim_key_values_src, binding_target);
 }
 
 void CMetaInfoBasic::removeEmptyAndStmt(std::string &query) const {

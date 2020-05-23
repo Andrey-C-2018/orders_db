@@ -176,7 +176,10 @@ void CMetaInfoBasic::markFieldAsPrimaryKey(const size_t field) {
 	assert(field < fields.size());
 	CFieldRecord &field_rec = fields[field];
 
-	field_rec.is_primary_key = true;
+	if (!field_rec.is_primary_key) {
+		field_rec.is_primary_key = true;
+		addKeyIndex(field_rec.id_table, field);
+	}
 }
 
 void CMetaInfoBasic::refreshFieldIndexes() {
@@ -282,33 +285,23 @@ void CMetaInfoBasic::getDeleteQuery(std::string &query) const {
 	removeEmptyAndStmt(query);
 }
 
-void CMetaInfoBasic::bindPrimaryKeyValues(const size_t field, \
+void CMetaInfoBasic::bindPrimaryKeyValues(\
 									std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 									std::shared_ptr<IDbBindingTarget> binding_target) const {
 
+	enumeratePrimKey(primary_table_id, BindPrimKeyValue(*this, 0, \
+														prim_key_values_src, binding_target));
+}
+
+void CMetaInfoBasic::bindPrimaryKeyValuesWithOffset(const size_t field, \
+									const size_t params_offset, \
+									std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+									std::shared_ptr<IDbBindingTarget> binding_target) const {
+	
 	assert(field < fields.size());
 	const CFieldRecord &field_rec = fields[field];
-	id_type updated_table_id = field_rec.id_table;
 
-	auto p_table = findTableRecord(updated_table_id);
-	assert(isTableRecordFound(p_table, updated_table_id));
-
-	enumeratePrimKey(tables[*p_table].id, BindPrimKeyValue(*this, 1, prim_key_values_src, \
-															binding_target));
-}
-
-void CMetaInfoBasic::bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
-										std::shared_ptr<IDbBindingTarget> binding_target) const {
-	
-	bindPrimaryKeyValuesWithOffset(0, prim_key_values_src, binding_target);
-}
-
-void CMetaInfoBasic::bindPrimaryKeyValuesWithOffset(const size_t params_offset, \
-									std::shared_ptr<const IDbResultSet> prim_key_values_src, \
-									std::shared_ptr<IDbBindingTarget> binding_target) const {
-	
-	assert(primary_table_id != -1);
-	enumeratePrimKey(primary_table_id, BindPrimKeyValue(*this, params_offset, \
+	enumeratePrimKey(field_rec.id_table, BindPrimKeyValue(*this, params_offset, \
 														prim_key_values_src, binding_target));
 }
 

@@ -10,12 +10,15 @@ struct IDbConnection;
 class CDbTable;
 class CDbGrid;
 struct CPaymentsConstraints;
+class CComboBoxCellWidget;
+class CDbComboBoxCellWidget;
 class CFilteringEdit;
 
 class CSearchForm : public XTabStopPanel {
-	enum {
-		DEF_GUI_MARGIN = 10, \
-		DEF_DBNAVIGATOR_HEIGHT = 40
+	enum Defaults {
+		DEF_GUI_ROW_HEIGHT = 30, \
+		DEF_GUI_VERT_GAP = 5, \
+		DEF_GUI_HORZ_GAP = 5
 	};
 
 	CPropertiesFile props;
@@ -27,6 +30,9 @@ class CSearchForm : public XTabStopPanel {
 	CFilteringEdit *flt_id;
 
 	CDbGrid *grid;
+	CDbComboBoxCellWidget *advocats_list;
+	int grid_x, grid_y;
+	int grid_margin_x, grid_margin_y;
 
 	XButton *btn_apply_filter, *btn_add, *btn_remove;
 	//CPaymentsInserter inserter;
@@ -34,7 +40,7 @@ class CSearchForm : public XTabStopPanel {
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 	void setFieldsSizes();
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
-	void displayInputWidgets();
+	void displayWidgets();
 	void adjustUIDependentCellWidgets(CDbGrid *grid);
 	void initFilteringControls();
 

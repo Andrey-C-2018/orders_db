@@ -3,7 +3,7 @@
 
 class CMetaInfo {
 	CMetaInfoBasic meta_info;
-	std::vector<size_t> visible_fields;
+	size_t invisible_fields_count;
 
 public:
 	CMetaInfo();
@@ -27,6 +27,7 @@ public:
 	inline size_t getFieldSize(const size_t field) const noexcept;
 	inline bool isPrimaryKey(const size_t field) const noexcept;
 
+	inline const char *getPrimaryTableName() const;
 	inline void setPrimaryTable(const char *table_name);
 	inline static void setQueryConstantModifier(ImmutableString<char> modifier);
 
@@ -43,12 +44,15 @@ public:
 	inline void getUpdateQueryForField(const size_t field, std::string &query) const;
 	inline void getDeleteQuery(std::string &query) const;
 
+	inline void bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+							std::shared_ptr<IDbBindingTarget> binding_target) const;
+
 	inline void bindPrimaryKeyValues(const size_t field, \
 							std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 							std::shared_ptr<IDbBindingTarget> binding_target) const;
-	inline void bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
-							std::shared_ptr<IDbBindingTarget> binding_target) const;
-	inline void bindPrimaryKeyValuesWithOffset(const size_t params_offset, \
+
+	inline void bindPrimaryKeyValuesWithOffset(const size_t field, \
+							const size_t params_offset, \
 							std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 							std::shared_ptr<IDbBindingTarget> binding_target) const;
 
@@ -59,8 +63,8 @@ public:
 
 size_t CMetaInfo::getFieldsCount() const {
 
-	assert(visible_fields.size() <= meta_info.getFieldsCount());
-	return visible_fields.size();
+	assert(invisible_fields_count <= meta_info.getFieldsCount());
+	return meta_info.getFieldsCount() - invisible_fields_count;
 }
 
 size_t CMetaInfo::getTablesCount() const {
@@ -70,22 +74,25 @@ size_t CMetaInfo::getTablesCount() const {
 
 bool CMetaInfo::empty() const {
 
-	return visible_fields.empty();
+	return meta_info.empty();
 }
 
 std::shared_ptr<const IDbField> CMetaInfo::getField(const size_t field) const {
 
-	return meta_info.getField(visible_fields[field]);
+	assert(field < getFieldsCount());
+	return meta_info.getField(field);
 }
 
 ImmutableString<char> CMetaInfo::getFieldName(const size_t field) const {
 
-	return meta_info.getFieldName(visible_fields[field]);
+	assert(field < getFieldsCount());
+	return meta_info.getFieldName(field);
 }
 
 ImmutableString<wchar_t> CMetaInfo::getFieldNameW(const size_t field) const {
 
-	return meta_info.getFieldNameW(visible_fields[field]);
+	assert(field < getFieldsCount());
+	return meta_info.getFieldNameW(field);
 }
 
 size_t CMetaInfo::getFieldIndexByName(const char *field_name) const {
@@ -100,22 +107,31 @@ size_t CMetaInfo::getFieldIndexByName(const char *field_name, const char *table_
 
 ImmutableString<char> CMetaInfo::getTableName(const size_t field) const {
 
-	return meta_info.getTableName(visible_fields[field]);
+	assert(field < getFieldsCount());
+	return meta_info.getTableName(field);
 }
 
 ImmutableString<wchar_t> CMetaInfo::getTableNameW(const size_t field) const {
 
-	return meta_info.getTableNameW(visible_fields[field]);
+	assert(field < getFieldsCount());
+	return meta_info.getTableNameW(field);
 }
 
 size_t CMetaInfo::getFieldSize(const size_t field) const noexcept {
 
-	return meta_info.getFieldSize(visible_fields[field]);
+	assert(field < getFieldsCount());
+	return meta_info.getFieldSize(field);
 }
 
 bool CMetaInfo::isPrimaryKey(const size_t field) const noexcept {
 
-	return meta_info.isPrimaryKey(visible_fields[field]);
+	assert(field < getFieldsCount());
+	return meta_info.isPrimaryKey(field);
+}
+
+const char *CMetaInfo::getPrimaryTableName() const {
+
+	return meta_info.getPrimaryTableName();
 }
 
 void CMetaInfo::setPrimaryTable(const char *table_name) {
@@ -130,16 +146,14 @@ void CMetaInfo::setQueryConstantModifier(ImmutableString<char> modifier) {
 
 void CMetaInfo::markFieldAsPrimaryKey(const size_t field) {
 
-	meta_info.markFieldAsPrimaryKey(visible_fields[field]);
+	assert(field < getFieldsCount());
+	meta_info.markFieldAsPrimaryKey(field);
 }
 
 void CMetaInfo::clearAndAddFields(std::shared_ptr<const IDbResultSetMetadata> fields) {
 
 	meta_info.clearAndAddFields(fields);
-
-	visible_fields.reserve(meta_info.getFieldsCount());
-	for (size_t i = 0; i < meta_info.getFieldsCount(); ++i)
-		visible_fields.push_back(i);
+	invisible_fields_count = 0;
 }
 
 size_t CMetaInfo::appendWherePartOfUpdateQuery(std::string &query, \
@@ -156,7 +170,8 @@ size_t CMetaInfo::appendWherePartOfUpdateQuery(const char *table_name, std::stri
 
 void CMetaInfo::getUpdateQueryForField(const size_t field, std::string &query) const {
 
-	meta_info.getUpdateQueryForField(visible_fields[field], query);
+	assert(field < getFieldsCount());
+	meta_info.getUpdateQueryForField(field, query);
 }
 
 void CMetaInfo::getDeleteQuery(std::string &query) const {
@@ -164,21 +179,25 @@ void CMetaInfo::getDeleteQuery(std::string &query) const {
 	meta_info.getDeleteQuery(query);
 }
 
-void CMetaInfo::bindPrimaryKeyValues(const size_t field, \
-								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
-								std::shared_ptr<IDbBindingTarget> binding_target) const {
-
-	meta_info.bindPrimaryKeyValues(visible_fields[field], \
-									prim_key_values_src, binding_target);
-}
 void CMetaInfo::bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 								std::shared_ptr<IDbBindingTarget> binding_target) const {
 
 	meta_info.bindPrimaryKeyValues(prim_key_values_src, binding_target);
 }
-void CMetaInfo::bindPrimaryKeyValuesWithOffset(const size_t params_offset, \
+
+void CMetaInfo::bindPrimaryKeyValues(const size_t field, \
 								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 								std::shared_ptr<IDbBindingTarget> binding_target) const {
 
-	meta_info.bindPrimaryKeyValues(params_offset, prim_key_values_src, binding_target);
+	assert(field < getFieldsCount());
+	meta_info.bindPrimaryKeyValues(field, prim_key_values_src, binding_target);
+}
+
+void CMetaInfo::bindPrimaryKeyValuesWithOffset(const size_t field, \
+								const size_t params_offset, \
+								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+								std::shared_ptr<IDbBindingTarget> binding_target) const {
+
+	meta_info.bindPrimaryKeyValuesWithOffset(field, params_offset, prim_key_values_src, \
+												binding_target);
 }
