@@ -10,6 +10,7 @@
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbComboBoxCellWidget.h>
 #include <db_controls/FilteringEdit.h>
+#include <db_controls/FilteringDbComboBox.h>
 #include <db_controls/BinderControls.h>
 #include <db_controls/DbNavigator.h>
 #include "SearchForm.h"
@@ -51,11 +52,10 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const int X, const int Y, \
 					const int width, const int height) : \
 				flt_id(nullptr), grid(nullptr), advocats_list(nullptr), \
+				centers_list(nullptr), \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
 
 	props.open("config.ini");
-
-	initFilteringControls();
 
 	conn = CMySQLConnectionFactory::createConnection(props);
 	db_table = createDbTable(conn);
@@ -63,6 +63,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	grid = new CDbGrid(false, db_table);
 	setFieldsSizes();
 	createCellWidgetsAndAttachToGrid(grid);
+	initFilteringControls();
 
 	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
 			label, X, Y, width, height);
@@ -117,13 +118,20 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 	assert(grid);
 	assert(!advocats_list);
-	CGridCellWidgetCreator adv_name_cr(grid);
+	assert(!centers_list);
+	CGridCellWidgetCreator creator(grid);
 	
-	advocats_list = adv_name_cr.createAndAttachToGrid<CDbComboBoxCellWidget>(\
+	advocats_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
 										"adv_name_short", \
 										conn, "adv_name_short", "advocats", \
 										"orders", db_table);
 	advocats_list->AddRelation("id_advocat", "id_adv");
+
+	centers_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
+										"center_short_name", \
+										conn, "center_short_name", "centers", \
+										"orders", db_table);
+	centers_list->AddRelation("id_center", "id_center_legalaid");
 }
 
 void CSearchForm::adjustUIDependentCellWidgets(CDbGrid *grid) {}
@@ -132,10 +140,19 @@ void CSearchForm::initFilteringControls() {
 
 	flt_id = new CFilteringEdit(filtering_manager, this);
 	std::shared_ptr<IBinder> id_binder = std::make_shared<CIntWidgetBinderControl>(flt_id);
-
 	ImmutableString<char> expr("a.id = ?", sizeof("a.id = ?") - 1);
 	int id_expr = filtering_manager.addExpr(expr, id_binder);
 	flt_id->setExprId(id_expr);
+
+	flt_advocat = new CFilteringDbComboBox(filtering_manager, \
+											advocats_list->getMasterResultSet(), 1, 0);
+	auto adv_binder = std::make_shared<CDbComboBoxBinderControl>(flt_advocat);
+	id_expr = filtering_manager.addExpr(\
+			ImmutableString<char>("a.id_adv = ?", sizeof("a.id_adv = ?") - 1), adv_binder);
+	flt_advocat->setExprId(id_expr);
+
+	flt_center = new CFilteringDbComboBox(filtering_manager, \
+											centers_list->getMasterResultSet(), 2, 0);
 }
 
 std::shared_ptr<CDbTable> CSearchForm::createDbTable(std::shared_ptr<IDbConnection> conn) {
@@ -188,8 +205,21 @@ void CSearchForm::displayWidgets() {
 
 	CHorizontalSizer sizer(CSizerPreferences(0, 0, 0, 0, DEF_GUI_HORZ_GAP));
 	main_sizer.pushNestedSizer(sizer);
-		sizer.addWidget(new XLabel(), _T("ID: "), FL_WINDOW_VISIBLE, \
-						XSize(20, DEF_GUI_ROW_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Адвокат: "), FL_WINDOW_VISIBLE, \
+						XSize(60, DEF_GUI_ROW_HEIGHT));
+		sizer.addResizeableWidget(flt_advocat, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+						XSize(250, DEF_GUI_ROW_HEIGHT), 250);
+
+		sizer.addWidget(new XLabel(), _T("Центр: "), FL_WINDOW_VISIBLE, \
+						XSize(50, DEF_GUI_ROW_HEIGHT));
+		sizer.addResizeableWidget(flt_center, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+						XSize(180, DEF_GUI_ROW_HEIGHT), 200);
+
+	main_sizer.popNestedSizer();
+
+	main_sizer.pushNestedSizer(sizer);
+		sizer.addWidget(new XLabel(), _T("№ дор.: "), FL_WINDOW_VISIBLE, \
+						XSize(60, DEF_GUI_ROW_HEIGHT));
 		sizer.addWidget(flt_id, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(45, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
@@ -213,6 +243,12 @@ void CSearchForm::displayWidgets() {
 	main_sizer.popNestedSizer();
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
+
+	grid->HideField(22);
+	grid->HideField(23);
+	grid->HideField(24);
+	grid->HideField(25);
+	grid->HideField(26);
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;
@@ -225,9 +261,9 @@ void CSearchForm::displayWidgets() {
 
 void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
 
-	if (filtering_manager.isWherePartChanged()) {
+	if (filtering_manager.isFilteringStringChanged()) {
 
-		query_modifier.changeWherePart(filtering_manager.getSQLWherePart());
+		query_modifier.changeWherePart(filtering_manager.buildFilteringString());
 
 		auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 		filtering_manager.apply(stmt);

@@ -141,7 +141,7 @@ CDbComboBoxInsertBinder::CDbComboBoxInsertBinder(CDbComboBox *db_combo_, \
 bool CDbComboBoxInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 									Params &params, const Tchar *field_name) {
 
-	if (db_combo->isEmpty()) {
+	if (db_combo->isEmptySelection()) {
 		params.error_str += field_name;
 		params.error_str += _T(": значення із списку не вибрано\n");
 		++params.param_no;

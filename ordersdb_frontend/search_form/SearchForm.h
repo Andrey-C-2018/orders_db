@@ -13,6 +13,7 @@ struct CPaymentsConstraints;
 class CComboBoxCellWidget;
 class CDbComboBoxCellWidget;
 class CFilteringEdit;
+class CFilteringDbComboBox;
 
 class CSearchForm : public XTabStopPanel {
 	enum Defaults {
@@ -28,9 +29,10 @@ class CSearchForm : public XTabStopPanel {
 	CQueryModifier query_modifier;
 	CFilteringManager filtering_manager;
 	CFilteringEdit *flt_id;
+	CFilteringDbComboBox *flt_advocat, *flt_center;
 
 	CDbGrid *grid;
-	CDbComboBoxCellWidget *advocats_list;
+	CDbComboBoxCellWidget *advocats_list, *centers_list;
 	int grid_x, grid_y;
 	int grid_margin_x, grid_margin_y;
 

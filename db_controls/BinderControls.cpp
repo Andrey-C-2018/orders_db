@@ -3,6 +3,7 @@
 #include <basic/Exception.h>
 #include <db/IDbBindingTarget.h>
 #include <xwindows/XWidget.h>
+#include "DbComboBox.h"
 #include <assert.h>
 
 CIntWidgetBinderControl::CIntWidgetBinderControl(XWidget *widget_) : widget(widget_) {
@@ -27,3 +28,20 @@ void CIntWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_tar
 }
 
 CIntWidgetBinderControl::~CIntWidgetBinderControl() { }
+
+//*****************************************************
+
+CDbComboBoxBinderControl::CDbComboBoxBinderControl(CDbComboBox *combobox_) : \
+													combobox(combobox_) {
+
+	assert(combobox);
+}
+
+void CDbComboBoxBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+									const size_t param_no) {
+
+	int i = combobox->getPrimaryKeyAsInteger();
+	binding_target->bindValue(param_no, i);
+}
+
+CDbComboBoxBinderControl::~CDbComboBoxBinderControl() { }

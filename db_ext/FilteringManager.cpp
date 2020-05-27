@@ -2,10 +2,8 @@
 #include <db/IDbBindingTarget.h>
 #include "FilteringManager.h"
 
-CFilteringManager::CFilteringManager() : query_text(), \
-									filtering_changed(false), \
-									query_text_changed(false), \
-									switched_expr_count(0) { }
+CFilteringManager::CFilteringManager() : filtering_changed(false), \
+										flt_string_changed(false) { }
 
 int CFilteringManager::addExpr(ImmutableString<char> expression, \
 								std::shared_ptr<IBinder> binder) {
@@ -18,13 +16,8 @@ int CFilteringManager::addExpr(ImmutableString<char> expression, \
 	item.id = size ? filtering_items[size - 1].id + 1 : 0;
 	item.expression = expression.str;
 
-	item.pos_begin = 0;
-	item.pos_end = 0;
-	item.enabled = false;
-	item.switched = false;
-	item.first_param = -1;
-
 	item.binders.push_back(binder);
+	item.enabled = false;
 	filtering_items.emplace_back(std::move(item));
 		
 	return item.id;
@@ -36,70 +29,69 @@ void CFilteringManager::addBinderToExpr(const int id_expr, \
 	assert(binder);
 
 	auto p = findFilteringItem(id_expr);
-	assert(isFound(p, id_expr));
-
 	p->binders.push_back(binder);
 }
 
 void CFilteringManager::enableExpr(int id_expr) {
 
 	auto p = findFilteringItem(id_expr);
-	assert(isFound(p, id_expr));
-
-	InternalEnable(p);
-	filtering_changed = true;
-}
-
-void CFilteringManager::enableAll() {
-
-	for (auto p = filtering_items.begin(); p != filtering_items.end(); ++p) 
-		InternalEnable(p);
+	if (!p->enabled) {
+		enabled_items[id_expr] = std::distance(filtering_items.begin(), p);
+		flt_string_changed = flt_string_changed || \
+						flt_str_items.find(id_expr) == flt_str_items.cend();
+	}
 
 	filtering_changed = true;
+	p->enabled = true;
 }
 
 void CFilteringManager::disableExpr(int id_expr) {
 
 	auto p = findFilteringItem(id_expr);
-	assert(isFound(p, id_expr));
+	if (p->enabled)
+		enabled_items.erase(id_expr);
 
-	InternalDisable(p);
 	filtering_changed = true;
+	p->enabled = false;
 }
 
 void CFilteringManager::disableAll() {
 
-	for (auto p = filtering_items.begin(); p != filtering_items.end(); ++p)
-		InternalDisable(p);
+	for (auto i : enabled_items)
+		filtering_items[i.second].enabled = false;
 
-	filtering_changed = true;
+	filtering_changed = !enabled_items.empty();
+	enabled_items.clear();
 }
 
 void CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
 
-	assert(filtering_changed || (!filtering_changed && !query_text_changed));
 	if (!filtering_changed) return;
 
 	assert(parsed_query);
 
-	int params_counter = 0;
-	for(auto p = filtering_items.begin(); p != filtering_items.end(); ++p) {
+	size_t params_counter = 0;
+	for(const auto &i : flt_str_items) {
 
-		p->first_param = params_counter;
-		if (p->switched) {
-			parsed_query->bindValue(p->first_param, !p->enabled);
-			++params_counter;
+		auto &flt_str_item = i.second;
+		auto &item = filtering_items[flt_str_item.index];
+
+		parsed_query->bindValue(params_counter, !item.enabled);
+		++params_counter;
+
+		if (item.enabled) {
+			auto p_binder = item.binders.begin();
+			while (p_binder != item.binders.end()) {
+				p_binder->get()->bind(parsed_query, params_counter);
+				++p_binder;
+				++params_counter;
+			}
 		}
-
-		if(p->enabled)
-			for(auto p_binder = p->binders.begin(); \
-				p_binder != p->binders.end(); ++p_binder, ++params_counter)
-					p_binder->get()->bind(parsed_query, params_counter);
-
+		else
+			params_counter += item.binders.size();
 	}
 
 	filtering_changed = false;
-	query_text_changed = false;
 }
 
 CFilteringManager::~CFilteringManager() { }

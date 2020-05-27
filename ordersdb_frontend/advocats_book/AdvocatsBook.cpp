@@ -295,9 +295,9 @@ void CAdvocatsBook::initFilteringControls() {
 
 void CAdvocatsBook::OnFilterButtonClick(XCommandEvent *eve) {
 
-	if (filtering_manager.isWherePartChanged()) {
+	if (filtering_manager.isFilteringStringChanged()) {
 
-		query_modifier.changeWherePart(filtering_manager.getSQLWherePart());
+		query_modifier.changeWherePart(filtering_manager.buildFilteringString());
 		
 		auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 		filtering_manager.apply(stmt);

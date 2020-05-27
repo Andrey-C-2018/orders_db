@@ -33,8 +33,6 @@ void CFilteringEdit::OnChange(XCommandEvent *eve) {
 void CFilteringEdit::OnLooseFocus(XCommandEvent *eve) {
 
 	if (is_changed) {
-		int id_expr = eve->GetSender()->GetTag();
-
 		const Tchar *label = eve->GetSender()->GetLabel();
 		if (label && label[0] != _T('\0'))
 			filtering_manager.enableExpr(id_expr);

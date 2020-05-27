@@ -32,6 +32,7 @@ void CDbComboBox::Create(XWindow *parent, const int flags, \
 void CDbComboBox::OnItemChoosed(XCommandEvent *eve) {
 
 	sel_index = GetCurrentSelectionIndex() - empty_value_added;
+	OnItemChoosed();
 }
 
 void CDbComboBox::OnKeyPress(XKeyboardEvent *eve) {
@@ -56,7 +57,7 @@ void CDbComboBox::setTabStopManager(ITabStopManager *manager_) {
 int CDbComboBox::getPrimaryKeyAsInteger() const {
 
 	assert(prim_key != (size_t)-1);
-	if (isEmpty())
+	if (isEmptySelection())
 		throw XException(0, _T("the DbComboBox item is not choosen or empty"));
 	
 	result_set->gotoRecord(sel_index);

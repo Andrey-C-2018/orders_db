@@ -26,6 +26,7 @@
     <ClInclude Include="DbGridEventsHandler.h" />
     <ClInclude Include="DbGridHeaderCell.h" />
     <ClInclude Include="DbNavigator.h" />
+    <ClInclude Include="FilteringDbComboBox.h" />
     <ClInclude Include="FilteringEdit.h" />
     <ClInclude Include="InsertionBinders.h" />
   </ItemGroup>
@@ -37,6 +38,7 @@
     <ClCompile Include="DbGridEventsHandler.cpp" />
     <ClCompile Include="DbGridHeaderCell.cpp" />
     <ClCompile Include="DbNavigator.cpp" />
+    <ClCompile Include="FilteringDbComboBox.cpp" />
     <ClCompile Include="FilteringEdit.cpp" />
     <ClCompile Include="InsertionBinders.cpp" />
   </ItemGroup>

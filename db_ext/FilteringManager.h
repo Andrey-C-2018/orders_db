@@ -1,60 +1,45 @@
 #include <vector>
+#include <map>
 #include <memory>
 #include <algorithm>
 #include <basic/ImmutableString.h>
+#include <basic/Exception.h>
 #include <db_ext/IBinder.h>
 
 class CFilteringManager {
-	enum {
-		MAX_SWITCHED_EXPR_COUNT = 5
-	};
-
-	std::string query_text;
-	bool filtering_changed, query_text_changed;
-	size_t switched_expr_count;
 
 	struct FilteringItem {
 		int id;
 		std::string expression;
-		size_t pos_begin, pos_end;
-		bool enabled;
-		bool switched;
 		std::vector<std::shared_ptr<IBinder> > binders;
-		int first_param;
-	};
+		bool enabled;
 
-	class CSearchPredicate {
-		const std::vector<FilteringItem> &filtering_items;
-	public:
-		CSearchPredicate(const std::vector<FilteringItem> &filtering_items_) : \
-							filtering_items(filtering_items_) { }
-		inline bool operator()(const int id_expr, const FilteringItem &item) {
+		inline FilteringItem() noexcept : id(-1) { }
+		inline FilteringItem(const int id_) noexcept : id(id_) { }
 
-			return id_expr < item.id;
-		}
+		inline bool operator<(const FilteringItem &obj) const {
 
-		inline bool operator()(const FilteringItem &item, const int id_expr) {
-
-			return item.id < id_expr;
+			return id < obj.id;
 		}
 	};
+
+	struct FltStringItem {
+		size_t index;
+		size_t pos_begin, pos_end;
+	};
+
+	std::string flt_string;
+	bool filtering_changed, flt_string_changed;
 
 	std::vector<FilteringItem> filtering_items;
-	
-	inline auto findFilteringItem(const int id_expr) const;
-	inline auto findFilteringItem(const int id_expr);
-	inline bool isFound(std::vector<FilteringItem>::const_iterator, \
-						const int id_expr) const;
-	inline bool isFound(std::vector<FilteringItem>::iterator, \
-						const int id_expr) const;
-	inline std::pair<size_t, size_t> \
-			addExprToWhereStmt(const std::string &expression);
-	inline bool isExprAddedToQuery(const FilteringItem &item) const;
+	std::map<int, size_t> enabled_items;
+	std::map<int, FltStringItem> flt_str_items;
 
-	inline void InternalEnable(std::vector<FilteringItem>::iterator p);
-	inline void InternalDisable(std::vector<FilteringItem>::iterator p);
+	inline auto findFilteringItem(const int id);
+	
 public:
 	CFilteringManager();
+
 	CFilteringManager(const CFilteringManager &obj) = default;
 	CFilteringManager(CFilteringManager &&obj) = default;
 	CFilteringManager &operator=(const CFilteringManager &obj) = default;
@@ -65,12 +50,11 @@ public:
 	void addBinderToExpr(const int id_expr, std::shared_ptr<IBinder> binder);
 
 	void enableExpr(int id_expr);
-	void enableAll();
 	void disableExpr(int id_expr);
 	void disableAll();
 	
-	inline ImmutableString<char> getSQLWherePart() const;
-	inline bool isWherePartChanged() const;
+	inline ImmutableString<char> buildFilteringString();
+	inline bool isFilteringStringChanged() const;
 	void apply(std::shared_ptr<IDbBindingTarget> parsed_query);
 
 	virtual ~CFilteringManager();
@@ -78,97 +62,46 @@ public:
 
 //*****************************************************
 
-auto CFilteringManager::findFilteringItem(const int id_expr) const {
+auto CFilteringManager::findFilteringItem(const int id) {
 
-	return std::lower_bound(filtering_items.cbegin(), filtering_items.cend(), \
-							id_expr, CSearchPredicate(filtering_items));
+	auto p = std::lower_bound(filtering_items.begin(), filtering_items.end(), \
+								FilteringItem(id));
+	if (!(p != filtering_items.end() && p->id == id)) {
+		XException e(0, _T("this filtering expression ID is not found: "));
+		e << id;
+		throw e;
+	}
+
+	return p;
 }
 
-auto CFilteringManager::findFilteringItem(const int id_expr) {
+ImmutableString<char> CFilteringManager::buildFilteringString() {
 
-	return std::lower_bound(filtering_items.begin(), filtering_items.end(), \
-							id_expr, CSearchPredicate(filtering_items));
-}
+	for (auto i : enabled_items) {
+		auto &item = filtering_items[i.second];
 
-bool CFilteringManager::isFound(std::vector<FilteringItem>::const_iterator p, \
-								const int id_expr) const {
+		auto p_flt = flt_str_items.find(item.id);
+		if (p_flt == flt_str_items.cend()) {
+			FltStringItem str_item;
+			str_item.index = i.second;
+			str_item.pos_begin = flt_string.size();
 
-	return p != filtering_items.cend() && p->id == id_expr;
-}
+			if (!flt_string.empty()) flt_string += " AND ";
+			flt_string += "(? OR (";
+			flt_string += item.expression;
+			flt_string += "))";
 
-bool CFilteringManager::isFound(std::vector<FilteringItem>::iterator p, \
-								const int id_expr) const {
-
-	return p != filtering_items.end() && p->id == id_expr;
-}
-
-std::pair<size_t, size_t> \
-		CFilteringManager::addExprToWhereStmt(const std::string &expression) {
-
-	std::pair<size_t, size_t> pos;
-	pos.first = query_text.size();
-
-	if(pos.first) query_text += " AND ";
-	query_text += '(';
-	query_text += expression;
-	query_text += ')';
-	pos.second = query_text.size();
-
-	query_text_changed = true;
-	return pos;
-}
-
-bool CFilteringManager::isExprAddedToQuery(const FilteringItem &item) const {
-
-	return item.pos_end && item.pos_begin != item.pos_end;
-}
-
-ImmutableString<char> CFilteringManager::getSQLWherePart() const {
-
-	return ImmutableString<char>(query_text.c_str(), query_text.size());
-}
-
-bool CFilteringManager::isWherePartChanged() const {
-
-	return query_text_changed;
-}
-
-void CFilteringManager::InternalEnable(std::vector<FilteringItem>::iterator p) {
-
-	bool prev_switched = p->switched;
-	if (!p->switched && switched_expr_count < MAX_SWITCHED_EXPR_COUNT) {
-		const char str_switch[] = "? OR (";
-
-		if (p->binders.size() > 1) {
-			p->expression.insert(0, str_switch);
-			p->expression += ')';
+			str_item.pos_end = flt_string.size();
+			flt_str_items.insert(\
+				std::pair<int, FltStringItem>(item.id, str_item));
 		}
-		else
-			p->expression.insert(0, str_switch, sizeof(str_switch) - 2);
-
-		p->switched = true;
-		++switched_expr_count;
 	}
 
-	if (!isExprAddedToQuery(*p) && \
-		(prev_switched != p->switched || (!p->switched && !p->enabled))) {
-
-		auto pos = addExprToWhereStmt(p->expression);
-		p->pos_begin = pos.first;
-		p->pos_end = pos.second;
-	}
-
-	p->enabled = true;
+	flt_string_changed = false;
+	return ImmutableString<char>(flt_string.c_str(), flt_string.size());
 }
 
-void CFilteringManager::InternalDisable(std::vector<FilteringItem>::iterator p) {
+bool CFilteringManager::isFilteringStringChanged() const {
 
-	if (isExprAddedToQuery(*p) && !p->switched && p->enabled) {
-
-		query_text.erase(p->pos_begin, p->pos_end - p->pos_begin);
-		p->pos_begin = 0;
-		p->pos_end = 0;
-	}
-
-	p->enabled = false;
+	return flt_string_changed;
 }

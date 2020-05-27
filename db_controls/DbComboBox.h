@@ -11,9 +11,12 @@ class CDbComboBox : public XComboBox {
 	ITabStopManager *manager;
 	int def_null_value;
 
-	void fillComboBox();
 	void OnItemChoosed(XCommandEvent *eve);
 	void OnKeyPress(XKeyboardEvent *eve);
+
+protected:
+	virtual void OnItemChoosed() { }
+	virtual void fillComboBox();
 
 public:
 	CDbComboBox(std::shared_ptr<const IDbResultSet> result_set, \
@@ -32,7 +35,7 @@ public:
 	void setTabStopManager(ITabStopManager *manager_);
 	inline std::shared_ptr<const IDbResultSet> getResultSet() const;
 	int getPrimaryKeyAsInteger() const;
-	inline bool isEmpty() const;
+	inline bool isEmptySelection() const;
 	inline void addEmptyValue();
 
 	void SetCurrRecord(const size_t prim_key_value);
@@ -49,9 +52,9 @@ std::shared_ptr<const IDbResultSet> CDbComboBox::getResultSet() const {
 	return result_set;
 }
 
-bool CDbComboBox::isEmpty() const { 
+bool CDbComboBox::isEmptySelection() const {
 	
-	return sel_index == (size_t)-1 || (empty_value_added && !sel_index);
+	return sel_index == (size_t)-1;
 }
 
 void CDbComboBox::addEmptyValue() {
