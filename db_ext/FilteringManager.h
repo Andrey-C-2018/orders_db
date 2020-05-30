@@ -30,6 +30,7 @@ class CFilteringManager {
 
 	std::string flt_string;
 	bool filtering_changed, flt_string_changed;
+	bool flt_str_to_be_erased;
 
 	std::vector<FilteringItem> filtering_items;
 	std::map<int, size_t> enabled_items;
@@ -55,7 +56,7 @@ public:
 	
 	inline ImmutableString<char> buildFilteringString();
 	inline bool isFilteringStringChanged() const;
-	void apply(std::shared_ptr<IDbBindingTarget> parsed_query);
+	bool apply(std::shared_ptr<IDbBindingTarget> parsed_query);
 
 	virtual ~CFilteringManager();
 };
@@ -77,6 +78,12 @@ auto CFilteringManager::findFilteringItem(const int id) {
 
 ImmutableString<char> CFilteringManager::buildFilteringString() {
 
+	if(flt_str_to_be_erased) {
+		flt_str_items.clear();
+		flt_string.clear();
+		flt_str_to_be_erased = false;
+	}
+	
 	for (auto i : enabled_items) {
 		auto &item = filtering_items[i.second];
 

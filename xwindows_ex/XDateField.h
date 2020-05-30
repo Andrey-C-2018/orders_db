@@ -12,6 +12,9 @@ class XDateField : public XTabStopEdit {
 						const int width, const int height);
 	void OnChange(XCommandEvent *eve);
 
+protected:
+	virtual void OnChange() { }
+
 public:
 	XDateField(ITabStopManager *manager_) noexcept;
 

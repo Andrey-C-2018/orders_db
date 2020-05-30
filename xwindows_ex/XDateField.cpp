@@ -25,6 +25,7 @@ void XDateField::Create(XWindow *parent, const int flags, \
 void XDateField::OnChange(XCommandEvent *eve) {
 
 	filter.OnChange(eve);
+	OnChange();
 }
 
 XDateField::~XDateField() { }

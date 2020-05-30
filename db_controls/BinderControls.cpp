@@ -11,7 +11,7 @@ CIntWidgetBinderControl::CIntWidgetBinderControl(XWidget *widget_) : widget(widg
 	assert(widget);
 }
 
-void CIntWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+bool CIntWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 									const size_t param_no) {
 
 	int err = 0;
@@ -19,15 +19,69 @@ void CIntWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_tar
 	int i = XConv::ToInt(text, err);
 
 	if (err) {
-		XException e(0, _T("the binding value is not an integer: "));
-		e << text << _T(" , param no: ") << param_no;
-		throw e;
-	}
+		Tchar buffer[4];
 
-	binding_target->bindValue(param_no, i);
+		err_str = _T("Не є цілим числом: ");
+		err_str += text;
+		err_str += _T(" , № параметру: ");
+		err_str += XConv::ToString(param_no, buffer);
+		WarningBox(err_str.c_str());
+	}
+	else
+		binding_target->bindValue(param_no, i);
+
+	return !err;
 }
 
 CIntWidgetBinderControl::~CIntWidgetBinderControl() { }
+
+//*****************************************************
+
+CStringWidgetBinderControl::CStringWidgetBinderControl(XWidget *widget_) : widget(widget_) {
+
+	assert(widget);
+}
+
+bool CStringWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+										const size_t param_no) {
+
+	binding_target->bindValue(param_no, widget->GetLabel());
+	return true;
+}
+
+CStringWidgetBinderControl::~CStringWidgetBinderControl() { }
+
+//*****************************************************
+
+CDateWidgetBinderControl::CDateWidgetBinderControl(XWidget *widget_) : widget(widget_) {
+
+	assert(widget);
+}
+
+bool CDateWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+									const size_t param_no) {
+
+	auto date_str = widget->GetLabel();
+	CDate date;
+	
+	bool ok = date.setDateGerman(date_str);
+
+	if (!ok) {
+		Tchar buffer[4];
+
+		err_str = _T("Невірний формат дати: ");
+		err_str += date_str;
+		err_str += _T(" , № параметру: ");
+		err_str += XConv::ToString(param_no, buffer);
+		WarningBox(err_str.c_str());
+	}
+	else
+		binding_target->bindValue(param_no, date);
+
+	return ok;
+}
+
+CDateWidgetBinderControl::~CDateWidgetBinderControl() { }
 
 //*****************************************************
 
@@ -37,11 +91,12 @@ CDbComboBoxBinderControl::CDbComboBoxBinderControl(CDbComboBox *combobox_) : \
 	assert(combobox);
 }
 
-void CDbComboBoxBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+bool CDbComboBoxBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 									const size_t param_no) {
 
 	int i = combobox->getPrimaryKeyAsInteger();
 	binding_target->bindValue(param_no, i);
+	return true;
 }
 
 CDbComboBoxBinderControl::~CDbComboBoxBinderControl() { }

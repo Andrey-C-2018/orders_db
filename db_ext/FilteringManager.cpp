@@ -3,7 +3,8 @@
 #include "FilteringManager.h"
 
 CFilteringManager::CFilteringManager() : filtering_changed(false), \
-										flt_string_changed(false) { }
+										flt_string_changed(false), \
+										flt_str_to_be_erased(false) { }
 
 int CFilteringManager::addExpr(ImmutableString<char> expression, \
 								std::shared_ptr<IBinder> binder) {
@@ -39,6 +40,10 @@ void CFilteringManager::enableExpr(int id_expr) {
 		enabled_items[id_expr] = std::distance(filtering_items.begin(), p);
 		flt_string_changed = flt_string_changed || \
 						flt_str_items.find(id_expr) == flt_str_items.cend();
+
+		bool empty = flt_str_items.empty();
+		flt_str_to_be_erased = flt_str_to_be_erased || \
+							!empty && flt_str_items.rbegin()->first > id_expr;
 	}
 
 	filtering_changed = true;
@@ -64,9 +69,9 @@ void CFilteringManager::disableAll() {
 	enabled_items.clear();
 }
 
-void CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
+bool CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
 
-	if (!filtering_changed) return;
+	if (!filtering_changed) return true;
 
 	assert(parsed_query);
 
@@ -82,7 +87,8 @@ void CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
 		if (item.enabled) {
 			auto p_binder = item.binders.begin();
 			while (p_binder != item.binders.end()) {
-				p_binder->get()->bind(parsed_query, params_counter);
+				if (!p_binder->get()->bind(parsed_query, params_counter))
+					return false;
 				++p_binder;
 				++params_counter;
 			}
@@ -92,6 +98,7 @@ void CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
 	}
 
 	filtering_changed = false;
+	return true;
 }
 
 CFilteringManager::~CFilteringManager() { }
