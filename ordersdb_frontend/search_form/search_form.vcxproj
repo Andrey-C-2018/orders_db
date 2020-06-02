@@ -156,6 +156,7 @@
     <ClInclude Include="OrdersPaymentsInserter.h" />
     <ClInclude Include="PaidFilter.h" />
     <ClInclude Include="ParametersManager.h" />
+    <ClInclude Include="PaymentsInserter.h" />
     <ClInclude Include="SearchForm.h" />
     <ClInclude Include="FilteringComboBox.h" />
     <ClInclude Include="ZoneFilter.h" />
@@ -166,6 +167,7 @@
     <ClCompile Include="OrdersPaymentsInserter.cpp" />
     <ClCompile Include="PaidFilter.cpp" />
     <ClCompile Include="ParametersManager.cpp" />
+    <ClCompile Include="PaymentsInserter.cpp" />
     <ClCompile Include="SearchForm.cpp" />
     <ClCompile Include="FilteringComboBox.cpp" />
     <ClCompile Include="ZoneFilter.cpp" />

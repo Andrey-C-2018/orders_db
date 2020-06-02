@@ -7,6 +7,7 @@ class CParametersManager {
 	int default_center;
 	CDate initial_order_date;
 	char date_buffer[CDate::SQL_FORMAT_LEN];
+	wchar_t date_buffer_w[CDate::SQL_FORMAT_LEN];
 public:
 	CParametersManager();
 
@@ -18,6 +19,8 @@ public:
 	void Init(CPropertiesFile *props);
 	inline int getDefaultCenter() const;
 	inline const char *getInitialDate() const;
+	inline const wchar_t *getInitialDateW() const;
+	std::string getInitialFilteringStr() const;
 
 	virtual ~CParametersManager();
 };
@@ -33,4 +36,10 @@ const char *CParametersManager::getInitialDate() const {
 
 	assert(date_buffer[0] != '\0');
 	return date_buffer;
+}
+
+const wchar_t *getInitialDateW() const {
+
+	assert(date_buffer_w[0] != '\0');
+	return date_buffer_w;
 }

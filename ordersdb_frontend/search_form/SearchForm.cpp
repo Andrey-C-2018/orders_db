@@ -194,7 +194,7 @@ void CSearchForm::adjustUIDependentCellWidgets() {
 void CSearchForm::loadInitialFilterToControls() {
 
 	flt_center->SetCurrRecord(params_manager.getDefaultCenter());
-	//flt_order_date_to->SetLabel(params_manager.getInitialDate());
+	flt_order_date_to->SetLabel(params_manager.getInitialDateW());
 	assert(filtering_manager.isFilteringStringChanged());
 }
 
@@ -303,11 +303,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable(std::shared_ptr<IDbConnecti
 	query += " ORDER BY a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
 	query_modifier.Init(query);
 
-	std::string initial_flt = "a.id_center_legalaid = ";
-	char buffer[10];
-	XConv::ToString(params_manager.getDefaultCenter(), buffer);
-	initial_flt += buffer;
-	//initial_flt += " AND a.order_date = '";
+	std::string initial_flt = params_manager.getInitialFilteringStr();
 	query_modifier.changeWherePart(\
 		ImmutableString<char>(initial_flt.c_str(), initial_flt.size()));
 

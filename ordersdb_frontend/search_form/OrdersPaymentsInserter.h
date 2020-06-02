@@ -10,7 +10,16 @@ class COrdersPaymentsInserter : public CDbInserter {
 		FIELDS_COUNT = 35
 	};
 	std::shared_ptr<IDbConnection> conn;
-	std::shared_ptr<CDbTable> db_table;
+
+	CDbComboBox *center;
+	XWidget *id_order;
+	XWidget *order_date;
+	CDbComboBox *order_type;
+	XWidget *client;
+	XWidget *bdate;
+	XWidget *reason;
+	XWidget *cancel_order;
+	XWidget *cancel_date;
 
 public:
 	COrdersPaymentsInserter();
@@ -19,6 +28,9 @@ public:
 	COrdersPaymentsInserter(COrdersPaymentsInserter &&obj) = delete;
 	COrdersPaymentsInserter &operator=(const COrdersPaymentsInserter &obj) = delete;
 	COrdersPaymentsInserter &operator=(COrdersPaymentsInserter &&obj) = delete;
+
+	void prepare(std::shared_ptr<IDbConnection> conn) override;
+	void insert() override;
 
 	virtual ~COrdersPaymentsInserter();
 };
