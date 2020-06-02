@@ -15,6 +15,8 @@
 #include <db_controls/BinderControls.h>
 #include <db_controls/DbNavigator.h>
 #include "SearchForm.h"
+#include "ZoneFilter.h"
+#include "PaidFilter.h"
 
 class CGridCellWidgetCreator final {
 	CDbGrid *grid;
@@ -53,8 +55,11 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const int X, const int Y, \
 					const int width, const int height) : \
 				flt_id(nullptr), flt_act(nullptr), flt_order_date_from(nullptr), \
-				flt_order_date_to(nullptr), flt_center(nullptr), flt_informer(nullptr), \
-				flt_order_type(nullptr), flt_stage(nullptr), \
+				flt_order_date_to(nullptr), flt_act_reg_date_from(nullptr), \
+				flt_act_reg_date_to(nullptr), flt_act_date_from(nullptr), \
+				flt_act_date_to(nullptr), flt_payment_date_from(nullptr), \
+				flt_payment_date_to(nullptr), flt_center(nullptr), flt_informer(nullptr), \
+				flt_order_type(nullptr), flt_stage(nullptr), flt_zone(nullptr), \
 				grid(nullptr), advocats_list(nullptr), \
 				centers_list(nullptr), order_types_list(nullptr), stages_list(nullptr), \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
@@ -172,8 +177,7 @@ void CSearchForm::initFilteringControls() {
 	flt_center = new CFilteringDbComboBox(filtering_manager, \
 										centers_list->getMasterResultSet(), 2, 0);
 	auto combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_center);
-	int id_expr = filtering_manager.addExpr(ImmutableString<char>("a.id_center_legalaid = ?", \
-									sizeof("a.id_center_legalaid = ?") - 1), combo_binder);
+	int id_expr = filtering_manager.addExpr("a.id_center_legalaid = ?", combo_binder);
 	flt_center->setExprId(id_expr);
 
 	flt_id = new CFilteringEdit(filtering_manager, this);
@@ -184,49 +188,76 @@ void CSearchForm::initFilteringControls() {
 
 	flt_order_date_from = new CFilteringDateField(filtering_manager, this);
 	auto date_binder = std::make_shared<CDateWidgetBinderControl>(flt_order_date_from);
-	id_expr = filtering_manager.addExpr(
-			ImmutableString<char>("a.order_date >= ?", sizeof("a.order_date >= ?") - 1), date_binder);
+	id_expr = filtering_manager.addExpr("a.order_date >= ?", date_binder);
 	flt_order_date_from->setExprId(id_expr);
 
 	flt_order_date_to = new CFilteringDateField(filtering_manager, this);
 	date_binder = std::make_shared<CDateWidgetBinderControl>(flt_order_date_to);
-	id_expr = filtering_manager.addExpr(
-			ImmutableString<char>("a.order_date <= ?", sizeof("a.order_date <= ?") - 1), date_binder);
+	id_expr = filtering_manager.addExpr("a.order_date <= ?", date_binder);
 	flt_order_date_to->setExprId(id_expr);
 
 	flt_order_type = new CFilteringDbComboBox(filtering_manager, \
 										order_types_list->getMasterResultSet(), 2, 0);
 	combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_order_type);
-	id_expr = filtering_manager.addExpr(\
-		ImmutableString<char>("a.id_order_type = ?", sizeof("a.id_order_type = ?") - 1), combo_binder);
+	id_expr = filtering_manager.addExpr("a.id_order_type = ?", combo_binder);
 	flt_order_type->setExprId(id_expr);
 
 	flt_advocat = new CFilteringDbComboBox(filtering_manager, \
 											advocats_list->getMasterResultSet(), 2, 0);
 	combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_advocat);
-	id_expr = filtering_manager.addExpr(\
-			ImmutableString<char>("a.id_adv = ?", sizeof("a.id_adv = ?") - 1), combo_binder);
+	id_expr = filtering_manager.addExpr("a.id_adv = ?", combo_binder);
 	flt_advocat->setExprId(id_expr);
+
+	flt_zone = new CZoneFilter(filtering_manager);
 
 	flt_act = new CFilteringEdit(filtering_manager, this);
 	auto str_binder = std::make_shared<CStringWidgetBinderControl>(flt_act);
-	id_expr = filtering_manager.addExpr(\
-			ImmutableString<char>("aa.id_act = ?", sizeof("aa.id_act = ?") - 1), str_binder);
+	id_expr = filtering_manager.addExpr("aa.id_act = ?", str_binder);
 	flt_act->setExprId(id_expr);
 
 	flt_informer = new CFilteringDbComboBox(filtering_manager, \
 											informers_list->getMasterResultSet(), 2, 0);
 	combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_informer);
-	id_expr = filtering_manager.addExpr(\
-		ImmutableString<char>("aa.id_informer = ?", sizeof("aa.id_informer = ?") - 1), combo_binder);
+	id_expr = filtering_manager.addExpr("aa.id_informer = ?", combo_binder);
 	flt_informer->setExprId(id_expr);
 
 	flt_stage = new CFilteringDbComboBox(filtering_manager, \
 											stages_list->getMasterResultSet(), 1, 0);
 	combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_stage);
-	id_expr = filtering_manager.addExpr(\
-		ImmutableString<char>("aa.id_stage = ?", sizeof("aa.id_stage = ?") - 1), combo_binder);
+	id_expr = filtering_manager.addExpr("aa.id_stage = ?", combo_binder);
 	flt_stage->setExprId(id_expr);
+
+	flt_act_reg_date_from = new CFilteringDateField(filtering_manager, this);
+	date_binder = std::make_shared<CDateWidgetBinderControl>(flt_act_reg_date_from);
+	id_expr = filtering_manager.addExpr("aa.act_reg_date >= ?", date_binder);
+	flt_act_reg_date_from->setExprId(id_expr);
+
+	flt_act_reg_date_to = new CFilteringDateField(filtering_manager, this);
+	date_binder = std::make_shared<CDateWidgetBinderControl>(flt_act_reg_date_to);
+	id_expr = filtering_manager.addExpr("aa.act_reg_date <= ?", date_binder);
+	flt_act_reg_date_to->setExprId(id_expr);
+
+	flt_act_date_from = new CFilteringDateField(filtering_manager, this);
+	date_binder = std::make_shared<CDateWidgetBinderControl>(flt_act_date_from);
+	id_expr = filtering_manager.addExpr("aa.act_date >= ?", date_binder);
+	flt_act_date_from->setExprId(id_expr);
+
+	flt_act_date_to = new CFilteringDateField(filtering_manager, this);
+	date_binder = std::make_shared<CDateWidgetBinderControl>(flt_act_date_to);
+	id_expr = filtering_manager.addExpr("aa.act_date <= ?", date_binder);
+	flt_act_date_to->setExprId(id_expr);
+
+	flt_payment_date_from = new CFilteringDateField(filtering_manager, this);
+	date_binder = std::make_shared<CDateWidgetBinderControl>(flt_payment_date_from);
+	id_expr = filtering_manager.addExpr("aa.payment_date >= ?", date_binder);
+	flt_payment_date_from->setExprId(id_expr);
+
+	flt_payment_date_to = new CFilteringDateField(filtering_manager, this);
+	date_binder = std::make_shared<CDateWidgetBinderControl>(flt_payment_date_to);
+	id_expr = filtering_manager.addExpr("aa.payment_date <= ?", date_binder);
+	flt_payment_date_to->setExprId(id_expr);
+
+	flt_paid = new CPaidFilter(filtering_manager);
 }
 
 std::shared_ptr<CDbTable> CSearchForm::createDbTable(std::shared_ptr<IDbConnection> conn) {
@@ -332,7 +363,7 @@ void CSearchForm::displayWidgets() {
 						XSize(110, DEF_GUI_ROW_HEIGHT), 250);
 
 		sizer.addWidget(new XLabel(), _T("№ розгляду:"), FL_WINDOW_VISIBLE, \
-						XSize(60, DEF_GUI_ROW_HEIGHT));
+						XSize(90, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *cycle = new XTabStopEdit(this);
 		sizer.addWidget(cycle, _T(""), edit_flags, XSize(30, DEF_GUI_ROW_HEIGHT));
 
@@ -347,6 +378,54 @@ void CSearchForm::displayWidgets() {
 		XTabStopEdit *outgoings = new XTabStopEdit(this);
 		sizer.addWidget(outgoings, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
+	main_sizer.popNestedSizer();
+
+	main_sizer.pushNestedSizer(sizer);
+		sizer.addWidget(new XLabel(), _T("Дата розрах. з: "), FL_WINDOW_VISIBLE, \
+						XSize(70, DEF_GUI_ROW_HEIGHT + 10));
+		sizer.addWidget(flt_act_reg_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
+	
+		sizer.addWidget(new XLabel(), _T("Дата розрах. до: "), FL_WINDOW_VISIBLE, \
+						XSize(80, DEF_GUI_ROW_HEIGHT + 10));
+		sizer.addWidget(flt_act_reg_date_to, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
+	
+		sizer.addWidget(new XLabel(), _T("Дата акту з: "), FL_WINDOW_VISIBLE, \
+						XSize(50, DEF_GUI_ROW_HEIGHT + 10));
+		sizer.addWidget(flt_act_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Дата акту до: "), FL_WINDOW_VISIBLE, \
+						XSize(65, DEF_GUI_ROW_HEIGHT + 10));
+		sizer.addWidget(flt_act_date_to, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Дата оплати з: "), FL_WINDOW_VISIBLE, \
+						XSize(70, DEF_GUI_ROW_HEIGHT + 10));
+		sizer.addWidget(flt_payment_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Дата оплати до: "), FL_WINDOW_VISIBLE, \
+						XSize(75, DEF_GUI_ROW_HEIGHT + 10));
+		sizer.addWidget(flt_payment_date_to, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
+	main_sizer.popNestedSizer();
+
+	main_sizer.pushNestedSizer(sizer);
+		sizer.addWidget(new XLabel(), _T("Клієнт:"), FL_WINDOW_VISIBLE, \
+						XSize(60, DEF_GUI_ROW_HEIGHT));
+		XTabStopEdit *client_name = new XTabStopEdit(this);
+		sizer.addWidget(client_name, _T(""), edit_flags, XSize(320, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Дата народж:"), FL_WINDOW_VISIBLE, \
+						XSize(55, DEF_GUI_ROW_HEIGHT + 10));
+		XDateField *bdate = new XDateField(this);
+		sizer.addWidget(bdate, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Зона відп.:"), FL_WINDOW_VISIBLE, \
+						XSize(85, DEF_GUI_ROW_HEIGHT + 10));
+		sizer.addResizeableWidget(flt_zone, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+						XSize(50, DEF_GUI_ROW_HEIGHT), 100);
+
+		sizer.addWidget(new XLabel(), _T("Оплачено:"), FL_WINDOW_VISIBLE, \
+						XSize(85, DEF_GUI_ROW_HEIGHT + 10));
+		sizer.addResizeableWidget(flt_paid, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+						XSize(50, DEF_GUI_ROW_HEIGHT), 100);
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -426,10 +505,21 @@ CSearchForm::~CSearchForm() {
 
 	if (grid && !grid->IsCreated()) delete grid;
 
+	if (flt_zone && !flt_zone->IsCreated()) delete flt_zone;
+	if (flt_paid && !flt_paid->IsCreated()) delete flt_paid;
+	if (flt_order_type && !flt_order_type->IsCreated()) delete flt_order_type;
 	if (flt_stage && !flt_stage->IsCreated()) delete flt_stage;
+	if (flt_center && !flt_center->IsCreated()) delete flt_center;
 	if (flt_informer && !flt_informer->IsCreated()) delete flt_informer;
 	if (flt_advocat && !flt_advocat->IsCreated()) delete flt_advocat;
+	if (flt_payment_date_from && !flt_payment_date_from->IsCreated()) delete flt_payment_date_from;
+	if (flt_payment_date_to && !flt_payment_date_to->IsCreated()) delete flt_payment_date_to;
+	if (flt_act_date_to && !flt_act_date_to->IsCreated()) delete flt_act_date_to;
+	if (flt_act_date_from && !flt_act_date_from->IsCreated()) delete flt_act_date_from;
+	if (flt_act_reg_date_to && !flt_act_reg_date_to->IsCreated()) delete flt_act_reg_date_to;
+	if (flt_act_reg_date_from && !flt_act_reg_date_from->IsCreated()) delete flt_act_reg_date_from;
 	if (flt_order_date_to && !flt_order_date_to->IsCreated()) delete flt_order_date_to;
 	if (flt_order_date_from && !flt_order_date_from->IsCreated()) delete flt_order_date_from;
+	if (flt_act && !flt_act->IsCreated()) delete flt_act;
 	if (flt_id && !flt_id->IsCreated()) delete flt_id;
 }

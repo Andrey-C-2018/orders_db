@@ -18,8 +18,9 @@ class CIntWidgetBinderControl : public CErrCheckingBinder {
 public:
 	CIntWidgetBinderControl(XWidget *widget_);
 
-	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+	size_t bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				const size_t param_no) override;
+	size_t affectedParamsCount() const override { return 1; }
 
 	virtual ~CIntWidgetBinderControl();
 };
@@ -29,8 +30,9 @@ class CStringWidgetBinderControl : public IBinder {
 public:
 	CStringWidgetBinderControl(XWidget *widget_);
 
-	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+	size_t bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				const size_t param_no) override;
+	size_t affectedParamsCount() const override { return 1; }
 
 	virtual ~CStringWidgetBinderControl();
 };
@@ -40,8 +42,9 @@ class CDateWidgetBinderControl : public CErrCheckingBinder {
 public:
 	CDateWidgetBinderControl(XWidget *widget_);
 
-	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+	size_t bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				const size_t param_no) override;
+	size_t affectedParamsCount() const override { return 1; }
 
 	virtual ~CDateWidgetBinderControl();
 };
@@ -51,8 +54,9 @@ class CDbComboBoxBinderControl : public CErrCheckingBinder {
 public:
 	CDbComboBoxBinderControl(CDbComboBox *combobox_);
 
-	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+	size_t bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				const size_t param_no) override;
+	size_t affectedParamsCount() const override { return 1; }
 
 	virtual ~CDbComboBoxBinderControl();
 };

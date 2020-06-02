@@ -11,7 +11,7 @@ CIntWidgetBinderControl::CIntWidgetBinderControl(XWidget *widget_) : widget(widg
 	assert(widget);
 }
 
-bool CIntWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+size_t CIntWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 									const size_t param_no) {
 
 	int err = 0;
@@ -30,7 +30,7 @@ bool CIntWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_tar
 	else
 		binding_target->bindValue(param_no, i);
 
-	return !err;
+	return (size_t)(!err);
 }
 
 CIntWidgetBinderControl::~CIntWidgetBinderControl() { }
@@ -42,11 +42,11 @@ CStringWidgetBinderControl::CStringWidgetBinderControl(XWidget *widget_) : widge
 	assert(widget);
 }
 
-bool CStringWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+size_t CStringWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 										const size_t param_no) {
 
 	binding_target->bindValue(param_no, widget->GetLabel());
-	return true;
+	return 1;
 }
 
 CStringWidgetBinderControl::~CStringWidgetBinderControl() { }
@@ -58,7 +58,7 @@ CDateWidgetBinderControl::CDateWidgetBinderControl(XWidget *widget_) : widget(wi
 	assert(widget);
 }
 
-bool CDateWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+size_t CDateWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 									const size_t param_no) {
 
 	auto date_str = widget->GetLabel();
@@ -78,7 +78,7 @@ bool CDateWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_ta
 	else
 		binding_target->bindValue(param_no, date);
 
-	return ok;
+	return (size_t)ok;
 }
 
 CDateWidgetBinderControl::~CDateWidgetBinderControl() { }
@@ -91,12 +91,12 @@ CDbComboBoxBinderControl::CDbComboBoxBinderControl(CDbComboBox *combobox_) : \
 	assert(combobox);
 }
 
-bool CDbComboBoxBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+size_t CDbComboBoxBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 									const size_t param_no) {
 
 	int i = combobox->getPrimaryKeyAsInteger();
 	binding_target->bindValue(param_no, i);
-	return true;
+	return 1;
 }
 
 CDbComboBoxBinderControl::~CDbComboBoxBinderControl() { }

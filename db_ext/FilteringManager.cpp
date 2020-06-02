@@ -18,6 +18,7 @@ int CFilteringManager::addExpr(ImmutableString<char> expression, \
 	item.expression = expression.str;
 
 	item.binders.push_back(binder);
+	item.count_to_process = binder->affectedParamsCount();
 	item.enabled = false;
 	filtering_items.emplace_back(std::move(item));
 		
@@ -31,6 +32,7 @@ void CFilteringManager::addBinderToExpr(const int id_expr, \
 
 	auto p = findFilteringItem(id_expr);
 	p->binders.push_back(binder);
+	p->count_to_process += binder->affectedParamsCount();
 }
 
 void CFilteringManager::enableExpr(int id_expr) {
@@ -87,14 +89,15 @@ bool CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
 		if (item.enabled) {
 			auto p_binder = item.binders.begin();
 			while (p_binder != item.binders.end()) {
-				if (!p_binder->get()->bind(parsed_query, params_counter))
-					return false;
+				size_t processed = p_binder->get()->bind(parsed_query, params_counter);
+				
+				if (!processed)	return false;
 				++p_binder;
-				++params_counter;
+				params_counter += processed;
 			}
 		}
 		else
-			params_counter += item.binders.size();
+			params_counter += item.count_to_process;
 	}
 
 	filtering_changed = false;

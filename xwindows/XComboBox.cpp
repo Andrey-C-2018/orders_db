@@ -38,12 +38,15 @@ void XComboBox::SetSelectionIndex(const size_t index) {
 	_plComboBoxSetSel(GetInternalHandle(), index);
 }
 
-void XComboBox::GetItemText(const size_t index, Tstring item_text) const{
-	size_t len = _plComboBoxGetItemTextLen(GetInternalHandle(), index);
-	Tchar *text = nullptr;
+void XComboBox::GetItemText(const size_t index, XString<Tchar> &item_text) const{
 
-	_plComboBoxGetItemText(GetInternalHandle(), index, text);
-	item_text = text;
+	GetItemTextInternal(index, item_text);
+}
+
+void XComboBox::GetCurrentItemText(XString<Tchar> &item_text) const {
+
+	size_t curr_selection = _plComboBoxGetCurrSel(GetInternalHandle());
+	GetItemTextInternal(curr_selection, item_text);
 }
 
 int XComboBox::OverrideWindowEvent(const _plEventId id_event, \

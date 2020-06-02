@@ -15,6 +15,8 @@ class CDbComboBoxCellWidget;
 class CFilteringEdit;
 class CFilteringDbComboBox;
 class CFilteringDateField;
+class CZoneFilter;
+class CPaidFilter;
 
 class CSearchForm : public XTabStopPanel {
 	enum Defaults {
@@ -31,8 +33,13 @@ class CSearchForm : public XTabStopPanel {
 	CFilteringManager filtering_manager;
 	CFilteringEdit *flt_id, *flt_act;
 	CFilteringDateField *flt_order_date_from, *flt_order_date_to;
+	CFilteringDateField *flt_act_reg_date_from, *flt_act_reg_date_to;
+	CFilteringDateField *flt_act_date_from, *flt_act_date_to;
+	CFilteringDateField *flt_payment_date_from, *flt_payment_date_to;
 	CFilteringDbComboBox *flt_advocat, *flt_center, *flt_informer;
 	CFilteringDbComboBox *flt_order_type, *flt_stage;
+	CZoneFilter *flt_zone;
+	CPaidFilter *flt_paid;
 
 	CDbGrid *grid;
 	CDbComboBoxCellWidget *advocats_list, *centers_list, *informers_list;

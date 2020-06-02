@@ -153,12 +153,18 @@
   <ItemGroup>
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
+    <ClInclude Include="PaidFilter.h" />
     <ClInclude Include="SearchForm.h" />
+    <ClInclude Include="FilteringComboBox.h" />
+    <ClInclude Include="ZoneFilter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />
+    <ClCompile Include="PaidFilter.cpp" />
     <ClCompile Include="SearchForm.cpp" />
+    <ClCompile Include="FilteringComboBox.cpp" />
+    <ClCompile Include="ZoneFilter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

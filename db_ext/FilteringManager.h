@@ -12,6 +12,7 @@ class CFilteringManager {
 		int id;
 		std::string expression;
 		std::vector<std::shared_ptr<IBinder> > binders;
+		size_t count_to_process;
 		bool enabled;
 
 		inline FilteringItem() noexcept : id(-1) { }
@@ -48,6 +49,9 @@ public:
 
 	int addExpr(ImmutableString<char> expression, \
 				std::shared_ptr<IBinder> binder);
+	template <size_t str_size> \
+		inline int addExpr(const char (&str)[str_size], \
+							std::shared_ptr<IBinder> binder);
 	void addBinderToExpr(const int id_expr, std::shared_ptr<IBinder> binder);
 
 	void enableExpr(int id_expr);
@@ -111,4 +115,11 @@ ImmutableString<char> CFilteringManager::buildFilteringString() {
 bool CFilteringManager::isFilteringStringChanged() const {
 
 	return flt_string_changed;
+}
+
+template<size_t str_size> \
+int CFilteringManager::addExpr(const char(&str)[str_size], \
+								std::shared_ptr<IBinder> binder) {
+	
+	return addExpr(ImmutableString<char>(str, str_size), binder);
 }

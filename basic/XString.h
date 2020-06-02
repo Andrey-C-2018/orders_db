@@ -40,7 +40,9 @@ public:
 	inline const Tchar &operator[](const size_t index) const noexcept;
 
 	inline bool operator==(const XString &obj) const noexcept;
+	inline bool operator==(const Tchar *str) const noexcept;
 	inline bool operator!=(const XString &obj) const noexcept;
+	inline bool operator!=(const Tchar *str) const noexcept;
 	inline bool operator<(const XString &obj) const noexcept;
 	inline bool operator<=(const XString &obj) const noexcept;
 	inline bool operator>(const XString &obj) const noexcept;
@@ -250,9 +252,22 @@ bool XString<Tchar>::operator==(const XString &obj) const noexcept {
 }
 
 template <typename Tchar> \
+bool XString<Tchar>::operator==(const Tchar *str) const noexcept {
+	size_t l_size = str_size;
+
+	return (!l_size && !str) || (l_size && str && !Tstrcmp(data, str));
+}
+
+template <typename Tchar> \
 bool XString<Tchar>::operator!=(const XString &obj) const noexcept {
 
 	return !operator==(obj);
+}
+
+template <typename Tchar> \
+bool XString<Tchar>::operator!=(const Tchar *str) const noexcept {
+
+	return !operator==(str);
 }
 
 template <typename Tchar> \

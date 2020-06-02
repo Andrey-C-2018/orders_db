@@ -1,8 +1,12 @@
 #pragma once
 #include "XWidget.h"
+#include <basic/XString.h>
 
 class XComboBox : public XWidget{
 	size_t items_count;
+
+	inline void GetItemTextInternal(const size_t index, \
+									XString<Tchar> &item_text) const;
 
 protected:
 	int OverrideWindowEvent(const _plEventId id_event, \
@@ -30,7 +34,8 @@ public:
 	void SetSelectionIndex(const size_t index);
 	inline bool ComboBoxHasFocus() const;
 
-	void GetItemText(const size_t index, Tstring item_text) const;
+	void GetItemText(const size_t index, XString<Tchar> &item_text) const;
+	void GetCurrentItemText(XString<Tchar> &item_text) const;
 	void Reset();
 
 	virtual ~XComboBox();
@@ -41,4 +46,13 @@ public:
 bool XComboBox::ComboBoxHasFocus() const {
 
 	return _plComboBoxHasFocus(GetInternalHandle());
+}
+
+void XComboBox::GetItemTextInternal(const size_t index, \
+									XString<Tchar> &item_text) const {
+
+	size_t len = _plComboBoxGetItemTextLen(GetInternalHandle(), index);
+	item_text.resize(len);
+
+	_plComboBoxGetItemText(GetInternalHandle(), index, &item_text[0]);
 }
