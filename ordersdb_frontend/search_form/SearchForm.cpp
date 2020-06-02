@@ -62,9 +62,11 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 				flt_order_type(nullptr), flt_stage(nullptr), flt_zone(nullptr), \
 				grid(nullptr), advocats_list(nullptr), \
 				centers_list(nullptr), order_types_list(nullptr), stages_list(nullptr), \
+				canceling_reasons_list(nullptr), \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
 
 	props.open("config.ini");
+	params_manager.Init(&props);
 
 	conn = CMySQLConnectionFactory::createConnection(props);
 	db_table = createDbTable(conn);
@@ -77,7 +79,8 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
 			label, X, Y, width, height);
 	displayWidgets();
-	adjustUIDependentCellWidgets(grid);
+	adjustUIDependentCellWidgets();
+	loadInitialFilterToControls();
 
 	Connect(EVT_COMMAND, btn_apply_filter->GetId(), this, &CSearchForm::OnFilterButtonClick);
 	Connect(EVT_COMMAND, btn_add->GetId(), this, &CSearchForm::OnAddRecordButtonClick);
@@ -145,6 +148,9 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 										"orders", db_table);
 	centers_list->AddRelation("id_center", "id_center_legalaid");
 
+	canceling_reasons_list = new CComboBoxCellWidget();
+	grid->SetWidgetForFieldByName("reason", canceling_reasons_list);
+
 	stmt = conn->PrepareQuery("SELECT id_inf, informer_name, informer_full_name FROM informers ORDER BY 2");
 	result_set = stmt->exec();
 	rs_metadata = stmt->getResultSetMetadata();
@@ -170,7 +176,27 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	stages_list->AddRelation("id_st", "id_stage");
 }
 
-void CSearchForm::adjustUIDependentCellWidgets(CDbGrid *grid) {}
+void CSearchForm::adjustUIDependentCellWidgets() {
+
+	assert(canceling_reasons_list);
+
+	canceling_reasons_list->AddItem(_T("скасовано"));
+	canceling_reasons_list->AddItem(_T("припинено"));
+	canceling_reasons_list->AddItem(_T("заміна"));
+	canceling_reasons_list->AddItem(_T("відмова"));
+	canceling_reasons_list->AddItem(_T("розбіжності"));
+	canceling_reasons_list->AddItem(_T("хвороба"));
+	canceling_reasons_list->AddItem(_T("розшук"));
+	canceling_reasons_list->AddItem(_T("виключений з реєстру"));
+	canceling_reasons_list->AddItem(_T("завершено"));
+}
+
+void CSearchForm::loadInitialFilterToControls() {
+
+	flt_center->SetCurrRecord(params_manager.getDefaultCenter());
+	//flt_order_date_to->SetLabel(params_manager.getInitialDate());
+	assert(filtering_manager.isFilteringStringChanged());
+}
 
 void CSearchForm::initFilteringControls() {
 
@@ -277,6 +303,14 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable(std::shared_ptr<IDbConnecti
 	query += " ORDER BY a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
 	query_modifier.Init(query);
 
+	std::string initial_flt = "a.id_center_legalaid = ";
+	char buffer[10];
+	XConv::ToString(params_manager.getDefaultCenter(), buffer);
+	initial_flt += buffer;
+	//initial_flt += " AND a.order_date = '";
+	query_modifier.changeWherePart(\
+		ImmutableString<char>(initial_flt.c_str(), initial_flt.size()));
+
 	auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
@@ -314,16 +348,19 @@ void CSearchForm::displayWidgets() {
 						XSize(60, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_advocat, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(250, DEF_GUI_ROW_HEIGHT), 250);
+		flt_advocat->setTabStopManager(this);
 
 		sizer.addWidget(new XLabel(), _T("Центр: "), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_center, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(180, DEF_GUI_ROW_HEIGHT), 200);
+		flt_center->setTabStopManager(this);
 
 		sizer.addWidget(new XLabel(), _T("Інформатор: "), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_informer, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(250, DEF_GUI_ROW_HEIGHT), 250);
+		flt_informer->setTabStopManager(this);
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -336,6 +373,7 @@ void CSearchForm::displayWidgets() {
 						XSize(35, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_order_type, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(100, DEF_GUI_ROW_HEIGHT), 250);
+		flt_order_type->setTabStopManager(this);
 
 		sizer.addWidget(new XLabel(), _T("Дата з: "), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT + 10));
@@ -361,6 +399,7 @@ void CSearchForm::displayWidgets() {
 						XSize(40, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_stage, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(110, DEF_GUI_ROW_HEIGHT), 250);
+		flt_stage->setTabStopManager(this);
 
 		sizer.addWidget(new XLabel(), _T("№ розгляду:"), FL_WINDOW_VISIBLE, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));

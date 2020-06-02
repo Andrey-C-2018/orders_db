@@ -88,6 +88,8 @@ void CDbComboBox::SetCurrRecord(const size_t prim_key_value) {
 	--i;
 	this->SetSelectionIndex(i);
 	sel_index = i;
+
+	OnItemChoosed();
 }
 
 void CDbComboBox::SetCurrRecord(std::shared_ptr<const IDbResultSet> rs, \

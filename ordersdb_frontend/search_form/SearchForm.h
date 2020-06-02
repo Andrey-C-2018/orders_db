@@ -5,6 +5,7 @@
 #include <xwindows_ex/XTabStopPanel.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
+#include "ParametersManager.h"
 
 struct IDbConnection;
 class CDbTable;
@@ -26,6 +27,7 @@ class CSearchForm : public XTabStopPanel {
 	};
 
 	CPropertiesFile props;
+	CParametersManager params_manager;
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
 
@@ -38,6 +40,7 @@ class CSearchForm : public XTabStopPanel {
 	CFilteringDateField *flt_payment_date_from, *flt_payment_date_to;
 	CFilteringDbComboBox *flt_advocat, *flt_center, *flt_informer;
 	CFilteringDbComboBox *flt_order_type, *flt_stage;
+	CComboBoxCellWidget *canceling_reasons_list;
 	CZoneFilter *flt_zone;
 	CPaidFilter *flt_paid;
 
@@ -53,9 +56,10 @@ class CSearchForm : public XTabStopPanel {
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 	void setFieldsSizes();
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
-	void displayWidgets();
-	void adjustUIDependentCellWidgets(CDbGrid *grid);
 	void initFilteringControls();
+	void displayWidgets();
+	void adjustUIDependentCellWidgets();
+	void loadInitialFilterToControls();
 
 	void OnFilterButtonClick(XCommandEvent *eve);
 	void OnAddRecordButtonClick(XCommandEvent *eve);
