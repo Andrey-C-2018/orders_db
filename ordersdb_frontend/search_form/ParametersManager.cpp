@@ -25,7 +25,7 @@ void CParametersManager::Init(CPropertiesFile *props) {
 		throw e;
 	}
 	initial_order_date.toStringSQL(date_buffer);
-	initial_order_date.toStringSQL(date_buffer_w);
+	initial_order_date.toStringGerman(date_buffer_w);
 
 	bool not_found;
 	default_center = props->getIntProperty(_T("default_center"), buffer, not_found);
@@ -47,7 +47,7 @@ std::string CParametersManager::getInitialFilteringStr() const {
 	std::string initial_flt = "a.id_center_legalaid = ";
 	XConv::ToString(default_center, int_buffer);
 	initial_flt += int_buffer;
-	initial_flt += " AND order_date = '";
+	initial_flt += " AND a.order_date >= '";
 	initial_flt += date_buffer;
 	initial_flt += "'";
 

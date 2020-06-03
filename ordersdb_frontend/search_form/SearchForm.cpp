@@ -194,7 +194,8 @@ void CSearchForm::adjustUIDependentCellWidgets() {
 void CSearchForm::loadInitialFilterToControls() {
 
 	flt_center->SetCurrRecord(params_manager.getDefaultCenter());
-	flt_order_date_to->SetLabel(params_manager.getInitialDateW());
+	flt_order_date_from->SetLabel(params_manager.getInitialDateW());
+	flt_order_date_from->enableIfChanged();
 	assert(filtering_manager.isFilteringStringChanged());
 }
 

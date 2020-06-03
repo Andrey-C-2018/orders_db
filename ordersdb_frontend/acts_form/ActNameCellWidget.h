@@ -1,6 +1,6 @@
 #pragma once
 #include <editable_grid/EditableCellWidget.h>
-#include "Validators.h"
+#include <forms_common/Validators.h>
 
 class CActNameCellWidget : public CEditableCellWidget {
 	mutable CActNameValidator validator;

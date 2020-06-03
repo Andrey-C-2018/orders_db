@@ -27,7 +27,9 @@ public:
 	inline bool isChanged() const { return is_changed; }
 	inline void setExprId(const int id_expr) { this->id_expr = id_expr; }
 	inline int getExprId() const { return id_expr; }
+	void enableIfChanged();
 
 	virtual ~CFilteringDateField();
 };
 
+//*****************************************************

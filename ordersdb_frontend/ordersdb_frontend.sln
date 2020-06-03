@@ -107,6 +107,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "search_form", "search_form\
 		{2BA536D1-373B-44DF-B160-E437E00278FA} = {2BA536D1-373B-44DF-B160-E437E00278FA}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "forms_common", "forms_common\forms_common.vcxproj", "{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug DLL|x64 = Debug DLL|x64
@@ -327,6 +329,22 @@ Global
 		{0F17D73B-DAEF-4B35-BE79-E17DDC9BD44F}.Release|x64.Build.0 = Release|x64
 		{0F17D73B-DAEF-4B35-BE79-E17DDC9BD44F}.Release|x86.ActiveCfg = Release|Win32
 		{0F17D73B-DAEF-4B35-BE79-E17DDC9BD44F}.Release|x86.Build.0 = Release|Win32
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Debug DLL|x64.ActiveCfg = Debug|x64
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Debug DLL|x64.Build.0 = Debug|x64
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Debug DLL|x86.ActiveCfg = Debug|Win32
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Debug DLL|x86.Build.0 = Debug|Win32
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Debug|x64.ActiveCfg = Debug|x64
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Debug|x64.Build.0 = Debug|x64
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Debug|x86.ActiveCfg = Debug|Win32
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Debug|x86.Build.0 = Debug|Win32
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Release DLL|x64.ActiveCfg = Release|x64
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Release DLL|x64.Build.0 = Release|x64
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Release DLL|x86.ActiveCfg = Release|Win32
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Release DLL|x86.Build.0 = Release|Win32
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Release|x64.ActiveCfg = Release|x64
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Release|x64.Build.0 = Release|x64
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Release|x86.ActiveCfg = Release|Win32
+		{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

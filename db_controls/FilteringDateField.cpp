@@ -31,7 +31,7 @@ void CFilteringDateField::OnChange() {
 void CFilteringDateField::OnLooseFocus(XCommandEvent *eve) {
 
 	if (is_changed) {
-		const Tchar *label = eve->GetSender()->GetLabel();
+		const Tchar *label = GetLabel();
 		if (label && label[0] != _T('\0'))
 			filtering_manager.enableExpr(id_expr);
 		else
@@ -39,6 +39,11 @@ void CFilteringDateField::OnLooseFocus(XCommandEvent *eve) {
 
 		is_changed = false;
 	}
+}
+
+void CFilteringDateField::enableIfChanged() {
+
+	OnLooseFocus(nullptr);
 }
 
 CFilteringDateField::~CFilteringDateField() { }

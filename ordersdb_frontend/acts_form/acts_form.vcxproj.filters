@@ -60,9 +60,6 @@
     <ClInclude Include="resource.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="Validators.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="ActNameCellWidget.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
