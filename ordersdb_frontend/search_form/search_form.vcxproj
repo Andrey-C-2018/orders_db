@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Inserter.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
     <ClInclude Include="OrdersInserter.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="ZoneFilter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Inserter.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />
     <ClCompile Include="OrdersInserter.cpp" />

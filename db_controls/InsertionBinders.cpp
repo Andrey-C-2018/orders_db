@@ -97,8 +97,8 @@ bool UIDateInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, 
 	size_t size;
 	auto date_str = widget->GetLabel(size);
 	if (size == 0) {
-		++params.param_no;
 		binding_target->bindNull(params.param_no);
+		++params.param_no;
 		return true;
 	}
 

@@ -237,14 +237,16 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	CDbInserter::prepare(conn);
 }
 
-void CAdvocatInserter::insert() {
+bool CAdvocatInserter::insert() {
 
+	bool result = false;
 	try {
-		CDbInserter::insert();
+		result = CDbInserter::insert();
 	}
 	catch (CDbInserterException &e) {
 
 		ErrorBox(e.what());
+		return false;
 	}
 	catch (CDbException &e) {
 
@@ -252,9 +254,12 @@ void CAdvocatInserter::insert() {
 			Tstring error_str = _T("Адвокат із таким ID уже доданий: ");
 			error_str += id_advocat->GetLabel();
 			ErrorBox(error_str.c_str());
+			return false;
 		}
 		else throw;
 	}
+
+	return result;
 }
 
 CAdvocatInserter::~CAdvocatInserter() {

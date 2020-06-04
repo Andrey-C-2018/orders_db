@@ -48,7 +48,7 @@ public:
 	void defStaticInsertion(const size_t field_no, const char *expr);
 
 	virtual void prepare(std::shared_ptr<IDbConnection> conn);
-	virtual void insert();
+	virtual bool insert();
 
 	virtual ~CDbInserter();
 };

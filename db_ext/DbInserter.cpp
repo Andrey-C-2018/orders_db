@@ -83,7 +83,7 @@ void CDbInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	std::sort(binders.begin(), binders.end());
 }
 
-void CDbInserter::insert() {
+bool CDbInserter::insert() {
 
 	assert(stmt);
 	IInsertBinder::Params params;
@@ -100,13 +100,15 @@ void CDbInserter::insert() {
 		assert(err_str_size <= params.error_str.size());
 	}
 
-	if (cancel) return;
+	if(cancel) return false;
 
 	if (!params.error_str.empty())
 		throw CDbInserterException(CDbInserterException::E_INSERT, \
 									std::move(params.error_str));
 	else
 		stmt->execScalar();
+
+	return true;
 }
 
 CDbInserter::~CDbInserter() { }

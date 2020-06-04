@@ -86,7 +86,7 @@ void CDbComboBox::SetCurrRecord(const size_t prim_key_value) {
 	}
 
 	--i;
-	this->SetSelectionIndex(i);
+	this->SetSelectionIndex(i + empty_value_added);
 	sel_index = i;
 
 	OnItemChoosed();

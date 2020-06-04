@@ -66,6 +66,18 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(id_order_binder);
 	assert(order_date_binder);
 
+	assert(center);
+	assert(stage);
+	assert(cycle);
+	assert(article);
+	assert(fee);
+	assert(outgoings);
+	assert(informer);
+	assert(id_act);
+	assert(act_date);
+	assert(act_reg_date);
+	assert(payment_date);
+
 	int id_user = 1;
 	/*auto &params_manager = CParametersManager::getInstance();
 	int id_user = params_manager.getIdUser();*/
@@ -110,14 +122,16 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	CDbInserter::prepare(conn);
 }
 
-void CPaymentsInserter::insert() {
+bool CPaymentsInserter::insert() {
 
+	bool result = false;
 	try {
-		CDbInserter::insert();
+		result = CDbInserter::insert();
 	}
 	catch (CDbInserterException &e) {
 
 		ErrorBox(e.what());
+		return false;
 	}
 	catch (CDbException &e) {
 
@@ -125,9 +139,12 @@ void CPaymentsInserter::insert() {
 			Tstring error_str = _T("Така стадія уже існує в цьому дорученні: ");
 			error_str += stage->GetLabel();
 			ErrorBox(error_str.c_str());
+			return false;
 		}
 		else throw;
 	}
+
+	return result;
 }
 
 CPaymentsInserter::~CPaymentsInserter() { }

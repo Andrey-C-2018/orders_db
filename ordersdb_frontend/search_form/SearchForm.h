@@ -6,6 +6,7 @@
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
 #include "ParametersManager.h"
+#include "Inserter.h"
 
 struct IDbConnection;
 class CDbTable;
@@ -51,7 +52,7 @@ class CSearchForm : public XTabStopPanel {
 	int grid_margin_x, grid_margin_y;
 
 	XButton *btn_apply_filter, *btn_add, *btn_remove;
-	//CPaymentsInserter inserter;
+	CInserter inserter;
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 	void setFieldsSizes();

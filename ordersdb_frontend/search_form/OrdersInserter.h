@@ -18,9 +18,10 @@ class COrdersInserter : public CDbInserter {
 	CDbComboBox *advocat;
 	XWidget *client;
 	XWidget *bdate;
-	XWidget *reason;
-	XWidget *cancel_order;
-	XWidget *cancel_date;
+
+	std::shared_ptr<IInsertBinder> center_binder;
+	std::shared_ptr<IInsertBinder> id_order_binder;
+	std::shared_ptr<IInsertBinder> order_date_binder;
 
 public:
 	COrdersInserter();
@@ -30,9 +31,9 @@ public:
 	COrdersInserter &operator=(const COrdersInserter &obj) = delete;
 	COrdersInserter &operator=(COrdersInserter &&obj) = delete;
 
-	inline void SetCenterBox(CDbComboBox *center);
-	inline void SetIdOrderWidget(XWidget *id_order);
-	inline void SetOrderDateWidget(XWidget *order_date);
+	void SetCenterBox(CDbComboBox *center);
+	void SetIdOrderWidget(XWidget *id_order);
+	void SetOrderDateWidget(XWidget *order_date);
 	inline void SetOrderTypeWidget(CDbComboBox *order_type);
 	inline void SetAdvocatWidget(CDbComboBox *advocat);
 	inline void SetClientWidget(XWidget *client);
@@ -41,28 +42,17 @@ public:
 	inline void SetCancelOrderWidget(XWidget *cancel_order);
 	inline void SetCancelDateWidget(XWidget *cancel_date);
 
+	inline std::shared_ptr<IInsertBinder> getCenterBinder();
+	inline std::shared_ptr<IInsertBinder> getIdOrderBinder();
+	inline std::shared_ptr<IInsertBinder> getOrderDateBinder();
+
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
-	void insert() override;
+	bool insert() override;
 
 	virtual ~COrdersInserter();
 };
 
 //*****************************************************
-
-void COrdersInserter::SetCenterBox(CDbComboBox *center) {
-
-	this->center = center;
-}
-
-void COrdersInserter::SetIdOrderWidget(XWidget *id_order) {
-
-	this->id_order = id_order;
-}
-
-void COrdersInserter::SetOrderDateWidget(XWidget *order_date) {
-
-	this->order_date = order_date;
-}
 
 void COrdersInserter::SetOrderTypeWidget(CDbComboBox *order_type) {
 
@@ -84,17 +74,17 @@ void COrdersInserter::SetClientBirthDateWidget(XWidget *bdate) {
 	this->bdate = bdate;
 }
 
-void COrdersInserter::SetCancelReasonWidget(XWidget *reason) {
+std::shared_ptr<IInsertBinder> COrdersInserter::getCenterBinder() {
 
-	this->reason = reason;
+	return center_binder;
 }
 
-void COrdersInserter::SetCancelOrderWidget(XWidget *cancel_order) {
+std::shared_ptr<IInsertBinder> COrdersInserter::getIdOrderBinder() {
 
-	this->cancel_order = cancel_order;
+	return id_order_binder;
 }
 
-void COrdersInserter::SetCancelDateWidget(XWidget *cancel_date) {
+inline std::shared_ptr<IInsertBinder> COrdersInserter::getOrderDateBinder() {
 
-	this->cancel_date = cancel_date;
+	return order_date_binder;
 }

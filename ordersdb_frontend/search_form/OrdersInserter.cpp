@@ -75,8 +75,8 @@ public:
 			return true;
 		}
 
-		const char *zone = (buffer == _T("МЦ") && order_date >= CDate(1, 1, 2017) ? \
-							"МЦ" : "РЦ");
+		const Tchar *zone = (buffer != _T("РЦ нБВПД") && order_date >= CDate(1, 1, 2017) ? \
+							_T("МЦ") : _T("РЦ"));
 		binding_target->bindValue(params.param_no, zone);
 		return true;
 	}
@@ -89,8 +89,31 @@ public:
 COrdersInserter::COrdersInserter() : CDbInserter("orders", FIELDS_COUNT), \
 						center(nullptr), id_order(nullptr), order_date(nullptr), \
 						order_type(nullptr), advocat(nullptr), client(nullptr), \
-						bdate(nullptr), reason(nullptr), cancel_order(nullptr), \
-						cancel_date(nullptr) { }
+						bdate(nullptr) { }
+
+void COrdersInserter::SetCenterBox(CDbComboBox *center) {
+
+	assert(center);
+	assert(!this->center);
+	this->center = center;
+	center_binder = std::make_shared<CDbComboBoxInsertBinder>(center, false);
+}
+
+void COrdersInserter::SetIdOrderWidget(XWidget *id_order) {
+
+	assert(id_order);
+	assert(!this->id_order);
+	this->id_order = id_order;
+	id_order_binder = std::make_shared<COrderNoBinder>(id_order, false);
+}
+
+void COrdersInserter::SetOrderDateWidget(XWidget *order_date) {
+
+	assert(order_date);
+	assert(!this->order_date);
+	this->order_date = order_date;
+	order_date_binder = std::make_shared<UIDateInsertBinder>(order_date, false);
+}
 
 void COrdersInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
@@ -101,42 +124,41 @@ void COrdersInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(advocat);
 	assert(client);
 	assert(bdate);
-	assert(reason);
-	assert(cancel_order);
-	assert(cancel_date);
 
 	int id_user = 1;
 	/*auto &params_manager = CParametersManager::getInstance();
 	int id_user = params_manager.getIdUser();*/
 	assert(id_user != -1);
 
-	addBinder(0, _T("Центр"), std::make_shared<CDbComboBoxInsertBinder>(center, false));
-	addBinder(1, _T("Номер доручення"), std::make_shared<COrderNoBinder>(id_order, false));
-	addBinder(2, _T("Дата доручення"), std::make_shared<UIDateInsertBinder>(order_date, false));
+	addBinder(0, _T("Центр"), center_binder);
+	addBinder(1, _T("Номер доручення"), id_order_binder);
+	addBinder(2, _T("Дата доручення"), order_date_binder);
 	addBinder(3, _T("Тип доручення"), std::make_shared<CDbComboBoxInsertBinder>(order_type, false));
 	addBinder(4, _T("Адвокат"), std::make_shared<CDbComboBoxInsertBinder>(advocat, false));
 	addBinder(5, _T("Клієнт"), std::make_shared<UITextInsertBinder>(client, false));
 	addBinder(6, _T("Дата народж. клієнта"), std::make_shared<UIDateInsertBinder>(bdate, false));
 	defStaticInsertion(7, "0"); // mark
 	defStaticInsertion(8, "0"); // KIAS id
-	defStaticInsertion(9, "NOW()");
-	addBinder(10, _T("Користувач"), std::make_shared<CIntInsertBinder>(id_user));
-	addBinder(11, _T("Причина скасування"), std::make_shared<UITextInsertBinder>(reason, false));
-	addBinder(12, _T("Наказ"), std::make_shared<UITextInsertBinder>(cancel_order, false));
-	addBinder(13, _T("Дата скасування"), std::make_shared<UIDateInsertBinder>(cancel_date, false));
+	addBinder(9, _T("Користувач"), std::make_shared<CIntInsertBinder>(id_user));
+	defStaticInsertion(10, "NOW()");
+	defStaticInsertion(11, "NULL"); // cancel reason
+	defStaticInsertion(12, "NULL"); // cancel order
+	defStaticInsertion(13, "NULL"); // cancel_date
 	addBinder(14, _T("Зона відповідальності"), std::make_shared<ZoneInsertBinder>(center, order_date));
 		
 	CDbInserter::prepare(conn);
 }
 
-void COrdersInserter::insert() {
+bool COrdersInserter::insert() {
 
+	bool result = false;
 	try {
-		CDbInserter::insert();
+		result = CDbInserter::insert();
 	}
 	catch (CDbInserterException &e) {
 
 		ErrorBox(e.what());
+		return false;
 	}
 	catch (CDbException &e) {
 
@@ -148,9 +170,12 @@ void COrdersInserter::insert() {
 			error_str += _T('-');
 			error_str += order_date->GetLabel();
 			ErrorBox(error_str.c_str());
+			return false;
 		}
 		else throw;
 	}
+
+	return result;
 }
 
 COrdersInserter::~COrdersInserter() { }

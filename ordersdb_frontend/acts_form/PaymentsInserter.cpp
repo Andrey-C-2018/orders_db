@@ -189,19 +189,21 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	CDbInserter::prepare(conn);
 }
 
-void CPaymentsInserter::insert() {
+bool CPaymentsInserter::insert() {
 
 	if (db_table->empty()) {
 		ErrorBox(_T("Неможливо додати стадію: доручення не вибране"));
-		return;
+		return false;
 	}
 
+	bool result = false;
 	try {
-		CDbInserter::insert();
+		result = CDbInserter::insert();
 	}
 	catch (CDbInserterException &e) {
 
 		ErrorBox(e.what());
+		return false;
 	}
 	catch (CDbException &e) {
 
@@ -209,9 +211,12 @@ void CPaymentsInserter::insert() {
 			Tstring error_str = _T("Така стадія уже існує в цьому дорученні: ");
 			error_str += stage->GetLabel();
 			ErrorBox(error_str.c_str());
+			return false;
 		}
 		else throw;
 	}
+
+	return result;
 }
 
 void CPaymentsInserter::Dispose() {
