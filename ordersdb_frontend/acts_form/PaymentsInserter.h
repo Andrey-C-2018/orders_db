@@ -67,7 +67,7 @@ public:
 	void getCurrRecord();
 
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
-	bool insert() override;
+	void insert() override;
 
 	void Dispose();
 	virtual ~CPaymentsInserter();

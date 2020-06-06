@@ -151,10 +151,10 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(id_user != -1);
 
 	addBinder(0, _T("Реквізити доручення"), std::make_shared<COrderParamsBinder>(db_table));
-	addBinder(3, _T("Сума"), std::make_shared<CFeeBinder>(fee, false));
-	addBinder(4, _T("Стадія"), std::make_shared<CDbComboBoxInsertBinder>(stage, false));
+	addBinder(3, _T("Сума"), std::make_shared<CFeeBinder>(fee, false, false));
+	addBinder(4, _T("Стадія"), std::make_shared<CDbComboBoxInsertBinder>(stage, false, false));
 	addBinder(5, _T("Стаття"), std::make_shared<UITextInsertBinder>(article, false));
-	addBinder(6, _T("Інформатор"), std::make_shared<CDbComboBoxInsertBinder>(informer, false));
+	addBinder(6, _T("Інформатор"), std::make_shared<CDbComboBoxInsertBinder>(informer, false, false));
 	addBinder(7, _T("Акт"), std::make_shared<CActNameBinder>(id_act, false));
 	addBinder(8, _T("Дата акта"), std::make_shared<CActDateBinder>(db_table, act_date, false, act_reg_date));
 	addBinder(9, _T("Цикл"), std::make_shared<UIIntInsertBinder>(cycle, false));
@@ -164,7 +164,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	defStaticInsertion(13, "NULL"); 
 	addBinder(14, _T("Дата прийняття акта"), std::make_shared<CActRegDateBinder>(db_table, act_reg_date, false));
 	defStaticInsertion(15, "NULL");
-	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false));
+	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false, false));
 	defStaticInsertion(17, "0.0");
 
 	addBinder(18, _T("Вік"), std::make_shared<CQaParamBinder>(age, false));
@@ -184,26 +184,15 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
 	addBinder(32, _T("Коеф."), std::make_shared<CQaKoefBinder>(Koef, false));
 	addBinder(33, _T("Дата реєстр. в ДКС"), std::make_shared<UIDateInsertBinder>(act_date, false));
-	addBinder(34, _T("Перевірив"), std::make_shared<CDbComboBoxInsertBinder>(checker, false));
+	addBinder(34, _T("Перевірив"), std::make_shared<CDbComboBoxInsertBinder>(checker, false, false));
 	
 	CDbInserter::prepare(conn);
 }
 
-bool CPaymentsInserter::insert() {
+void CPaymentsInserter::insert() {
 
-	if (db_table->empty()) {
-		ErrorBox(_T("Неможливо додати стадію: доручення не вибране"));
-		return false;
-	}
-
-	bool result = false;
 	try {
-		result = CDbInserter::insert();
-	}
-	catch (CDbInserterException &e) {
-
-		ErrorBox(e.what());
-		return false;
+		CDbInserter::insert();
 	}
 	catch (CDbException &e) {
 
@@ -211,12 +200,9 @@ bool CPaymentsInserter::insert() {
 			Tstring error_str = _T("Така стадія уже існує в цьому дорученні: ");
 			error_str += stage->GetLabel();
 			ErrorBox(error_str.c_str());
-			return false;
 		}
 		else throw;
 	}
-
-	return result;
 }
 
 void CPaymentsInserter::Dispose() {

@@ -14,6 +14,7 @@
 #include <db_controls/FilteringDateField.h>
 #include <db_controls/BinderControls.h>
 #include <db_controls/DbNavigator.h>
+#include <forms_common/ParametersManager.h>
 #include "SearchForm.h"
 #include "ZoneFilter.h"
 #include "PaidFilter.h"
@@ -66,9 +67,9 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
 
 	props.open("config.ini");
-	params_manager.Init(&props);
-
+	
 	conn = CMySQLConnectionFactory::createConnection(props);
+	CParametersManager::init(&props, conn);
 	db_table = createDbTable(conn);
 
 	grid = new CDbGrid(false, db_table);
@@ -193,6 +194,8 @@ void CSearchForm::adjustUIDependentCellWidgets() {
 
 void CSearchForm::loadInitialFilterToControls() {
 
+	const auto &params_manager = CParametersManager::getInstance();
+
 	flt_center->SetCurrRecord(params_manager.getDefaultCenter());
 	flt_order_date_from->SetLabel(params_manager.getInitialDateW());
 	flt_order_date_from->enableIfChanged();
@@ -304,6 +307,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable(std::shared_ptr<IDbConnecti
 	query += " ORDER BY a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
 	query_modifier.Init(query);
 
+	const auto &params_manager = CParametersManager::getInstance();
 	std::string initial_flt = params_manager.getInitialFilteringStr();
 	query_modifier.changeWherePart(\
 		ImmutableString<char>(initial_flt.c_str(), initial_flt.size()));
@@ -537,8 +541,7 @@ void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
 
 void CSearchForm::OnAddRecordButtonClick(XCommandEvent *eve) {
 
-	inserter.insert();
-	db_table->reload();
+	if(inserter.insert()) db_table->reload();
 }
 
 void CSearchForm::OnRemoveButtonClick(XCommandEvent *eve) {

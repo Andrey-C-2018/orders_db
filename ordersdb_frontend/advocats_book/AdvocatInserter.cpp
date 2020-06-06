@@ -223,30 +223,24 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	addBinder(3, _T("mark"), std::make_shared<CIntInsertBinder>(0));
 	addBinder(4, _T("Номер свідоцтва"), std::make_shared<UITextInsertBinder>(license_no, false));
 	addBinder(5, _T("Дата свідоцтва"), std::make_shared<UIDateInsertBinder>(license_date, false));
-	addBinder(6, _T("Екзаменатор"), std::make_shared<CDbComboBoxInsertBinder>(examiner, false));
+	addBinder(6, _T("Екзаменатор"), std::make_shared<CDbComboBoxInsertBinder>(examiner, false, false));
 	addBinder(7, _T("Поштовий індекс"), std::make_shared<CPostIndexBinder>(post_index, false));
 	addBinder(8, _T("Адреса"), std::make_shared<UITextInsertBinder>(address, false));
 	addBinder(9, _T("Телефон"), std::make_shared<UITextInsertBinder>(tel, false));
 	addBinder(10, _T("E-mail"), std::make_shared<UITextInsertBinder>(email, false));
 	addBinder(11, _T("Дата народження"), std::make_shared<UIDateInsertBinder>(adv_bdate, false));
 	addBinder(12, _T("Основний район роботи"), \
-				std::make_shared<CDbComboBoxInsertBinder>(district, false));
+				std::make_shared<CDbComboBoxInsertBinder>(district, false, false));
 	addBinder(13, _T("Організація"), \
 				std::make_shared<CAdvOrgBinder>(org_name, org_type, false, false));
 
 	CDbInserter::prepare(conn);
 }
 
-bool CAdvocatInserter::insert() {
+void CAdvocatInserter::insert() {
 
-	bool result = false;
 	try {
-		result = CDbInserter::insert();
-	}
-	catch (CDbInserterException &e) {
-
-		ErrorBox(e.what());
-		return false;
+		CDbInserter::insert();
 	}
 	catch (CDbException &e) {
 
@@ -254,12 +248,9 @@ bool CAdvocatInserter::insert() {
 			Tstring error_str = _T("Адвокат із таким ID уже доданий: ");
 			error_str += id_advocat->GetLabel();
 			ErrorBox(error_str.c_str());
-			return false;
 		}
 		else throw;
 	}
-
-	return result;
 }
 
 CAdvocatInserter::~CAdvocatInserter() {

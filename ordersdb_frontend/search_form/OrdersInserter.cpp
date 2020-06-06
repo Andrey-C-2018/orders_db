@@ -2,6 +2,7 @@
 #include <db/DbException.h>
 #include <xwindows/XWidget.h>
 #include <db_controls/DbComboBox.h>
+#include <forms_common/ParametersManager.h>
 #include "OrdersInserter.h"
 
 class COrderNoBinder : public CVisualInsertBinder {
@@ -96,7 +97,7 @@ void COrdersInserter::SetCenterBox(CDbComboBox *center) {
 	assert(center);
 	assert(!this->center);
 	this->center = center;
-	center_binder = std::make_shared<CDbComboBoxInsertBinder>(center, false);
+	center_binder = std::make_shared<CDbComboBoxInsertBinder>(center, false, false);
 }
 
 void COrdersInserter::SetIdOrderWidget(XWidget *id_order) {
@@ -125,16 +126,15 @@ void COrdersInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(client);
 	assert(bdate);
 
-	int id_user = 1;
-	/*auto &params_manager = CParametersManager::getInstance();
-	int id_user = params_manager.getIdUser();*/
+	const auto &params_manager = CParametersManager::getInstance();
+	int id_user = params_manager.getIdUser();
 	assert(id_user != -1);
 
 	addBinder(0, _T("Центр"), center_binder);
 	addBinder(1, _T("Номер доручення"), id_order_binder);
 	addBinder(2, _T("Дата доручення"), order_date_binder);
-	addBinder(3, _T("Тип доручення"), std::make_shared<CDbComboBoxInsertBinder>(order_type, false));
-	addBinder(4, _T("Адвокат"), std::make_shared<CDbComboBoxInsertBinder>(advocat, false));
+	addBinder(3, _T("Тип доручення"), std::make_shared<CDbComboBoxInsertBinder>(order_type, false, false));
+	addBinder(4, _T("Адвокат"), std::make_shared<CDbComboBoxInsertBinder>(advocat, false, false));
 	addBinder(5, _T("Клієнт"), std::make_shared<UITextInsertBinder>(client, false));
 	addBinder(6, _T("Дата народж. клієнта"), std::make_shared<UIDateInsertBinder>(bdate, false));
 	defStaticInsertion(7, "0"); // mark
@@ -149,33 +149,16 @@ void COrdersInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	CDbInserter::prepare(conn);
 }
 
-bool COrdersInserter::insert() {
+void COrdersInserter::insert() {
 
-	bool result = false;
 	try {
-		result = CDbInserter::insert();
-	}
-	catch (CDbInserterException &e) {
-
-		ErrorBox(e.what());
-		return false;
+		CDbInserter::insert();
 	}
 	catch (CDbException &e) {
 
-		if (e.GetErrorCode() == CDbException::E_DB_PRIMARY_KEY_DUPLICATE) {
-			Tstring error_str = _T("Таке доручення уже існує в БД: ");
-			error_str += center->GetLabel();
-			error_str += _T('-');
-			error_str += id_order->GetLabel();
-			error_str += _T('-');
-			error_str += order_date->GetLabel();
-			ErrorBox(error_str.c_str());
-			return false;
-		}
+		if (e.GetErrorCode() == CDbException::E_DB_PRIMARY_KEY_DUPLICATE) return;
 		else throw;
 	}
-
-	return result;
 }
 
 COrdersInserter::~COrdersInserter() { }

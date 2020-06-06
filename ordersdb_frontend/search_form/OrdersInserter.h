@@ -47,7 +47,7 @@ public:
 	inline std::shared_ptr<IInsertBinder> getOrderDateBinder();
 
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
-	bool insert() override;
+	void insert() override;
 
 	virtual ~COrdersInserter();
 };

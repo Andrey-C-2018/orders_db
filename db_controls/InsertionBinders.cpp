@@ -134,14 +134,21 @@ UIDateInsertBinder::~UIDateInsertBinder() { }
 //*****************************************************
 
 CDbComboBoxInsertBinder::CDbComboBoxInsertBinder(CDbComboBox *db_combo_, \
-												const bool deallocate_widget_object_) : \
+												const bool deallocate_widget_object_, \
+												const bool allow_empty_) : \
 							CVisualInsertBinder(db_combo_, deallocate_widget_object_), \
-							db_combo(db_combo_) { }
+							db_combo(db_combo_), allow_empty(allow_empty_), \
+							value_if_empty(0) { }
 
 bool CDbComboBoxInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 									Params &params, const Tchar *field_name) {
 
 	if (db_combo->isEmptySelection()) {
+		if (allow_empty) {
+			binding_target->bindValue(params.param_no, value_if_empty);
+			++params.param_no;
+			return true;
+		}
 		params.error_str += field_name;
 		params.error_str += _T(": значення із списку не вибрано\n");
 		++params.param_no;

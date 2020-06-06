@@ -5,18 +5,6 @@
 #include <db/IDbStatement.h>
 #include "IInsertBinder.h"
 
-class CDbInserterException : public XException {
-public:
-	enum {
-		E_INSERT = 1
-	};
-	CDbInserterException(const int err_code, const Tchar *err_descr);
-	CDbInserterException(const int err_code, Tstring &&err_descr);
-	CDbInserterException(const CDbInserterException &obj);
-	CDbInserterException(CDbInserterException &&obj) = default;
-	~CDbInserterException();
-};
-
 struct IDbConnection;
 
 class CDbInserter {
@@ -48,7 +36,8 @@ public:
 	void defStaticInsertion(const size_t field_no, const char *expr);
 
 	virtual void prepare(std::shared_ptr<IDbConnection> conn);
-	virtual bool insert();
+	bool bind(Tstring &err_str);
+	virtual void insert();
 
 	virtual ~CDbInserter();
 };

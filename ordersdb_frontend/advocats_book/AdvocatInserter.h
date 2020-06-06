@@ -49,7 +49,7 @@ public:
 	inline void setOrgTypeWidget(XComboBox *org_type) { this->org_type = org_type; }
 
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
-	bool insert() override;
+	void insert() override;
 
 	virtual ~CAdvocatInserter();
 };

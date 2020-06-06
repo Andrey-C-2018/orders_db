@@ -5,7 +5,6 @@
 #include <xwindows_ex/XTabStopPanel.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
-#include "ParametersManager.h"
 #include "Inserter.h"
 
 struct IDbConnection;
@@ -28,7 +27,6 @@ class CSearchForm : public XTabStopPanel {
 	};
 
 	CPropertiesFile props;
-	CParametersManager params_manager;
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
 

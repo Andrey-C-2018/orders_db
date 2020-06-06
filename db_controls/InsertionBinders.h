@@ -53,10 +53,15 @@ class CDbComboBox;
 
 class CDbComboBoxInsertBinder : public CVisualInsertBinder {
 	CDbComboBox *db_combo;
+	bool allow_empty;
+	int value_if_empty;
 public:
-	CDbComboBoxInsertBinder(CDbComboBox *db_combo_, const bool deallocate_widget_object_);
+	CDbComboBoxInsertBinder(CDbComboBox *db_combo_, const bool deallocate_widget_object_, \
+							const bool allow_empty);
 
+	inline void setValueIfEmpty(const int value_if_empty) {	this->value_if_empty = value_if_empty; }
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override;
+
 	virtual ~CDbComboBoxInsertBinder();
 };

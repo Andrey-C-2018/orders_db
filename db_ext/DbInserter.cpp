@@ -3,20 +3,6 @@
 #include "DbInserter.h"
 #include <assert.h>
 
-CDbInserterException::CDbInserterException(const int err_code, \
-											const Tchar *err_descr) : \
-											XException(err_code, err_descr) { }
-
-CDbInserterException::CDbInserterException(const int err_code, Tstring &&err_descr) : \
-											XException(err_code, std::move(err_descr)) { }
-
-CDbInserterException::CDbInserterException(const CDbInserterException &obj) : \
-											XException(obj) { }
-
-CDbInserterException::~CDbInserterException() { }
-
-//*****************************************************
-
 CDbInserter::CDbInserter(const char *table_name, const size_t fields_count_) : \
 							fields_count(fields_count_) {
 
@@ -83,7 +69,7 @@ void CDbInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	std::sort(binders.begin(), binders.end());
 }
 
-bool CDbInserter::insert() {
+bool CDbInserter::bind(Tstring &err_str) {
 
 	assert(stmt);
 	IInsertBinder::Params params;
@@ -100,15 +86,15 @@ bool CDbInserter::insert() {
 		assert(err_str_size <= params.error_str.size());
 	}
 
-	if(cancel) return false;
-
 	if (!params.error_str.empty())
-		throw CDbInserterException(CDbInserterException::E_INSERT, \
-									std::move(params.error_str));
-	else
-		stmt->execScalar();
+		err_str = std::move(params.error_str);
 
-	return true;
+	return !cancel;
+}
+
+void CDbInserter::insert() {
+
+	stmt->execScalar();
 }
 
 CDbInserter::~CDbInserter() { }

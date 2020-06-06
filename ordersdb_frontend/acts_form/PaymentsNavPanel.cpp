@@ -199,8 +199,19 @@ void CPaymentsNavPanel::OnGetCurrRecordButtonClick(XCommandEvent *eve) {
 
 void CPaymentsNavPanel::OnAddRecordButtonClick(XCommandEvent *eve) {
 
-	inserter.insert();
-	db_table->reload();
+	if (db_table->empty()) {
+		ErrorBox(_T("Неможливо додати стадію: доручення не вибране"));
+		return;
+	}
+
+	Tstring err_str;
+	bool bound = inserter.bind(err_str);
+	if (bound && err_str.empty()) {
+		inserter.insert();
+		db_table->reload();
+	}
+	else
+		ErrorBox(err_str.c_str());
 }
 
 void CPaymentsNavPanel::OnRemoveButtonClick(XCommandEvent *eve) {

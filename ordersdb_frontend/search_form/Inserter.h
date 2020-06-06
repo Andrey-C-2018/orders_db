@@ -22,7 +22,7 @@ public:
 	inline void SetOrderDateWidget(XWidget *order_date);
 
 	void prepare(std::shared_ptr<IDbConnection> conn);
-	void insert();
+	bool insert();
 
 	virtual ~CInserter();
 };

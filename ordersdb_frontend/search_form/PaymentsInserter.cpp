@@ -3,6 +3,7 @@
 #include <xwindows/XWidget.h>
 #include <db_controls/DbComboBox.h>
 #include <forms_common/FormsInsertionBinders.h>
+#include <forms_common/ParametersManager.h>
 #include "PaymentsInserter.h"
 
 class CheckerInsertBinder : public IInsertBinder {
@@ -78,28 +79,27 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(act_reg_date);
 	assert(payment_date);
 
-	int id_user = 1;
-	/*auto &params_manager = CParametersManager::getInstance();
-	int id_user = params_manager.getIdUser();*/
+	const auto &params_manager = CParametersManager::getInstance();
+	int id_user = params_manager.getIdUser();
 	assert(id_user != -1);
 
 	addBinder(0, _T("Центр"), center_binder);
 	addBinder(1, _T("Номер доручення"), id_order_binder);
 	addBinder(2, _T("Дата доручення"), order_date_binder);
-	addBinder(3, _T("Сума"), std::make_shared<CFeeBinder>(fee, false));
-	addBinder(4, _T("Стадія"), std::make_shared<CDbComboBoxInsertBinder>(stage, false));
+	addBinder(3, _T("Сума"), std::make_shared<CFeeBinder>(fee, false, true));
+	addBinder(4, _T("Етап"), std::make_shared<CDbComboBoxInsertBinder>(stage, false, false));
 	addBinder(5, _T("Стаття"), std::make_shared<UITextInsertBinder>(article, false));
-	addBinder(6, _T("Інформатор"), std::make_shared<CDbComboBoxInsertBinder>(informer, false));
+	addBinder(6, _T("Інформатор"), std::make_shared<CDbComboBoxInsertBinder>(informer, false, true));
 	addBinder(7, _T("Акт"), std::make_shared<CActNameBinder>(id_act, false));
 	addBinder(8, _T("Дата акта"), std::make_shared<UIDateInsertBinder>(act_date, false));
-	addBinder(9, _T("Цикл"), std::make_shared<UIIntInsertBinder>(cycle, false));
+	addBinder(9, _T("№ розгляду"), std::make_shared<UIIntInsertBinder>(cycle, false));
 	addBinder(10, _T("Користувач"), std::make_shared<CIntInsertBinder>(id_user));
 	defStaticInsertion(11, "NOW()");
 	defStaticInsertion(12, "NULL");
 	defStaticInsertion(13, "NULL");
 	addBinder(14, _T("Дата прийняття акта"), std::make_shared<UIDateInsertBinder>(act_reg_date, false));
 	defStaticInsertion(15, "NULL");
-	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false));
+	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false, true));
 	defStaticInsertion(17, "0.0");
 	defStaticInsertion(18, "0");
 	defStaticInsertion(19, "0");
@@ -122,16 +122,10 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	CDbInserter::prepare(conn);
 }
 
-bool CPaymentsInserter::insert() {
+void CPaymentsInserter::insert() {
 
-	bool result = false;
 	try {
-		result = CDbInserter::insert();
-	}
-	catch (CDbInserterException &e) {
-
-		ErrorBox(e.what());
-		return false;
+		CDbInserter::insert();
 	}
 	catch (CDbException &e) {
 
@@ -139,12 +133,9 @@ bool CPaymentsInserter::insert() {
 			Tstring error_str = _T("Така стадія уже існує в цьому дорученні: ");
 			error_str += stage->GetLabel();
 			ErrorBox(error_str.c_str());
-			return false;
 		}
 		else throw;
 	}
-
-	return result;
 }
 
 CPaymentsInserter::~CPaymentsInserter() { }

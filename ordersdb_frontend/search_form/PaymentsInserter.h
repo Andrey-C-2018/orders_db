@@ -47,7 +47,7 @@ public:
 	inline void setIdOrderBinder(std::shared_ptr<IInsertBinder> binder);
 	inline void setOrderDateBinder(std::shared_ptr<IInsertBinder> binder);
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
-	bool insert() override;
+	void insert() override;
 
 	virtual ~CPaymentsInserter();
 };

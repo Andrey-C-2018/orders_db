@@ -10,9 +10,10 @@ enum {
 };
 
 class CFeeBinder : public CVisualInsertBinder {
+	bool allow_empty;
 public:
-	CFeeBinder(XWidget *fee_holder, bool free_widget) : \
-		CVisualInsertBinder(fee_holder, free_widget) { }
+	CFeeBinder(XWidget *fee_holder, bool free_widget, bool allow_empty_) : \
+		CVisualInsertBinder(fee_holder, free_widget), allow_empty(allow_empty_) { }
 
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 		Params &params, const Tchar *field_name) override {
@@ -23,6 +24,11 @@ public:
 		auto fee_str = widget->GetLabel(size);
 
 		if (!size) {
+			if (allow_empty) {
+				binding_target->bindValue(params.param_no, "0.0");
+				return true;
+			}
+
 			params.error_str += field_name;
 			params.error_str += _T(": не може бути порожнім\n");
 			return true;
