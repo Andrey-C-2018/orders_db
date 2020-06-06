@@ -38,9 +38,6 @@ public:
 	inline void SetAdvocatWidget(CDbComboBox *advocat);
 	inline void SetClientWidget(XWidget *client);
 	inline void SetClientBirthDateWidget(XWidget *bdate);
-	inline void SetCancelReasonWidget(XWidget *reason);
-	inline void SetCancelOrderWidget(XWidget *cancel_order);
-	inline void SetCancelDateWidget(XWidget *cancel_date);
 
 	inline std::shared_ptr<IInsertBinder> getCenterBinder();
 	inline std::shared_ptr<IInsertBinder> getIdOrderBinder();

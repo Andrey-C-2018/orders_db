@@ -3,11 +3,13 @@
 #include "PaymentsInserter.h"
 
 class CInserter {
+	bool allow_orders, allow_payments;
 	COrdersInserter orders_inserter;
 	CPaymentsInserter payments_inserter;
 
 public:
 	CInserter();
+	void evalPermissions();
 
 	CInserter(const CInserter &obj) = delete;
 	CInserter(CInserter &&obj) = delete;

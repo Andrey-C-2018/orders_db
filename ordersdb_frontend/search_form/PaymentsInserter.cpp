@@ -134,6 +134,8 @@ void CPaymentsInserter::insert() {
 			error_str += stage->GetLabel();
 			ErrorBox(error_str.c_str());
 		}
+		else if (e.GetErrorCode() == CDbException::E_DB_NO_REF_IN_MASTER_TABLE)
+			ErrorBox(_T("Доручення не внесено. Зверніться до відділу роботи з адвокатами"));
 		else throw;
 	}
 }

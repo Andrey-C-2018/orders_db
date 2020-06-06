@@ -16,6 +16,9 @@ int CMySQLException::MapMySQLErrorCodeToCommonCode(const int mysql_code) const {
 		case ER_PARSE_ERROR:
 			return CDbException::E_DB_PARSE_ERROR;
 
+		case ER_NO_REFERENCED_ROW_2:
+			return CDbException::E_DB_NO_REF_IN_MASTER_TABLE;
+
 		default:
 			return CDbException::E_DB_WRONG_CODE;
 	}

@@ -7,6 +7,7 @@
 #include <xwindows/XButton.h>
 #include <xwindows_ex/HorizontalSizer.h>
 #include <xwindows_ex/VerticalSizer.h>
+#include <xwindows_ex/XCurrencyField.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbComboBoxCellWidget.h>
 #include <db_controls/FilteringEdit.h>
@@ -70,6 +71,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	
 	conn = CMySQLConnectionFactory::createConnection(props);
 	CParametersManager::init(&props, conn);
+	inserter.evalPermissions();
 	db_table = createDbTable(conn);
 
 	grid = new CDbGrid(false, db_table);
@@ -315,7 +317,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable(std::shared_ptr<IDbConnecti
 	auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
-	db_table->setPrimaryTableForQuery("payments");
+	db_table->setPrimaryTableForQuery("orders");
 	db_table->markFieldAsPrimaryKey("id_center_legalaid", "orders");
 	db_table->markFieldAsPrimaryKey("id", "orders");
 	db_table->markFieldAsPrimaryKey("order_date", "orders");
@@ -419,14 +421,14 @@ void CSearchForm::displayWidgets() {
 
 		sizer.addWidget(new XLabel(), _T("Сума: "), FL_WINDOW_VISIBLE, \
 						XSize(45, DEF_GUI_ROW_HEIGHT));
-		XTabStopEdit *fee = new XTabStopEdit(this);
+		XTabStopEdit *fee = new XCurrencyField(this);
 		sizer.addWidget(fee, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setFeeWidget(fee);
 
 		sizer.addWidget(new XLabel(), _T("Витрати: "), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
-		XTabStopEdit *outgoings = new XTabStopEdit(this);
+		XTabStopEdit *outgoings = new XCurrencyField(this);
 		sizer.addWidget(outgoings, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setOutgoingsWidget(outgoings);
@@ -546,6 +548,9 @@ void CSearchForm::OnAddRecordButtonClick(XCommandEvent *eve) {
 
 void CSearchForm::OnRemoveButtonClick(XCommandEvent *eve) {
 
+	int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
+	if (option == IDYES)
+		db_table->removeCurrentRecord();
 }
 
 void CSearchForm::OnSize(XSizeEvent *eve) {

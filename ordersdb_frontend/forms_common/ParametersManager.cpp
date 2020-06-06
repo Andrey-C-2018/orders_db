@@ -15,25 +15,8 @@ void CParametersManager::getParamsValuesFromFile(CPropertiesFile *props, \
 	assert(props);
 	assert(conn);
 	Tstring buffer;
-		
-	const Tchar *user_name = props->getStringProperty(_T("user_name"), buffer);
-	if (!user_name || (user_name && user_name[0] == _T('\0')))
-		throw XException(0, _T("Параметр 'user_name' відсутній у config.ini"));
 
-	auto stmt = conn->PrepareQuery("SELECT id_user FROM users WHERE user_name = ?");
-	stmt->bindValue(0, user_name);
-	auto rs = stmt->exec();
-
-	if (rs->empty()) {
-		XException e(0, _T("Користувач '"));
-		e << user_name << _T("' відсутній в БД. Перевірте config.ini");
-		throw e;
-	}
-	rs->gotoRecord(0);
-
-	bool is_null;
-	this->id_user = rs->getInt(0, is_null);
-	assert(!is_null);
+	determineUserAndGroups(props, conn, buffer);
 
 	auto str_date = props->getStringProperty(_T("initial_order_date"), buffer);
 	if (!str_date)
@@ -63,6 +46,49 @@ void CParametersManager::getParamsValuesFromFile(CPropertiesFile *props, \
 		XException e(0, _T("Невірний номер центру: "));
 		e << default_center;
 		throw e;
+	}
+}
+
+void CParametersManager::determineUserAndGroups(CPropertiesFile *props, \
+												std::shared_ptr<IDbConnection> conn, \
+												Tstring &buffer) {
+
+	assert(props);
+	assert(conn);
+
+	const Tchar *user_name = props->getStringProperty(_T("user_name"), buffer);
+	if (!user_name || (user_name && user_name[0] == _T('\0')))
+		throw XException(0, _T("Параметр 'user_name' відсутній у config.ini"));
+
+	auto stmt = conn->PrepareQuery("SELECT id_user FROM users WHERE user_name = ?");
+	stmt->bindValue(0, user_name);
+	auto rs = stmt->exec();
+
+	if (rs->empty()) {
+		XException e(0, _T("Користувач '"));
+		e << user_name << _T("' відсутній в БД. Перевірте config.ini");
+		throw e;
+	}
+	rs->gotoRecord(0);
+
+	bool is_null;
+	this->id_user = rs->getInt(0, is_null);
+	assert(!is_null);
+
+	stmt = conn->PrepareQuery("SELECT gr.group_name FROM groups gr INNER JOIN users_groups ug ON gr.id_group = ug.id_group WHERE ug.id_user = ? ORDER BY 1");
+	stmt->bindValue(0, id_user);
+	rs = stmt->exec();
+
+	size_t groups_count = rs->getRecordsCount();
+	if (!groups_count) {
+		XException e(0, _T("Неможливо визначити список груп для користувача '"));
+		e << user_name << _T("'");
+		throw e;
+	}
+
+	for (size_t i = 0; i < groups_count; ++i) {
+		rs->gotoRecord(i);
+		groups.emplace_back(rs->getString(0));
 	}
 }
 

@@ -148,6 +148,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/x64/Release;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 #pragma once
-#include <string>
+#include <vector>
 #include <memory>
+#include <basic/tstring.h>
 #include <date/Date.h>
 
 class CPropertiesFile;
@@ -10,6 +11,7 @@ class CParametersManager {
 	static CParametersManager inst;
 
 	int id_user;
+	std::vector<std::string> groups;
 	int default_center;
 	CDate initial_order_date;
 	char date_buffer[CDate::SQL_FORMAT_LEN + 1];
@@ -18,6 +20,9 @@ class CParametersManager {
 	CParametersManager();
 	void getParamsValuesFromFile(CPropertiesFile *props, \
 									std::shared_ptr<IDbConnection> conn);
+	void determineUserAndGroups(CPropertiesFile *props, \
+									std::shared_ptr<IDbConnection> conn, \
+									Tstring &buffer);
 	inline bool areParamsInitilized() const { return id_user != -1; }
 
 public:
@@ -31,6 +36,7 @@ public:
 	static inline const CParametersManager &getInstance() { return inst; }
 
 	inline int getIdUser() const { return id_user; }
+	inline const std::vector<std::string> &getGroups() const { return groups; }
 	inline int getDefaultCenter() const;
 	inline const wchar_t *getInitialDateW() const;
 	std::string getInitialFilteringStr() const;
