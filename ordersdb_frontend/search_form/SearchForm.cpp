@@ -249,6 +249,8 @@ void CSearchForm::loadInitialFilterToControls() {
 
 void CSearchForm::initFilteringControls() {
 
+	def_binding_target = std::make_shared<CDoubleBndTarget>();
+
 	flt_center = new CFilteringDbComboBox(filtering_manager, \
 										centers_list->getMasterResultSet(), 2, 0);
 	auto combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_center);
@@ -579,7 +581,9 @@ void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
 
 	if (filtering_manager.isFilteringStringChanged()) {
 
-		query_modifier.changeWherePart(filtering_manager.buildFilteringString());
+		auto new_flt_str = filtering_manager.buildFilteringString();
+		query_modifier.changeWherePart(new_flt_str);
+		query_aggregate.changeWherePart(new_flt_str);
 
 		auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 		auto stmt_aggregate = conn->PrepareQuery(query_aggregate.getQuery().c_str());

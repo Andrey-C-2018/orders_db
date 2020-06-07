@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DoubleBndTarget.h" />
     <ClInclude Include="Inserter.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="ZoneFilter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DoubleBndTarget.cpp" />
     <ClCompile Include="Inserter.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />

@@ -8,6 +8,7 @@
 #include "Inserter.h"
 
 struct IDbConnection;
+class CDoubleBndTarget;
 class CDbTable;
 class CDbGrid;
 class CDbStaticNumField;
@@ -50,6 +51,7 @@ class CSearchForm : public XTabStopPanel {
 	int grid_margin_x, grid_margin_y;
 
 	CDbStaticNumField *total_fee, *total_paid, *total_orders;
+	std::shared_ptr<CDoubleBndTarget> def_binding_target;
 
 	XButton *btn_apply_filter, *btn_add, *btn_remove;
 	CInserter inserter;
