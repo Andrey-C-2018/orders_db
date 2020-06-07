@@ -16,6 +16,11 @@ class CDbNavigator : public XEdit {
 public:
 	CDbNavigator(std::shared_ptr<CDbTable> db_table);
 
+	CDbNavigator(const CDbNavigator &obj) = delete;
+	CDbNavigator(CDbNavigator &&obj) = default;
+	CDbNavigator &operator=(const CDbNavigator &obj) = delete;
+	CDbNavigator &operator=(CDbNavigator &&obj) = default;
+
 	void Create(XWindow *parent, const int flags, \
 						const Tchar *label, \
 						const int x, const int y, \
@@ -24,6 +29,8 @@ public:
 
 	virtual ~CDbNavigator();
 };
+
+//*****************************************************
 
 const Tchar *CDbNavigator::ConvToStr() {
 

@@ -15,10 +15,12 @@
 #include <db_controls/FilteringDateField.h>
 #include <db_controls/BinderControls.h>
 #include <db_controls/DbNavigator.h>
+#include <db_controls/DbStaticNumField.h>
 #include <forms_common/ParametersManager.h>
 #include "SearchForm.h"
 #include "ZoneFilter.h"
 #include "PaidFilter.h"
+#include "DoubleBndTarget.h"
 
 class CGridCellWidgetCreator final {
 	CDbGrid *grid;
@@ -65,14 +67,17 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 				grid(nullptr), advocats_list(nullptr), \
 				centers_list(nullptr), order_types_list(nullptr), stages_list(nullptr), \
 				canceling_reasons_list(nullptr), \
-				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
+				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0), \
+				total_fee(nullptr), total_paid(nullptr), total_orders(nullptr) {
 
 	props.open("config.ini");
 	
 	conn = CMySQLConnectionFactory::createConnection(props);
 	CParametersManager::init(&props, conn);
 	inserter.evalPermissions();
-	db_table = createDbTable(conn);
+
+	db_table = createDbTable();
+	createStatisticsStatements();
 
 	grid = new CDbGrid(false, db_table);
 	setFieldsSizes();
@@ -88,6 +93,44 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	Connect(EVT_COMMAND, btn_apply_filter->GetId(), this, &CSearchForm::OnFilterButtonClick);
 	Connect(EVT_COMMAND, btn_add->GetId(), this, &CSearchForm::OnAddRecordButtonClick);
 	Connect(EVT_COMMAND, btn_remove->GetId(), this, &CSearchForm::OnRemoveButtonClick);
+}
+
+void CSearchForm::createStatisticsStatements() {
+
+	std::string query = "SELECT SUM(fee) as total_fee, SUM(fee_parus) as total_paid,";
+	query += " COUNT(DISTINCT a.id_center_legalaid, a.id, a.order_date) as orders_count ";
+	query += "FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
+	query += " #### ";
+	query_aggregate.Init(query);
+
+	const auto &params_manager = CParametersManager::getInstance();
+	std::string initial_flt = params_manager.getInitialFilteringStr();
+	query_aggregate.changeWherePart(\
+		ImmutableString<char>(initial_flt.c_str(), initial_flt.size()));
+}
+
+void CSearchForm::reloadStatisticsControls() {
+
+	assert(total_fee);
+	assert(total_paid);
+	assert(total_orders);
+
+	total_fee->Refresh();
+	total_paid->Refresh();
+	total_orders->Refresh();
+}
+
+void CSearchForm::reloadStatisticsControls(std::shared_ptr<IDbStatement> new_stmt) {
+
+	assert(total_fee);
+	assert(total_paid);
+	assert(total_orders);
+
+	auto new_rs = new_stmt->exec();
+
+	total_fee->Refresh(new_rs);
+	total_paid->Refresh(new_rs);
+	total_orders->Refresh(std::move(new_rs));
 }
 
 void CSearchForm::setFieldsSizes() {
@@ -292,7 +335,7 @@ void CSearchForm::initFilteringControls() {
 	flt_paid = new CPaidFilter(filtering_manager);
 }
 
-std::shared_ptr<CDbTable> CSearchForm::createDbTable(std::shared_ptr<IDbConnection> conn) {
+std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	std::string query = "SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,";
 	query += " t.type_name, a.client_name, a.bdate, sta.stage_name, a.reason, a.cancel_order, a.cancel_date, aa.fee, aa.outgoings,";
@@ -500,9 +543,17 @@ void CSearchForm::displayWidgets() {
 		sizer.addWidget(btn_add, _T("+"), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
 
+		const auto &params_manager = CParametersManager::getInstance();
+		int rm_button_flags = FL_WINDOW_VISIBLE * (params_manager.getIdUser() == 1);
 		btn_remove = new XButton();
-		sizer.addWidget(btn_remove, _T("-"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(btn_remove, _T("-"), rm_button_flags, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
+
+		auto stmt_aggregate = conn->PrepareQuery(query_aggregate.getQuery().c_str());
+		auto rs_aggr = stmt_aggregate->exec();
+		total_fee = new CDbStaticDecimalField(rs_aggr, 0);
+		sizer.addWidget(total_fee, _T(""), FL_WINDOW_VISIBLE, \
+						XSize(100, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
@@ -531,26 +582,39 @@ void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
 		query_modifier.changeWherePart(filtering_manager.buildFilteringString());
 
 		auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
-		if(filtering_manager.apply(stmt))
+		auto stmt_aggregate = conn->PrepareQuery(query_aggregate.getQuery().c_str());
+		def_binding_target->replaceFirst(stmt);
+		def_binding_target->replaceSecond(stmt_aggregate);
+
+		if (filtering_manager.apply(def_binding_target)) {
 			db_table->reload(stmt);
+			reloadStatisticsControls(stmt_aggregate);
+		}
 	}
 	else {
 
-		if(filtering_manager.apply(db_table->getBindingTarget()))
+		if (filtering_manager.apply(def_binding_target)) {
 			db_table->reload();
+			reloadStatisticsControls();
+		}
 	}
 }
 
 void CSearchForm::OnAddRecordButtonClick(XCommandEvent *eve) {
 
-	if(inserter.insert()) db_table->reload();
+	if (inserter.insert()) {
+		db_table->reload();
+		reloadStatisticsControls();
+	}
 }
 
 void CSearchForm::OnRemoveButtonClick(XCommandEvent *eve) {
 
 	int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
-	if (option == IDYES)
+	if (option == IDYES) {
 		db_table->removeCurrentRecord();
+		reloadStatisticsControls();
+	}
 }
 
 void CSearchForm::OnSize(XSizeEvent *eve) {

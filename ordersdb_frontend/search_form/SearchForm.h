@@ -10,7 +10,7 @@
 struct IDbConnection;
 class CDbTable;
 class CDbGrid;
-struct CPaymentsConstraints;
+class CDbStaticNumField;
 class CComboBoxCellWidget;
 class CDbComboBoxCellWidget;
 class CFilteringEdit;
@@ -30,7 +30,7 @@ class CSearchForm : public XTabStopPanel {
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
 
-	CQueryModifier query_modifier;
+	CQueryModifier query_modifier, query_aggregate;
 	CFilteringManager filtering_manager;
 	CFilteringEdit *flt_id, *flt_act;
 	CFilteringDateField *flt_order_date_from, *flt_order_date_to;
@@ -49,10 +49,15 @@ class CSearchForm : public XTabStopPanel {
 	int grid_x, grid_y;
 	int grid_margin_x, grid_margin_y;
 
+	CDbStaticNumField *total_fee, *total_paid, *total_orders;
+
 	XButton *btn_apply_filter, *btn_add, *btn_remove;
 	CInserter inserter;
 
-	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
+	std::shared_ptr<CDbTable> createDbTable();
+	void createStatisticsStatements();
+	void reloadStatisticsControls();
+	void reloadStatisticsControls(std::shared_ptr<IDbStatement> new_stmt);
 	void setFieldsSizes();
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
 	void initFilteringControls();
