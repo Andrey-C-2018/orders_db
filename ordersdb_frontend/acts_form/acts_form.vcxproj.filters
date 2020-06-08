@@ -60,12 +60,6 @@
     <ClInclude Include="resource.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="ActNameCellWidget.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="ActDateCellWidget.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="PaymentsDbTableEvtHandler.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
@@ -114,12 +108,6 @@
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="ParametersManager.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="ActNameCellWidget.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="ActDateCellWidget.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="PaymentsDbTableEvtHandler.cpp">

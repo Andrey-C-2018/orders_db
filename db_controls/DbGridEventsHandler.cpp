@@ -15,7 +15,7 @@ void CDbGridEventsHandler::OnCellChanged(IGridCellWidget *cell_widget, \
 	}
 	catch (CDbException &e) {
 
-		MessageBox(NULL, e.what(), _T("Error"), MB_OK);
+		ErrorBox(e.what());
 	}
 }
 
@@ -27,7 +27,7 @@ void CDbGridEventsHandler::OnCellChangedIndirectly(IGridCellWidget *cell_widget,
 	}
 	catch (CDbException &e) {
 
-		MessageBox(NULL, e.what(), _T("Error"), MB_OK);
+		ErrorBox(e.what());
 	}
 }
 

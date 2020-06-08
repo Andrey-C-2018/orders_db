@@ -19,11 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActDateCellWidget.h" />
+    <ClInclude Include="ActNameCellWidget.h" />
     <ClInclude Include="FormsInsertionBinders.h" />
     <ClInclude Include="ParametersManager.h" />
     <ClInclude Include="Validators.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActDateCellWidget.cpp" />
+    <ClCompile Include="ActNameCellWidget.cpp" />
     <ClCompile Include="ParametersManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

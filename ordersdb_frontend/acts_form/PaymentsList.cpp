@@ -6,11 +6,11 @@
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbNavigator.h>
 #include <db_controls/DbComboBoxCellWidget.h>
+#include <forms_common/ActNameCellWidget.h>
+#include <forms_common/ActDateCellWidget.h>
 #include <xwindows/XButton.h>
 #include "PaymentsList.h"
 #include "PaymentsGridEvtHandler.h"
-#include "ActNameCellWidget.h"
-#include "ActDateCellWidget.h"
 
 CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_) : \
 								grid(nullptr), grid_as_window(nullptr), \

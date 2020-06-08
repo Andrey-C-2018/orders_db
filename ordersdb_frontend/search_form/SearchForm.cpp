@@ -8,6 +8,8 @@
 #include <xwindows_ex/HorizontalSizer.h>
 #include <xwindows_ex/VerticalSizer.h>
 #include <xwindows_ex/XCurrencyField.h>
+#include <editable_grid/BooleanCellWidget.h>
+#include <editable_grid/CurrencyCellWidget.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbComboBoxCellWidget.h>
 #include <db_controls/FilteringEdit.h>
@@ -17,6 +19,7 @@
 #include <db_controls/DbNavigator.h>
 #include <db_controls/DbStaticNumField.h>
 #include <forms_common/ParametersManager.h>
+#include <forms_common/ActNameCellWidget.h>
 #include "SearchForm.h"
 #include "ZoneFilter.h"
 #include "PaidFilter.h"
@@ -66,7 +69,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 				flt_order_type(nullptr), flt_stage(nullptr), flt_zone(nullptr), \
 				grid(nullptr), advocats_list(nullptr), \
 				centers_list(nullptr), order_types_list(nullptr), stages_list(nullptr), \
-				canceling_reasons_list(nullptr), \
+				canceling_reasons_list(nullptr), qa_widget(nullptr), \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0), \
 				total_fee(nullptr), total_paid(nullptr), total_orders(nullptr) {
 
@@ -220,6 +223,28 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 										conn, 1, result_set, rs_metadata, \
 										"payments", db_table);
 	stages_list->AddRelation("id_st", "id_stage");
+
+	creator.createAndAttachToGrid<CActNameCellWidget>("id_act");
+
+	CCurrencyCellWidget *currency_widget = creator.createAndAttachToGrid<CCurrencyCellWidget>("fee", true);
+	grid->SetWidgetForFieldByName("outgoings", currency_widget);
+
+	qa_widget = creator.createAndAttachToGrid<CBooleanCellWidget>("age");
+	grid->SetWidgetForFieldByName("inv", qa_widget);
+	grid->SetWidgetForFieldByName("lang", qa_widget);
+	grid->SetWidgetForFieldByName("ill", qa_widget);
+	grid->SetWidgetForFieldByName("zek", qa_widget);
+	grid->SetWidgetForFieldByName("vpr", qa_widget);
+	grid->SetWidgetForFieldByName("reduce", qa_widget);
+	grid->SetWidgetForFieldByName("change_", qa_widget);
+	grid->SetWidgetForFieldByName("close", qa_widget);
+	grid->SetWidgetForFieldByName("zv", qa_widget);
+	grid->SetWidgetForFieldByName("min", qa_widget);
+	grid->SetWidgetForFieldByName("nm_suv", qa_widget);
+	grid->SetWidgetForFieldByName("zv_kr", qa_widget);
+	grid->SetWidgetForFieldByName("No_Ch_Ist", qa_widget);
+
+	grid->SetWidgetForFieldByName("Koef", currency_widget);
 }
 
 void CSearchForm::adjustUIDependentCellWidgets() {
@@ -342,8 +367,10 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 	std::string query = "SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,";
 	query += " t.type_name, a.client_name, a.bdate, sta.stage_name, a.reason, a.cancel_order, a.cancel_date, aa.fee, aa.outgoings,";
 	query += " aa.id_act, aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,";
-	query += " aa.cycle, aa.article, inf.informer_name, aa.id_stage,";
-	query += " a.id_center_legalaid, a.id_adv, a.id_order_type, aa.id_informer ";
+	query += " aa.cycle, aa.article, inf.informer_name,";
+	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
+	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,";
+	query += " aa.id_stage, a.id_center_legalaid, a.id_adv, a.id_order_type, aa.id_informer ";
 	query += "FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
 	query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat";
 	query += " INNER JOIN order_types t ON a.id_order_type = t.id_type";
@@ -553,18 +580,32 @@ void CSearchForm::displayWidgets() {
 
 		auto stmt_aggregate = conn->PrepareQuery(query_aggregate.getQuery().c_str());
 		auto rs_aggr = stmt_aggregate->exec();
+		sizer.addWidget(new XLabel(), _T("Заг. сума:"), FL_WINDOW_VISIBLE, \
+						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
 		total_fee = new CDbStaticDecimalField(rs_aggr, 0);
 		sizer.addWidget(total_fee, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Сума 1С:"), FL_WINDOW_VISIBLE, \
+						XSize(60, DEF_GUI_ROW_HEIGHT + 10));
+		total_paid = new CDbStaticDecimalField(rs_aggr, 1);
+		sizer.addWidget(total_paid, _T(""), FL_WINDOW_VISIBLE, \
+						XSize(100, DEF_GUI_ROW_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("К-сть дор.:"), FL_WINDOW_VISIBLE, \
+						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
+		total_orders = new CDbStaticIntField(rs_aggr, 2);
+		sizer.addWidget(total_orders, _T(""), FL_WINDOW_VISIBLE, \
+						XSize(60, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
 
-	grid->HideField(22);
-	grid->HideField(23);
-	grid->HideField(24);
-	grid->HideField(25);
-	grid->HideField(26);
+	grid->HideField(37);
+	grid->HideField(38);
+	grid->HideField(39);
+	grid->HideField(40);
+	grid->HideField(41);
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;
