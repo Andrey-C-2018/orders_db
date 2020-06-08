@@ -8,8 +8,8 @@
 #include <xwindows_ex/XNullWidget.h>
 #include <xwindows_ex/XDateField.h>
 #include <xwindows_ex/XCurrencyField.h>
+#include <forms_common/Constraints.h>
 #include "PaymentsNavPanel.h"
-#include "Constraints.h"
 
 CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn_, \
 										std::shared_ptr<CDbTable> db_table_, \

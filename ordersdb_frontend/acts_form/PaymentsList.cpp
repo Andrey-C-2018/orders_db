@@ -9,8 +9,8 @@
 #include <forms_common/ActNameCellWidget.h>
 #include <forms_common/ActDateCellWidget.h>
 #include <xwindows/XButton.h>
+#include <forms_common/PaymentsGridEvtHandler.h>
 #include "PaymentsList.h"
-#include "PaymentsGridEvtHandler.h"
 
 CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_) : \
 								grid(nullptr), grid_as_window(nullptr), \

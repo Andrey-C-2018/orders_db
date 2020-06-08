@@ -4,11 +4,12 @@
 #include <db_ext/DbTable.h>
 #include <db_ext/DependentTableUpdater.h>
 #include <xwindows/XButton.h>
+#include <forms_common/PaymentsDbTableEvtHandler.h>
+#include <forms_common/ParametersManager.h>
+#include <forms_common/CommonRoutines.h>
 #include "ActsForm.h"
 #include "AdvDbTableEventsHandler.h"
 #include "OrdersDbTableEventsHandler.h"
-#include "PaymentsDbTableEvtHandler.h"
-#include "ParametersManager.h"
 
 CActsForm::CActsForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
@@ -22,17 +23,7 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 	conn = CMySQLConnectionFactory::createConnection(props);
 	CParametersManager::init(&props, conn);
 
-	std::string last_user_query = "d.id_user = ";
-	int id_user = CParametersManager::getInstance().getIdUser();
-	assert(id_user != -1);
-	char buffer[20];
-	XConv::ToString(id_user, buffer);
-	last_user_query += buffer;
-
-	ImmutableString<char> dep_table_user_str(last_user_query.c_str(), last_user_query.size());
-	CDependentTableUpdater::setQueryConstantModifier(dep_table_user_str);
-	ImmutableString<char> user_str(last_user_query.c_str() + 2, last_user_query.size() - 2);
-	CMetaInfo::setQueryConstantModifier(user_str);
+	setLastChangedUser();
 
 	adv_list.initDbTable(conn);
 	auto adv_db_table = adv_list.getDbTable();
@@ -78,7 +69,8 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 	orders_list.initDbTableEvtHandler(orders_evt_handler);
 
 	auto payments_evt_handler = std::make_shared<CPaymentsDbTableEvtHandler>(payments_db_table, \
-										CPaymentsDbTableEvtHandler::REGIONAL, true, constraints);
+										CPaymentsDbTableEvtHandler::REGIONAL, "id_center", \
+										true, true, constraints);
 	payments_list.initDbTableEvtHandler(payments_evt_handler);
 
 	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \

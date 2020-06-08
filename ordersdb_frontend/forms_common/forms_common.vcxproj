@@ -21,14 +21,21 @@
   <ItemGroup>
     <ClInclude Include="ActDateCellWidget.h" />
     <ClInclude Include="ActNameCellWidget.h" />
+    <ClInclude Include="CommonRoutines.h" />
+    <ClInclude Include="Constraints.h" />
     <ClInclude Include="FormsInsertionBinders.h" />
     <ClInclude Include="ParametersManager.h" />
+    <ClInclude Include="PaymentsDbTableEvtHandler.h" />
+    <ClInclude Include="PaymentsGridEvtHandler.h" />
     <ClInclude Include="Validators.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActDateCellWidget.cpp" />
     <ClCompile Include="ActNameCellWidget.cpp" />
+    <ClCompile Include="CommonRoutines.cpp" />
     <ClCompile Include="ParametersManager.cpp" />
+    <ClCompile Include="PaymentsDbTableEvtHandler.cpp" />
+    <ClCompile Include="PaymentsGridEvtHandler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}</ProjectGuid>

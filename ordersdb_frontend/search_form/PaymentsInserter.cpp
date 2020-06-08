@@ -57,9 +57,50 @@ public:
 	virtual ~CheckerInsertBinder() { }
 };
 
+class CActDateBinderNoDb : public CVisualInsertBinder {
+
+	CActDateValidatorNoDb validator;
+public:
+	CActDateBinderNoDb(XWidget *order_date_holder, \
+						XWidget *act_date_holder, bool free_widget, \
+						XWidget *act_reg_date_holder) : \
+				CVisualInsertBinder(act_date_holder, free_widget), \
+				validator(order_date_holder, act_reg_date_holder) {	}
+
+	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+				Params &params, const Tchar *field_name) override {
+
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
+
+		size_t size;
+		auto date_str = widget->GetLabel(size);
+		if (size == 0) {
+			binding_target->bindNull(params.param_no);
+			return true;
+		}
+
+		size_t err_str_size = params.error_str.size();
+		CDate date(date_str, CDate::GERMAN_FORMAT);
+
+		if (!validator.validate(ImmutableString<Tchar>(date_str, size), \
+			date, params.error_str, field_name)) return false;
+
+		if (err_str_size == params.error_str.size())
+			binding_target->bindValue(params.param_no, date);
+
+		return true;
+	}
+
+	virtual ~CActDateBinderNoDb() { }
+};
+
 //*****************************************************
 
-CPaymentsInserter::CPaymentsInserter() : CDbInserter("payments", FIELDS_COUNT) { }
+CPaymentsInserter::CPaymentsInserter() : CDbInserter("payments", FIELDS_COUNT), \
+						center(nullptr), order_date(nullptr), stage(nullptr), \
+						cycle(nullptr), article(nullptr), fee(nullptr), \
+						outgoings(nullptr), informer(nullptr), id_act(nullptr), \
+						act_date(nullptr), act_reg_date(nullptr), payment_date(nullptr) { }
 
 void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
@@ -83,6 +124,8 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	int id_user = params_manager.getIdUser();
 	assert(id_user != -1);
 
+	const char *qa_part = params_manager.getDefaultCenter() == 1 ? "NULL" : "0";
+
 	addBinder(0, _T("Центр"), center_binder);
 	addBinder(1, _T("Номер доручення"), id_order_binder);
 	addBinder(2, _T("Дата доручення"), order_date_binder);
@@ -91,7 +134,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	addBinder(5, _T("Стаття"), std::make_shared<UITextInsertBinder>(article, false));
 	addBinder(6, _T("Інформатор"), std::make_shared<CDbComboBoxInsertBinder>(informer, false, true));
 	addBinder(7, _T("Акт"), std::make_shared<CActNameBinder>(id_act, false));
-	addBinder(8, _T("Дата акта"), std::make_shared<UIDateInsertBinder>(act_date, false));
+	addBinder(8, _T("Дата акта"), std::make_shared<CActDateBinderNoDb>(order_date, act_date, false, act_reg_date));
 	addBinder(9, _T("№ розгляду"), std::make_shared<UIIntInsertBinder>(cycle, false));
 	addBinder(10, _T("Користувач"), std::make_shared<CIntInsertBinder>(id_user));
 	defStaticInsertion(11, "NOW()");
@@ -101,20 +144,20 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	defStaticInsertion(15, "NULL");
 	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false, true));
 	defStaticInsertion(17, "0.0");
-	defStaticInsertion(18, "0");
-	defStaticInsertion(19, "0");
-	defStaticInsertion(20, "0");
-	defStaticInsertion(21, "0");
-	defStaticInsertion(22, "0");
-	defStaticInsertion(23, "0");
-	defStaticInsertion(24, "0");
-	defStaticInsertion(25, "0");
-	defStaticInsertion(26, "0");
-	defStaticInsertion(27, "0");
-	defStaticInsertion(28, "0");
-	defStaticInsertion(29, "0");
-	defStaticInsertion(30, "0");
-	defStaticInsertion(31, "0");
+	defStaticInsertion(18, "NULL");
+	defStaticInsertion(19, "NULL");
+	defStaticInsertion(20, "NULL");
+	defStaticInsertion(21, "NULL");
+	defStaticInsertion(22, "NULL");
+	defStaticInsertion(23, qa_part);
+	defStaticInsertion(24, qa_part);
+	defStaticInsertion(25, qa_part);
+	defStaticInsertion(26, qa_part);
+	defStaticInsertion(27, qa_part);
+	defStaticInsertion(28, qa_part);
+	defStaticInsertion(29, qa_part);
+	defStaticInsertion(30, qa_part);
+	defStaticInsertion(31, qa_part);
 	defStaticInsertion(32, "0.0");
 	addBinder(33, _T("Дата реєстр. в ДКС"), std::make_shared<UIDateInsertBinder>(act_date, false));
 	defStaticInsertion(34, "0"); // id_checker

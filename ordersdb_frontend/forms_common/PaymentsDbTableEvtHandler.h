@@ -14,14 +14,15 @@ private:
 	std::shared_ptr<const CDbTable> db_table;
 	size_t center_index, order_date_index, act_date_index;
 	const size_t this_center;
-	const bool lock_old_stages;
+	const bool lock_old_stages, check_zone;
 	std::shared_ptr<CPaymentsConstraints> constraints;
 	size_t prev_record;
 
-	inline void OnRecordNoChanged();
+	inline CDate getLastQuartalEnd() const;
 public:
 	CPaymentsDbTableEvtHandler(std::shared_ptr<const CDbTable> db_table_, \
-								const size_t this_center_, const bool lock_old_stages_, \
+								const size_t this_center_, const char *center_field_name, \
+								const bool lock_old_stages_, const bool check_zone_, \
 								std::shared_ptr<CPaymentsConstraints> constraints_);
 
 	void OnCurrRecordNoChanged(const size_t new_record) override;
@@ -29,10 +30,14 @@ public:
 	void OnRecordsCountChanged(const size_t new_records_count) override;
 	void OnTableReset() override;
 
+	inline void calcConstraintsValues();
+
 	virtual ~CPaymentsDbTableEvtHandler();
 };
 
-void CPaymentsDbTableEvtHandler::OnRecordNoChanged() {
+//*****************************************************
+
+void CPaymentsDbTableEvtHandler::calcConstraintsValues() {
 
 	auto rs = db_table->getResultSet();
 	if (rs->empty()) return;
@@ -40,14 +45,12 @@ void CPaymentsDbTableEvtHandler::OnRecordNoChanged() {
 	bool is_null;
 	if (lock_old_stages) {
 		CDate act_date = rs->getDate(act_date_index, is_null);
-		CDate this_year_begginning = CDate::now();
+		CDate last_q_end = getLastQuartalEnd();
 
-		const unsigned year = this_year_begginning.getYear();
-		this_year_begginning.set(1, 1, year);
-		constraints->old_stage_locked = !is_null && act_date < this_year_begginning;
+		constraints->old_stage_locked = !is_null && act_date < last_q_end;
 	}
 
-	if (this_center != NULL_CENTER) {
+	if (check_zone && this_center != NULL_CENTER) {
 		int id_center = rs->getInt(center_index, is_null);
 		assert(!is_null);
 		CDate order_date = rs->getDate(order_date_index, is_null);
@@ -57,4 +60,17 @@ void CPaymentsDbTableEvtHandler::OnRecordNoChanged() {
 			this_center != id_center && order_date >= CDate(1, 1, 2017)) || \
 			(this_center != REGIONAL && this_center != id_center);
 	}
+}
+
+CDate CPaymentsDbTableEvtHandler::getLastQuartalEnd() const {
+
+	CDate this_year_beginning = CDate::now();
+
+	const unsigned year = this_year_beginning.getYear();
+	const unsigned month = this_year_beginning.getMonth();
+
+	unsigned last_q_month = month % 3 == 0 ? month - 2 : \
+								((unsigned)(month / 3)) * 2 + 1;
+
+	return CDate(1, last_q_month, year);
 }

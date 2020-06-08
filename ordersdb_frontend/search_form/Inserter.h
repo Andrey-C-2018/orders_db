@@ -46,5 +46,6 @@ void CInserter::SetIdOrderWidget(XWidget *id_order) {
 void CInserter::SetOrderDateWidget(XWidget *order_date) {
 
 	orders_inserter.SetOrderDateWidget(order_date);
-	payments_inserter.setOrderDateBinder(orders_inserter.getOrderDateBinder());
+	payments_inserter.setOrderDateBinder(orders_inserter.getOrderDateBinder(), \
+											order_date);
 }

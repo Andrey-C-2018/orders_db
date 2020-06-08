@@ -20,6 +20,9 @@
 #include <db_controls/DbStaticNumField.h>
 #include <forms_common/ParametersManager.h>
 #include <forms_common/ActNameCellWidget.h>
+#include <forms_common/PaymentsDbTableEvtHandler.h>
+#include <forms_common/PaymentsGridEvtHandler.h>
+#include <forms_common/CommonRoutines.h>
 #include "SearchForm.h"
 #include "ZoneFilter.h"
 #include "PaidFilter.h"
@@ -79,10 +82,29 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	CParametersManager::init(&props, conn);
 	inserter.evalPermissions();
 
+	setLastChangedUser();
+
+	auto constraints = std::make_shared<CPaymentsConstraints>();
+	constraints->old_stage_locked = true;
+	constraints->wrong_zone = true;
+
+	auto groups = CParametersManager::getInstance().getGroups();
+	bool db_admin = std::find(groups.cbegin(), groups.cend(), "Administrators") != \
+								groups.cend();
+
 	db_table = createDbTable();
+	int def_center = CParametersManager::getInstance().getDefaultCenter();
+	std::shared_ptr<CPaymentsDbTableEvtHandler> payments_evt_handler = \
+						std::make_shared<CPaymentsDbTableEvtHandler>(db_table, \
+												def_center, "id_center_legalaid", \
+												!db_admin, !db_admin, constraints);
+	db_table->ConnectEventsHandler(std::dynamic_pointer_cast<IDbTableEventsHandler, \
+									CPaymentsDbTableEvtHandler>(payments_evt_handler));
+
 	createStatisticsStatements();
 
-	grid = new CDbGrid(false, db_table);
+	grid = new CDbGrid(false, db_table, \
+					std::make_shared<CPaymentsGridEvtHandler>(db_table, constraints));
 	setFieldsSizes();
 	createCellWidgetsAndAttachToGrid(grid);
 	initFilteringControls();
@@ -90,6 +112,8 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
 			label, X, Y, width, height);
 	displayWidgets();
+	payments_evt_handler->calcConstraintsValues();
+
 	adjustUIDependentCellWidgets();
 	loadInitialFilterToControls();
 

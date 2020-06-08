@@ -114,43 +114,6 @@ public:
 	virtual ~CActNameBinder() { }
 };
 
-class CActDateBinder : public CVisualInsertBinder {
-
-	CActDateValidator validator;
-public:
-	CActDateBinder(std::shared_ptr<CDbTable> db_table_, \
-					XWidget *act_date_holder, bool free_widget, \
-					XWidget *act_reg_date_holder) : \
-		CVisualInsertBinder(act_date_holder, free_widget), \
-		validator(db_table_, act_reg_date_holder) {	}
-
-	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
-		Params &params, const Tchar *field_name) override {
-
-		CInsParamNoGuard param_no_guard(params.param_no, 1);
-
-		size_t size;
-		auto date_str = widget->GetLabel(size);
-		if (size == 0) {
-			binding_target->bindNull(params.param_no);
-			return true;
-		}
-
-		size_t err_str_size = params.error_str.size();
-		CDate date(date_str, CDate::GERMAN_FORMAT);
-
-		if (!validator.validate(ImmutableString<Tchar>(date_str, size), \
-			date, params.error_str, field_name)) return false;
-
-		if (err_str_size == params.error_str.size())
-			binding_target->bindValue(params.param_no, date);
-
-		return true;
-	}
-
-	virtual ~CActDateBinder() { }
-};
-
 class CActRegDateBinder : public CVisualInsertBinder {
 	enum { INVALID_FIELD_INDEX = (size_t)-1 };
 

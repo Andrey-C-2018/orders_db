@@ -74,23 +74,47 @@ public:
 
 //*****************************************************
 
-class CActDateValidator final {
+class CActDateValidatorBasic {
+	enum { INVALID_FIELD_INDEX = (size_t)-1 };
+
+protected:
+	XWidget *act_reg_date_widget;
+	inline bool validate(ImmutableString<Tchar> date_str, \
+						const CDate &date, \
+						const CDate &order_date, \
+						const CDate &act_reg_date, \
+						Tstring &error_str, \
+						const Tchar *error_str_prefix) const;
+
+public:
+	CActDateValidatorBasic(XWidget *act_reg_date_widget_) : \
+							act_reg_date_widget(act_reg_date_widget_) { }
+
+	CActDateValidatorBasic(const CActDateValidatorBasic &obj) = default;
+	CActDateValidatorBasic(CActDateValidatorBasic &&obj) = default;
+	CActDateValidatorBasic &operator=(const CActDateValidatorBasic &obj) = default;
+	CActDateValidatorBasic &operator=(CActDateValidatorBasic &&obj) = default;
+
+	virtual ~CActDateValidatorBasic() { }
+};
+
+class CActDateValidator : public CActDateValidatorBasic {
 	enum { INVALID_FIELD_INDEX = (size_t)-1 };
 
 	std::shared_ptr<CDbTable> db_table;
-	XWidget *act_reg_date_widget;
 	size_t order_date_no, act_reg_dt_no;
 public:
 	CActDateValidator(std::shared_ptr<CDbTable> db_table_, \
 						XWidget *act_reg_date_widget_) : \
-			db_table(db_table_), act_reg_date_widget(act_reg_date_widget_), \
+			CActDateValidatorBasic(act_reg_date_widget_), \
+			db_table(db_table_), \
 			order_date_no(INVALID_FIELD_INDEX), \
 			act_reg_dt_no(INVALID_FIELD_INDEX) {
 	
 		const CMetaInfo &meta_info = db_table->getQuery().getMetaInfo();
 		order_date_no = meta_info.getFieldIndexByName("order_date");
 
-		if (!act_reg_date_widget) 
+		if (!act_reg_date_widget_) 
 			act_reg_dt_no = meta_info.getFieldIndexByName("act_reg_date");
 	}
 
@@ -102,57 +126,120 @@ public:
 	inline bool validate(ImmutableString<Tchar> date_str, \
 							const CDate &date, \
 							Tstring &error_str, \
-							const Tchar *error_str_prefix) const {
+							const Tchar *error_str_prefix) const;
 
-		assert(order_date_no != INVALID_FIELD_INDEX);
-		if (date.isNull()) {
+	virtual ~CActDateValidator() { }
+};
 
-			error_str += error_str_prefix;
-			error_str += _T(": невірний формат дати: ");
-			error_str += date_str.str;
-			error_str += _T('\n');
-			return true;
-		}
-		if (date > CDate::now()) {
-			int option = _plMessageBoxYesNo(_T("Дата акта в майбутньому. Продовжувати?"));
-			if (option == IDNO) return false;
-		}
-		if (date < CDate(1, 1, 2013)) {
-			error_str += error_str_prefix;
-			error_str += _T(": не може бути меншою за 01.01.2013\n");
-			return true;
-		}
+class CActDateValidatorNoDb : public CActDateValidatorBasic {
+	XWidget *order_date_widget;
 
-		auto rs = db_table->getResultSet();
-		db_table->gotoCurrentRecord();
+public:
+	CActDateValidatorNoDb(XWidget *order_date_widget_, \
+							XWidget *act_reg_date_widget_) : \
+					CActDateValidatorBasic(act_reg_date_widget_), \
+					order_date_widget(order_date_widget_) { }
 
-		bool is_null;
-		CDate order_date = rs->getDate(order_date_no, is_null);
-		assert(!is_null);
-		if (date < order_date) {
-			error_str += error_str_prefix;
-			error_str += _T(": не може бути меншою за дату доручення\n");
-			return true;
-		}
-		if (date == order_date) {
-			int option = _plMessageBoxYesNo(_T("Дата акта співпадає із датою доручення.\n Малоімовірно, що акт був прийнятий в той же день.\n Продовжувати?"));
-			if (option == IDNO) return false;
-		}
+	CActDateValidatorNoDb(const CActDateValidatorNoDb &obj) = default;
+	CActDateValidatorNoDb(CActDateValidatorNoDb &&obj) = default;
+	CActDateValidatorNoDb &operator=(const CActDateValidatorNoDb &obj) = default;
+	CActDateValidatorNoDb &operator=(CActDateValidatorNoDb &&obj) = default;
 
-		CDate act_reg_date;
-		if (act_reg_date_widget) {
-			act_reg_date.setDateGerman(act_reg_date_widget->GetLabel());
-			is_null = act_reg_date.isNull();
-		}
-		else {
-			assert(act_reg_dt_no != INVALID_FIELD_INDEX);
-			act_reg_date = rs->getDate(act_reg_dt_no, is_null);
-		}
-		if (!is_null && date < act_reg_date) {
-			error_str += error_str_prefix;
-			error_str += _T(": не може бути меншою за дату прийняття акта\n");
-		}
+	inline bool validate(ImmutableString<Tchar> date_str, \
+							const CDate &date, \
+							Tstring &error_str, \
+							const Tchar *error_str_prefix) const;
 
+	virtual ~CActDateValidatorNoDb() { }
+};
+
+//*****************************************************
+
+bool CActDateValidatorBasic::validate(ImmutableString<Tchar> date_str, \
+										const CDate &date, \
+										const CDate &order_date, \
+										const CDate &act_reg_date, \
+										Tstring &error_str, \
+										const Tchar *error_str_prefix) const {
+
+	assert(!order_date.isNull());
+	if (date.isNull()) {
+
+		error_str += error_str_prefix;
+		error_str += _T(": невірний формат дати: ");
+		error_str += date_str.str;
+		error_str += _T('\n');
 		return true;
 	}
-};
+	if (date > CDate::now()) {
+		int option = _plMessageBoxYesNo(_T("Дата акта в майбутньому. Продовжувати?"));
+		if (option == IDNO) return false;
+	}
+	if (date < CDate(1, 1, 2013)) {
+		error_str += error_str_prefix;
+		error_str += _T(": не може бути меншою за 01.01.2013\n");
+		return true;
+	}
+
+	if (date < order_date) {
+		error_str += error_str_prefix;
+		error_str += _T(": не може бути меншою за дату доручення\n");
+		return true;
+	}
+	if (date == order_date) {
+		int option = _plMessageBoxYesNo(_T("Дата акта співпадає із датою доручення.\n Малоімовірно, що акт був прийнятий в той же день.\n Продовжувати?"));
+		if (option == IDNO) return false;
+	}
+
+	if (!act_reg_date.isNull() && date < act_reg_date) {
+		error_str += error_str_prefix;
+		error_str += _T(": не може бути меншою за дату прийняття акта\n");
+	}
+
+	return true;
+}
+
+//*****************************************************
+
+bool CActDateValidator::validate(ImmutableString<Tchar> date_str, \
+									const CDate &date, \
+									Tstring &error_str, \
+									const Tchar *error_str_prefix) const {
+
+	assert(order_date_no != INVALID_FIELD_INDEX);
+
+	auto rs = db_table->getResultSet();
+	db_table->gotoCurrentRecord();
+
+	bool is_null;
+	CDate order_date = rs->getDate(order_date_no, is_null);
+
+	CDate act_reg_date;
+	if (act_reg_date_widget)
+		act_reg_date.setDateGerman(act_reg_date_widget->GetLabel());
+	else {
+		assert(act_reg_dt_no != INVALID_FIELD_INDEX);
+		act_reg_date = rs->getDate(act_reg_dt_no, is_null);
+	}
+	
+	return CActDateValidatorBasic::validate(date_str, date, order_date, act_reg_date, \
+											error_str, error_str_prefix);
+}
+
+//*****************************************************
+
+bool CActDateValidatorNoDb::validate(ImmutableString<Tchar> date_str, \
+									const CDate &date, \
+									Tstring &error_str, \
+									const Tchar *error_str_prefix) const {
+
+	auto dt_str = order_date_widget->GetLabel();
+	CDate order_date(dt_str, CDate::GERMAN_FORMAT);
+	assert(!order_date.isNull());
+
+	dt_str = act_reg_date_widget->GetLabel();
+	CDate act_reg_date(dt_str, CDate::GERMAN_FORMAT);
+
+	return CActDateValidatorBasic::validate(date_str, date, order_date, act_reg_date, \
+											error_str, error_str_prefix);
+}

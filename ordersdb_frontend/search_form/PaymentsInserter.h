@@ -12,6 +12,8 @@ class CPaymentsInserter : public CDbInserter {
 	std::shared_ptr<IInsertBinder> order_date_binder;
 	
 	CDbComboBox *center;
+	XWidget *order_date;
+
 	CDbComboBox *stage;
 	XWidget *cycle;
 	XWidget *article;
@@ -45,7 +47,8 @@ public:
 	inline void setCenterBinder(std::shared_ptr<IInsertBinder> binder, \
 								CDbComboBox *center);
 	inline void setIdOrderBinder(std::shared_ptr<IInsertBinder> binder);
-	inline void setOrderDateBinder(std::shared_ptr<IInsertBinder> binder);
+	inline void setOrderDateBinder(std::shared_ptr<IInsertBinder> binder, \
+									XWidget *order_date);
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
 	void insert() override;
 
@@ -66,7 +69,9 @@ void CPaymentsInserter::setIdOrderBinder(std::shared_ptr<IInsertBinder> binder) 
 	this->id_order_binder = binder;
 }
 
-void CPaymentsInserter::setOrderDateBinder(std::shared_ptr<IInsertBinder> binder) {
+void CPaymentsInserter::setOrderDateBinder(std::shared_ptr<IInsertBinder> binder, \
+											XWidget *order_date) {
 
 	this->order_date_binder = binder;
+	this->order_date = order_date;
 }
