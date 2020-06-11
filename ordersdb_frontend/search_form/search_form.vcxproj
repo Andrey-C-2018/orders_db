@@ -71,15 +71,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(VLD_PATH)\lib\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(VLD_PATH)\lib\Win64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(VLD_PATH)\lib\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(VLD_PATH)\lib\Win64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -93,7 +97,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vld.lib;basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -108,7 +112,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vld.lib;basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../0libs/x64/Debug;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -128,7 +132,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vld.lib;basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -147,7 +151,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vld.lib;basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../0libs/x64/Release;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

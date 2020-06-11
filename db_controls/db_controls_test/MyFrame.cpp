@@ -2,6 +2,7 @@
 #include <db_ext/DbTable.h>
 #include <db/MySQL/MySQLConnection.h>
 #include <db_controls/DbComboBoxCellWidget.h>
+#include <db_controls/DbGridEventsHandler.h>
 
 CMyFrame::CMyFrame(const Tchar *class_name,\
 					 const Tchar *label, const int X, const int Y,\
@@ -19,7 +20,7 @@ CMyFrame::CMyFrame(const Tchar *class_name,\
 
 	conn->Connect("127.0.0.1", 3306, "root", "12345", "orders");
 
-	auto stmt = conn->PrepareQuery("SELECT id_center_legalaid, id, order_date, type_name FROM orders INNER JOIN order_types ON id_order_type = id_type WHERE id BETWEEN 1700 AND 1702 ORDER BY 1,3,2");
+	auto stmt = conn->PrepareQuery("SELECT id_center_legalaid, id, order_date, type_name, id_order_type FROM orders INNER JOIN order_types ON id_order_type = id_type WHERE id BETWEEN 1700 AND 1702 ORDER BY 1,3,2");
 	
 	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
 	db_table->setPrimaryTableForQuery("orders");
@@ -29,7 +30,7 @@ CMyFrame::CMyFrame(const Tchar *class_name,\
 	CDbComboBoxCellWidget *combo = new CDbComboBoxCellWidget(conn, 1, "order_types", "orders", db_table);
 	combo->AddRelation("id_type", "id_order_type");
 
-	grid = new CDbGrid(db_table);
+	grid = new CDbGrid(false, db_table);
 	grid->SetWidgetForField(3, combo);
 
 	grid->Create(this, FL_WINDOW_VISIBLE, _T(""), 20, 40, \

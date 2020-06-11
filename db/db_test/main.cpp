@@ -1,6 +1,7 @@
 #include <iostream>
 #include <basic/locale_init.h>
 #include <UnitTest++/UnitTest++.h>
+#include <vld.h>
 
 TEST(Sanity) {
 
