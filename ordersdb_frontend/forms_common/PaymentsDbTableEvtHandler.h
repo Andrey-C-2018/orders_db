@@ -11,13 +11,14 @@ public:
 	};
 
 private:
-	std::shared_ptr<const CDbTable> db_table;
+	std::weak_ptr<const CDbTable> db_table;
 	size_t center_index, order_date_index, act_date_index;
 	const size_t this_center;
 	const bool lock_old_stages, check_zone;
 	std::shared_ptr<CPaymentsConstraints> constraints;
 	size_t prev_record;
 
+	inline std::shared_ptr<const CDbTable> getDbTablePtr();
 	inline CDate getLastQuartalEnd() const;
 public:
 	CPaymentsDbTableEvtHandler(std::shared_ptr<const CDbTable> db_table_, \
@@ -37,9 +38,18 @@ public:
 
 //*****************************************************
 
+std::shared_ptr<const CDbTable> CPaymentsDbTableEvtHandler::getDbTablePtr() {
+
+	auto ptr = db_table.lock();
+	if (!ptr) 
+		throw XException(0, _T("CPaymentsDbTableEvtHandler: the DbTable pointer is NULL"));
+	
+	return std::move(ptr);
+}
+
 void CPaymentsDbTableEvtHandler::calcConstraintsValues() {
 
-	auto rs = db_table->getResultSet();
+	auto rs = getDbTablePtr()->getResultSet();
 	if (rs->empty()) return;
 
 	bool is_null;

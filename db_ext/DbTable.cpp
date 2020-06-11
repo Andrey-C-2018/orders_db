@@ -90,12 +90,12 @@ void CDbTable::DisconnectEventsHandler(ITableEventsHandlerPtr handler) {
 	event_handlers.DisconnectEventsHandler(handler);
 }
 
-void CDbTable::ConnectEventsHandler(IDbTableEvtHandlerPtr handler) {
+void CDbTable::ConnectDbEventsHandler(IDbTableEvtHandlerPtr handler) {
 
 	db_event_handlers.ConnectEventsHandler(handler);
 }
 
-void CDbTable::DisconnectEventsHandler(IDbTableEvtHandlerPtr handler) {
+void CDbTable::DisconnectDbEventsHandler(IDbTableEvtHandlerPtr handler) {
 
 	db_event_handlers.DisconnectEventsHandler(handler);
 }

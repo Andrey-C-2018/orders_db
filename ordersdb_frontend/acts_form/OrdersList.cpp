@@ -42,7 +42,7 @@ void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int de
 
 void COrdersList::initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler) {
 
-	db_table->ConnectEventsHandler(evt_handler);
+	db_table->ConnectDbEventsHandler(evt_handler);
 }
 
 std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnection> conn, \

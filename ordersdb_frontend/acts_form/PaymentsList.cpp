@@ -95,7 +95,7 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 
 void CPaymentsList::initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler) {
 
-	db_table->ConnectEventsHandler(evt_handler);
+	db_table->ConnectDbEventsHandler(evt_handler);
 }
 
 std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnection> conn, \

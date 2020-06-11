@@ -98,8 +98,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 						std::make_shared<CPaymentsDbTableEvtHandler>(db_table, \
 												def_center, "id_center_legalaid", \
 												!db_admin, !db_admin, constraints);
-	db_table->ConnectEventsHandler(std::dynamic_pointer_cast<IDbTableEventsHandler, \
-									CPaymentsDbTableEvtHandler>(payments_evt_handler));
+	db_table->ConnectDbEventsHandler(payments_evt_handler);
 
 	createStatisticsStatements();
 

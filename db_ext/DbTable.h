@@ -57,8 +57,8 @@ public:
 	size_t GetFieldsCount() const override;
 	size_t GetRecordsCount() const override;
 
-	void ConnectEventsHandler(IDbTableEvtHandlerPtr handler);
-	void DisconnectEventsHandler(IDbTableEvtHandlerPtr handler);
+	void ConnectDbEventsHandler(IDbTableEvtHandlerPtr handler);
+	void DisconnectDbEventsHandler(IDbTableEvtHandlerPtr handler);
 
 	void AddField(const size_t max_field_len, const Tchar *field_name) override;
 	void AddRecord() override;

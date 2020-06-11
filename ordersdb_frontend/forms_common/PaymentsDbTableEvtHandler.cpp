@@ -14,7 +14,9 @@ CPaymentsDbTableEvtHandler::CPaymentsDbTableEvtHandler(std::shared_ptr<const CDb
 															prev_record((size_t)-1) {
 
 	assert(center_field_name);
-	const CMetaInfo &meta_info = db_table->getQuery().getMetaInfo();
+	assert(db_table_);
+
+	const CMetaInfo &meta_info = db_table_->getQuery().getMetaInfo();
 	center_index = meta_info.getFieldIndexByName(center_field_name);
 	order_date_index = meta_info.getFieldIndexByName("order_date");
 	act_date_index = meta_info.getFieldIndexByName("act_date");
