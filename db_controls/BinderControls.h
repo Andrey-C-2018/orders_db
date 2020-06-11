@@ -21,6 +21,7 @@ public:
 	size_t bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				const size_t param_no) override;
 	size_t affectedParamsCount() const override { return 1; }
+	void reset() override;
 
 	virtual ~CIntWidgetBinderControl();
 };
@@ -33,6 +34,7 @@ public:
 	size_t bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				const size_t param_no) override;
 	size_t affectedParamsCount() const override { return 1; }
+	void reset() override;
 
 	virtual ~CStringWidgetBinderControl();
 };
@@ -45,6 +47,7 @@ public:
 	size_t bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				const size_t param_no) override;
 	size_t affectedParamsCount() const override { return 1; }
+	void reset() override;
 
 	virtual ~CDateWidgetBinderControl();
 };
@@ -57,6 +60,7 @@ public:
 	size_t bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				const size_t param_no) override;
 	size_t affectedParamsCount() const override { return 1; }
+	void reset() override;
 
 	virtual ~CDbComboBoxBinderControl();
 };

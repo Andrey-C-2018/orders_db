@@ -8,6 +8,7 @@ struct IBinder {
 						const size_t param_no) = 0;
 
 	virtual size_t affectedParamsCount() const = 0;
+	virtual void reset() = 0;
 
 	virtual ~IBinder() { }
 };

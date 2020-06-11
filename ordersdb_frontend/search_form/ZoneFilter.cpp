@@ -3,11 +3,11 @@
 #include "ZoneFilter.h"
 
 class CZoneBinder : public IBinder {
-	const CFilteringComboBox *zone_filter;
+	CFilteringComboBox *zone_filter;
 	XString<Tchar> buffer;
 
 public:
-	CZoneBinder(const CFilteringComboBox *zone_filter_) : zone_filter(zone_filter_) {
+	CZoneBinder(CFilteringComboBox *zone_filter_) : zone_filter(zone_filter_) {
 
 		assert(zone_filter);
 	}
@@ -26,6 +26,8 @@ public:
 	}
 
 	size_t affectedParamsCount() const override { return 1; }
+
+	void reset() override { zone_filter->SetSelectionIndex(0); }
 
 	virtual ~CZoneBinder() { }
 };

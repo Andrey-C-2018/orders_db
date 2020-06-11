@@ -37,6 +37,7 @@ public:
 	int getPrimaryKeyAsInteger() const;
 	inline bool isEmptySelection() const;
 	inline void addEmptyValue();
+	void selectEmptyValue();
 
 	void SetCurrRecord(const size_t prim_key_value);
 	void SetCurrRecord(std::shared_ptr<const IDbResultSet> rs, \

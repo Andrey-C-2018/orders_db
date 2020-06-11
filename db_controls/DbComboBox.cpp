@@ -102,4 +102,11 @@ void CDbComboBox::SetCurrRecord(std::shared_ptr<const IDbResultSet> rs, \
 	SetCurrRecord(value);
 }
 
+void CDbComboBox::selectEmptyValue() {
+
+	this->SetSelectionIndex(0);
+	sel_index = (size_t)-1;
+	OnItemChoosed();
+}
+
 CDbComboBox::~CDbComboBox() { }

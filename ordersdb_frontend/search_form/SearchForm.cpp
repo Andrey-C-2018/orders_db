@@ -1,4 +1,4 @@
-#include <basic/XConv.h>
+ï»¿#include <basic/XConv.h>
 #include <db/MySQL/MySQLConnectionFactory.h>
 #include <db/IDbConnection.h>
 #include <db_ext/DbTable.h>
@@ -116,10 +116,13 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 	adjustUIDependentCellWidgets();
 	loadInitialFilterToControls();
+	assert(filtering_manager.isFilteringStringChanged());
 
 	Connect(EVT_COMMAND, btn_apply_filter->GetId(), this, &CSearchForm::OnFilterButtonClick);
 	Connect(EVT_COMMAND, btn_add->GetId(), this, &CSearchForm::OnAddRecordButtonClick);
 	Connect(EVT_COMMAND, btn_remove->GetId(), this, &CSearchForm::OnRemoveButtonClick);
+	Connect(EVT_COMMAND, btn_rev->GetId(), this, &CSearchForm::OnRevButtonClick);
+	Connect(EVT_COMMAND, btn_reset->GetId(), this, &CSearchForm::OnResetButtonClick);
 }
 
 void CSearchForm::createStatisticsStatements() {
@@ -163,40 +166,40 @@ void CSearchForm::reloadStatisticsControls(std::shared_ptr<IDbStatement> new_stm
 void CSearchForm::setFieldsSizes() {
 
 	grid->SetFieldWidth(0, 2);
-	grid->SetFieldLabel(0, _T("ÇÂ"));
+	grid->SetFieldLabel(0, _T("Ð—Ð’"));
 	grid->SetFieldWidth(1, 12);
-	grid->SetFieldLabel(1, _T("Öåíòð"));
+	grid->SetFieldLabel(1, _T("Ð¦ÐµÐ½Ñ‚Ñ€"));
 	grid->SetFieldWidth(2, 17);
-	grid->SetFieldLabel(2, _T("Àäâîêàò"));
+	grid->SetFieldLabel(2, _T("ÐÐ´Ð²Ð¾ÐºÐ°Ñ‚"));
 	grid->SetFieldWidth(3, 5);
-	grid->SetFieldLabel(3, _T("¹"));
-	grid->SetFieldLabel(4, _T("Äàòà"));
+	grid->SetFieldLabel(3, _T("â„–"));
+	grid->SetFieldLabel(4, _T("Ð”Ð°Ñ‚Ð°"));
 	grid->SetFieldWidth(5, 6);
-	grid->SetFieldLabel(5, _T("Òèï"));
+	grid->SetFieldLabel(5, _T("Ð¢Ð¸Ð¿"));
 	grid->SetFieldWidth(6, 30);
-	grid->SetFieldLabel(6, _T("Êë³ºíò"));
-	grid->SetFieldLabel(7, _T("Äàòà íàð."));
+	grid->SetFieldLabel(6, _T("ÐšÐ»Ñ–Ñ”Ð½Ñ‚"));
+	grid->SetFieldLabel(7, _T("Ð”Ð°Ñ‚Ð° Ð½Ð°Ñ€."));
 	grid->SetFieldWidth(8, 10);
-	grid->SetFieldLabel(8, _T("Åòàï"));
+	grid->SetFieldLabel(8, _T("Ð•Ñ‚Ð°Ð¿"));
 	grid->SetFieldWidth(9, 17);
-	grid->SetFieldLabel(9, _T("Ñêñ./Ïðï."));
+	grid->SetFieldLabel(9, _T("Ð¡ÐºÑ./ÐŸÑ€Ð¿."));
 	grid->SetFieldWidth(10, 9);
-	grid->SetFieldLabel(10, _T("Íàêàç"));
-	grid->SetFieldLabel(11, _T("Äàòà ñêñ."));
-	grid->SetFieldLabel(12, _T("Ñóìà"));
-	grid->SetFieldLabel(13, _T("Âèòðàòè"));
+	grid->SetFieldLabel(10, _T("ÐÐ°ÐºÐ°Ð·"));
+	grid->SetFieldLabel(11, _T("Ð”Ð°Ñ‚Ð° ÑÐºÑ."));
+	grid->SetFieldLabel(12, _T("Ð¡ÑƒÐ¼Ð°"));
+	grid->SetFieldLabel(13, _T("Ð’Ð¸Ñ‚Ñ€Ð°Ñ‚Ð¸"));
 	grid->SetFieldWidth(14, 15);
-	grid->SetFieldLabel(14, _T("Àêò"));
-	grid->SetFieldLabel(15, _T("Äò ðîçðàõ"));
-	grid->SetFieldLabel(16, _T("Äò àêòó"));
-	grid->SetFieldLabel(17, _T("Äò ð. êàçí"));
-	grid->SetFieldLabel(18, _T("Äàòà îïë."));
+	grid->SetFieldLabel(14, _T("ÐÐºÑ‚"));
+	grid->SetFieldLabel(15, _T("Ð”Ñ‚ Ñ€Ð¾Ð·Ñ€Ð°Ñ…"));
+	grid->SetFieldLabel(16, _T("Ð”Ñ‚ Ð°ÐºÑ‚Ñƒ"));
+	grid->SetFieldLabel(17, _T("Ð”Ñ‚ Ñ€. ÐºÐ°Ð·Ð½"));
+	grid->SetFieldLabel(18, _T("Ð”Ð°Ñ‚Ð° Ð¾Ð¿Ð»."));
 	grid->SetFieldWidth(19, 1);
 	grid->SetFieldLabel(19, _T("#"));
 	grid->SetFieldWidth(20, 30);
-	grid->SetFieldLabel(20, _T("Ñòàòòÿ"));
+	grid->SetFieldLabel(20, _T("Ð¡Ñ‚Ð°Ñ‚Ñ‚Ñ"));
 	grid->SetFieldWidth(21, 32);
-	grid->SetFieldLabel(21, _T("²íôîðìàòîð"));
+	grid->SetFieldLabel(21, _T("Ð†Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ð¾Ñ€"));
 }
 
 void CSearchForm::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
@@ -275,15 +278,15 @@ void CSearchForm::adjustUIDependentCellWidgets() {
 
 	assert(canceling_reasons_list);
 
-	canceling_reasons_list->AddItem(_T("ñêàñîâàíî"));
-	canceling_reasons_list->AddItem(_T("ïðèïèíåíî"));
-	canceling_reasons_list->AddItem(_T("çàì³íà"));
-	canceling_reasons_list->AddItem(_T("â³äìîâà"));
-	canceling_reasons_list->AddItem(_T("ðîçá³æíîñò³"));
-	canceling_reasons_list->AddItem(_T("õâîðîáà"));
-	canceling_reasons_list->AddItem(_T("ðîçøóê"));
-	canceling_reasons_list->AddItem(_T("âèêëþ÷åíèé ç ðåºñòðó"));
-	canceling_reasons_list->AddItem(_T("çàâåðøåíî"));
+	canceling_reasons_list->AddItem(_T("ÑÐºÐ°ÑÐ¾Ð²Ð°Ð½Ð¾"));
+	canceling_reasons_list->AddItem(_T("Ð¿Ñ€Ð¸Ð¿Ð¸Ð½ÐµÐ½Ð¾"));
+	canceling_reasons_list->AddItem(_T("Ð·Ð°Ð¼Ñ–Ð½Ð°"));
+	canceling_reasons_list->AddItem(_T("Ð²Ñ–Ð´Ð¼Ð¾Ð²Ð°"));
+	canceling_reasons_list->AddItem(_T("Ñ€Ð¾Ð·Ð±Ñ–Ð¶Ð½Ð¾ÑÑ‚Ñ–"));
+	canceling_reasons_list->AddItem(_T("Ñ…Ð²Ð¾Ñ€Ð¾Ð±Ð°"));
+	canceling_reasons_list->AddItem(_T("Ñ€Ð¾Ð·ÑˆÑƒÐº"));
+	canceling_reasons_list->AddItem(_T("Ð²Ð¸ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ð¹ Ð· Ñ€ÐµÑ”ÑÑ‚Ñ€Ñƒ"));
+	canceling_reasons_list->AddItem(_T("Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾"));
 }
 
 void CSearchForm::loadInitialFilterToControls() {
@@ -293,7 +296,6 @@ void CSearchForm::loadInitialFilterToControls() {
 	flt_center->SetCurrRecord(params_manager.getDefaultCenter());
 	flt_order_date_from->SetLabel(params_manager.getInitialDateW());
 	flt_order_date_from->enableIfChanged();
-	assert(filtering_manager.isFilteringStringChanged());
 }
 
 void CSearchForm::initFilteringControls() {
@@ -412,7 +414,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 
-	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
+	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt), true);
 	db_table->setPrimaryTableForQuery("orders");
 	db_table->markFieldAsPrimaryKey("id_center_legalaid", "orders");
 	db_table->markFieldAsPrimaryKey("id", "orders");
@@ -443,21 +445,21 @@ void CSearchForm::displayWidgets() {
 
 	CHorizontalSizer sizer(CSizerPreferences(0, 0, 0, 0, DEF_GUI_HORZ_GAP));
 	main_sizer.pushNestedSizer(sizer);
-		sizer.addWidget(new XLabel(), _T("Àäâîêàò: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("ÐÐ´Ð²Ð¾ÐºÐ°Ñ‚: "), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_advocat, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(250, DEF_GUI_ROW_HEIGHT), 250);
 		flt_advocat->setTabStopManager(this);
 		inserter.getOrdersInserter().SetAdvocatWidget(flt_advocat);
 
-		sizer.addWidget(new XLabel(), _T("Öåíòð: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð¦ÐµÐ½Ñ‚Ñ€: "), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_center, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(180, DEF_GUI_ROW_HEIGHT), 200);
 		flt_center->setTabStopManager(this);
 		inserter.SetCenterBox(flt_center);
 
-		sizer.addWidget(new XLabel(), _T("²íôîðìàòîð: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð†Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ð¾Ñ€: "), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_informer, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(250, DEF_GUI_ROW_HEIGHT), 250);
@@ -466,29 +468,29 @@ void CSearchForm::displayWidgets() {
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
-		sizer.addWidget(new XLabel(), _T("¹ äîð.: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("â„– Ð´Ð¾Ñ€.: "), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
 		sizer.addWidget(flt_id, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(45, DEF_GUI_ROW_HEIGHT));
 		inserter.SetIdOrderWidget(flt_id);
 
-		sizer.addWidget(new XLabel(), _T("Òèï: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð¢Ð¸Ð¿: "), FL_WINDOW_VISIBLE, \
 						XSize(35, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_order_type, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(100, DEF_GUI_ROW_HEIGHT), 250);
 		flt_order_type->setTabStopManager(this);
 		inserter.getOrdersInserter().SetOrderTypeWidget(flt_order_type);
 
-		sizer.addWidget(new XLabel(), _T("Äàòà ç: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð”Ð°Ñ‚Ð° Ð·: "), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_order_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 		inserter.SetOrderDateWidget(flt_order_date_from);
 
-		sizer.addWidget(new XLabel(), _T("Äàòà äî: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð”Ð°Ñ‚Ð° Ð´Ð¾: "), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_order_date_to, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 
-		sizer.addWidget(new XLabel(), _T("Îïèñ:"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("ÐžÐ¿Ð¸Ñ:"), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *article = new XTabStopEdit(this);
 		sizer.addWidget(article, _T(""), edit_flags, XSize(320, DEF_GUI_ROW_HEIGHT));
@@ -496,33 +498,33 @@ void CSearchForm::displayWidgets() {
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
-		sizer.addWidget(new XLabel(), _T("¹ àêòà: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("â„– Ð°ÐºÑ‚Ð°: "), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
 		sizer.addWidget(flt_act, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setActWidget(flt_act);
 
-		sizer.addWidget(new XLabel(), _T("Åòàï: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð•Ñ‚Ð°Ð¿: "), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_stage, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(110, DEF_GUI_ROW_HEIGHT), 250);
 		flt_stage->setTabStopManager(this);
 		inserter.getPaymentsInserter().setStageWidget(flt_stage);
 
-		sizer.addWidget(new XLabel(), _T("¹ ðîçãëÿäó:"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("â„– Ñ€Ð¾Ð·Ð³Ð»ÑÐ´Ñƒ:"), FL_WINDOW_VISIBLE, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *cycle = new XTabStopEdit(this);
 		sizer.addWidget(cycle, _T(""), edit_flags, XSize(30, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setCycleWidget(cycle);
 
-		sizer.addWidget(new XLabel(), _T("Ñóìà: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð¡ÑƒÐ¼Ð°: "), FL_WINDOW_VISIBLE, \
 						XSize(45, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *fee = new XCurrencyField(this);
 		sizer.addWidget(fee, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setFeeWidget(fee);
 
-		sizer.addWidget(new XLabel(), _T("Âèòðàòè: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð’Ð¸Ñ‚Ñ€Ð°Ñ‚Ð¸: "), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *outgoings = new XCurrencyField(this);
 		sizer.addWidget(outgoings, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
@@ -531,53 +533,53 @@ void CSearchForm::displayWidgets() {
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
-		sizer.addWidget(new XLabel(), _T("Äàòà ðîçðàõ. ç: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð”Ð°Ñ‚Ð° Ñ€Ð¾Ð·Ñ€Ð°Ñ…. Ð·: "), FL_WINDOW_VISIBLE, \
 						XSize(70, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_act_reg_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setActRegDateWidget(flt_act_reg_date_from);
 
-		sizer.addWidget(new XLabel(), _T("Äàòà ðîçðàõ. äî: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð”Ð°Ñ‚Ð° Ñ€Ð¾Ð·Ñ€Ð°Ñ…. Ð´Ð¾: "), FL_WINDOW_VISIBLE, \
 						XSize(80, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_act_reg_date_to, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 	
-		sizer.addWidget(new XLabel(), _T("Äàòà àêòó ç: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð”Ð°Ñ‚Ð° Ð°ÐºÑ‚Ñƒ Ð·: "), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_act_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setActDateWidget(flt_act_date_from);
 
-		sizer.addWidget(new XLabel(), _T("Äàòà àêòó äî: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð”Ð°Ñ‚Ð° Ð°ÐºÑ‚Ñƒ Ð´Ð¾: "), FL_WINDOW_VISIBLE, \
 						XSize(65, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_act_date_to, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 
-		sizer.addWidget(new XLabel(), _T("Äàòà îïëàòè ç: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð”Ð°Ñ‚Ð° Ð¾Ð¿Ð»Ð°Ñ‚Ð¸ Ð·: "), FL_WINDOW_VISIBLE, \
 						XSize(70, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_payment_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setPaymentDateWidget(flt_payment_date_from);
 
-		sizer.addWidget(new XLabel(), _T("Äàòà îïëàòè äî: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð”Ð°Ñ‚Ð° Ð¾Ð¿Ð»Ð°Ñ‚Ð¸ Ð´Ð¾: "), FL_WINDOW_VISIBLE, \
 						XSize(75, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_payment_date_to, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
-		sizer.addWidget(new XLabel(), _T("Êë³ºíò:"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("ÐšÐ»Ñ–Ñ”Ð½Ñ‚:"), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *client_name = new XTabStopEdit(this);
 		sizer.addWidget(client_name, _T(""), edit_flags, XSize(320, DEF_GUI_ROW_HEIGHT));
 		inserter.getOrdersInserter().SetClientWidget(client_name);
 
-		sizer.addWidget(new XLabel(), _T("Äàòà íàðîäæ:"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð”Ð°Ñ‚Ð° Ð½Ð°Ñ€Ð¾Ð´Ð¶:"), FL_WINDOW_VISIBLE, \
 						XSize(55, DEF_GUI_ROW_HEIGHT + 10));
 		XDateField *bdate = new XDateField(this);
 		sizer.addWidget(bdate, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
 		inserter.getOrdersInserter().SetClientBirthDateWidget(bdate);
 
-		sizer.addWidget(new XLabel(), _T("Çîíà â³äï.:"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð—Ð¾Ð½Ð° Ð²Ñ–Ð´Ð¿.:"), FL_WINDOW_VISIBLE, \
 						XSize(85, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addResizeableWidget(flt_zone, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(50, DEF_GUI_ROW_HEIGHT), 100);
 		
-		sizer.addWidget(new XLabel(), _T("Îïëà÷åíî:"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾:"), FL_WINDOW_VISIBLE, \
 						XSize(85, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addResizeableWidget(flt_paid, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(50, DEF_GUI_ROW_HEIGHT), 100);
@@ -585,9 +587,13 @@ void CSearchForm::displayWidgets() {
 
 	main_sizer.pushNestedSizer(sizer);
 		btn_apply_filter = new XButton();
-		sizer.addWidget(btn_apply_filter, _T("Ô³ëüòð"), FL_WINDOW_VISIBLE, \
-						XSize(100, DEF_GUI_ROW_HEIGHT));
+		sizer.addWidget(btn_apply_filter, _T("Ð¤Ñ–Ð»ÑŒÑ‚Ñ€"), FL_WINDOW_VISIBLE, \
+						XSize(70, DEF_GUI_ROW_HEIGHT));
 
+		btn_reset = new XButton();
+		sizer.addWidget(btn_reset, _T("Ð¡ÐºÐ´"), FL_WINDOW_VISIBLE, \
+						XSize(35, DEF_GUI_ROW_HEIGHT));
+		
 		auto db_navigator = new CDbNavigator(db_table);
 		sizer.addWidget(db_navigator, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
@@ -604,23 +610,27 @@ void CSearchForm::displayWidgets() {
 
 		auto stmt_aggregate = conn->PrepareQuery(query_aggregate.getQuery().c_str());
 		auto rs_aggr = stmt_aggregate->exec();
-		sizer.addWidget(new XLabel(), _T("Çàã. ñóìà:"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð—Ð°Ð³. ÑÑƒÐ¼Ð°:"), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
 		total_fee = new CDbStaticDecimalField(rs_aggr, 0);
 		sizer.addWidget(total_fee, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
 
-		sizer.addWidget(new XLabel(), _T("Ñóìà 1Ñ:"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ð¡ÑƒÐ¼Ð° 1Ð¡:"), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT + 10));
 		total_paid = new CDbStaticDecimalField(rs_aggr, 1);
 		sizer.addWidget(total_paid, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
 
-		sizer.addWidget(new XLabel(), _T("Ê-ñòü äîð.:"), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Ðš-ÑÑ‚ÑŒ Ð´Ð¾Ñ€.:"), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
 		total_orders = new CDbStaticIntField(rs_aggr, 2);
 		sizer.addWidget(total_orders, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
+
+		btn_rev = new XButton();
+		sizer.addWidget(btn_rev, _T("â†‘"), FL_WINDOW_VISIBLE, \
+						XSize(20, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
@@ -679,11 +689,28 @@ void CSearchForm::OnAddRecordButtonClick(XCommandEvent *eve) {
 
 void CSearchForm::OnRemoveButtonClick(XCommandEvent *eve) {
 
-	int option = _plMessageBoxYesNo(_T("Âèäàëèòè ïîòî÷íèé çàïèñ?"));
+	int option = _plMessageBoxYesNo(_T("Ð’Ð¸Ð´Ð°Ð»Ð¸Ñ‚Ð¸ Ð¿Ð¾Ñ‚Ð¾Ñ‡Ð½Ð¸Ð¹ Ð·Ð°Ð¿Ð¸Ñ?"));
 	if (option == IDYES) {
 		db_table->removeCurrentRecord();
 		reloadStatisticsControls();
 	}
+}
+
+void CSearchForm::OnRevButtonClick(XCommandEvent *eve) {
+
+	bool s_order = db_table->invertSortingOrder();
+	if (s_order)
+		btn_rev->SetLabel(_T("â†‘"));
+	else
+		btn_rev->SetLabel(_T("â†“"));
+}
+
+void CSearchForm::OnResetButtonClick(XCommandEvent *eve) {
+
+	filtering_manager.disableAll();
+	loadInitialFilterToControls();
+
+	OnFilterButtonClick(eve);
 }
 
 void CSearchForm::OnSize(XSizeEvent *eve) {

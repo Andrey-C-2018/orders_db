@@ -33,6 +33,11 @@ size_t CIntWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_t
 	return (size_t)(!err);
 }
 
+void CIntWidgetBinderControl::reset() {
+
+	widget->SetLabel(_T(""));
+}
+
 CIntWidgetBinderControl::~CIntWidgetBinderControl() { }
 
 //*****************************************************
@@ -47,6 +52,11 @@ size_t CStringWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> bindin
 
 	binding_target->bindValue(param_no, widget->GetLabel());
 	return 1;
+}
+
+void CStringWidgetBinderControl::reset() {
+
+	widget->SetLabel(_T(""));
 }
 
 CStringWidgetBinderControl::~CStringWidgetBinderControl() { }
@@ -81,6 +91,11 @@ size_t CDateWidgetBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_
 	return (size_t)ok;
 }
 
+void CDateWidgetBinderControl::reset() {
+
+	widget->SetLabel(_T(""));
+}
+
 CDateWidgetBinderControl::~CDateWidgetBinderControl() { }
 
 //*****************************************************
@@ -97,6 +112,11 @@ size_t CDbComboBoxBinderControl::bind(std::shared_ptr<IDbBindingTarget> binding_
 	int i = combobox->getPrimaryKeyAsInteger();
 	binding_target->bindValue(param_no, i);
 	return 1;
+}
+
+void CDbComboBoxBinderControl::reset() {
+
+	combobox->selectEmptyValue();
 }
 
 CDbComboBoxBinderControl::~CDbComboBoxBinderControl() { }

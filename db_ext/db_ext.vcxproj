@@ -166,6 +166,7 @@
     <ClCompile Include="MetaInfoBasic.cpp" />
     <ClCompile Include="Query.cpp" />
     <ClCompile Include="QueryModifier.cpp" />
+    <ClCompile Include="RevDbResultSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbEventsHandlersContainer.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="MetaInfoBasic.h" />
     <ClInclude Include="Query.h" />
     <ClInclude Include="QueryModifier.h" />
+    <ClInclude Include="RevDbResultSet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

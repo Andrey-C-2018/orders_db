@@ -7,11 +7,11 @@ class CPaidBinder : public IBinder {
 		AFFECTED_PARAMS_COUNT = 3
 	};
 
-	const CFilteringComboBox *paid_filter;
+	CFilteringComboBox *paid_filter;
 	XString<Tchar> buffer;
 
 public:
-	CPaidBinder(const CFilteringComboBox *paid_filter_) : paid_filter(paid_filter_) {
+	CPaidBinder(CFilteringComboBox *paid_filter_) : paid_filter(paid_filter_) {
 
 		assert(paid_filter);
 	}
@@ -36,6 +36,8 @@ public:
 	}
 
 	size_t affectedParamsCount() const override { return AFFECTED_PARAMS_COUNT; }
+
+	void reset() override { paid_filter->SetSelectionIndex(0); }
 
 	virtual ~CPaidBinder() { }
 };

@@ -31,7 +31,7 @@ class CFilteringManager {
 
 	std::string flt_string;
 	bool filtering_changed, flt_string_changed;
-	bool flt_str_to_be_erased;
+	bool flt_str_to_be_erased, lock;
 
 	std::vector<FilteringItem> filtering_items;
 	std::map<int, size_t> enabled_items;

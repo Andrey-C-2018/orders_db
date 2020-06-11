@@ -2,9 +2,19 @@
 #include <db/IDbBindingTarget.h>
 #include "FilteringManager.h"
 
+class CFltLockGuard final {
+	bool &lock;
+public:
+	inline CFltLockGuard(bool &lock_) noexcept : lock(lock_) { }
+	~CFltLockGuard() { lock = false; }
+};
+
+//*****************************************************
+
 CFilteringManager::CFilteringManager() : filtering_changed(false), \
 										flt_string_changed(false), \
-										flt_str_to_be_erased(false) { }
+										flt_str_to_be_erased(false), \
+										lock(false) { }
 
 int CFilteringManager::addExpr(ImmutableString<char> expression, \
 								std::shared_ptr<IBinder> binder) {
@@ -54,6 +64,8 @@ void CFilteringManager::enableExpr(int id_expr) {
 
 void CFilteringManager::disableExpr(int id_expr) {
 
+	if (lock) return;
+
 	auto p = findFilteringItem(id_expr);
 	if (p->enabled)
 		enabled_items.erase(id_expr);
@@ -64,9 +76,17 @@ void CFilteringManager::disableExpr(int id_expr) {
 
 void CFilteringManager::disableAll() {
 
-	for (auto i : enabled_items)
+	lock = true;
+	CFltLockGuard guard(lock);
+	for (auto i : enabled_items) {
 		filtering_items[i.second].enabled = false;
 
+		auto &binders = filtering_items[i.second].binders;
+		for (auto p = binders.begin(); p != binders.end(); ++p)
+			p->get()->reset();
+	}
+	lock = false;
+	
 	filtering_changed = !enabled_items.empty();
 	enabled_items.clear();
 }

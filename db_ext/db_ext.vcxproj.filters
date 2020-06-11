@@ -42,6 +42,9 @@
     <ClCompile Include="MetaInfo.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="RevDbResultSet.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbTable.h">
@@ -81,6 +84,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="MetaInfo.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="RevDbResultSet.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

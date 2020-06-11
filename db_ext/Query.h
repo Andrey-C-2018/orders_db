@@ -6,10 +6,13 @@
 #include <db/IDbResultSet.h>
 #include "MetaInfo.h"
 
+class CRevDbResultSet;
+
 class CQuery{
 	CMetaInfo meta_info;
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<IDbStatement> stmt;
+	std::shared_ptr<CRevDbResultSet> rs;
 	
 	mutable std::map<size_t, std::shared_ptr<IDbStatement> > update_stmts;
 public:
@@ -36,8 +39,10 @@ public:
 		getDeleteStmt(std::shared_ptr<IDbResultSet> result_set) const;
 
 	inline std::shared_ptr<IDbBindingTarget> getBindingTarget();
-	inline std::shared_ptr<IDbResultSet> exec();
+	std::shared_ptr<IDbResultSet> exec(const bool rev_sorting_order);
 	void setStmtWithTheSameMetaInfo(std::shared_ptr<IDbStatement> stmt);
+
+	void setSortingOrder(const bool rev_sorting_order);
 
 	~CQuery();
 };
@@ -71,9 +76,4 @@ void CQuery::addPrimaryKeyAsRef(const char *field_name, const char *table_name, 
 std::shared_ptr<IDbBindingTarget> CQuery::getBindingTarget() {
 
 	return stmt;
-}
-
-std::shared_ptr<IDbResultSet> CQuery::exec() {
-
-	return stmt->exec();
 }

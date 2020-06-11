@@ -56,7 +56,7 @@ class CSearchForm : public XTabStopPanel {
 	CDbStaticNumField *total_fee, *total_paid, *total_orders;
 	std::shared_ptr<CDoubleBndTarget> def_binding_target;
 
-	XButton *btn_apply_filter, *btn_add, *btn_remove;
+	XButton *btn_apply_filter, *btn_add, *btn_remove, *btn_rev, *btn_reset;
 	CInserter inserter;
 
 	std::shared_ptr<CDbTable> createDbTable();
@@ -73,6 +73,8 @@ class CSearchForm : public XTabStopPanel {
 	void OnFilterButtonClick(XCommandEvent *eve);
 	void OnAddRecordButtonClick(XCommandEvent *eve);
 	void OnRemoveButtonClick(XCommandEvent *eve);
+	void OnRevButtonClick(XCommandEvent *eve);
+	void OnResetButtonClick(XCommandEvent *eve);
 	
 public:
 	CSearchForm(XWindow *parent, const int flags, \

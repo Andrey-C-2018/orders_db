@@ -1,4 +1,5 @@
 #include "Query.h"
+#include "RevDbResultSet.h"
 
 CQuery::CQuery(std::shared_ptr<IDbConnection> conn_, \
 				std::shared_ptr<IDbStatement> stmt_) : conn(conn_), stmt(stmt_) {
@@ -42,6 +43,18 @@ void CQuery::setStmtWithTheSameMetaInfo(std::shared_ptr<IDbStatement> stmt) {
 	assert(stmt->getResultSetMetadata()->getFieldsCount() == \
 			this->stmt->getResultSetMetadata()->getFieldsCount());
 	this->stmt = stmt;
+}
+
+std::shared_ptr<IDbResultSet> CQuery::exec(const bool rev_sorting_order) {
+
+	rs = std::make_shared<CRevDbResultSet>(stmt->exec(), rev_sorting_order);
+	return rs;
+}
+
+void CQuery::setSortingOrder(const bool rev_sorting_order) {
+
+	assert(rs);
+	rs->setSortingOrder(rev_sorting_order);
 }
 
 CQuery::~CQuery(){ }

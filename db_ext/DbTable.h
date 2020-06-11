@@ -26,6 +26,7 @@ class CDbTable : public ITable{
 	std::shared_ptr<IDbResultSet> result_set;
 
 	size_t curr_record;
+	bool rev_sorting_order;
 
 	CDbEventsHandlersContainer db_event_handlers;
 	CEventsHandlersContainer<ITableEventsHandler> event_handlers;
@@ -34,7 +35,8 @@ class CDbTable : public ITable{
 	void ConnectEventsHandler(ITableEventsHandlerPtr handler) override;
 	void DisconnectEventsHandler(ITableEventsHandlerPtr handler) override;
 public:
-	CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_);
+	CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_, \
+				const bool rev_sorting_order_ = false);
 
 	inline size_t getCurrentRecordNo() const;
 	inline void setCurrentRecordNo(const size_t rec_no);
@@ -70,6 +72,8 @@ public:
 	void SetCell(const size_t field, const size_t record, const Tchar *value) override;
 
 	inline void executeScalarStmt(std::shared_ptr<IDbStatement> stmt);
+
+	inline bool invertSortingOrder();
 
 	void reload();
 	void reload(std::shared_ptr<IDbStatement> stmt);
@@ -147,4 +151,16 @@ void CDbTable::rereadQueryContents() {
 	size_t records_count = result_set->getRecordsCount();
 	event_handlers.OnRecordsCountChanged(records_count);
 	db_event_handlers.OnRecordsCountChanged(records_count);
+}
+
+bool CDbTable::invertSortingOrder() {
+
+	rev_sorting_order = !rev_sorting_order;
+	query.setSortingOrder(rev_sorting_order);
+	result_set->reload();
+
+	size_t records_count = result_set->getRecordsCount();
+	event_handlers.OnRecordsCountChanged(records_count);
+
+	return rev_sorting_order;
 }
