@@ -38,8 +38,7 @@ CDbNavigator::CDbNavigator(std::shared_ptr<CDbTable> db_table_) : \
 				evt_handler(std::make_shared<CDbTableEventsHandler>(\
 										*this, curr_record, records_count)){
 
-	db_table->ConnectEventsHandler(std::dynamic_pointer_cast<IDbTableEventsHandler, \
-														CDbTableEventsHandler>(evt_handler));
+	db_table->ConnectDbEventsHandler(evt_handler);
 }
 
 void CDbNavigator::Create(XWindow *parent, const int flags, \
@@ -60,6 +59,5 @@ void CDbNavigator::Create(XWindow *parent, const int flags, \
 
 CDbNavigator::~CDbNavigator() {
 
-	db_table->DisconnectEventsHandler(std::dynamic_pointer_cast<IDbTableEventsHandler, \
-													CDbTableEventsHandler>(evt_handler));
+	db_table->DisconnectDbEventsHandler(evt_handler);
 }

@@ -77,7 +77,7 @@ void XString<Tchar>::resize(const size_t size_to_allocate, \
 											MIN_ALLOCATION_SIZE : size_to_allocate;
 		Tchar *new_data = new Tchar[actual_size_to_allocate];
 
-		if (str_size != 0) {
+		if (allocated_size != 0) {
 			assert(data);
 			if (preserve_old_content) {
 				Tstrncpy(new_data, data, str_size);
@@ -354,7 +354,7 @@ Tchar *XString<Tchar>::c_str_writable() noexcept {
 template <typename Tchar> \
 void XString<Tchar>::destroy() {
 
-	if (str_size) {
+	if (allocated_size) {
 		assert(data);
 
 		delete[] data;
