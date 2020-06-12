@@ -1,5 +1,7 @@
 #include "ParametersManager.h"
+#include <basic/XString.h>
 #include <basic/XConv.h>
+#include <basic/TextConv.h>
 #include <basic/PropertiesFile.h>
 #include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
@@ -112,6 +114,30 @@ std::string CParametersManager::getInitialFilteringStr() const {
 	initial_flt += "'";
 
 	return std::move(initial_flt);
+}
+
+const std::string &CParametersManager::getCenterFilteringStr() const {
+
+	if (!center_flt_str.empty()) return center_flt_str;
+
+	XString<char> str;
+
+	if (default_center == 1) {
+		UCS16_ToUTF8(L"аж", 2, str);
+
+		center_flt_str = "a.zone = '";
+		center_flt_str += str.c_str();
+		center_flt_str += "'";
+	}
+	else {
+		str.resize(10);
+		XConv::ToString(default_center, &str[0]);
+
+		center_flt_str = "a.id_center_legalaid = ";
+		center_flt_str += str.c_str();
+	}
+
+	return center_flt_str;
 }
 
 CParametersManager::~CParametersManager() { }

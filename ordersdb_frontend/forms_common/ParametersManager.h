@@ -12,11 +12,14 @@ class CParametersManager {
 
 	int id_user;
 	std::vector<std::string> groups;
+
 	int default_center;
+	mutable std::string center_flt_str;
+
 	CDate initial_order_date;
 	char date_buffer[CDate::SQL_FORMAT_LEN + 1];
 	wchar_t date_buffer_w[CDate::GERMAN_FORMAT_LEN + 1];
-
+	
 	CParametersManager();
 	void getParamsValuesFromFile(CPropertiesFile *props, \
 									std::shared_ptr<IDbConnection> conn);
@@ -40,6 +43,7 @@ public:
 	inline int getDefaultCenter() const;
 	inline const wchar_t *getInitialDateW() const;
 	std::string getInitialFilteringStr() const;
+	const std::string &getCenterFilteringStr() const;
 
 	virtual ~CParametersManager();
 };

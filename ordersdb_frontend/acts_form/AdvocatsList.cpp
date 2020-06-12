@@ -2,6 +2,7 @@
 #include <db_ext/DbTable.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbNavigator.h>
+#include <forms_common/ParametersManager.h>
 #include "AdvocatsList.h"
 #include "AdvocatsListEvtHandler.h"
 
@@ -37,7 +38,10 @@ std::shared_ptr<CDbTable> CAdvocatsList::createDbTable(std::shared_ptr<IDbConnec
 
 	std::string query = "SELECT b.id_advocat, b.adv_name_short ";
 	query += "FROM advocats b ";
-	query += "ORDER BY adv_name_short";
+	query += "WHERE b.id_advocat IN (SELECT DISTINCT a.id_adv FROM orders a WHERE ";
+	query += CParametersManager::getInstance().getCenterFilteringStr();
+	query += ") ";
+	query += "ORDER BY b.adv_name_short";
 
 	auto stmt = conn->PrepareQuery(query.c_str());
 
