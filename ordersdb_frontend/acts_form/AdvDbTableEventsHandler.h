@@ -6,7 +6,7 @@ class CDbTable;
 struct IDbField;
 
 class CAdvDbTableEventsHandler : public IDbTableEventsHandler {
-	std::shared_ptr<const CDbTable> master_table;
+	std::weak_ptr<const CDbTable> master_table;
 	std::shared_ptr<CDbTable> dependent_table;
 	std::shared_ptr<const IDbField> master_field;
 	size_t dep_param_no;

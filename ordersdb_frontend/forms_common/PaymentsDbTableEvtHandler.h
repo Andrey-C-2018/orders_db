@@ -2,6 +2,7 @@
 #include <db_ext/IDbTableEventsHandler.h>
 #include <db_ext/DbTable.h>
 #include "Constraints.h"
+#include "CommonRoutines.h"
 
 class CPaymentsDbTableEvtHandler : public IDbTableEventsHandler {
 public:
@@ -18,7 +19,6 @@ private:
 	std::shared_ptr<CPaymentsConstraints> constraints;
 	size_t prev_record;
 
-	inline std::shared_ptr<const CDbTable> getDbTablePtr();
 	inline CDate getLastQuartalEnd() const;
 public:
 	CPaymentsDbTableEvtHandler(std::shared_ptr<const CDbTable> db_table_, \
@@ -38,18 +38,9 @@ public:
 
 //*****************************************************
 
-std::shared_ptr<const CDbTable> CPaymentsDbTableEvtHandler::getDbTablePtr() {
-
-	auto ptr = db_table.lock();
-	if (!ptr) 
-		throw XException(0, _T("CPaymentsDbTableEvtHandler: the DbTable pointer is NULL"));
-	
-	return std::move(ptr);
-}
-
 void CPaymentsDbTableEvtHandler::calcConstraintsValues() {
 
-	auto rs = getDbTablePtr()->getResultSet();
+	auto rs = getDbTablePtr(db_table)->getResultSet();
 	if (rs->empty()) return;
 
 	bool is_null;

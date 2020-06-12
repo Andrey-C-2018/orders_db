@@ -88,7 +88,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	constraints->old_stage_locked = true;
 	constraints->wrong_zone = true;
 
-	auto groups = CParametersManager::getInstance().getGroups();
+	auto &groups = CParametersManager::getInstance().getGroups();
 	bool db_admin = std::find(groups.cbegin(), groups.cend(), "Administrators") != \
 								groups.cend();
 

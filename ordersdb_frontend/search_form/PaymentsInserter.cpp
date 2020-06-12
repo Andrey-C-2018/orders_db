@@ -178,7 +178,7 @@ void CPaymentsInserter::insert() {
 			ErrorBox(error_str.c_str());
 		}
 		else if (e.GetErrorCode() == CDbException::E_DB_NO_REF_IN_MASTER_TABLE)
-			ErrorBox(_T("Доручення не внесено. Зверніться до відділу роботи з адвокатами"));
+			ErrorBox(_T("Відсутні права на додавання нових доручень. Зверніться до адміністратора БД"));
 		else throw;
 	}
 }

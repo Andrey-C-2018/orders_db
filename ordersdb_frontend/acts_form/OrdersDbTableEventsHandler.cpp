@@ -27,12 +27,13 @@ void COrdersDbTableEventsHandler::OnRecordsCountChanged(const size_t new_records
 		applyCurrRecordChanges();
 	}
 	else {
-		auto dep_binding_target = dependent_table->getBindingTarget();
+		auto dependent_table_shptr = getDbTablePtr(dependent_table);
+		auto dep_binding_target = dependent_table_shptr->getBindingTarget();
 
 		dep_binding_target->bindValue(0, 0);
 		dep_binding_target->bindValue(1, 0);
 		dep_binding_target->bindNull(2);
-		dependent_table->reload();
+		dependent_table_shptr->reload();
 	}
 }
 
