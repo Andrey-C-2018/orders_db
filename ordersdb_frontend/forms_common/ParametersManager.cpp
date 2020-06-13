@@ -6,6 +6,7 @@
 #include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
+#include "AutorizationManager.h"
 
 CParametersManager CParametersManager::inst;
 
@@ -58,12 +59,17 @@ void CParametersManager::determineUserAndGroups(CPropertiesFile *props, \
 	assert(props);
 	assert(conn);
 
-	const Tchar *user_name = props->getStringProperty(_T("user_name"), buffer);
-	if (!user_name || (user_name && user_name[0] == _T('\0')))
+	const Tchar *p_user_name = props->getStringProperty(_T("user_name"), buffer);
+	if (!p_user_name || (p_user_name && p_user_name[0] == _T('\0')))
 		throw XException(0, _T("Параметр 'user_name' відсутній у config.ini"));
+	Tstring user_name = p_user_name;
+
+	const Tchar *pwd = props->getStringProperty(_T("password"), buffer);
+	if (!pwd || (pwd && pwd[0] == _T('\0')))
+		throw XException(0, _T("Параметр 'password' відсутній у config.ini"));
 
 	auto stmt = conn->PrepareQuery("SELECT id_user FROM users WHERE user_name = ?");
-	stmt->bindValue(0, user_name);
+	stmt->bindValue(0, user_name.c_str());
 	auto rs = stmt->exec();
 
 	if (rs->empty()) {
@@ -76,6 +82,9 @@ void CParametersManager::determineUserAndGroups(CPropertiesFile *props, \
 	bool is_null;
 	this->id_user = rs->getInt(0, is_null);
 	assert(!is_null);
+
+	CAutorizationManager auth_mgr(conn);
+	auth_mgr.autorize(id_user, user_name.c_str(), ImmutableString<Tchar>(pwd, Tstrlen(pwd)));
 
 	stmt = conn->PrepareQuery("SELECT gr.group_name FROM groups gr INNER JOIN users_groups ug ON gr.id_group = ug.id_group WHERE ug.id_user = ? ORDER BY 1");
 	stmt->bindValue(0, id_user);

@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="ActDateCellWidget.h" />
     <ClInclude Include="ActNameCellWidget.h" />
+    <ClInclude Include="AutorizationManager.h" />
     <ClInclude Include="CommonRoutines.h" />
     <ClInclude Include="Constraints.h" />
     <ClInclude Include="FormsInsertionBinders.h" />
@@ -32,6 +33,7 @@
   <ItemGroup>
     <ClCompile Include="ActDateCellWidget.cpp" />
     <ClCompile Include="ActNameCellWidget.cpp" />
+    <ClCompile Include="AutorizationManager.cpp" />
     <ClCompile Include="CommonRoutines.cpp" />
     <ClCompile Include="ParametersManager.cpp" />
     <ClCompile Include="PaymentsDbTableEvtHandler.cpp" />

@@ -1,4 +1,5 @@
 #include <codecvt>
+#include <algorithm>
 #include "locale_init.h"
 #include "PropertiesFile.h"
 #include "XConv.h"
@@ -50,34 +51,31 @@ const Tchar *CPropertiesFile::getStringProperty(const Tchar *name, Tstring &buff
 		throw CPropertiesFileException(CPropertiesFileException::E_WRONG_NAME, \
 			_T("Property name cannot be NULL or empty"));
 
-	Tstring::size_type pos = Tstring::npos;
-	while (pos == Tstring::npos && !f.eof()) {
+	bool found = false;
+	size_t name_size = Tstrlen(name);
+	while (!found && !f.eof()) {
 		std::getline(f, buffer);
-		pos = buffer.find(name);
+		size_t size = std::min(buffer.size(), name_size);
+
+		found = !Tstrncmp(buffer.c_str(), name, size);
+		found = found && (buffer.size() > name_size) && buffer[name_size] == _T('=');
 	}
-	if (pos == Tstring::npos && f.eof()) {
+	if (!found && f.eof()) {
 		f.clear();
 		f.seekg(0);
 
-		while (pos == Tstring::npos && !f.eof()) {
+		while (!found && !f.eof()) {
 			std::getline(f, buffer);
-			pos = buffer.find(name);
+			size_t size = std::min(buffer.size(), name_size);
+
+			found = !Tstrncmp(buffer.c_str(), name, size);
+			found = found && (buffer.size() > name_size) && buffer[name_size] == _T('=');
 		}
 	}
 
-	if (pos != Tstring::npos && pos == 0) {
-		Tstring::size_type pos_value = buffer.find_first_of(_T('='), pos + Tstrlen(name));
-		if (pos_value == Tstring::npos) {
-			CPropertiesFileException e(CPropertiesFileException::E_WRONG_FILE_FORMAT, \
-				_T("Invalid config file format: property name - "), name);
-			e << name;
-			throw e;
-		}
-		else {
-			const Tchar *p = buffer.c_str();
-			return p + pos_value + 1;
-		}
-	}
+	if (found) 
+		return buffer.c_str() + name_size + 1;
+	
 	return nullptr;
 }
 

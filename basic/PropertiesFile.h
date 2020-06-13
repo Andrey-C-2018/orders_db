@@ -9,9 +9,8 @@ public:
 		E_FILE_NOT_FOUND = 1, \
 		E_FILE_NOT_OPENED = 2, \
 		E_WRONG_NAME = 3, \
-		E_WRONG_FILE_FORMAT = 4, \
-		E_WRONG_VALUE = 5, \
-		E_PROPERTY_NOT_FOUND = 6
+		E_WRONG_VALUE = 4, \
+		E_PROPERTY_NOT_FOUND = 5
 	};
 	CPropertiesFileException(const int err_code, const Tchar *err_descr);
 	CPropertiesFileException(const int err_code, const Tchar *err_descr, \
