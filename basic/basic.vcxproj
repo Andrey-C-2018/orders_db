@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="chars.h" />
+    <ClInclude Include="Cryptor.h" />
     <ClInclude Include="Delegate.h" />
     <ClInclude Include="dll_definitions.h" />
     <ClInclude Include="Exception.h" />
@@ -53,6 +54,7 @@
     <ClInclude Include="XString.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Cryptor.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="PropertiesFile.cpp" />
     <ClCompile Include="win\FileSystemImpl.cpp" />

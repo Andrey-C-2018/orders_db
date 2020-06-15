@@ -7,6 +7,7 @@
 #include <forms_common/PaymentsDbTableEvtHandler.h>
 #include <forms_common/ParametersManager.h>
 #include <forms_common/CommonRoutines.h>
+#include <forms_common/VernamOneTimePad.h>
 #include "ActsForm.h"
 #include "AdvDbTableEventsHandler.h"
 #include "OrdersDbTableEventsHandler.h"
@@ -20,7 +21,7 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 				payments_list(DEF_GUI_MARGIN, DEF_DBNAVIGATOR_HEIGHT) {
 
 	props.open("config.ini");
-	conn = CMySQLConnectionFactory::createConnection(props);
+	conn = CMySQLConnectionFactory::createConnection(props, vernam_one_time_pad);
 	CParametersManager::init(&props, conn);
 
 	setLastChangedUser();

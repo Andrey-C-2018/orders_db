@@ -29,6 +29,7 @@
     <ClInclude Include="PaymentsDbTableEvtHandler.h" />
     <ClInclude Include="PaymentsGridEvtHandler.h" />
     <ClInclude Include="Validators.h" />
+    <ClInclude Include="VernamOneTimePad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActDateCellWidget.cpp" />

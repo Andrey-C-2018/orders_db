@@ -23,6 +23,7 @@
 #include <forms_common/PaymentsDbTableEvtHandler.h>
 #include <forms_common/PaymentsGridEvtHandler.h>
 #include <forms_common/CommonRoutines.h>
+#include <forms_common/VernamOneTimePad.h>
 #include "SearchForm.h"
 #include "ZoneFilter.h"
 #include "PaidFilter.h"
@@ -78,7 +79,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 	props.open("config.ini");
 	
-	conn = CMySQLConnectionFactory::createConnection(props);
+	conn = CMySQLConnectionFactory::createConnection(props, vernam_one_time_pad);
 	CParametersManager::init(&props, conn);
 	inserter.evalPermissions();
 
