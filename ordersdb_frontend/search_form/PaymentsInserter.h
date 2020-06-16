@@ -11,7 +11,6 @@ class CPaymentsInserter : public CDbInserter {
 	std::shared_ptr<IInsertBinder> id_order_binder;
 	std::shared_ptr<IInsertBinder> order_date_binder;
 	
-	CDbComboBox *center;
 	XWidget *order_date;
 
 	CDbComboBox *stage;
@@ -61,7 +60,6 @@ void CPaymentsInserter::setCenterBinder(std::shared_ptr<IInsertBinder> binder, \
 										CDbComboBox *center) {
 
 	this->center_binder = binder;
-	this->center = center;
 }
 
 void CPaymentsInserter::setIdOrderBinder(std::shared_ptr<IInsertBinder> binder) {

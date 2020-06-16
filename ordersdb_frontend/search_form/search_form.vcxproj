@@ -98,6 +98,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>vld.lib;basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/Debug;%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -133,6 +134,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>vld.lib;basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/Release;%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,8 +165,10 @@
     <ClInclude Include="OrdersInserter.h" />
     <ClInclude Include="PaidFilter.h" />
     <ClInclude Include="PaymentsInserter.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SearchForm.h" />
     <ClInclude Include="FilteringComboBox.h" />
+    <ClInclude Include="SearchFormGridEvtHandler.h" />
     <ClInclude Include="ZoneFilter.h" />
   </ItemGroup>
   <ItemGroup>
@@ -177,7 +181,11 @@
     <ClCompile Include="PaymentsInserter.cpp" />
     <ClCompile Include="SearchForm.cpp" />
     <ClCompile Include="FilteringComboBox.cpp" />
+    <ClCompile Include="SearchFormGridEvtHandler.cpp" />
     <ClCompile Include="ZoneFilter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="search_form.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

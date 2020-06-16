@@ -1,4 +1,7 @@
 #pragma once
+#include <memory>
+
+struct IDbConnection;
 
 void setLastChangedUser();
 
@@ -11,3 +14,5 @@ inline std::shared_ptr<TDbTable> getDbTablePtr(std::weak_ptr<TDbTable> &db_table
 
 	return std::move(ptr);
 }
+
+std::string getFormVersion(std::shared_ptr<IDbConnection>, const char *form_param);

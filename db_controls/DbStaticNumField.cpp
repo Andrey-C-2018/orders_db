@@ -33,7 +33,8 @@ const Tchar *CDbStaticIntField::ConvToStr() const {
 	bool is_null;
 
 	rs->gotoRecord(0);
-	return XConv::ToString(rs->getInt(field_index, is_null), buffer, size);
+	int value = rs->getInt(field_index, is_null);
+	return is_null ? _T("0") : XConv::ToString(value, buffer, size);
 }
 
 CDbStaticIntField::~CDbStaticIntField() { }
@@ -49,7 +50,8 @@ const Tchar *CDbStaticDecimalField::ConvToStr() const {
 	assert(!rs->empty());
 
 	rs->gotoRecord(0);
-	return rs->getWString(field_index);
+	auto value = rs->getWString(field_index);
+	return value ? value : _T("0");
 }
 
 CDbStaticDecimalField::~CDbStaticDecimalField() { }

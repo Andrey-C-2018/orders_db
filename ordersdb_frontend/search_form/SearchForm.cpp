@@ -21,10 +21,10 @@
 #include <forms_common/ParametersManager.h>
 #include <forms_common/ActNameCellWidget.h>
 #include <forms_common/PaymentsDbTableEvtHandler.h>
-#include <forms_common/PaymentsGridEvtHandler.h>
 #include <forms_common/CommonRoutines.h>
 #include <forms_common/VernamOneTimePad.h>
 #include "SearchForm.h"
+#include "SearchFormGridEvtHandler.h"
 #include "ZoneFilter.h"
 #include "PaidFilter.h"
 #include "DoubleBndTarget.h"
@@ -61,6 +61,8 @@ public:
 
 //*****************************************************
 
+constexpr char search_form_version[] = "0.9.9";
+
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
 					const int X, const int Y, \
@@ -80,6 +82,10 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	props.open("config.ini");
 	
 	conn = CMySQLConnectionFactory::createConnection(props, vernam_one_time_pad);
+	auto version = getFormVersion(conn, "search_form_version");
+	if (version != search_form_version)
+		throw XException(0, _T("Версія програми не співпадає з версією БД. Використовуйте актуальну версію"));
+
 	CParametersManager::init(&props, conn);
 	inserter.evalPermissions();
 
@@ -98,15 +104,17 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	std::shared_ptr<CPaymentsDbTableEvtHandler> payments_evt_handler = \
 						std::make_shared<CPaymentsDbTableEvtHandler>(db_table, \
 												def_center, "id_center_legalaid", \
-												!db_admin, !db_admin, constraints);
+												!db_admin, !db_admin, !db_admin, \
+												constraints);
 	db_table->ConnectDbEventsHandler(payments_evt_handler);
 
 	createStatisticsStatements();
 
 	grid = new CDbGrid(false, db_table, \
-					std::make_shared<CPaymentsGridEvtHandler>(db_table, constraints));
+					std::make_shared<CSearchFormGridEvtHandler>(db_table, constraints, \
+													std::move(orders_fields_indexes)));
 	setFieldsSizes();
-	createCellWidgetsAndAttachToGrid(grid);
+	createCellWidgetsAndAttachToGrid(db_admin);
 	initFilteringControls();
 
 	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
@@ -202,13 +210,16 @@ void CSearchForm::setFieldsSizes() {
 	grid->SetFieldLabel(21, _T("Інформатор"));
 }
 
-void CSearchForm::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
+void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 
 	assert(grid);
 	assert(!advocats_list);
 	assert(!centers_list);
 	CGridCellWidgetCreator creator(grid);
 	
+	auto readonly_widget = creator.createAndAttachToGrid<CEditableCellWidget>(\
+										"zone", true);
+
 	auto stmt = conn->PrepareQuery("SELECT id_advocat, adv_name_short, adv_name FROM advocats ORDER BY 2");
 	auto result_set = stmt->exec();
 	auto rs_metadata = stmt->getResultSetMetadata();
@@ -218,12 +229,16 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 										"orders", db_table);
 	advocats_list->AddRelation("id_advocat", "id_adv");
 
-	centers_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
+	if (db_admin) {
+		centers_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
 										"center_short_name", \
 										conn, "center_short_name", "centers", \
 										"orders", db_table);
-	centers_list->AddRelation("id_center", "id_center_legalaid");
-
+		centers_list->AddRelation("id_center", "id_center_legalaid");
+	}
+	else
+		grid->SetWidgetForFieldByName("center_short_name", readonly_widget);
+	
 	canceling_reasons_list = new CComboBoxCellWidget();
 	grid->SetWidgetForFieldByName("reason", canceling_reasons_list);
 
@@ -302,8 +317,13 @@ void CSearchForm::initFilteringControls() {
 
 	def_binding_target = std::make_shared<CDoubleBndTarget>();
 
-	flt_center = new CFilteringDbComboBox(filtering_manager, \
-										centers_list->getMasterResultSet(), 2, 0);
+	std::shared_ptr<const IDbResultSet> cn_rs;
+	if (centers_list)
+		cn_rs = centers_list->getMasterResultSet();
+	else
+		cn_rs = conn->ExecQuery("SELECT * FROM centers ORDER BY id_center");
+
+	flt_center = new CFilteringDbComboBox(filtering_manager, cn_rs, 2, 0);
 	auto combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_center);
 	int id_expr = filtering_manager.addExpr("a.id_center_legalaid = ?", combo_binder);
 	flt_center->setExprId(id_expr);
@@ -389,6 +409,8 @@ void CSearchForm::initFilteringControls() {
 }
 
 std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
+
+	orders_fields_indexes.insert({0, 1, 2, 3, 4, 5, 6, 7, 9, 10});
 
 	std::string query = "SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,";
 	query += " t.type_name, a.client_name, a.bdate, sta.stage_name, a.reason, a.cancel_order, a.cancel_date, aa.fee, aa.outgoings,";

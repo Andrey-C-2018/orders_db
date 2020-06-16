@@ -1,6 +1,7 @@
 #include "PaymentsGridEvtHandler.h"
 #include <db/DbException.h>
 #include <xwindows/platform_specific.h>
+#include "Constraints.h"
 
 CPaymentsGridEvtHandler::CPaymentsGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
 													std::shared_ptr<CPaymentsConstraints> constraints_) : \
@@ -9,6 +10,7 @@ CPaymentsGridEvtHandler::CPaymentsGridEvtHandler(std::shared_ptr<CDbTable> db_ta
 
 void CPaymentsGridEvtHandler::OnCellChangedCommon(IGridCellWidget *cell_widget, \
 													IOnCellChangedAction &action) const {
+	
 	if (constraints->wrong_zone) {
 		ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до іншого центру"));
 		return;

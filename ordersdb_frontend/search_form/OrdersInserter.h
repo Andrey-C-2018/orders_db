@@ -10,6 +10,7 @@ class COrdersInserter : public CDbInserter {
 		FIELDS_COUNT = 15
 	};
 	std::shared_ptr<IDbConnection> conn;
+	bool admin_logged;
 
 	CDbComboBox *center;
 	XWidget *id_order;
@@ -31,6 +32,8 @@ public:
 	COrdersInserter &operator=(const COrdersInserter &obj) = delete;
 	COrdersInserter &operator=(COrdersInserter &&obj) = delete;
 
+	inline void adminLogged(const bool admin_logged);
+
 	void SetCenterBox(CDbComboBox *center);
 	void SetIdOrderWidget(XWidget *id_order);
 	void SetOrderDateWidget(XWidget *order_date);
@@ -50,6 +53,11 @@ public:
 };
 
 //*****************************************************
+
+void COrdersInserter::adminLogged(const bool admin_logged) {
+
+	this->admin_logged = admin_logged;
+}
 
 void COrdersInserter::SetOrderTypeWidget(CDbComboBox *order_type) {
 

@@ -5,6 +5,7 @@
 
 struct IDbConnection;
 struct IDbTableEventsHandler;
+struct CPaymentsConstraints;
 class CDbGrid;
 class CDbTable;
 
@@ -31,7 +32,8 @@ public:
 	COrdersList &operator=(const COrdersList &obj) = delete;
 	COrdersList &operator=(COrdersList &&obj) = delete;
 
-	void initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_adv_id);
+	void initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_adv_id, \
+						std::shared_ptr<CPaymentsConstraints> constraints);
 	void initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler);
 	inline void initSizers(XPoint initial_coords, XSize parent_size, \
 							XDynamicSizer *prev_sizer);

@@ -46,7 +46,7 @@ public:
 class ZoneInsertBinder : public IInsertBinder {
 	XComboBox *center;
 	XWidget *order_date;
-	XString<Tchar> buffer;
+	XString<Tchar> center_name;
 public:
 	ZoneInsertBinder(XComboBox *center_, XWidget *order_date_) : \
 				center(center_), order_date(order_date_) {
@@ -55,17 +55,27 @@ public:
 		assert(order_date);
 	}
 
+	ZoneInsertBinder(const Tchar *center_, XWidget *order_date_) : \
+				center(nullptr), center_name(center_), \
+				order_date(order_date_) {
+
+		assert(!center_name.empty());
+		assert(order_date);
+	}
+
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
 		CInsParamNoGuard param_no_guard(params.param_no, 1);
 
-		center->GetCurrentItemText(buffer);
-		if (buffer.empty() || buffer == _T("(0)")) {
-			params.error_str += field_name;
-			params.error_str += _T(": для визначення зони виберіть Центр у відп. полі");
-			params.error_str += _T('\n');
-			return true;
+		if (center) {
+			center->GetCurrentItemText(center_name);
+			if (center_name.empty() || center_name == _T("(0)")) {
+				params.error_str += field_name;
+				params.error_str += _T(": для визначення зони виберіть Центр у відп. полі");
+				params.error_str += _T('\n');
+				return true;
+			}
 		}
 
 		CDate order_date(this->order_date->GetLabel(), CDate::GERMAN_FORMAT);
@@ -76,7 +86,7 @@ public:
 			return true;
 		}
 
-		const Tchar *zone = (buffer != _T("РЦ нБВПД") && order_date >= CDate(1, 1, 2017) ? \
+		const Tchar *zone = (center_name != _T("РЦ нБВПД") && order_date >= CDate(1, 1, 2017) ? \
 							_T("МЦ") : _T("РЦ"));
 		binding_target->bindValue(params.param_no, zone);
 		return true;
@@ -88,6 +98,7 @@ public:
 //*****************************************************
 
 COrdersInserter::COrdersInserter() : CDbInserter("orders", FIELDS_COUNT), \
+						admin_logged(false), \
 						center(nullptr), id_order(nullptr), order_date(nullptr), \
 						order_type(nullptr), advocat(nullptr), client(nullptr), \
 						bdate(nullptr) { }
@@ -97,7 +108,8 @@ void COrdersInserter::SetCenterBox(CDbComboBox *center) {
 	assert(center);
 	assert(!this->center);
 	this->center = center;
-	center_binder = std::make_shared<CDbComboBoxInsertBinder>(center, false, false);
+	center_binder = admin_logged ? \
+		std::make_shared<CDbComboBoxInsertBinder>(center, false, false) : nullptr;
 }
 
 void COrdersInserter::SetIdOrderWidget(XWidget *id_order) {
@@ -130,7 +142,14 @@ void COrdersInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	int id_user = params_manager.getIdUser();
 	assert(id_user != -1);
 
-	addBinder(0, _T("Центр"), center_binder);
+	int def_center = params_manager.getDefaultCenter();
+	assert(0 < def_center && def_center < 10);
+	const char center_str[] = {'0' + (char)def_center , 0};
+
+	if(admin_logged) 
+		addBinder(0, _T("Центр"), center_binder);
+	else
+		defStaticInsertion(0, center_str);
 	addBinder(1, _T("Номер доручення"), id_order_binder);
 	addBinder(2, _T("Дата доручення"), order_date_binder);
 	addBinder(3, _T("Тип доручення"), std::make_shared<CDbComboBoxInsertBinder>(order_type, false, false));
@@ -144,7 +163,10 @@ void COrdersInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	defStaticInsertion(11, "NULL"); // cancel reason
 	defStaticInsertion(12, "NULL"); // cancel order
 	defStaticInsertion(13, "NULL"); // cancel_date
-	addBinder(14, _T("Зона відповідальності"), std::make_shared<ZoneInsertBinder>(center, order_date));
+	addBinder(14, _T("Зона відповідальності"), admin_logged ? \
+		std::make_shared<ZoneInsertBinder>(center, order_date) : \
+		std::make_shared<ZoneInsertBinder>(def_center == 1 ? \
+										_T("РЦ нБВПД") : _T("МЦ"), order_date));
 		
 	CDbInserter::prepare(conn);
 }

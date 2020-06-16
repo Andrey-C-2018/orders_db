@@ -28,6 +28,7 @@
     <ClInclude Include="ParametersManager.h" />
     <ClInclude Include="PaymentsDbTableEvtHandler.h" />
     <ClInclude Include="PaymentsGridEvtHandler.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Validators.h" />
     <ClInclude Include="VernamOneTimePad.h" />
   </ItemGroup>

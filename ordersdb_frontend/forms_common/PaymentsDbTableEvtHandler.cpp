@@ -5,13 +5,15 @@ CPaymentsDbTableEvtHandler::CPaymentsDbTableEvtHandler(std::shared_ptr<const CDb
 														const char *center_field_name, \
 														const bool lock_old_stages_, \
 														const bool check_zone_, \
+														const bool lock_old_orders_, \
 														std::shared_ptr<CPaymentsConstraints> constraints_) : \
-															db_table(db_table_), \
-															this_center(this_center_), \
-															lock_old_stages(lock_old_stages_), \
-															check_zone(check_zone_), \
-															constraints(constraints_), \
-															prev_record((size_t)-1) {
+											db_table(db_table_), \
+											this_center(this_center_), \
+											lock_old_stages(lock_old_stages_), \
+											check_zone(check_zone_), \
+											lock_old_orders(lock_old_orders_), \
+											constraints(constraints_), \
+											prev_record((size_t)-1) {
 
 	assert(center_field_name);
 	assert(db_table_);

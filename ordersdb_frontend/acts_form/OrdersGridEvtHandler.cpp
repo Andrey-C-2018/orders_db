@@ -1,12 +1,21 @@
 #include "OrdersGridEvtHandler.h"
 #include <db/DbException.h>
 #include <xwindows/platform_specific.h>
+#include <forms_common/Constraints.h>
 
-COrdersGridEvtHandler::COrdersGridEvtHandler(std::shared_ptr<CDbTable> db_table) : \
-												CDbGridEventsHandler(db_table) { }
+COrdersGridEvtHandler::COrdersGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
+									std::shared_ptr<CPaymentsConstraints> constraints_) : \
+							CDbGridEventsHandler(db_table), \
+							constraints(constraints_) { }
 
 void COrdersGridEvtHandler::OnCellChangedCommon(IGridCellWidget *cell_widget, \
 												IOnCellChangedAction &action) const {
+	
+	if (constraints->old_order_locked) {
+		ErrorBox(_T("Неможливо змінити це доручення, оскільки воно було додане більше року тому"));
+		return;
+	}
+	
 	auto label = cell_widget->GetLabel();
 
 	try {

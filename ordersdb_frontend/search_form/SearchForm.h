@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include <basic/PropertiesFile.h>
 #include <db_ext/FilteringManager.h>
 #include <db_ext/QueryModifier.h>
@@ -47,6 +48,7 @@ class CSearchForm : public XTabStopPanel {
 	CPaidFilter *flt_paid;
 
 	CDbGrid *grid;
+	std::set<size_t> orders_fields_indexes;
 	CDbComboBoxCellWidget *advocats_list, *centers_list, *informers_list;
 	CDbComboBoxCellWidget *order_types_list, *stages_list;
 	CBooleanCellWidget *qa_widget;
@@ -64,7 +66,7 @@ class CSearchForm : public XTabStopPanel {
 	void reloadStatisticsControls();
 	void reloadStatisticsControls(std::shared_ptr<IDbStatement> new_stmt);
 	void setFieldsSizes();
-	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
+	void createCellWidgetsAndAttachToGrid(const bool db_admin);
 	void initFilteringControls();
 	void displayWidgets();
 	void adjustUIDependentCellWidgets();

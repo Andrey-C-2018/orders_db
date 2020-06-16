@@ -1,10 +1,10 @@
 #pragma once
 #include <db_controls/DbGridEventsHandler.h>
-#include "Constraints.h"
 
-class CDbException;
+struct CPaymentsConstraints;
 
 class CPaymentsGridEvtHandler : public CDbGridEventsHandler {
+protected:
 	std::shared_ptr<CPaymentsConstraints> constraints;
 
 	void OnCellChangedCommon(IGridCellWidget *cell_widget, \

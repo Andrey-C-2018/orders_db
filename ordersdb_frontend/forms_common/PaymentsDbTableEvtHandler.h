@@ -15,7 +15,7 @@ private:
 	std::weak_ptr<const CDbTable> db_table;
 	size_t center_index, order_date_index, act_date_index;
 	const size_t this_center;
-	const bool lock_old_stages, check_zone;
+	const bool lock_old_stages, check_zone, lock_old_orders;
 	std::shared_ptr<CPaymentsConstraints> constraints;
 	size_t prev_record;
 
@@ -24,6 +24,7 @@ public:
 	CPaymentsDbTableEvtHandler(std::shared_ptr<const CDbTable> db_table_, \
 								const size_t this_center_, const char *center_field_name, \
 								const bool lock_old_stages_, const bool check_zone_, \
+								const bool lock_old_orders_, \
 								std::shared_ptr<CPaymentsConstraints> constraints_);
 
 	void OnCurrRecordNoChanged(const size_t new_record) override;
@@ -60,6 +61,15 @@ void CPaymentsDbTableEvtHandler::calcConstraintsValues() {
 		constraints->wrong_zone = (this_center == REGIONAL && \
 			this_center != id_center && order_date >= CDate(1, 1, 2017)) || \
 			(this_center != REGIONAL && this_center != id_center);
+	}
+
+	if (lock_old_orders) {
+		CDate order_date = rs->getDate(order_date_index, is_null);
+		assert(!is_null);
+		CDate now = CDate::now();
+		CDate year_later_dt(now.getDay(), now.getMonth(), now.getYear() - 1);
+		
+		constraints->old_order_locked = order_date < year_later_dt;
 	}
 }
 

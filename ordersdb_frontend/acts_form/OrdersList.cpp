@@ -16,13 +16,16 @@ COrdersList::COrdersList(const int margins_, const float multiplier_, \
 								grid_sizer(margins_, 0), nav_sizer(margins_, margins_), \
 								prev_sizer(nullptr) { }
 
-void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_adv_id) {
+void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_, \
+								const int def_adv_id, \
+							std::shared_ptr<CPaymentsConstraints> constraints) {
 
 	assert(!db_table);
 	assert(!grid);
 
 	db_table = createDbTable(conn_, def_adv_id);
-	grid = new CDbGrid(true, db_table, std::make_shared<COrdersGridEvtHandler>(db_table));
+	grid = new CDbGrid(true, db_table, \
+			std::make_shared<COrdersGridEvtHandler>(db_table, constraints));
 	grid->SetFieldLabel(1, _T("Центр"));
 	grid->SetFieldWidth(1, 12);
 	grid->SetFieldLabel(2, _T("№"));

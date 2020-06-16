@@ -38,18 +38,6 @@ void CParametersManager::getParamsValuesFromFile(CPropertiesFile *props, \
 	}
 	initial_order_date.toStringSQL(date_buffer);
 	initial_order_date.toStringGerman(date_buffer_w);
-
-	bool not_found;
-	default_center = props->getIntProperty(_T("default_center"), buffer, not_found);
-	if(not_found)
-		throw XException(0, \
-			_T("Параметр центру 'default_center' відсутній у config.ini"));
-
-	if (default_center < 1 || default_center > 5) {
-		XException e(0, _T("Невірний номер центру: "));
-		e << default_center;
-		throw e;
-	}
 }
 
 void CParametersManager::determineUserAndGroups(CPropertiesFile *props, \
@@ -68,7 +56,7 @@ void CParametersManager::determineUserAndGroups(CPropertiesFile *props, \
 	if (!pwd || (pwd && pwd[0] == _T('\0')))
 		throw XException(0, _T("Параметр 'password' відсутній у config.ini"));
 
-	auto stmt = conn->PrepareQuery("SELECT id_user FROM users WHERE user_name = ?");
+	auto stmt = conn->PrepareQuery("SELECT id_user, id_center FROM users WHERE user_name = ?");
 	stmt->bindValue(0, user_name.c_str());
 	auto rs = stmt->exec();
 
@@ -83,6 +71,14 @@ void CParametersManager::determineUserAndGroups(CPropertiesFile *props, \
 	this->id_user = rs->getInt(0, is_null);
 	assert(!is_null);
 
+	this->default_center = rs->getInt(1, is_null);
+	assert(!is_null);
+	if (default_center < 1 || default_center > 5) {
+		XException e(0, _T("Невірний номер центру: "));
+		e << default_center;
+		throw e;
+	}
+	
 	CAutorizationManager auth_mgr(conn);
 	auth_mgr.autorize(id_user, user_name.c_str(), ImmutableString<Tchar>(pwd, Tstrlen(pwd)));
 

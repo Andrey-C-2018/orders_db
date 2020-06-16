@@ -97,18 +97,16 @@ public:
 //*****************************************************
 
 CPaymentsInserter::CPaymentsInserter() : CDbInserter("payments", FIELDS_COUNT), \
-						center(nullptr), order_date(nullptr), stage(nullptr), \
+						order_date(nullptr), stage(nullptr), \
 						cycle(nullptr), article(nullptr), fee(nullptr), \
 						outgoings(nullptr), informer(nullptr), id_act(nullptr), \
 						act_date(nullptr), act_reg_date(nullptr), payment_date(nullptr) { }
 
 void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
-	assert(center_binder);
 	assert(id_order_binder);
 	assert(order_date_binder);
 
-	assert(center);
 	assert(stage);
 	assert(cycle);
 	assert(article);
@@ -124,9 +122,14 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	int id_user = params_manager.getIdUser();
 	assert(id_user != -1);
 
-	const char *qa_part = params_manager.getDefaultCenter() == 1 ? "NULL" : "0";
+	int def_center = params_manager.getDefaultCenter();
+	const char *qa_part = def_center == 1 ? "NULL" : "0";
+	const char center_str[] = { '0' + (char)def_center , 0 };
 
-	addBinder(0, _T("Центр"), center_binder);
+	if (center_binder)
+		addBinder(0, _T("Центр"), center_binder);
+	else
+		defStaticInsertion(0, center_str);
 	addBinder(1, _T("Номер доручення"), id_order_binder);
 	addBinder(2, _T("Дата доручення"), order_date_binder);
 	addBinder(3, _T("Сума"), std::make_shared<CFeeBinder>(fee, false, true));

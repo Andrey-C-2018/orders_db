@@ -14,6 +14,7 @@ void CInserter::evalPermissions() {
 
 		allow_orders = true;
 		allow_payments = true;
+		orders_inserter.adminLogged(true);
 	}
 	else {
 		allow_orders = std::find(groups.cbegin(), groups.cend(), "Orders keepers") != \
