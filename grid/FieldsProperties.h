@@ -153,19 +153,26 @@ public:
 		this->multiplier = multiplier;
 	}
 
-	ImmutableString<Tchar> GetFieldName(const size_t index) const override {
+	inline ImmutableString<Tchar> GetFieldNameAbs(const size_t index) const {
 
-		assert(index < indexes.size());
+		assert(index < fields_props.size());
+		assert(fields_props.size());
 		assert(data_table);
-		size_t exact_index = GetFieldIndex(index);
 
-		if (fields_props[exact_index].field_name.size()) {
-			ImmutableString<Tchar> field_name(&fields_props[exact_index].field_name[0], \
-												fields_props[exact_index].field_name.size());
+		if (fields_props[index].field_name.size()) {
+			ImmutableString<Tchar> field_name(&fields_props[index].field_name[0], \
+											fields_props[index].field_name.size());
 			return field_name;
 		}
 
-		return data_table->GetFieldNameAsImmutableStr(exact_index);
+		return data_table->GetFieldNameAsImmutableStr(index);
+	}
+
+	ImmutableString<Tchar> GetFieldName(const size_t index) const override {
+
+		assert(index < indexes.size());
+		size_t exact_index = GetFieldIndex(index);
+		return GetFieldNameAbs(exact_index);
 	}
 
 	inline void SetFieldName(const size_t index, const Tchar *new_name) {

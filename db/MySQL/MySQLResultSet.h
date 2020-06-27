@@ -6,6 +6,10 @@
 
 class CMySQLResultSetException : public CMySQLException {
 public:
+	enum Errors {
+		E_TRUNC = 1
+	};
+
 	CMySQLResultSetException(const int err_code, const Tchar *err_descr);
 	CMySQLResultSetException(MYSQL *conn);
 	CMySQLResultSetException(MYSQL_STMT *stmt);

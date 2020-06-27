@@ -60,8 +60,8 @@ private:
 									XScrollParams &scroll_params) const;
 
 	void InitCellsAndHeaders(const int kind_of_layout);
-	inline void CheckWhetherAbsFieldIndexValid(const size_t abs_field_index);
-	inline void CheckWhetherFieldIndexValid(const size_t field_index);
+	inline void CheckWhetherAbsFieldIndexValid(const size_t abs_field_index) const;
+	inline void CheckWhetherFieldIndexValid(const size_t field_index) const;
 
 	CGrid(const CGrid &obj) = delete;
 	CGrid &operator=(const CGrid &obj) = delete;
@@ -103,6 +103,7 @@ public:
 	inline size_t GetRecordsCount() const;
 
 	inline void SetFieldWidth(const size_t field, const int new_width);
+	inline const Tchar *GetFieldLabelAbs(const size_t field) const;
 	inline void SetFieldLabel(const size_t field, const Tchar *label);
 	void HideField(const size_t field_index);
 
@@ -133,6 +134,13 @@ void CGrid::SetFieldWidth(const size_t field, const int new_width) {
 	CheckWhetherFieldIndexValid(field);
 	assert(!IsCreated());
 	data_table_proxy->SetFieldWidth(field, new_width);
+}
+
+const Tchar *CGrid::GetFieldLabelAbs(const size_t field) const {
+
+	CheckWhetherAbsFieldIndexValid(field);
+	assert(!IsCreated());
+	return data_table_proxy->GetFieldNameAbs(field);
 }
 
 void CGrid::SetFieldLabel(const size_t field, const Tchar *label) {
@@ -233,7 +241,7 @@ void CGrid::FocusOnField(const size_t field_index) {
 	this->SetScrollBar(X_SCROLL_HORZ, hscroll);
 }
 
-void CGrid::CheckWhetherAbsFieldIndexValid(const size_t abs_field_index) {
+void CGrid::CheckWhetherAbsFieldIndexValid(const size_t abs_field_index) const {
 
 	if (abs_field_index >= data_table_proxy->GetAbsoluteFieldsCount()) {
 
@@ -244,7 +252,7 @@ void CGrid::CheckWhetherAbsFieldIndexValid(const size_t abs_field_index) {
 	}
 }
 
-void CGrid::CheckWhetherFieldIndexValid(const size_t field_index) {
+void CGrid::CheckWhetherFieldIndexValid(const size_t field_index) const {
 
 	if (field_index >= data_table_proxy->GetFieldsCount()) {
 

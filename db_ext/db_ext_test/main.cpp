@@ -1,10 +1,17 @@
 #include <iostream>
-//#include <db/MySQL/MySQLConnection.h>
-#include <db/SQLite/SQLiteConnection.h>
-#include <db/IDbStatement.h>
-#include <db_ext/DbTable.h>
+#include <basic/locale_init.h>
+#include <UnitTest++/UnitTest++.h>
+#include <vld.h>
+
+TEST(Sanity) {
+
+	CHECK_EQUAL(1, 1);
+}
 
 int main() {
 
-	return 0;
+	setLocaleToCurrOS_Locale();
+	int ret_value = UnitTest::RunAllTests();
+
+	return ret_value;
 }

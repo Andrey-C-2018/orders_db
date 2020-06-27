@@ -28,6 +28,7 @@
 #include "ZoneFilter.h"
 #include "PaidFilter.h"
 #include "DoubleBndTarget.h"
+#include "OrderingComboBox.h"
 
 class CGridCellWidgetCreator final {
 	CDbGrid *grid;
@@ -61,23 +62,26 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "0.9.9";
+constexpr char search_form_version[] = "1.0.0";
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
 					const int X, const int Y, \
 					const int width, const int height) : \
+				sorting_manager(FIELDS_COUNT), \
 				flt_id(nullptr), flt_act(nullptr), flt_order_date_from(nullptr), \
 				flt_order_date_to(nullptr), flt_act_reg_date_from(nullptr), \
 				flt_act_reg_date_to(nullptr), flt_act_date_from(nullptr), \
 				flt_act_date_to(nullptr), flt_payment_date_from(nullptr), \
 				flt_payment_date_to(nullptr), flt_center(nullptr), flt_informer(nullptr), \
 				flt_order_type(nullptr), flt_stage(nullptr), flt_zone(nullptr), \
-				grid(nullptr), advocats_list(nullptr), \
+				grid(nullptr), advocats_list(nullptr), flt_client(nullptr), \
 				centers_list(nullptr), order_types_list(nullptr), stages_list(nullptr), \
 				canceling_reasons_list(nullptr), qa_widget(nullptr), \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0), \
-				total_fee(nullptr), total_paid(nullptr), total_orders(nullptr) {
+				total_fee(nullptr), total_paid(nullptr), total_orders(nullptr), \
+				btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
+				btn_rev(nullptr), btn_reset(nullptr), btn_sort(nullptr) {
 
 	props.open("config.ini");
 	
@@ -91,13 +95,14 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 	setLastChangedUser();
 
-	auto constraints = std::make_shared<CPaymentsConstraints>();
-	constraints->old_stage_locked = true;
-	constraints->wrong_zone = true;
-
 	auto &groups = CParametersManager::getInstance().getGroups();
 	bool db_admin = std::find(groups.cbegin(), groups.cend(), "Administrators") != \
 								groups.cend();
+
+	auto constraints = std::make_shared<CPaymentsConstraints>();
+	constraints->old_stage_locked = !db_admin;
+	constraints->wrong_zone = !db_admin;
+	constraints->old_order_locked = !db_admin;
 
 	db_table = createDbTable();
 	int def_center = CParametersManager::getInstance().getDefaultCenter();
@@ -131,6 +136,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	Connect(EVT_COMMAND, btn_remove->GetId(), this, &CSearchForm::OnRemoveButtonClick);
 	Connect(EVT_COMMAND, btn_rev->GetId(), this, &CSearchForm::OnRevButtonClick);
 	Connect(EVT_COMMAND, btn_reset->GetId(), this, &CSearchForm::OnResetButtonClick);
+	Connect(EVT_COMMAND, btn_sort->GetId(), this, &CSearchForm::OnSortButtonClick);
 }
 
 void CSearchForm::createStatisticsStatements() {
@@ -138,7 +144,7 @@ void CSearchForm::createStatisticsStatements() {
 	std::string query = "SELECT SUM(fee) as total_fee, SUM(fee_parus) as total_paid,";
 	query += " COUNT(DISTINCT a.id_center_legalaid, a.id, a.order_date) as orders_count ";
 	query += "FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
-	query += " #### ";
+	query += " ####";
 	query_aggregate.Init(query);
 
 	const auto &params_manager = CParametersManager::getInstance();
@@ -356,11 +362,16 @@ void CSearchForm::initFilteringControls() {
 	id_expr = filtering_manager.addExpr("a.id_adv = ?", combo_binder);
 	flt_advocat->setExprId(id_expr);
 
+	flt_client = new CFilteringEdit(filtering_manager, this);
+	auto str_binder = std::make_shared<CStringWidgetBinderControl>(flt_client);
+	id_expr = filtering_manager.addExpr("a.client_name LIKE ?", str_binder);
+	flt_client->setExprId(id_expr);
+
 	flt_zone = new CZoneFilter(filtering_manager);
 
 	flt_act = new CFilteringEdit(filtering_manager, this);
-	auto str_binder = std::make_shared<CStringWidgetBinderControl>(flt_act);
-	id_expr = filtering_manager.addExpr("aa.id_act = ?", str_binder);
+	str_binder = std::make_shared<CStringWidgetBinderControl>(flt_act);
+	id_expr = filtering_manager.addExpr("aa.id_act LIKE ?", str_binder);
 	flt_act->setExprId(id_expr);
 
 	flt_informer = new CFilteringDbComboBox(filtering_manager, \
@@ -425,7 +436,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 	query += " INNER JOIN informers inf ON aa.id_informer = inf.id_inf";
 	query += " INNER JOIN centers c ON a.id_center_legalaid = c.id_center";
 	query += " INNER JOIN stages sta ON aa.id_stage = sta.id_st";
-	query += " #### ";
+	query += " ####";
 	query += " ORDER BY a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
 	query_modifier.Init(query);
 
@@ -586,9 +597,8 @@ void CSearchForm::displayWidgets() {
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(new XLabel(), _T("Клієнт:"), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
-		XTabStopEdit *client_name = new XTabStopEdit(this);
-		sizer.addWidget(client_name, _T(""), edit_flags, XSize(320, DEF_GUI_ROW_HEIGHT));
-		inserter.getOrdersInserter().SetClientWidget(client_name);
+		sizer.addWidget(flt_client, _T(""), edit_flags, XSize(320, DEF_GUI_ROW_HEIGHT));
+		inserter.getOrdersInserter().SetClientWidget(flt_client);
 
 		sizer.addWidget(new XLabel(), _T("Дата народж:"), FL_WINDOW_VISIBLE, \
 						XSize(55, DEF_GUI_ROW_HEIGHT + 10));
@@ -653,6 +663,17 @@ void CSearchForm::displayWidgets() {
 		btn_rev = new XButton();
 		sizer.addWidget(btn_rev, _T("↑"), FL_WINDOW_VISIBLE, \
 						XSize(20, DEF_GUI_ROW_HEIGHT));
+
+		auto combo_sorting = new COrderingComboBox(&sorting_manager);
+		sizer.addResizeableWidget(combo_sorting, _T(""), \
+						FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | FL_COMBOBOX_DROPDOWN, \
+						XSize(120, DEF_GUI_ROW_HEIGHT), 100);
+		initOrdering(combo_sorting);
+
+		btn_sort = new XButton();
+		sizer.addWidget(btn_sort, _T("Сорт"), FL_WINDOW_VISIBLE, \
+						XSize(30, DEF_GUI_ROW_HEIGHT));
+				
 	main_sizer.popNestedSizer();
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
@@ -672,6 +693,23 @@ void CSearchForm::displayWidgets() {
 	grid_margin_y = margins.top;
 
 	inserter.prepare(conn);
+}
+
+void CSearchForm::initOrdering(COrderingComboBox *ordering_box) {
+
+	assert(ordering_box);
+	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	ordering_box->addOrderingField("zone", meta_info, grid);
+	ordering_box->addOrderingField("order_date", meta_info, grid);
+	ordering_box->addOrderingField("id", meta_info, grid);
+	ordering_box->addOrderingField("cycle", meta_info, grid);
+}
+
+void CSearchForm::OnSortButtonClick(XCommandEvent *eve) {
+
+	query_modifier.changeOrdering(sorting_manager.getOrderingString());
+	//db_table->reload();
+	MessageBoxA(0, query_modifier.getQuery().c_str(), 0, MB_OK);
 }
 
 void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
@@ -756,6 +794,7 @@ CSearchForm::~CSearchForm() {
 	if (flt_order_type && !flt_order_type->IsCreated()) delete flt_order_type;
 	if (flt_stage && !flt_stage->IsCreated()) delete flt_stage;
 	if (flt_center && !flt_center->IsCreated()) delete flt_center;
+	if (flt_client && !flt_client->IsCreated()) delete flt_client;
 	if (flt_informer && !flt_informer->IsCreated()) delete flt_informer;
 	if (flt_advocat && !flt_advocat->IsCreated()) delete flt_advocat;
 	if (flt_payment_date_from && !flt_payment_date_from->IsCreated()) delete flt_payment_date_from;

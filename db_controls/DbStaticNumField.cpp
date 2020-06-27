@@ -51,7 +51,7 @@ const Tchar *CDbStaticDecimalField::ConvToStr() const {
 
 	rs->gotoRecord(0);
 	auto value = rs->getWString(field_index);
-	return value ? value : _T("0");
+	return value ? value : _T("0.00");
 }
 
 CDbStaticDecimalField::~CDbStaticDecimalField() { }

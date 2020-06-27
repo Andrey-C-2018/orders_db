@@ -167,6 +167,7 @@
     <ClCompile Include="Query.cpp" />
     <ClCompile Include="QueryModifier.cpp" />
     <ClCompile Include="RevDbResultSet.cpp" />
+    <ClCompile Include="SortingManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbEventsHandlersContainer.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="Query.h" />
     <ClInclude Include="QueryModifier.h" />
     <ClInclude Include="RevDbResultSet.h" />
+    <ClInclude Include="SortingManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

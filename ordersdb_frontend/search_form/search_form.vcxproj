@@ -162,6 +162,7 @@
     <ClInclude Include="Inserter.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
+    <ClInclude Include="OrderingComboBox.h" />
     <ClInclude Include="OrdersInserter.h" />
     <ClInclude Include="PaidFilter.h" />
     <ClInclude Include="PaymentsInserter.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="Inserter.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />
+    <ClCompile Include="OrderingComboBox.cpp" />
     <ClCompile Include="OrdersInserter.cpp" />
     <ClCompile Include="PaidFilter.cpp" />
     <ClCompile Include="PaymentsInserter.cpp" />

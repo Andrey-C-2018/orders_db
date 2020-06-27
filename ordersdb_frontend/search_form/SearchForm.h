@@ -2,6 +2,7 @@
 #include <set>
 #include <basic/PropertiesFile.h>
 #include <db_ext/FilteringManager.h>
+#include <db_ext/SortingManager.h>
 #include <db_ext/QueryModifier.h>
 #include <xwindows_ex/XTabStopPanel.h>
 #include <xwindows/XEdit.h>
@@ -22,12 +23,14 @@ class CFilteringDbComboBox;
 class CFilteringDateField;
 class CZoneFilter;
 class CPaidFilter;
+class COrderingComboBox;
 
 class CSearchForm : public XTabStopPanel {
 	enum Defaults {
 		DEF_GUI_ROW_HEIGHT = 30, \
 		DEF_GUI_VERT_GAP = 5, \
-		DEF_GUI_HORZ_GAP = 5
+		DEF_GUI_HORZ_GAP = 5, \
+		FIELDS_COUNT = 37
 	};
 
 	CPropertiesFile props;
@@ -36,7 +39,8 @@ class CSearchForm : public XTabStopPanel {
 
 	CQueryModifier query_modifier, query_aggregate;
 	CFilteringManager filtering_manager;
-	CFilteringEdit *flt_id, *flt_act;
+	CSortingManager sorting_manager;
+	CFilteringEdit *flt_id, *flt_act, *flt_client;
 	CFilteringDateField *flt_order_date_from, *flt_order_date_to;
 	CFilteringDateField *flt_act_reg_date_from, *flt_act_reg_date_to;
 	CFilteringDateField *flt_act_date_from, *flt_act_date_to;
@@ -58,7 +62,7 @@ class CSearchForm : public XTabStopPanel {
 	CDbStaticNumField *total_fee, *total_paid, *total_orders;
 	std::shared_ptr<CDoubleBndTarget> def_binding_target;
 
-	XButton *btn_apply_filter, *btn_add, *btn_remove, *btn_rev, *btn_reset;
+	XButton *btn_apply_filter, *btn_add, *btn_remove, *btn_rev, *btn_reset, *btn_sort;
 	CInserter inserter;
 
 	std::shared_ptr<CDbTable> createDbTable();
@@ -71,12 +75,14 @@ class CSearchForm : public XTabStopPanel {
 	void displayWidgets();
 	void adjustUIDependentCellWidgets();
 	void loadInitialFilterToControls();
+	void initOrdering(COrderingComboBox *ordering_box);
 
 	void OnFilterButtonClick(XCommandEvent *eve);
 	void OnAddRecordButtonClick(XCommandEvent *eve);
 	void OnRemoveButtonClick(XCommandEvent *eve);
 	void OnRevButtonClick(XCommandEvent *eve);
 	void OnResetButtonClick(XCommandEvent *eve);
+	void OnSortButtonClick(XCommandEvent *eve);
 	
 public:
 	CSearchForm(XWindow *parent, const int flags, \

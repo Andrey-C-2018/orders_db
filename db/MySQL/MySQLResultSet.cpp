@@ -41,7 +41,7 @@ CMySQLResultSet::CMySQLResultSet(std::shared_ptr<MYSQL_STMT> stmt_, \
 
 		MYSQL_BIND field_binding;
 		field_binding.buffer_type = field->type;
-		if (rec.value.IsString())
+		if (rec.value.IsVectorType())
 			field_binding.buffer_length = field->length;
 
 		field_binding.buffer = fields[i].value.GetValuePtr();
@@ -113,8 +113,12 @@ void CMySQLResultSet::gotoRecord(const size_t record) const {
 	assert(stmt);
 	mysql_stmt_data_seek(stmt.get(), record);
 
-	bool success = (mysql_stmt_fetch(stmt.get()) == 0);
-	assert(success);
+	volatile int success = mysql_stmt_fetch(stmt.get());
+	if (success == MYSQL_DATA_TRUNCATED)
+		throw CMySQLResultSetException(CMySQLResultSetException::E_TRUNC, \
+										_T("fetched data was truncated"));
+	assert(success == 0);
+
 	curr_record = record;
 }
 
@@ -203,8 +207,11 @@ void CMySQLResultSet::reload() {
 						(curr_record < records_count) * curr_record;
 		mysql_stmt_data_seek(stmt.get(), curr_record);
 
-		bool success = (mysql_stmt_fetch(stmt.get()) == 0);
-		assert(success);
+		volatile int success = mysql_stmt_fetch(stmt.get());
+		if (success == MYSQL_DATA_TRUNCATED)
+			throw CMySQLResultSetException(CMySQLResultSetException::E_TRUNC, \
+				_T("fetched data was truncated"));
+		assert(success == 0);
 	}
 	else
 		curr_record = (size_t)-1;

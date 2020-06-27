@@ -37,6 +37,7 @@ public:
 	inline std::shared_ptr<IFieldsProperties> GetFieldsProperties();
 
 	void SetFieldWidth(const size_t field, const int new_width);
+	inline const Tchar *GetFieldNameAbs(const size_t field) const;
 	void SetFieldName(const size_t field, const Tchar *new_name);
 	inline bool IsFieldHidden(const size_t field) const;
 	inline size_t GetRelativeFieldIndex(const size_t abs_field_index) const;
@@ -250,4 +251,9 @@ size_t CGridTableProxy::GetRelativeFieldIndex(const size_t abs_field_index) cons
 bool CGridTableProxy::checkIsTheSame(std::shared_ptr<ITable> table) const {
 
 	return this->table == table;
+}
+
+const Tchar *CGridTableProxy::GetFieldNameAbs(const size_t field) const {
+
+	return fields_props->GetFieldNameAbs(field).str;
 }

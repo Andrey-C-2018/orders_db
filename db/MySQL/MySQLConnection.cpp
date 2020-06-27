@@ -31,6 +31,8 @@ void CMySQLConnection::Connect(const char *location, const unsigned port, \
 	
 	unsigned def_conn_timeout = DEF_CONN_TIMEOUT;
 	mysql_options(conn, MYSQL_OPT_CONNECT_TIMEOUT, &def_conn_timeout);
+	bool no_trunc_errors_rep = true;
+	mysql_options(conn, MYSQL_REPORT_DATA_TRUNCATION, &no_trunc_errors_rep);
 
 	if (!mysql_real_connect(conn, location, login, pwd, \
 							schema_name, port, NULL, 0)) {
