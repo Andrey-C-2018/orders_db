@@ -1,6 +1,11 @@
 #include "DoubleBndTarget.h"
+#include <db/NullDbBindingTarget.h>
 
-CDoubleBndTarget::CDoubleBndTarget() { }
+CDoubleBndTarget::CDoubleBndTarget() {
+	
+	target1 = std::make_shared<CNullDbBindingTarget>();
+	target2 = target1;
+}
 
 CDoubleBndTarget::CDoubleBndTarget(std::shared_ptr<IDbBindingTarget> target1_, \
 									std::shared_ptr<IDbBindingTarget> target2_) : \

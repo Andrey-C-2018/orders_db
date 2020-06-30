@@ -62,7 +62,8 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.0";
+constexpr char search_form_version[] = "1.0.1";
+const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
@@ -437,7 +438,8 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 	query += " INNER JOIN centers c ON a.id_center_legalaid = c.id_center";
 	query += " INNER JOIN stages sta ON aa.id_stage = sta.id_st";
 	query += " ####";
-	query += " ORDER BY a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
+	query += " ORDER BY ";
+	query += def_ordering_str;
 	query_modifier.Init(query);
 
 	const auto &params_manager = CParametersManager::getInstance();
@@ -667,12 +669,12 @@ void CSearchForm::displayWidgets() {
 		auto combo_sorting = new COrderingComboBox(&sorting_manager);
 		sizer.addResizeableWidget(combo_sorting, _T(""), \
 						FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | FL_COMBOBOX_DROPDOWN, \
-						XSize(120, DEF_GUI_ROW_HEIGHT), 100);
+						XSize(120, DEF_GUI_ROW_HEIGHT), 150);
 		initOrdering(combo_sorting);
 
 		btn_sort = new XButton();
 		sizer.addWidget(btn_sort, _T("Сорт"), FL_WINDOW_VISIBLE, \
-						XSize(30, DEF_GUI_ROW_HEIGHT));
+						XSize(60, DEF_GUI_ROW_HEIGHT));
 				
 	main_sizer.popNestedSizer();
 
@@ -700,16 +702,38 @@ void CSearchForm::initOrdering(COrderingComboBox *ordering_box) {
 	assert(ordering_box);
 	const auto &meta_info = db_table->getQuery().getMetaInfo();
 	ordering_box->addOrderingField("zone", meta_info, grid);
+	ordering_box->addOrderingField("center_short_name", meta_info, grid);
+	ordering_box->addOrderingField("adv_name_short", meta_info, grid);
 	ordering_box->addOrderingField("order_date", meta_info, grid);
 	ordering_box->addOrderingField("id", meta_info, grid);
-	ordering_box->addOrderingField("cycle", meta_info, grid);
+	ordering_box->addOrderingField("type_name", meta_info, grid);
+	ordering_box->addOrderingField("client_name", meta_info, grid);
+	ordering_box->addOrderingField("stage_name", meta_info, grid);
+	ordering_box->addOrderingField("reason", meta_info, grid);
+	ordering_box->addOrderingField("cancel_date", meta_info, grid);
+	ordering_box->addOrderingField("act_reg_date", meta_info, grid);
+	ordering_box->addOrderingField("act_date", meta_info, grid);
+	ordering_box->addOrderingField("payment_date", meta_info, grid);
+	ordering_box->addOrderingField("informer_name", meta_info, grid);
 }
 
 void CSearchForm::OnSortButtonClick(XCommandEvent *eve) {
 
-	query_modifier.changeOrdering(sorting_manager.getOrderingString());
-	//db_table->reload();
-	MessageBoxA(0, query_modifier.getQuery().c_str(), 0, MB_OK);
+	if (sorting_manager.isOrderingChanged()) {
+		
+		if (sorting_manager.empty()) {
+			ImmutableString<char> p_str(def_ordering_str, \
+										sizeof(def_ordering_str) - 1);
+			query_modifier.changeOrdering(p_str);
+		}
+		else
+			query_modifier.changeOrdering(sorting_manager.buildOrderingString());
+		auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
+		
+		def_binding_target->replaceFirst(stmt);
+		filtering_manager.applyForced(stmt);
+		db_table->reload(stmt);
+	}
 }
 
 void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
@@ -769,7 +793,6 @@ void CSearchForm::OnResetButtonClick(XCommandEvent *eve) {
 
 	filtering_manager.disableAll();
 	loadInitialFilterToControls();
-
 	OnFilterButtonClick(eve);
 }
 

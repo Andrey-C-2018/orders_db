@@ -52,7 +52,7 @@ std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnec
 
 	std::string query = "SELECT b.id_advocat, b.adv_name, b.license_no, b.license_date,";
 	query += " e.exm_name, b.post_index, b.address, b.tel, b.adv_bdate,";
-	query += " d.distr_center, b.org_name, b.org_type ";
+	query += " d.distr_center, b.org_name, b.org_type, b.id_exm, b.id_main_district ";
 	query += "FROM advocats b INNER JOIN examiners e ON b.id_exm = e.id_examiner";
 	query += " INNER JOIN districts d ON b.id_main_district = d.id_distr";
 	query += " #### ";
@@ -271,6 +271,9 @@ void CAdvocatsBook::DisplayWidgets() {
 	main_sizer.popNestedSizer();
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
+
+	grid->HideField(12);
+	grid->HideField(13);
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;

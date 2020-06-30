@@ -60,7 +60,8 @@ public:
 	
 	inline ImmutableString<char> buildFilteringString();
 	inline bool isFilteringStringChanged() const;
-	bool apply(std::shared_ptr<IDbBindingTarget> parsed_query);
+	inline bool apply(std::shared_ptr<IDbBindingTarget> parsed_query);
+	bool applyForced(std::shared_ptr<IDbBindingTarget> parsed_query);
 
 	virtual ~CFilteringManager();
 };
@@ -122,4 +123,10 @@ int CFilteringManager::addExpr(const char(&str)[str_size], \
 								std::shared_ptr<IBinder> binder) {
 	
 	return addExpr(ImmutableString<char>(str, str_size), binder);
+}
+
+bool CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
+
+	if (!filtering_changed) return true;
+	return applyForced(parsed_query);
 }

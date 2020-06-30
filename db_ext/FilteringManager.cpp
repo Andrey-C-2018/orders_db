@@ -91,9 +91,7 @@ void CFilteringManager::disableAll() {
 	enabled_items.clear();
 }
 
-bool CFilteringManager::apply(std::shared_ptr<IDbBindingTarget> parsed_query) {
-
-	if (!filtering_changed) return true;
+bool CFilteringManager::applyForced(std::shared_ptr<IDbBindingTarget> parsed_query) {
 
 	assert(parsed_query);
 

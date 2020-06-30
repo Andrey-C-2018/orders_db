@@ -137,5 +137,8 @@
     <ClInclude Include="MySQL\MySQLConnectionFactory.h">
       <Filter>MySQL</Filter>
     </ClInclude>
+    <ClInclude Include="NullDbBindingTarget.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

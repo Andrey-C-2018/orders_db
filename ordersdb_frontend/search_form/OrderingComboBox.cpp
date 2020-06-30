@@ -24,7 +24,10 @@ void COrderingComboBox::Create(XWindow *parent, const int flags, \
 void COrderingComboBox::OnItemChoosed(XCommandEvent *eve) {
 
 	size_t sel_index = GetCurrentSelectionIndex();
-	if (!sel_index) manager->reset();
+	if (!sel_index) {
+		manager->reset();
+		return;
+	}
 
 	auto p = ordering_map.find(sel_index);
 	if (p == ordering_map.end()) {
@@ -45,7 +48,7 @@ void COrderingComboBox::addOrderingField(const char *field_name, \
 
 	size_t index = meta_info.getFieldIndexByName(field_name);
 	size_t sz = ordering_map.size() + 1;
-	ordering_map[sz] = index;
+	ordering_map[sz] = index + 1;
 
 	XComboBox::AddItem(grid->GetFieldLabelAbs(index));
 }

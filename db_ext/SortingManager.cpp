@@ -3,26 +3,34 @@
 #include "SortingManager.h"
 
 CSortingManager::CSortingManager(const size_t columns_count_) :
-								columns_count(columns_count_) { }
+								columns_count(columns_count_), \
+								is_changed(false) { }
 
 void CSortingManager::sortByColumn(const size_t column_index) {
 
+	assert(column_index < columns_count);
+
+	bool is_empty = sorting.empty();
+	is_changed = is_empty || (!is_empty && sorting[0] != column_index);
+
 	sorting.clear();
-	addSortingByColumn(column_index);
+	sorting.push_back(column_index);
 }
 
 void CSortingManager::addSortingByColumn(const size_t column_index) {
 
 	assert(column_index < columns_count);
 	sorting.push_back(column_index);
+	is_changed = true;
 }
 
 void CSortingManager::reset() {
 
+	is_changed = !sorting.empty();
 	sorting.clear();
 }
 
-ImmutableString<char> CSortingManager::getOrderingString() const {
+ImmutableString<char> CSortingManager::buildOrderingString() {
 	
 	if (sorting.empty()) return ImmutableString<char>(nullptr, 0);
 
@@ -35,6 +43,8 @@ ImmutableString<char> CSortingManager::getOrderingString() const {
 	}
 
 	buffer.erase(buffer.size() - 1);
+	is_changed = false;
+
 	return ImmutableString<char>(&buffer[0], buffer.size());
 }
 

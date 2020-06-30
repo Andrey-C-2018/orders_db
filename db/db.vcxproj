@@ -52,6 +52,7 @@
     <ClInclude Include="MySQL\MySQLResultSetMetadata.h" />
     <ClInclude Include="MySQL\MySQLStatement.h" />
     <ClInclude Include="MySQL\MySQLVariant.h" />
+    <ClInclude Include="NullDbBindingTarget.h" />
     <ClInclude Include="SQLite\SQLiteCommon.h" />
     <ClInclude Include="SQLite\SQLiteConnection.h" />
     <ClInclude Include="SQLite\SQLiteField.h" />
