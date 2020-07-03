@@ -12,6 +12,6 @@ SUITE(SortingManagerTest_tests) {
 		CSortingManager mgr(COLUMNS_COUNT);
 		mgr.sortByColumn(1);
 
-		CHECK_EQUAL(mgr.getOrderingString().str, "1");
+		CHECK_EQUAL(mgr.buildOrderingString().str, "1");
 	}
 }

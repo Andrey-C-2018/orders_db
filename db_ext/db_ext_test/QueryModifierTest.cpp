@@ -38,7 +38,7 @@ public:
 	void sortByColumn(const size_t column) {
 
 		mgr_srt.sortByColumn(column);
-		auto ordering_str = mgr_srt.getOrderingString();
+		auto ordering_str = mgr_srt.buildOrderingString();
 		modifier.changeOrdering(ordering_str);
 	}
 

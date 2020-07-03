@@ -203,18 +203,46 @@ void CSearchForm::setFieldsSizes() {
 	grid->SetFieldLabel(11, _T("Дата скс."));
 	grid->SetFieldLabel(12, _T("Сума"));
 	grid->SetFieldLabel(13, _T("Витрати"));
-	grid->SetFieldWidth(14, 15);
-	grid->SetFieldLabel(14, _T("Акт"));
-	grid->SetFieldLabel(15, _T("Дт розрах"));
-	grid->SetFieldLabel(16, _T("Дт акту"));
-	grid->SetFieldLabel(17, _T("Дт р. казн"));
-	grid->SetFieldLabel(18, _T("Дата опл."));
-	grid->SetFieldWidth(19, 1);
-	grid->SetFieldLabel(19, _T("#"));
-	grid->SetFieldWidth(20, 30);
-	grid->SetFieldLabel(20, _T("Стаття"));
-	grid->SetFieldWidth(21, 32);
-	grid->SetFieldLabel(21, _T("Інформатор"));
+	grid->SetFieldLabel(14, _T("Сума 1С"));
+	grid->SetFieldWidth(15, 15);
+	grid->SetFieldLabel(15, _T("Акт"));
+	grid->SetFieldLabel(16, _T("Дт розрах"));
+	grid->SetFieldLabel(17, _T("Дт акту"));
+	grid->SetFieldLabel(18, _T("Дт р. казн"));
+	grid->SetFieldLabel(19, _T("Дата опл."));
+	grid->SetFieldWidth(20, 1);
+	grid->SetFieldLabel(20, _T("#"));
+	grid->SetFieldWidth(21, 30);
+	grid->SetFieldLabel(21, _T("Стаття"));
+	grid->SetFieldWidth(22, 32);
+	grid->SetFieldLabel(22, _T("Інформатор"));
+
+	grid->SetFieldLabel(23, _T("Вік"));
+	grid->SetFieldWidth(24, 4);
+	grid->SetFieldLabel(24, _T("Вади"));
+	grid->SetFieldWidth(25, 4);
+	grid->SetFieldLabel(25, _T("Мова"));
+	grid->SetFieldLabel(26, _T("Хв"));
+	grid->SetFieldLabel(27, _T("ЗЕК"));
+	grid->SetFieldWidth(28, 4);
+	grid->SetFieldLabel(28, _T("Випр"));
+	grid->SetFieldWidth(29, 5);
+	grid->SetFieldLabel(29, _T("Зменш"));
+	grid->SetFieldWidth(30, 4);
+	grid->SetFieldLabel(30, _T("Змін"));
+	grid->SetFieldWidth(31, 4);
+	grid->SetFieldLabel(31, _T("Закр"));
+	grid->SetFieldWidth(32, 5);
+	grid->SetFieldLabel(32, _T("Звільн"));
+	grid->SetFieldLabel(33, _T("Мін"));
+	grid->SetFieldWidth(34, 10);
+	grid->SetFieldLabel(34, _T("Найм. сув."));
+	grid->SetFieldWidth(35, 11);
+	grid->SetFieldLabel(35, _T("Звільн. кр."));
+	grid->SetFieldWidth(36, 14);
+	grid->SetFieldLabel(36, _T("Без зм. 1 інст"));
+	grid->SetFieldWidth(37, 5);
+	grid->SetFieldLabel(37, _T("Кзвіт"));
 }
 
 void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
@@ -425,7 +453,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 	orders_fields_indexes.insert({0, 1, 2, 3, 4, 5, 6, 7, 9, 10});
 
 	std::string query = "SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,";
-	query += " t.type_name, a.client_name, a.bdate, sta.stage_name, a.reason, a.cancel_order, a.cancel_date, aa.fee, aa.outgoings,";
+	query += " t.type_name, a.client_name, a.bdate, sta.stage_name, a.reason, a.cancel_order, a.cancel_date, aa.fee, aa.outgoings, aa.fee_parus,";
 	query += " aa.id_act, aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,";
 	query += " aa.cycle, aa.article, inf.informer_name,";
 	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
@@ -680,11 +708,11 @@ void CSearchForm::displayWidgets() {
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
 
-	grid->HideField(37);
 	grid->HideField(38);
 	grid->HideField(39);
 	grid->HideField(40);
 	grid->HideField(41);
+	grid->HideField(42);
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;

@@ -94,7 +94,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>basic.lib;date.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%UNITTEST_LIB_PATH_X32%\Debug;../../0libs/Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%VLD_PATH%\lib\Win32;%UNITTEST_LIB_PATH_X32%\Debug;../../0libs/Debug</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,7 +110,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>basic.lib;date.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%UNITTEST_LIB_PATH_X64%\Debug;../../0libs/x64/Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%VLD_PATH%\lib\Win64;%UNITTEST_LIB_PATH_X64%\Debug;../../0libs/x64/Debug</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
