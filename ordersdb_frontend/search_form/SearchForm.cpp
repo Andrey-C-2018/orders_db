@@ -62,7 +62,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.1";
+constexpr char search_form_version[] = "1.0.2";
 const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \

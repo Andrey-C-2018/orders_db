@@ -30,6 +30,8 @@ public:
 		binding_target->bindValue(param_no, is_paid);
 		if (is_paid)
 			binding_target->bindValue(param_no + 1, buffer.c_str());
+		else
+			binding_target->bindValue(param_no + 1, "");
 		binding_target->bindValue(param_no + 2, !is_paid);
 
 		return AFFECTED_PARAMS_COUNT;
