@@ -19,7 +19,7 @@ private:
 	std::shared_ptr<CPaymentsConstraints> constraints;
 	size_t prev_record;
 
-	inline CDate getLastQuartalEnd() const;
+	inline CDate getThisQuartalBeginning() const;
 public:
 	CPaymentsDbTableEvtHandler(std::shared_ptr<const CDbTable> db_table_, \
 								const size_t this_center_, const char *center_field_name, \
@@ -47,9 +47,9 @@ void CPaymentsDbTableEvtHandler::calcConstraintsValues() {
 	bool is_null;
 	if (lock_old_stages) {
 		CDate act_date = rs->getDate(act_date_index, is_null);
-		CDate last_q_end = getLastQuartalEnd();
+		CDate this_q_beg = getThisQuartalBeginning();
 
-		constraints->old_stage_locked = !is_null && act_date < last_q_end;
+		constraints->old_stage_locked = !is_null && act_date < this_q_beg;
 	}
 
 	if (check_zone && this_center != NULL_CENTER) {
@@ -73,15 +73,10 @@ void CPaymentsDbTableEvtHandler::calcConstraintsValues() {
 	}
 }
 
-CDate CPaymentsDbTableEvtHandler::getLastQuartalEnd() const {
+CDate CPaymentsDbTableEvtHandler::getThisQuartalBeginning() const {
 
-	CDate this_year_beginning = CDate::now();
+	CDate now = CDate::now();
+	unsigned month = ((now.getMonth() - 1) / 3) * 3 + 1;
 
-	const unsigned year = this_year_beginning.getYear();
-	const unsigned month = this_year_beginning.getMonth();
-
-	unsigned last_q_month = month % 3 == 0 ? month - 2 : \
-								((unsigned)(month / 3)) * 2 + 1;
-
-	return CDate(1, last_q_month, year);
+	return CDate(1, month, now.getYear());
 }

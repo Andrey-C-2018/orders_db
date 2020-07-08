@@ -4,13 +4,12 @@
 #include "Constraints.h"
 
 CPaymentsGridEvtHandler::CPaymentsGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
-													std::shared_ptr<CPaymentsConstraints> constraints_) : \
+													std::shared_ptr<const CPaymentsConstraints> constraints_) : \
 												CDbGridEventsHandler(db_table), \
 												constraints(constraints_) { }
 
-void CPaymentsGridEvtHandler::OnCellChangedCommon(IGridCellWidget *cell_widget, \
-													IOnCellChangedAction &action) const {
-	
+void CPaymentsGridEvtHandler::CheckConstraints() const {
+
 	if (constraints->wrong_zone) {
 		ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до іншого центру"));
 		return;
@@ -19,6 +18,10 @@ void CPaymentsGridEvtHandler::OnCellChangedCommon(IGridCellWidget *cell_widget, 
 		ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до минулого періоду"));
 		return;
 	}
+}
+
+void CPaymentsGridEvtHandler::ProceedWithChanging(IGridCellWidget *cell_widget, \
+												IOnCellChangedAction &action) const {
 
 	auto label = cell_widget->GetLabel();
 	try {

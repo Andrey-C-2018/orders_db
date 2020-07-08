@@ -4,15 +4,19 @@
 struct CPaymentsConstraints;
 
 class CPaymentsGridEvtHandler : public CDbGridEventsHandler {
-protected:
-	std::shared_ptr<CPaymentsConstraints> constraints;
+	
+	inline void OnCellChangedCommon(IGridCellWidget *cell_widget, \
+									IOnCellChangedAction &action) const;
 
-	void OnCellChangedCommon(IGridCellWidget *cell_widget, \
-								IOnCellChangedAction &action) const;
+protected:
+	std::shared_ptr<const CPaymentsConstraints> constraints;
+	void CheckConstraints() const;
+	void ProceedWithChanging(IGridCellWidget *cell_widget, \
+							IOnCellChangedAction &action) const;
 
 public:
 	CPaymentsGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
-							std::shared_ptr<CPaymentsConstraints> constraints_);
+							std::shared_ptr<const CPaymentsConstraints> constraints_);
 
 	CPaymentsGridEvtHandler(const CPaymentsGridEvtHandler &obj) = default;
 	CPaymentsGridEvtHandler(CPaymentsGridEvtHandler &&obj) = default;
@@ -27,3 +31,12 @@ public:
 
 	virtual ~CPaymentsGridEvtHandler();
 };
+
+//*****************************************************
+
+void CPaymentsGridEvtHandler::OnCellChangedCommon(IGridCellWidget *cell_widget, \
+												IOnCellChangedAction &action) const {
+
+	CheckConstraints();
+	ProceedWithChanging(cell_widget, action);
+}

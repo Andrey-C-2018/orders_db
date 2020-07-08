@@ -2,26 +2,29 @@
 #include <xwindows/platform_specific.h>
 #include <forms_common/Constraints.h>
 
-CSearchFormGridEvtHandler::CSearchFormGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
-							std::shared_ptr<CPaymentsConstraints> constraints_, \
-							std::set<size_t> orders_fields_indexes_) : \
-				CPaymentsGridEvtHandler(db_table, constraints_), \
-				orders_fields_indexes(std::move(orders_fields_indexes_)), \
-				deny_changes_to_orders(true) { 
-
-	assert(!orders_fields_indexes.empty());
-}
-
 void CSearchFormGridEvtHandler::OnSearchFormCellChanged(IGridCellWidget *cell_widget, \
 												IOnCellChangedAction &action) const {
 
-	if (deny_changes_to_orders && ordersCellChanged() && \
-		constraints->old_order_locked) {
-
-		ErrorBox(_T("Неможливо змінити це доручення, оскільки воно було додане більше року тому"));
+	if (constraints->wrong_zone) {
+		ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до іншого центру"));
 		return;
 	}
-	OnCellChangedCommon(cell_widget, action);
+	else if (constraints->old_stage_locked) {
+
+		auto p_field = ordersCellChanged();
+		if (p_field != orders_fields_indexes.cend()) {
+			if (constraints->old_order_locked && !p_field->change_allowed) {
+				ErrorBox(_T("Неможливо змінити це доручення, оскільки воно було додане більше року тому"));
+				return;
+			}
+		}
+		else {
+			ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до минулого періоду"));
+			return;
+		}
+	}
+
+	ProceedWithChanging(cell_widget, action);
 }
 
 void CSearchFormGridEvtHandler::OnCellChanged(IGridCellWidget *cell_widget, \

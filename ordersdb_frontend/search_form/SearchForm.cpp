@@ -116,9 +116,11 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 	createStatisticsStatements();
 
+	size_t orders_indexes[] = { 0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11 };
+	size_t allowed_indexes[] = { 9, 10, 11 };
 	grid = new CDbGrid(false, db_table, \
 					std::make_shared<CSearchFormGridEvtHandler>(db_table, constraints, \
-													std::move(orders_fields_indexes)));
+													orders_indexes, allowed_indexes));
 	setFieldsSizes();
 	createCellWidgetsAndAttachToGrid(db_admin);
 	initFilteringControls();
@@ -449,8 +451,6 @@ void CSearchForm::initFilteringControls() {
 }
 
 std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
-
-	orders_fields_indexes.insert({0, 1, 2, 3, 4, 5, 6, 7, 9, 10});
 
 	std::string query = "SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,";
 	query += " t.type_name, a.client_name, a.bdate, sta.stage_name, a.reason, a.cancel_order, a.cancel_date, aa.fee, aa.outgoings, aa.fee_parus,";

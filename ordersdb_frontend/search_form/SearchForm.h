@@ -52,7 +52,6 @@ class CSearchForm : public XTabStopPanel {
 	CPaidFilter *flt_paid;
 
 	CDbGrid *grid;
-	std::set<size_t> orders_fields_indexes;
 	CDbComboBoxCellWidget *advocats_list, *centers_list, *informers_list;
 	CDbComboBoxCellWidget *order_types_list, *stages_list;
 	CBooleanCellWidget *qa_widget;
