@@ -62,7 +62,24 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.2";
+constexpr char search_form_version[] = "1.0.3";
+
+#ifdef DUTY
+const char main_query_fields[] = "\
+SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
+ t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
+ a.reason, a.cancel_order, a.cancel_date, inf.informer_name, aa.article,\
+ aa.fee, aa.outgoings, aa.fee_parus, aa.id_act,\
+ aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,";
+#else
+const char main_query_fields[] = "\
+SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
+ t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
+ aa.fee, aa.outgoings, aa.fee_parus, aa.id_act,\
+ aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,\
+ aa.article, a.reason, a.cancel_order, a.cancel_date, inf.informer_name,";
+#endif
+
 const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
@@ -116,11 +133,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 	createStatisticsStatements();
 
-	size_t orders_indexes[] = { 0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11 };
-	size_t allowed_indexes[] = { 9, 10, 11 };
-	grid = new CDbGrid(false, db_table, \
-					std::make_shared<CSearchFormGridEvtHandler>(db_table, constraints, \
-													orders_indexes, allowed_indexes));
+	createDbGrid(constraints);
 	setFieldsSizes();
 	createCellWidgetsAndAttachToGrid(db_admin);
 	initFilteringControls();
@@ -140,6 +153,24 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	Connect(EVT_COMMAND, btn_rev->GetId(), this, &CSearchForm::OnRevButtonClick);
 	Connect(EVT_COMMAND, btn_reset->GetId(), this, &CSearchForm::OnResetButtonClick);
 	Connect(EVT_COMMAND, btn_sort->GetId(), this, &CSearchForm::OnSortButtonClick);
+}
+
+void CSearchForm::createDbGrid(std::shared_ptr<CPaymentsConstraints> constraints) {
+
+	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	size_t allowed_indexes[] = { meta_info.getFieldIndexByName("reason"), \
+								meta_info.getFieldIndexByName("cancel_order"), \
+								meta_info.getFieldIndexByName("cancel_date") };
+		
+	auto orders_indexes = meta_info.getAllTableFieldsIndexes("orders");
+	orders_indexes.erase(orders_indexes.end() - 3, orders_indexes.end());
+	orders_indexes.push_back(meta_info.getFieldIndexByName("center_short_name"));
+	orders_indexes.push_back(meta_info.getFieldIndexByName("adv_name_short"));
+	orders_indexes.push_back(meta_info.getFieldIndexByName("type_name"));
+	
+	grid = new CDbGrid(false, db_table, \
+		std::make_shared<CSearchFormGridEvtHandler>(db_table, constraints, \
+												orders_indexes, allowed_indexes));
 }
 
 void CSearchForm::createStatisticsStatements() {
@@ -181,70 +212,124 @@ void CSearchForm::reloadStatisticsControls(std::shared_ptr<IDbStatement> new_stm
 }
 
 void CSearchForm::setFieldsSizes() {
+	
+	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	size_t field_index = meta_info.getFieldIndexByName("zone");
+	grid->SetFieldWidth(field_index, 2);
+	grid->SetFieldLabel(field_index, _T("ЗВ"));
 
-	grid->SetFieldWidth(0, 2);
-	grid->SetFieldLabel(0, _T("ЗВ"));
-	grid->SetFieldWidth(1, 12);
-	grid->SetFieldLabel(1, _T("Центр"));
-	grid->SetFieldWidth(2, 17);
-	grid->SetFieldLabel(2, _T("Адвокат"));
-	grid->SetFieldWidth(3, 5);
-	grid->SetFieldLabel(3, _T("№"));
-	grid->SetFieldLabel(4, _T("Дата"));
-	grid->SetFieldWidth(5, 6);
-	grid->SetFieldLabel(5, _T("Тип"));
-	grid->SetFieldWidth(6, 30);
-	grid->SetFieldLabel(6, _T("Клієнт"));
-	grid->SetFieldLabel(7, _T("Дата нар."));
-	grid->SetFieldWidth(8, 10);
-	grid->SetFieldLabel(8, _T("Етап"));
-	grid->SetFieldWidth(9, 17);
-	grid->SetFieldLabel(9, _T("Скс./Прп."));
-	grid->SetFieldWidth(10, 9);
-	grid->SetFieldLabel(10, _T("Наказ"));
-	grid->SetFieldLabel(11, _T("Дата скс."));
-	grid->SetFieldLabel(12, _T("Сума"));
-	grid->SetFieldLabel(13, _T("Витрати"));
-	grid->SetFieldLabel(14, _T("Сума 1С"));
-	grid->SetFieldWidth(15, 15);
-	grid->SetFieldLabel(15, _T("Акт"));
-	grid->SetFieldLabel(16, _T("Дт розрах"));
-	grid->SetFieldLabel(17, _T("Дт акту"));
-	grid->SetFieldLabel(18, _T("Дт р. казн"));
-	grid->SetFieldLabel(19, _T("Дата опл."));
-	grid->SetFieldWidth(20, 1);
-	grid->SetFieldLabel(20, _T("#"));
-	grid->SetFieldWidth(21, 30);
-	grid->SetFieldLabel(21, _T("Стаття"));
-	grid->SetFieldWidth(22, 32);
-	grid->SetFieldLabel(22, _T("Інформатор"));
+	field_index = meta_info.getFieldIndexByName("center_short_name");
+	grid->SetFieldWidth(field_index, 12);
+	grid->SetFieldLabel(field_index, _T("Центр"));
 
-	grid->SetFieldLabel(23, _T("Вік"));
-	grid->SetFieldWidth(24, 4);
-	grid->SetFieldLabel(24, _T("Вади"));
-	grid->SetFieldWidth(25, 4);
-	grid->SetFieldLabel(25, _T("Мова"));
-	grid->SetFieldLabel(26, _T("Хв"));
-	grid->SetFieldLabel(27, _T("ЗЕК"));
-	grid->SetFieldWidth(28, 4);
-	grid->SetFieldLabel(28, _T("Випр"));
-	grid->SetFieldWidth(29, 5);
-	grid->SetFieldLabel(29, _T("Зменш"));
-	grid->SetFieldWidth(30, 4);
-	grid->SetFieldLabel(30, _T("Змін"));
-	grid->SetFieldWidth(31, 4);
-	grid->SetFieldLabel(31, _T("Закр"));
-	grid->SetFieldWidth(32, 5);
-	grid->SetFieldLabel(32, _T("Звільн"));
-	grid->SetFieldLabel(33, _T("Мін"));
-	grid->SetFieldWidth(34, 10);
-	grid->SetFieldLabel(34, _T("Найм. сув."));
-	grid->SetFieldWidth(35, 11);
-	grid->SetFieldLabel(35, _T("Звільн. кр."));
-	grid->SetFieldWidth(36, 14);
-	grid->SetFieldLabel(36, _T("Без зм. 1 інст"));
-	grid->SetFieldWidth(37, 5);
-	grid->SetFieldLabel(37, _T("Кзвіт"));
+	field_index = meta_info.getFieldIndexByName("adv_name_short");
+	grid->SetFieldWidth(field_index, 17);
+	grid->SetFieldLabel(field_index, _T("Адвокат"));
+
+	field_index = meta_info.getFieldIndexByName("id");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("№"));
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("order_date", "orders"), _T("Дата"));
+
+	field_index = meta_info.getFieldIndexByName("type_name");
+	grid->SetFieldWidth(field_index, 6);
+	grid->SetFieldLabel(field_index, _T("Тип"));
+
+	field_index = meta_info.getFieldIndexByName("client_name");
+	grid->SetFieldWidth(field_index, 30);
+	grid->SetFieldLabel(field_index, _T("Клієнт"));
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("bdate"), _T("Дата нар."));
+
+	field_index = meta_info.getFieldIndexByName("stage_name");
+	grid->SetFieldWidth(field_index, 10);
+	grid->SetFieldLabel(field_index, _T("Етап"));
+
+	field_index = meta_info.getFieldIndexByName("reason");
+	grid->SetFieldWidth(field_index, 17);
+	grid->SetFieldLabel(field_index, _T("Скс./Прп."));
+
+	field_index = meta_info.getFieldIndexByName("cancel_order");
+	grid->SetFieldWidth(field_index, 9);
+	grid->SetFieldLabel(field_index, _T("Наказ"));
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("cancel_date"), _T("Дата скс."));
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("fee"), _T("Сума"));
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("outgoings"), _T("Витрати"));
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("fee_parus"), _T("Сума 1С"));
+
+	field_index = meta_info.getFieldIndexByName("id_act");
+	grid->SetFieldWidth(field_index, 15);
+	grid->SetFieldLabel(field_index, _T("Акт"));
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("act_reg_date"), _T("Дт розрах"));
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("act_date"), _T("Дт акту"));
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("bank_reg_date"), _T("Дт р. казн"));
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("payment_date"), _T("Дата опл."));
+
+	field_index = meta_info.getFieldIndexByName("cycle");
+	grid->SetFieldWidth(field_index, 1);
+	grid->SetFieldLabel(field_index, _T("#"));
+
+	field_index = meta_info.getFieldIndexByName("article");
+	grid->SetFieldWidth(field_index, 40);
+	grid->SetFieldLabel(field_index, _T("Стаття"));
+
+	field_index = meta_info.getFieldIndexByName("informer_name");
+	grid->SetFieldWidth(field_index, 32);
+	grid->SetFieldLabel(field_index, _T("Інформатор"));
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("age"), _T("Вік"));
+
+	field_index = meta_info.getFieldIndexByName("inv");
+	grid->SetFieldWidth(field_index, 4);
+	grid->SetFieldLabel(field_index, _T("Вади"));
+
+	field_index = meta_info.getFieldIndexByName("lang");
+	grid->SetFieldWidth(field_index, 4);
+	grid->SetFieldLabel(field_index, _T("Мова"));
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("ill"), _T("Хв"));
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("zek"), _T("ЗЕК"));
+
+	field_index = meta_info.getFieldIndexByName("vpr");
+	grid->SetFieldWidth(field_index, 4);
+	grid->SetFieldLabel(field_index, _T("Випр"));
+
+	field_index = meta_info.getFieldIndexByName("reduce");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("Зменш"));
+
+	field_index = meta_info.getFieldIndexByName("change_");
+	grid->SetFieldWidth(field_index, 4);
+	grid->SetFieldLabel(field_index, _T("Змін"));
+
+	field_index = meta_info.getFieldIndexByName("close");
+	grid->SetFieldWidth(field_index, 4);
+	grid->SetFieldLabel(field_index, _T("Закр"));
+
+	field_index = meta_info.getFieldIndexByName("zv");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("Звільн"));
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("min"), _T("Мін"));
+
+	field_index = meta_info.getFieldIndexByName("nm_suv");
+	grid->SetFieldWidth(field_index, 10);
+	grid->SetFieldLabel(field_index, _T("Найм. сув."));
+
+	field_index = meta_info.getFieldIndexByName("zv_kr");
+	grid->SetFieldWidth(field_index, 11);
+	grid->SetFieldLabel(field_index, _T("Звільн. кр."));
+
+	field_index = meta_info.getFieldIndexByName("No_Ch_Ist");
+	grid->SetFieldWidth(field_index, 14);
+	grid->SetFieldLabel(field_index, _T("Без зм. 1 інст"));
+
+	field_index = meta_info.getFieldIndexByName("Koef");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("Кзвіт"));
 }
 
 void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
@@ -452,10 +537,7 @@ void CSearchForm::initFilteringControls() {
 
 std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
-	std::string query = "SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,";
-	query += " t.type_name, a.client_name, a.bdate, sta.stage_name, a.reason, a.cancel_order, a.cancel_date, aa.fee, aa.outgoings, aa.fee_parus,";
-	query += " aa.id_act, aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,";
-	query += " aa.cycle, aa.article, inf.informer_name,";
+	std::string query = main_query_fields;
 	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
 	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,";
 	query += " aa.id_stage, a.id_center_legalaid, a.id_adv, a.id_order_type, aa.id_informer ";

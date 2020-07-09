@@ -13,6 +13,7 @@ struct IDbConnection;
 class CDoubleBndTarget;
 class CDbTable;
 class CDbGrid;
+struct CPaymentsConstraints;
 class CDbStaticNumField;
 class CComboBoxCellWidget;
 class CDbComboBoxCellWidget;
@@ -68,6 +69,7 @@ class CSearchForm : public XTabStopPanel {
 	void createStatisticsStatements();
 	void reloadStatisticsControls();
 	void reloadStatisticsControls(std::shared_ptr<IDbStatement> new_stmt);
+	void createDbGrid(std::shared_ptr<CPaymentsConstraints> constraints);
 	void setFieldsSizes();
 	void createCellWidgetsAndAttachToGrid(const bool db_admin);
 	void initFilteringControls();

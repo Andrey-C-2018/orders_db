@@ -74,6 +74,29 @@ CMetaInfoBasic::CMetaInfoBasic() : primary_table_id(-1){
 	keys_index_table.reserve(DEF_TABLE_KEY_SIZE);
 }
 
+std::vector<size_t> CMetaInfoBasic::getAllTableFieldsIndexes(const char *table_name) const {
+
+	assert(table_name);
+	auto p_table_name = findTableRecord(table_name);
+	if (!isTableRecordFound(p_table_name, table_name)) {
+		CMetaInfoBasicException e(CMetaInfoBasicException::E_TABLE, \
+								_T("the query does not refer to such table: "));
+		e << table_name;
+		throw e;
+	}
+
+	int id_table = tables[*p_table_name].id;
+	std::vector<size_t> fields_indexes;
+	fields_indexes.reserve(DEF_FIELDS_COUNT);
+
+	size_t i = 0;
+	for (auto p = fields.cbegin(); p != fields.cend(); ++p, ++i)
+		if (p->id_table == id_table)
+			fields_indexes.push_back(i);
+
+	return fields_indexes;
+}
+
 void CMetaInfoBasic::setPrimaryTable(const char *table_name) {
 
 	assert(table_name);

@@ -166,6 +166,7 @@ public:
 	inline size_t getFieldIndexByName(const char *field_name, const char *table_name) const;
 	inline ImmutableString<char> getTableName(const size_t field) const;
 	inline ImmutableString<wchar_t> getTableNameW(const size_t field) const;
+	std::vector<size_t> getAllTableFieldsIndexes(const char *table_name) const;
 	inline size_t getFieldSize(const size_t field) const noexcept;
 	inline bool isPrimaryKey(const size_t field) const noexcept;
 

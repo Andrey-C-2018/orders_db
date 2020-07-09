@@ -24,6 +24,7 @@ public:
 	inline size_t getFieldIndexByName(const char *field_name, const char *table_name) const;
 	inline ImmutableString<char> getTableName(const size_t field) const;
 	inline ImmutableString<wchar_t> getTableNameW(const size_t field) const;
+	inline std::vector<size_t> getAllTableFieldsIndexes(const char *table_name) const;
 	inline size_t getFieldSize(const size_t field) const noexcept;
 	inline bool isPrimaryKey(const size_t field) const noexcept;
 
@@ -115,6 +116,11 @@ ImmutableString<wchar_t> CMetaInfo::getTableNameW(const size_t field) const {
 
 	assert(field < getFieldsCount());
 	return meta_info.getTableNameW(field);
+}
+
+std::vector<size_t> CMetaInfo::getAllTableFieldsIndexes(const char *table_name) const {
+
+	return meta_info.getAllTableFieldsIndexes(table_name);
 }
 
 size_t CMetaInfo::getFieldSize(const size_t field) const noexcept {

@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <set>
 #include <forms_common/PaymentsGridEvtHandler.h>
 
@@ -16,6 +17,10 @@ class CSearchFormGridEvtHandler : public CPaymentsGridEvtHandler {
 
 	std::set<FieldItem> orders_fields_indexes;
 		
+	template <class Container, size_t AllowedCount> \
+		inline void initOrdersFieldsIndexes(const Container &orders_fields_indexes_, \
+											const size_t TotalCount, \
+											const size_t(&allowed_fields_indexes_)[AllowedCount]);
 	inline FieldItemsIterator ordersCellChanged() const;
 	void OnSearchFormCellChanged(IGridCellWidget *cell_widget, \
 									IOnCellChangedAction &action) const;
@@ -24,7 +29,13 @@ public:
 	template <size_t TotalCount, size_t AllowedCount> \
 	CSearchFormGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
 								std::shared_ptr<CPaymentsConstraints> constraints_, \
-								const size_t(&orders_fields_indexes_)[TotalCount], \
+								const size_t (&orders_fields_indexes_)[TotalCount], \
+								const size_t (&allowed_fields_indexes_)[AllowedCount]);
+
+	template <size_t AllowedCount> \
+	CSearchFormGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
+								std::shared_ptr<CPaymentsConstraints> constraints_, \
+								const std::vector<size_t> &orders_fields_indexes_, \
 								const size_t (&allowed_fields_indexes_)[AllowedCount]);
 
 	CSearchFormGridEvtHandler(const CSearchFormGridEvtHandler &obj) = default;
@@ -50,8 +61,26 @@ CSearchFormGridEvtHandler::CSearchFormGridEvtHandler(std::shared_ptr<CDbTable> d
 								const size_t(&allowed_fields_indexes_)[AllowedCount]) : \
 					CPaymentsGridEvtHandler(db_table, constraints_) {
 
-	assert(TotalCount);
+	initOrdersFieldsIndexes(orders_fields_indexes_, TotalCount, allowed_fields_indexes_);
+}
 
+template <size_t AllowedCount> \
+CSearchFormGridEvtHandler::CSearchFormGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
+								std::shared_ptr<CPaymentsConstraints> constraints_, \
+								const std::vector<size_t> &orders_fields_indexes_, \
+								const size_t(&allowed_fields_indexes_)[AllowedCount]) : \
+				CPaymentsGridEvtHandler(db_table, constraints_) {
+
+	initOrdersFieldsIndexes(orders_fields_indexes_, orders_fields_indexes_.size(), \
+							allowed_fields_indexes_);
+}
+
+template <class Container, size_t AllowedCount> \
+void CSearchFormGridEvtHandler::initOrdersFieldsIndexes(const Container &orders_fields_indexes_, \
+										const size_t TotalCount, \
+										const size_t(&allowed_fields_indexes_)[AllowedCount]) {
+
+	assert(TotalCount);
 	FieldItem item;
 	for (size_t i = 0; i < TotalCount; ++i) {
 		item.index = orders_fields_indexes_[i];
