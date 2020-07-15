@@ -7,21 +7,17 @@ CInserter::CInserter() : allow_orders(false), allow_payments(false) { }
 void CInserter::evalPermissions() {
 
 	const auto &params_manager = CParametersManager::getInstance();
-	auto groups = params_manager.getGroups();
+	auto &perm_mgr = CParametersManager::getInstance().getPermissions();
 
-	if (std::find(groups.cbegin(), groups.cend(), "Administrators") != \
-		groups.cend()) {
+	if (perm_mgr.isAdmin()) {
 
 		allow_orders = true;
 		allow_payments = true;
 		orders_inserter.adminLogged(true);
 	}
 	else {
-		allow_orders = std::find(groups.cbegin(), groups.cend(), "Orders keepers") != \
-			groups.cend();
-		allow_payments = allow_orders ? true : \
-			std::find(groups.cbegin(), groups.cend(), "Accountants") != \
-			groups.cend();
+		allow_orders = perm_mgr.isOrdersInserter();
+		allow_payments = allow_orders ? true : perm_mgr.isAccountant();
 	}
 }
 

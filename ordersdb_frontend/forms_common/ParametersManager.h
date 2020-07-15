@@ -3,6 +3,7 @@
 #include <memory>
 #include <basic/tstring.h>
 #include <date/Date.h>
+#include "PermissionsManager.h"
 
 class CPropertiesFile;
 struct IDbConnection;
@@ -11,7 +12,7 @@ class CParametersManager {
 	static CParametersManager inst;
 
 	int id_user;
-	std::vector<std::string> groups;
+	CPermissionsManager permissions_mgr;
 
 	int default_center;
 	mutable std::string center_flt_str;
@@ -23,7 +24,7 @@ class CParametersManager {
 	CParametersManager();
 	void getParamsValuesFromFile(CPropertiesFile *props, \
 									std::shared_ptr<IDbConnection> conn);
-	void determineUserAndGroups(CPropertiesFile *props, \
+	void determineUserAndPermissions(CPropertiesFile *props, \
 									std::shared_ptr<IDbConnection> conn, \
 									Tstring &buffer);
 	inline bool areParamsInitilized() const { return id_user != -1; }
@@ -39,7 +40,7 @@ public:
 	static inline const CParametersManager &getInstance() { return inst; }
 
 	inline int getIdUser() const { return id_user; }
-	inline const std::vector<std::string> &getGroups() const { return groups; }
+	inline const CPermissionsManager &getPermissions() const { return permissions_mgr; }
 	inline int getDefaultCenter() const;
 	inline const wchar_t *getInitialDateW() const;
 	std::string getInitialFilteringStr() const;

@@ -44,6 +44,7 @@ public:
 
 	inline void getUpdateQueryForField(const size_t field, std::string &query) const;
 	inline void getDeleteQuery(std::string &query) const;
+	inline void getDeleteQuery(const char *table_name, std::string &query) const;
 
 	inline void bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 							std::shared_ptr<IDbBindingTarget> binding_target) const;
@@ -54,6 +55,14 @@ public:
 
 	inline void bindPrimaryKeyValuesWithOffset(const size_t field, \
 							const size_t params_offset, \
+							std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+							std::shared_ptr<IDbBindingTarget> binding_target) const;
+
+	inline void bindPrimaryKeyValues(const char *table_name, \
+							std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+							std::shared_ptr<IDbBindingTarget> binding_target) const;
+
+	inline void bindPrimaryKeyValuesWithOffset(const char *table_name, const size_t params_offset, \
 							std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 							std::shared_ptr<IDbBindingTarget> binding_target) const;
 
@@ -185,6 +194,11 @@ void CMetaInfo::getDeleteQuery(std::string &query) const {
 	meta_info.getDeleteQuery(query);
 }
 
+void CMetaInfo::getDeleteQuery(const char *table_name, std::string &query) const {
+
+	meta_info.getDeleteQuery(table_name, query);
+}
+
 void CMetaInfo::bindPrimaryKeyValues(std::shared_ptr<const IDbResultSet> prim_key_values_src, \
 								std::shared_ptr<IDbBindingTarget> binding_target) const {
 
@@ -205,5 +219,22 @@ void CMetaInfo::bindPrimaryKeyValuesWithOffset(const size_t field, \
 								std::shared_ptr<IDbBindingTarget> binding_target) const {
 
 	meta_info.bindPrimaryKeyValuesWithOffset(field, params_offset, prim_key_values_src, \
+												binding_target);
+}
+
+void CMetaInfo::bindPrimaryKeyValues(const char *table_name, \
+								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+								std::shared_ptr<IDbBindingTarget> binding_target) const {
+
+	meta_info.bindPrimaryKeyValuesWithOffset(table_name, 0, prim_key_values_src, \
+												binding_target);
+}
+
+void CMetaInfo::bindPrimaryKeyValuesWithOffset(const char *table_name, \
+								const size_t params_offset, \
+								std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+								std::shared_ptr<IDbBindingTarget> binding_target) const {
+
+	meta_info.bindPrimaryKeyValuesWithOffset(table_name, params_offset, prim_key_values_src, \
 												binding_target);
 }

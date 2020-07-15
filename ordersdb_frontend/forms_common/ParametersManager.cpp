@@ -19,7 +19,7 @@ void CParametersManager::getParamsValuesFromFile(CPropertiesFile *props, \
 	assert(conn);
 	Tstring buffer;
 
-	determineUserAndGroups(props, conn, buffer);
+	determineUserAndPermissions(props, conn, buffer);
 
 	auto str_date = props->getStringProperty(_T("initial_order_date"), buffer);
 	if (!str_date)
@@ -40,7 +40,7 @@ void CParametersManager::getParamsValuesFromFile(CPropertiesFile *props, \
 	initial_order_date.toStringGerman(date_buffer_w);
 }
 
-void CParametersManager::determineUserAndGroups(CPropertiesFile *props, \
+void CParametersManager::determineUserAndPermissions(CPropertiesFile *props, \
 												std::shared_ptr<IDbConnection> conn, \
 												Tstring &buffer) {
 
@@ -82,21 +82,7 @@ void CParametersManager::determineUserAndGroups(CPropertiesFile *props, \
 	CAutorizationManager auth_mgr(conn);
 	auth_mgr.autorize(id_user, user_name.c_str(), ImmutableString<Tchar>(pwd, Tstrlen(pwd)));
 
-	stmt = conn->PrepareQuery("SELECT gr.group_name FROM groups gr INNER JOIN users_groups ug ON gr.id_group = ug.id_group WHERE ug.id_user = ? ORDER BY 1");
-	stmt->bindValue(0, id_user);
-	rs = stmt->exec();
-
-	size_t groups_count = rs->getRecordsCount();
-	if (!groups_count) {
-		XException e(0, _T("Неможливо визначити список груп для користувача '"));
-		e << user_name << _T("'");
-		throw e;
-	}
-
-	for (size_t i = 0; i < groups_count; ++i) {
-		rs->gotoRecord(i);
-		groups.emplace_back(rs->getString(0));
-	}
+	permissions_mgr.init(conn, id_user, user_name);
 }
 
 void CParametersManager::init(CPropertiesFile *props, std::shared_ptr<IDbConnection> conn) {

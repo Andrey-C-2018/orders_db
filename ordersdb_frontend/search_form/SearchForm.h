@@ -54,7 +54,7 @@ class CSearchForm : public XTabStopPanel {
 
 	CDbGrid *grid;
 	CDbComboBoxCellWidget *advocats_list, *centers_list, *informers_list;
-	CDbComboBoxCellWidget *order_types_list, *stages_list;
+	CDbComboBoxCellWidget *order_types_list, *stages_list, *checkers_list;
 	CBooleanCellWidget *qa_widget;
 	int grid_x, grid_y;
 	int grid_margin_x, grid_margin_y;

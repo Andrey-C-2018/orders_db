@@ -295,6 +295,28 @@ void CMetaInfoBasic::getUpdateQueryForField(const size_t field, std::string &que
 	removeEmptyAndStmt(query);
 }
 
+void CMetaInfoBasic::getDeleteQuery(const char *table_name, std::string &query) const {
+
+	assert(table_name);
+	auto p_table_name = findTableRecord(table_name);
+	if (!isTableRecordFound(p_table_name, table_name)) {
+		CMetaInfoBasicException e(CMetaInfoBasicException::E_TABLE, \
+								_T("No such table: "));
+		e << table_name;
+		throw e;
+	}
+
+	query.clear();
+	query = "DELETE FROM ";
+	query += tables[*p_table_name].table_name;
+
+	query += " WHERE ";
+	enumeratePrimKey(tables[*p_table_name].id, \
+						AddPrimKeyToWhereStmt(*this, query, nullptr));
+
+	removeEmptyAndStmt(query);
+}
+
 void CMetaInfoBasic::getDeleteQuery(std::string &query) const {
 
 	assert(primary_table_id != -1);
@@ -325,6 +347,23 @@ void CMetaInfoBasic::bindPrimaryKeyValuesWithOffset(const size_t field, \
 	const CFieldRecord &field_rec = fields[field];
 
 	enumeratePrimKey(field_rec.id_table, BindPrimKeyValue(*this, params_offset, \
+														prim_key_values_src, binding_target));
+}
+
+void CMetaInfoBasic::bindPrimaryKeyValuesWithOffset(const char *table_name, const size_t params_offset, \
+									std::shared_ptr<const IDbResultSet> prim_key_values_src, \
+									std::shared_ptr<IDbBindingTarget> binding_target) const {
+
+	assert(table_name);
+	auto p_table_name = findTableRecord(table_name);
+	if (!isTableRecordFound(p_table_name, table_name)) {
+		CMetaInfoBasicException e(CMetaInfoBasicException::E_TABLE, \
+									_T("No such table: "));
+		e << table_name;
+		throw e;
+	}
+
+	enumeratePrimKey(tables[*p_table_name].id, BindPrimKeyValue(*this, params_offset, \
 														prim_key_values_src, binding_target));
 }
 

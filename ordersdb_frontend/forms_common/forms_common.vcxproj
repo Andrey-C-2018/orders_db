@@ -28,6 +28,7 @@
     <ClInclude Include="ParametersManager.h" />
     <ClInclude Include="PaymentsDbTableEvtHandler.h" />
     <ClInclude Include="PaymentsGridEvtHandler.h" />
+    <ClInclude Include="PermissionsManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Validators.h" />
     <ClInclude Include="VernamOneTimePad.h" />
@@ -40,6 +41,7 @@
     <ClCompile Include="ParametersManager.cpp" />
     <ClCompile Include="PaymentsDbTableEvtHandler.cpp" />
     <ClCompile Include="PaymentsGridEvtHandler.cpp" />
+    <ClCompile Include="PermissionsManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B1371C0C-6520-451E-BAC5-4FBEC01CD7EA}</ProjectGuid>

@@ -62,7 +62,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.3";
+constexpr char search_form_version[] = "1.0.4";
 
 #ifdef DUTY
 const char main_query_fields[] = "\
@@ -95,7 +95,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 				flt_order_type(nullptr), flt_stage(nullptr), flt_zone(nullptr), \
 				grid(nullptr), advocats_list(nullptr), flt_client(nullptr), \
 				centers_list(nullptr), order_types_list(nullptr), stages_list(nullptr), \
-				canceling_reasons_list(nullptr), qa_widget(nullptr), \
+				checkers_list(nullptr), canceling_reasons_list(nullptr), qa_widget(nullptr), \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0), \
 				total_fee(nullptr), total_paid(nullptr), total_orders(nullptr), \
 				btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
@@ -113,9 +113,8 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 	setLastChangedUser();
 
-	auto &groups = CParametersManager::getInstance().getGroups();
-	bool db_admin = std::find(groups.cbegin(), groups.cend(), "Administrators") != \
-								groups.cend();
+	auto &perm_mgr = CParametersManager::getInstance().getPermissions();
+	bool db_admin = perm_mgr.isAdmin();
 
 	auto constraints = std::make_shared<CPaymentsConstraints>();
 	constraints->old_stage_locked = !db_admin;
@@ -330,6 +329,10 @@ void CSearchForm::setFieldsSizes() {
 	field_index = meta_info.getFieldIndexByName("Koef");
 	grid->SetFieldWidth(field_index, 5);
 	grid->SetFieldLabel(field_index, _T("Кзвіт"));
+
+	field_index = meta_info.getFieldIndexByName("user_full_name");
+	grid->SetFieldWidth(field_index, 30);
+	grid->SetFieldLabel(field_index, _T("Перевірив"));
 }
 
 void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
@@ -364,7 +367,7 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 	canceling_reasons_list = new CComboBoxCellWidget();
 	grid->SetWidgetForFieldByName("reason", canceling_reasons_list);
 
-	stmt = conn->PrepareQuery("SELECT id_inf, informer_name, informer_full_name FROM informers ORDER BY 2");
+	stmt = conn->PrepareQuery("SELECT id_inf, informer_name FROM informers ORDER BY 2");
 	result_set = stmt->exec();
 	rs_metadata = stmt->getResultSetMetadata();
 	informers_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
@@ -409,6 +412,15 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 	grid->SetWidgetForFieldByName("No_Ch_Ist", qa_widget);
 
 	grid->SetWidgetForFieldByName("Koef", currency_widget);
+
+	stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE user_full_name IS NOT NULL ORDER BY user_name");
+	result_set = stmt->exec();
+	rs_metadata = stmt->getResultSetMetadata();
+	checkers_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
+											"user_full_name", \
+											conn, 1, result_set, rs_metadata, \
+											"payments", db_table);
+	checkers_list->AddRelation("id_user", "id_checker");
 }
 
 void CSearchForm::adjustUIDependentCellWidgets() {
@@ -491,7 +503,7 @@ void CSearchForm::initFilteringControls() {
 	flt_act->setExprId(id_expr);
 
 	flt_informer = new CFilteringDbComboBox(filtering_manager, \
-											informers_list->getMasterResultSet(), 2, 0);
+											informers_list->getMasterResultSet(), 1, 0);
 	combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_informer);
 	id_expr = filtering_manager.addExpr("aa.id_informer = ?", combo_binder);
 	flt_informer->setExprId(id_expr);
@@ -539,14 +551,15 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	std::string query = main_query_fields;
 	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
-	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,";
-	query += " aa.id_stage, a.id_center_legalaid, a.id_adv, a.id_order_type, aa.id_informer ";
+	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,uu.user_full_name,";
+	query += " aa.id_stage,a.id_center_legalaid,a.id_adv,a.id_order_type,aa.id_informer,aa.id_checker ";
 	query += "FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
 	query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat";
 	query += " INNER JOIN order_types t ON a.id_order_type = t.id_type";
 	query += " INNER JOIN informers inf ON aa.id_informer = inf.id_inf";
 	query += " INNER JOIN centers c ON a.id_center_legalaid = c.id_center";
 	query += " INNER JOIN stages sta ON aa.id_stage = sta.id_st";
+	query += " INNER JOIN users uu ON aa.id_checker = uu.id_user";
 	query += " ####";
 	query += " ORDER BY ";
 	query += def_ordering_str;
@@ -607,7 +620,7 @@ void CSearchForm::displayWidgets() {
 		sizer.addWidget(new XLabel(), _T("Інформатор: "), FL_WINDOW_VISIBLE, \
 						XSize(100, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_informer, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
-						XSize(250, DEF_GUI_ROW_HEIGHT), 250);
+						XSize(270, DEF_GUI_ROW_HEIGHT), 250);
 		flt_informer->setTabStopManager(this);
 		inserter.getPaymentsInserter().setInformerWidget(flt_informer);
 	main_sizer.popNestedSizer();
@@ -638,7 +651,7 @@ void CSearchForm::displayWidgets() {
 		sizer.addWidget(new XLabel(), _T("Опис:"), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *article = new XTabStopEdit(this);
-		sizer.addWidget(article, _T(""), edit_flags, XSize(320, DEF_GUI_ROW_HEIGHT));
+		sizer.addWidget(article, _T(""), edit_flags, XSize(340, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setArticleWidget(article);
 	main_sizer.popNestedSizer();
 
@@ -746,8 +759,9 @@ void CSearchForm::displayWidgets() {
 		sizer.addWidget(btn_add, _T("+"), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
 
-		const auto &params_manager = CParametersManager::getInstance();
-		int rm_button_flags = FL_WINDOW_VISIBLE * (params_manager.getIdUser() == 1);
+		auto &perm_mgr = CParametersManager::getInstance().getPermissions();
+		int rm_button_flags = FL_WINDOW_VISIBLE * \
+							(perm_mgr.isOrdersDeleter() || perm_mgr.isAdmin());
 		btn_remove = new XButton();
 		sizer.addWidget(btn_remove, _T("-"), rm_button_flags, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
@@ -790,11 +804,12 @@ void CSearchForm::displayWidgets() {
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
 
-	grid->HideField(38);
 	grid->HideField(39);
 	grid->HideField(40);
 	grid->HideField(41);
 	grid->HideField(42);
+	grid->HideField(43);
+	grid->HideField(44);
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;
@@ -885,7 +900,41 @@ void CSearchForm::OnRemoveButtonClick(XCommandEvent *eve) {
 
 	int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
 	if (option == IDYES) {
-		db_table->removeCurrentRecord();
+		std::string query;
+		bool is_null = false;
+		const auto &meta_info = db_table->getQuery().getMetaInfo();
+
+		query.reserve(200);
+		query = "SELECT COUNT(*) FROM payments ";
+		query += "WHERE id_center = ? AND id_order = ? AND order_date = ?";
+		
+		auto stmt = conn->PrepareQuery(query.c_str());
+		auto rs_main = db_table->getResultSet();
+		
+		db_table->gotoCurrentRecord();
+		const size_t center = meta_info.getFieldIndexByName("id_center_legalaid");
+		const size_t id = meta_info.getFieldIndexByName("id", "orders");
+		const size_t order_date = meta_info.getFieldIndexByName("order_date", "orders");
+
+		stmt->bindValue(0, rs_main->getInt(center, is_null));
+		stmt->bindValue(1, rs_main->getInt(id, is_null));
+		stmt->bindValue(2, rs_main->getDate(order_date, is_null));
+		auto rs = stmt->exec();
+
+		assert(!rs->empty());
+		rs->gotoRecord(0);
+		const size_t stages_count = (size_t)rs->getInt(0, is_null);
+
+		assert(!is_null);
+		assert(stages_count);
+		const char *table = stages_count > 1 ? "payments" : "orders";
+
+		meta_info.getDeleteQuery(table, query);
+		auto del_stmt = conn->PrepareQuery(query.c_str());
+		meta_info.bindPrimaryKeyValues(table, rs_main, del_stmt);
+		del_stmt->execScalar();
+
+		db_table->reload();
 		reloadStatisticsControls();
 	}
 }

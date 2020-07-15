@@ -144,7 +144,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	defStaticInsertion(12, "NULL");
 	defStaticInsertion(13, "NULL");
 	addBinder(14, _T("Дата прийняття акта"), std::make_shared<UIDateInsertBinder>(act_reg_date, false));
-	defStaticInsertion(15, "NULL");
+	addBinder(15, _T("Дата оплати"), std::make_shared<UIDateInsertBinder>(payment_date, false));
 	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false, true));
 	defStaticInsertion(17, "0.0");
 	defStaticInsertion(18, "NULL");

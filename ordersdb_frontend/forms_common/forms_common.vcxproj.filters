@@ -51,6 +51,9 @@
     <ClInclude Include="resource.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="PermissionsManager.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ParametersManager.cpp">
@@ -72,6 +75,9 @@
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="AutorizationManager.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="PermissionsManager.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
