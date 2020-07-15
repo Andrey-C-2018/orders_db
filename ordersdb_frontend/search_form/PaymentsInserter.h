@@ -23,6 +23,7 @@ class CPaymentsInserter : public CDbInserter {
 	XWidget *act_date;
 	XWidget *act_reg_date;
 	XWidget *payment_date;
+	CDbComboBox *checker;
 
 public:
 	CPaymentsInserter();
@@ -42,6 +43,7 @@ public:
 	inline void setActDateWidget(XWidget *act_date) { this->act_date = act_date; }
 	inline void setActRegDateWidget(XWidget *act_reg_date) { this->act_reg_date = act_reg_date; }
 	inline void setPaymentDateWidget(XWidget *payment_date) { this->payment_date = payment_date; }
+	inline void setCheckerWidget(CDbComboBox *checker) { this->checker = checker; }
 
 	inline void setCenterBinder(std::shared_ptr<IInsertBinder> binder, \
 								CDbComboBox *center);

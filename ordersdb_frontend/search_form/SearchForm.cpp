@@ -70,14 +70,14 @@ SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
  a.reason, a.cancel_order, a.cancel_date, inf.informer_name, aa.article,\
  aa.fee, aa.outgoings, aa.fee_parus, aa.id_act,\
- aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,";
+ aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date, uu.user_full_name,";
 #else
 const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
  aa.fee, aa.outgoings, aa.fee_parus, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,\
- aa.article, a.reason, a.cancel_order, a.cancel_date, inf.informer_name,";
+ aa.article, uu.user_full_name, a.reason, a.cancel_order, a.cancel_date, inf.informer_name,";
 #endif
 
 const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
@@ -551,7 +551,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	std::string query = main_query_fields;
 	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
-	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,uu.user_full_name,";
+	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,";
 	query += " aa.id_stage,a.id_center_legalaid,a.id_adv,a.id_order_type,aa.id_informer,aa.id_checker ";
 	query += "FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
 	query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat";
@@ -740,6 +740,12 @@ void CSearchForm::displayWidgets() {
 						XSize(85, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addResizeableWidget(flt_paid, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(50, DEF_GUI_ROW_HEIGHT), 100);
+
+		auto checkers_list_ctl = new CDbComboBox(checkers_list->getMasterResultSet(), 1, 0);
+		sizer.addResizeableWidget(checkers_list_ctl, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+									XSize(110, DEF_GUI_ROW_HEIGHT), 250);
+		checkers_list_ctl->setTabStopManager(this);
+		inserter.getPaymentsInserter().setCheckerWidget(checkers_list_ctl);
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);

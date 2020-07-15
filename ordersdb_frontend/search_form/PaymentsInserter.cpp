@@ -7,50 +7,54 @@
 #include "PaymentsInserter.h"
 
 class CheckerInsertBinder : public IInsertBinder {
-	XComboBox *center;
-	XString<Tchar> buffer;
-	std::map<std::wstring, int> def_checkers;
+	enum {
+		NO_CHECKER = 0
+	};
+
+	CDbComboBox *checkers_list;
+	XWidget *act_reg_date_holder;
+	int id_checker;
 public:
-	CheckerInsertBinder(XComboBox *center_holder, \
-						std::shared_ptr<IDbConnection> conn, \
-						bool free_widget) : center(center_holder) {
+	CheckerInsertBinder(CDbComboBox *checkers_list_, \
+						const int def_center, \
+						XWidget *act_reg_date_holder_, \
+						std::shared_ptr<IDbConnection> conn) : \
+				checkers_list(checkers_list_), \
+				act_reg_date_holder(act_reg_date_holder_), id_checker(NO_CHECKER) {
 	
-		assert(center);
+		assert(checkers_list);
 
-		std::string query = "SELECT c.center_short_name, MAX(u.id_user) ";
-		query += "FROM users u INNER JOIN centers c ON u.id_center = c.id_center ";
-		query += "WHERE is_def_checker = 1 GROUP BY id_center ORDER BY c.id_center";
+		auto stmt = conn->PrepareQuery("SELECT MAX(id_user) FROM users WHERE is_def_checker = 1 AND id_center = ?");
+		stmt->bindValue(0, def_center);
+		auto rs = stmt->exec();
 
-		auto rs = conn->ExecQuery(query.c_str());
-		const size_t count = rs->getRecordsCount();
+		if (rs->empty()) {
+			id_checker = NO_CHECKER;
+			return;
+		}
+
 		bool is_null;
-		for (size_t i = 0; i < count; ++i)
-			def_checkers.insert(std::pair<std::wstring, int>(rs->getWString(0), \
-															rs->getInt(1, is_null)));
+		rs->gotoRecord(0);
+		id_checker = rs->getInt(0, is_null);
 	}
 
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
-		Params &params, const Tchar *field_name) override {
+				Params &params, const Tchar *field_name) override {
 
 		CInsParamNoGuard param_no_guard(params.param_no, 1);
 
-		center->GetCurrentItemText(buffer);
-		if (buffer.empty() || buffer == _T("(0)")) {
-			params.error_str += field_name;
-			params.error_str += _T(": для визначення Підписувача виберіть Центр у відп. полі");
-			params.error_str += _T('\n');
+		const Tchar *act_reg_date = act_reg_date_holder->GetLabel();
+		if (!act_reg_date || (act_reg_date && act_reg_date[0] == 0)) {
+			binding_target->bindValue(params.param_no, NO_CHECKER);
 			return true;
 		}
 
-		auto p = def_checkers.find(buffer.c_str());
-		if (p == def_checkers.end()) {
-			params.error_str += field_name;
-			params.error_str += _T(": невірне значення поля Центр");
-			params.error_str += _T('\n');
-			return true;
-		}
+		if (checkers_list->isEmptySelection()) 
+			binding_target->bindValue(params.param_no, id_checker);
+		else
+			binding_target->bindValue(params.param_no, \
+										checkers_list->getPrimaryKeyAsInteger());
 
-		binding_target->bindValue(params.param_no, p->second);
 		return true;
 	}
 
@@ -100,7 +104,8 @@ CPaymentsInserter::CPaymentsInserter() : CDbInserter("payments", FIELDS_COUNT), 
 						order_date(nullptr), stage(nullptr), \
 						cycle(nullptr), article(nullptr), fee(nullptr), \
 						outgoings(nullptr), informer(nullptr), id_act(nullptr), \
-						act_date(nullptr), act_reg_date(nullptr), payment_date(nullptr) { }
+						act_date(nullptr), act_reg_date(nullptr), payment_date(nullptr), \
+						checker(nullptr) { }
 
 void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
@@ -117,12 +122,13 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(act_date);
 	assert(act_reg_date);
 	assert(payment_date);
+	assert(checker);
 
 	const auto &params_manager = CParametersManager::getInstance();
 	int id_user = params_manager.getIdUser();
 	assert(id_user != -1);
 
-	int def_center = params_manager.getDefaultCenter();
+	const int def_center = params_manager.getDefaultCenter();
 	const char *qa_part = def_center == 1 ? "NULL" : "0";
 	const char center_str[] = { '0' + (char)def_center , 0 };
 
@@ -162,9 +168,15 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	defStaticInsertion(30, qa_part);
 	defStaticInsertion(31, qa_part);
 	defStaticInsertion(32, "0.0");
-	addBinder(33, _T("Дата реєстр. в ДКС"), std::make_shared<UIDateInsertBinder>(act_date, false));
-	defStaticInsertion(34, "0"); // id_checker
-
+	if(def_center == 1)
+		addBinder(33, _T("Дата реєстр. в ДКС"), \
+					std::make_shared<UIDateInsertBinder>(act_date, false));
+	else
+		defStaticInsertion(33, "NULL");
+	addBinder(34, _T("Перевірив"), \
+					std::make_shared<CheckerInsertBinder>(checker, def_center, \
+															act_reg_date, conn));
+	
 	CDbInserter::prepare(conn);
 }
 
