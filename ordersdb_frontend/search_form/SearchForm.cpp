@@ -62,7 +62,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.4";
+constexpr char search_form_version[] = "1.0.5";
 
 #ifdef DUTY
 const char main_query_fields[] = "\
@@ -86,7 +86,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
 					const int X, const int Y, \
 					const int width, const int height) : \
-				sorting_manager(FIELDS_COUNT), \
+				sorting_manager(FIELDS_COUNT), uploader(6), \
 				flt_id(nullptr), flt_act(nullptr), flt_order_date_from(nullptr), \
 				flt_order_date_to(nullptr), flt_act_reg_date_from(nullptr), \
 				flt_act_reg_date_to(nullptr), flt_act_date_from(nullptr), \
@@ -99,7 +99,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0), \
 				total_fee(nullptr), total_paid(nullptr), total_orders(nullptr), \
 				btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
-				btn_rev(nullptr), btn_reset(nullptr), btn_sort(nullptr) {
+				btn_rev(nullptr), btn_reset(nullptr), btn_sort(nullptr), btn_upload(nullptr) {
 
 	props.open("config.ini");
 	
@@ -129,7 +129,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 												!db_admin, !db_admin, !db_admin, \
 												constraints);
 	db_table->ConnectDbEventsHandler(payments_evt_handler);
-
+	
 	createStatisticsStatements();
 
 	createDbGrid(constraints);
@@ -140,6 +140,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
 			label, X, Y, width, height);
 	displayWidgets();
+	uploader.init(db_table, &props);
 	payments_evt_handler->calcConstraintsValues();
 
 	adjustUIDependentCellWidgets();
@@ -152,6 +153,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	Connect(EVT_COMMAND, btn_rev->GetId(), this, &CSearchForm::OnRevButtonClick);
 	Connect(EVT_COMMAND, btn_reset->GetId(), this, &CSearchForm::OnResetButtonClick);
 	Connect(EVT_COMMAND, btn_sort->GetId(), this, &CSearchForm::OnSortButtonClick);
+	Connect(EVT_COMMAND, btn_upload->GetId(), this, &CSearchForm::OnUploadButtonClick);
 }
 
 void CSearchForm::createDbGrid(std::shared_ptr<CPaymentsConstraints> constraints) {
@@ -751,7 +753,7 @@ void CSearchForm::displayWidgets() {
 	main_sizer.pushNestedSizer(sizer);
 		btn_apply_filter = new XButton();
 		sizer.addWidget(btn_apply_filter, _T("Фільтр"), FL_WINDOW_VISIBLE, \
-						XSize(70, DEF_GUI_ROW_HEIGHT));
+						XSize(60, DEF_GUI_ROW_HEIGHT));
 
 		btn_reset = new XButton();
 		sizer.addWidget(btn_reset, _T("Скд"), FL_WINDOW_VISIBLE, \
@@ -804,8 +806,11 @@ void CSearchForm::displayWidgets() {
 
 		btn_sort = new XButton();
 		sizer.addWidget(btn_sort, _T("Сорт"), FL_WINDOW_VISIBLE, \
-						XSize(60, DEF_GUI_ROW_HEIGHT));
-				
+						XSize(50, DEF_GUI_ROW_HEIGHT));
+		
+		btn_upload = new XButton();
+		sizer.addWidget(btn_upload, _T("Вивант"), FL_WINDOW_VISIBLE, \
+						XSize(55, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
@@ -959,6 +964,18 @@ void CSearchForm::OnResetButtonClick(XCommandEvent *eve) {
 	filtering_manager.disableAll();
 	loadInitialFilterToControls();
 	OnFilterButtonClick(eve);
+}
+
+void CSearchForm::OnUploadButtonClick(XCommandEvent *eve) {
+
+	try {
+		uploader.upload(grid);
+	}
+	catch (XException &e) {
+		ErrorBox(e.what());
+		return;
+	}
+	uploader.execExcel();
 }
 
 void CSearchForm::OnSize(XSizeEvent *eve) {

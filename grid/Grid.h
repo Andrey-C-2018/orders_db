@@ -139,7 +139,6 @@ void CGrid::SetFieldWidth(const size_t field, const int new_width) {
 const Tchar *CGrid::GetFieldLabelAbs(const size_t field) const {
 
 	CheckWhetherAbsFieldIndexValid(field);
-	assert(!IsCreated());
 	return data_table_proxy->GetFieldNameAbs(field);
 }
 

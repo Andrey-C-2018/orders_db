@@ -31,5 +31,7 @@ struct IDbField {
 									std::shared_ptr<IDbBindingTarget> binding_target, \
 									const size_t param_no) const = 0;
 
+	virtual const char *getQuoteStr() const = 0;
+
 	virtual ~IDbField() { }
 };

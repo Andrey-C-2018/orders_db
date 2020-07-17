@@ -189,6 +189,11 @@ void SQLiteIntegerField::getValueAndBindItTo(const std::shared_ptr<const IDbResu
 		binding_target->bindValue(param_no, i);
 }
 
+const char *SQLiteIntegerField::getQuoteStr() const {
+
+	return "";
+}
+
 SQLiteIntegerField::~SQLiteIntegerField() { }
 
 //**************************************************
@@ -269,6 +274,11 @@ void SQLiteDateField::getValueAndBindItTo(const std::shared_ptr<const IDbResultS
 		binding_target->bindValue(param_no, date_value);
 }
 
+const char *SQLiteDateField::getQuoteStr() const {
+
+	return "\"";
+}
+
 SQLiteDateField::~SQLiteDateField() { }
 
 //**************************************************
@@ -325,6 +335,11 @@ void SQLiteStringField::getValueAndBindItTo(const std::shared_ptr<const IDbResul
 
 	const char *value = result_set->getString(field);
 	binding_target->bindValue(param_no, value);
+}
+
+const char *SQLiteStringField::getQuoteStr() const {
+
+	return "\"";
 }
 
 SQLiteStringField::~SQLiteStringField() { }

@@ -82,6 +82,8 @@ public:
 							std::shared_ptr<IDbBindingTarget> binding_target, \
 							const size_t param_no) const override;
 
+	const char *getQuoteStr() const override;
+
 	virtual ~SQLiteIntegerField();
 };
 
@@ -114,6 +116,8 @@ public:
 							std::shared_ptr<IDbBindingTarget> binding_target, \
 							const size_t param_no) const override;
 
+	const char *getQuoteStr() const override;
+
 	virtual ~SQLiteDateField();
 };
 
@@ -145,6 +149,8 @@ public:
 	void getValueAndBindItTo(const std::shared_ptr<const IDbResultSet> result_set, \
 							std::shared_ptr<IDbBindingTarget> binding_target, \
 							const size_t param_no) const override;
+
+	const char *getQuoteStr() const override;
 
 	virtual ~SQLiteStringField();
 };

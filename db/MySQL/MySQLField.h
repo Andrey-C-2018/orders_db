@@ -77,6 +77,8 @@ public:
 							std::shared_ptr<IDbBindingTarget> binding_target, \
 							const size_t param_no) const override;
 
+	const char *getQuoteStr() const override;
+
 	virtual ~CMySQLIntegerField();
 };
 
@@ -108,6 +110,8 @@ public:
 							std::shared_ptr<IDbBindingTarget> binding_target, \
 							const size_t param_no) const override;
 
+	const char *getQuoteStr() const override;
+
 	virtual ~CMySQLDateField();
 };
 
@@ -137,6 +141,8 @@ public:
 	void getValueAndBindItTo(const std::shared_ptr<const IDbResultSet> result_set, \
 							std::shared_ptr<IDbBindingTarget> binding_target, \
 							const size_t param_no) const override;
+
+	const char *getQuoteStr() const override;
 
 	virtual ~CMySQLStringField();
 };
@@ -244,6 +250,12 @@ void CMySQLIntegerField<Tint>::getValueAndBindItTo(const std::shared_ptr<const I
 		binding_target->bindNull(param_no);
 	else
 		binding_target->bindValue(param_no, i);
+}
+
+template <typename Tint> \
+const char *CMySQLIntegerField<Tint>::getQuoteStr() const {
+
+	return "";
 }
 
 template <typename Tint> \

@@ -8,6 +8,7 @@
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
 #include "Inserter.h"
+#include "Uploader.h"
 
 struct IDbConnection;
 class CDoubleBndTarget;
@@ -62,8 +63,10 @@ class CSearchForm : public XTabStopPanel {
 	CDbStaticNumField *total_fee, *total_paid, *total_orders;
 	std::shared_ptr<CDoubleBndTarget> def_binding_target;
 
-	XButton *btn_apply_filter, *btn_add, *btn_remove, *btn_rev, *btn_reset, *btn_sort;
+	XButton *btn_apply_filter, *btn_add, *btn_remove, *btn_rev;
+	XButton *btn_reset, *btn_sort, *btn_upload;
 	CInserter inserter;
+	Uploader uploader;
 
 	std::shared_ptr<CDbTable> createDbTable();
 	void createStatisticsStatements();
@@ -84,6 +87,7 @@ class CSearchForm : public XTabStopPanel {
 	void OnRevButtonClick(XCommandEvent *eve);
 	void OnResetButtonClick(XCommandEvent *eve);
 	void OnSortButtonClick(XCommandEvent *eve);
+	void OnUploadButtonClick(XCommandEvent *eve);
 	
 public:
 	CSearchForm(XWindow *parent, const int flags, \
