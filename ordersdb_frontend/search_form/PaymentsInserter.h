@@ -4,7 +4,7 @@
 
 class CPaymentsInserter : public CDbInserter {
 	enum {
-		FIELDS_COUNT = 35
+		FIELDS_COUNT = 37
 	};
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<IInsertBinder> center_binder;
@@ -17,7 +17,7 @@ class CPaymentsInserter : public CDbInserter {
 	XWidget *cycle;
 	XWidget *article;
 	XWidget *fee;
-	XWidget *outgoings;
+	XWidget *outg_extra, *outg_post, *outg_daynight;
 	CDbComboBox *informer;
 	XWidget *id_act;
 	XWidget *act_date;
@@ -37,7 +37,9 @@ public:
 	inline void setCycleWidget(XWidget *cycle) { this->cycle = cycle; }
 	inline void setArticleWidget(XWidget *article) { this->article = article; }
 	inline void setFeeWidget(XWidget *fee) { this->fee = fee; }
-	inline void setOutgoingsWidget(XWidget *outgoings) { this->outgoings = outgoings; }
+	inline void setOutgExtraWidget(XWidget *outg_extra) { this->outg_extra = outg_extra; }
+	inline void setOutgPostWidget(XWidget *outg_post) { this->outg_post = outg_post; }
+	inline void setOutgDayNightWidget(XWidget *outg_dn) { this->outg_daynight = outg_dn; }
 	inline void setInformerWidget(CDbComboBox *informer) { this->informer = informer; }
 	inline void setActWidget(XWidget *id_act) { this->id_act = id_act; }
 	inline void setActDateWidget(XWidget *act_date) { this->act_date = act_date; }

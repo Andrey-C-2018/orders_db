@@ -69,13 +69,13 @@ const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
  a.reason, a.cancel_order, a.cancel_date, inf.informer_name, aa.article,\
- aa.fee, aa.outgoings, aa.fee_parus, aa.id_act,\
+ aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date, uu.user_full_name,";
 #else
 const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
- aa.fee, aa.outgoings, aa.fee_parus, aa.id_act,\
+ aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,\
  aa.article, uu.user_full_name, a.reason, a.cancel_order, a.cancel_date, inf.informer_name,";
 #endif
@@ -257,9 +257,20 @@ void CSearchForm::setFieldsSizes() {
 
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("cancel_date"), _T("Дата скс."));
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("fee"), _T("Сума"));
-	grid->SetFieldLabel(meta_info.getFieldIndexByName("outgoings"), _T("Витрати"));
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("fee_parus"), _T("Сума 1С"));
 
+	field_index = meta_info.getFieldIndexByName("outgoings");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("Різні"));
+
+	field_index = meta_info.getFieldIndexByName("outg_post");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("Пошт."));
+
+	field_index = meta_info.getFieldIndexByName("outg_daynight");
+	grid->SetFieldWidth(field_index, 6);
+	grid->SetFieldLabel(field_index, _T("Добові"));
+	
 	field_index = meta_info.getFieldIndexByName("id_act");
 	grid->SetFieldWidth(field_index, 15);
 	grid->SetFieldLabel(field_index, _T("Акт"));
@@ -552,6 +563,7 @@ void CSearchForm::initFilteringControls() {
 std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	std::string query = main_query_fields;
+
 	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
 	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,";
 	query += " aa.id_stage,a.id_center_legalaid,a.id_adv,a.id_order_type,aa.id_informer,aa.id_checker ";
@@ -684,12 +696,26 @@ void CSearchForm::displayWidgets() {
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInserter().setFeeWidget(fee);
 
-		sizer.addWidget(new XLabel(), _T("Витрати: "), FL_WINDOW_VISIBLE, \
-						XSize(60, DEF_GUI_ROW_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Витрати різні: "), FL_WINDOW_VISIBLE, \
+						XSize(55, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *outgoings = new XCurrencyField(this);
-		sizer.addWidget(outgoings, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
-						XSize(90, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setOutgoingsWidget(outgoings);
+		sizer.addWidget(outgoings, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
+						FL_EDIT_AUTOHSCROLL, XSize(50, DEF_GUI_ROW_HEIGHT));
+		inserter.getPaymentsInserter().setOutgExtraWidget(outgoings);
+
+		sizer.addWidget(new XLabel(), _T("Поштові: "), FL_WINDOW_VISIBLE, \
+						XSize(62, DEF_GUI_ROW_HEIGHT));
+		XTabStopEdit *outg_post = new XCurrencyField(this);
+		sizer.addWidget(outg_post, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
+						FL_EDIT_AUTOHSCROLL, XSize(50, DEF_GUI_ROW_HEIGHT));
+		inserter.getPaymentsInserter().setOutgPostWidget(outg_post);
+
+		sizer.addWidget(new XLabel(), _T("Добові: "), FL_WINDOW_VISIBLE, \
+						XSize(55, DEF_GUI_ROW_HEIGHT));
+		XTabStopEdit *outg_daynight = new XCurrencyField(this);
+		sizer.addWidget(outg_daynight, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
+						FL_EDIT_AUTOHSCROLL, XSize(50, DEF_GUI_ROW_HEIGHT));
+		inserter.getPaymentsInserter().setOutgDayNightWidget(outg_daynight);
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -815,12 +841,13 @@ void CSearchForm::displayWidgets() {
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
 
-	grid->HideField(39);
-	grid->HideField(40);
-	grid->HideField(41);
-	grid->HideField(42);
-	grid->HideField(43);
-	grid->HideField(44);
+	size_t id_stage = db_table->getQuery().getMetaInfo().getFieldIndexByName("id_stage");
+	grid->HideField(id_stage);
+	grid->HideField(id_stage + 1);
+	grid->HideField(id_stage + 2);
+	grid->HideField(id_stage + 3);
+	grid->HideField(id_stage + 4);
+	grid->HideField(id_stage + 5);
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;

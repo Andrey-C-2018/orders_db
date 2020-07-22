@@ -103,7 +103,8 @@ public:
 CPaymentsInserter::CPaymentsInserter() : CDbInserter("payments", FIELDS_COUNT), \
 						order_date(nullptr), stage(nullptr), \
 						cycle(nullptr), article(nullptr), fee(nullptr), \
-						outgoings(nullptr), informer(nullptr), id_act(nullptr), \
+						outg_extra(nullptr), outg_post(nullptr), outg_daynight(nullptr), \
+						informer(nullptr), id_act(nullptr), \
 						act_date(nullptr), act_reg_date(nullptr), payment_date(nullptr), \
 						checker(nullptr) { }
 
@@ -116,7 +117,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(cycle);
 	assert(article);
 	assert(fee);
-	assert(outgoings);
+	assert(outg_extra);
 	assert(informer);
 	assert(id_act);
 	assert(act_date);
@@ -151,7 +152,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	defStaticInsertion(13, "NULL");
 	addBinder(14, _T("Дата прийняття акта"), std::make_shared<UIDateInsertBinder>(act_reg_date, false));
 	addBinder(15, _T("Дата оплати"), std::make_shared<UIDateInsertBinder>(payment_date, false));
-	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false, true));
+	addBinder(16, _T("Різні витрати"), std::make_shared<CFeeBinder>(outg_extra, false, true));
 	defStaticInsertion(17, "0.0");
 	defStaticInsertion(18, "NULL");
 	defStaticInsertion(19, "NULL");
@@ -176,6 +177,16 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	addBinder(34, _T("Перевірив"), \
 					std::make_shared<CheckerInsertBinder>(checker, def_center, \
 															act_reg_date, conn));
+	if(outg_post)
+		addBinder(35, _T("Поштові витрати"), \
+					std::make_shared<CFeeBinder>(outg_post, false, true));
+	else
+		defStaticInsertion(35, "0.0");
+	if (outg_daynight)
+		addBinder(36, _T("Добові витрати"), \
+					std::make_shared<CFeeBinder>(outg_daynight, false, true));
+	else
+		defStaticInsertion(36, "0.0");
 	
 	CDbInserter::prepare(conn);
 }
