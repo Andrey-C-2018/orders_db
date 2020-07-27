@@ -35,53 +35,104 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	grid = new CDbGrid(false, db_table, \
 						std::make_shared<CPaymentsGridEvtHandler>(db_table, constraints));
 
-	grid->SetFieldLabel(3, _T("Опл."));
-	grid->SetFieldWidth(3, 4);
-	grid->SetFieldLabel(5, _T("Стадія"));
-	grid->SetFieldWidth(5, 14);
-	grid->SetFieldLabel(6, _T("Цикл"));
-	grid->SetFieldWidth(6, 4);
-	grid->SetFieldLabel(7, _T("Стаття"));
-	grid->SetFieldWidth(7, 20);
-	grid->SetFieldLabel(8, _T("Сума"));
-	grid->SetFieldWidth(8, 8);
-	grid->SetFieldLabel(9, _T("Витрати"));
-	grid->SetFieldWidth(9, 8);
-	grid->SetFieldLabel(11, _T("Інформатор"));
-	grid->SetFieldWidth(11, 30);
-	grid->SetFieldLabel(12, _T("Акт"));
-	grid->SetFieldWidth(12, 9);
-	grid->SetFieldLabel(13, _T("Дата акту"));
-	grid->SetFieldLabel(14, _T("Дт. реєстр"));
+	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	size_t field_index = meta_info.getFieldIndexByName("is_paid");
+	grid->SetFieldLabel(field_index, _T("Опл."));
+	grid->SetFieldWidth(field_index, 4);
 
-	grid->SetFieldLabel(15, _T("Вік"));
-	grid->SetFieldLabel(16, _T("Вади"));
-	grid->SetFieldWidth(16, 5);
-	grid->SetFieldLabel(17, _T("Мова"));
-	grid->SetFieldWidth(17, 5);
-	grid->SetFieldLabel(18, _T("Хв"));
-	grid->SetFieldLabel(19, _T("ЗЕК"));
-	grid->SetFieldLabel(20, _T("Випр"));
-	grid->SetFieldWidth(20, 4);
-	grid->SetFieldLabel(21, _T("Зменш"));
-	grid->SetFieldWidth(21, 6);
-	grid->SetFieldLabel(22, _T("Змін"));
-	grid->SetFieldWidth(22, 4);
-	grid->SetFieldLabel(23, _T("Закр"));
-	grid->SetFieldWidth(23, 4);
-	grid->SetFieldLabel(24, _T("Звільн"));
-	grid->SetFieldWidth(24, 6);
-	grid->SetFieldLabel(25, _T("Мін."));
-	grid->SetFieldLabel(26, _T("Найм. сув."));
-	grid->SetFieldWidth(26, 10);
-	grid->SetFieldLabel(27, _T("Звільн. кр."));
-	grid->SetFieldWidth(27, 10);
-	grid->SetFieldLabel(28, _T("Без зм. 1 інст"));
-	grid->SetFieldWidth(28, 12);
-	grid->SetFieldLabel(29, _T("Кзвіт"));
-	grid->SetFieldWidth(29, 5);
-	grid->SetFieldLabel(30, _T("Перевірив"));
-	grid->SetFieldWidth(30, 20);
+	field_index = meta_info.getFieldIndexByName("stage_name");
+	grid->SetFieldLabel(field_index, _T("Стадія"));
+	grid->SetFieldWidth(field_index, 14);
+
+	field_index = meta_info.getFieldIndexByName("cycle");
+	grid->SetFieldLabel(field_index, _T("#"));
+	grid->SetFieldWidth(field_index, 2);
+
+	field_index = meta_info.getFieldIndexByName("article");
+	grid->SetFieldLabel(field_index, _T("Стаття"));
+	grid->SetFieldWidth(field_index, 20);
+
+	field_index = meta_info.getFieldIndexByName("fee");
+	grid->SetFieldLabel(field_index, _T("Сума"));
+	grid->SetFieldWidth(field_index, 8);
+
+	field_index = meta_info.getFieldIndexByName("outgoings");
+	grid->SetFieldLabel(field_index, _T("Різні"));
+	grid->SetFieldWidth(field_index, 6);
+
+	field_index = meta_info.getFieldIndexByName("outg_post");
+	grid->SetFieldLabel(field_index, _T("Пошт"));
+	grid->SetFieldWidth(field_index, 5);
+
+	field_index = meta_info.getFieldIndexByName("outg_daynight");
+	grid->SetFieldLabel(field_index, _T("Добові"));
+	grid->SetFieldWidth(field_index, 6);
+
+	field_index = meta_info.getFieldIndexByName("informer_name");
+	grid->SetFieldLabel(field_index, _T("Інформатор"));
+	grid->SetFieldWidth(field_index, 30);
+
+	field_index = meta_info.getFieldIndexByName("id_act");
+	grid->SetFieldLabel(field_index, _T("Акт"));
+	grid->SetFieldWidth(field_index, 9);
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("act_date"), _T("Дата акту"));
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("act_reg_date"), _T("Дт. розрах"));
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("age"), _T("Вік"));
+
+	field_index = meta_info.getFieldIndexByName("inv");
+	grid->SetFieldLabel(field_index, _T("Вади"));
+	grid->SetFieldWidth(field_index, 5);
+
+	field_index = meta_info.getFieldIndexByName("lang");
+	grid->SetFieldLabel(field_index, _T("Мова"));
+	grid->SetFieldWidth(field_index, 5);
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("ill"), _T("Хв"));
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("zek"), _T("ЗЕК"));
+
+	field_index = meta_info.getFieldIndexByName("vpr");
+	grid->SetFieldLabel(field_index, _T("Випр"));
+	grid->SetFieldWidth(field_index, 4);
+
+	field_index = meta_info.getFieldIndexByName("reduce");
+	grid->SetFieldLabel(field_index, _T("Зменш"));
+	grid->SetFieldWidth(field_index, 6);
+
+	field_index = meta_info.getFieldIndexByName("change_");
+	grid->SetFieldLabel(field_index, _T("Змін"));
+	grid->SetFieldWidth(field_index, 4);
+
+	field_index = meta_info.getFieldIndexByName("close");
+	grid->SetFieldLabel(field_index, _T("Закр"));
+	grid->SetFieldWidth(field_index, 4);
+
+	field_index = meta_info.getFieldIndexByName("zv");
+	grid->SetFieldLabel(field_index, _T("Звільн"));
+	grid->SetFieldWidth(field_index, 6);
+
+	grid->SetFieldLabel(meta_info.getFieldIndexByName("min"), _T("Мін."));
+
+	field_index = meta_info.getFieldIndexByName("nm_suv");
+	grid->SetFieldLabel(field_index, _T("Найм. сув."));
+	grid->SetFieldWidth(field_index, 10);
+
+	field_index = meta_info.getFieldIndexByName("zv_kr");
+	grid->SetFieldLabel(field_index, _T("Звільн. кр."));
+	grid->SetFieldWidth(field_index, 10);
+
+	field_index = meta_info.getFieldIndexByName("No_Ch_Ist");
+	grid->SetFieldLabel(field_index, _T("Без зм. 1 інст"));
+	grid->SetFieldWidth(field_index, 12);
+
+	field_index = meta_info.getFieldIndexByName("Koef");
+	grid->SetFieldLabel(field_index, _T("Кзвіт"));
+	grid->SetFieldWidth(field_index, 5);
+
+	field_index = meta_info.getFieldIndexByName("user_full_name");
+	grid->SetFieldLabel(field_index, _T("Перевірив"));
+	grid->SetFieldWidth(field_index, 20);
 
 	grid_as_window = grid;
 	createCellWidgetsAndAttachToGrid(grid);
@@ -104,7 +155,8 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 														CDate def_order_date) {
 
 	std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date,";
-	query += " aa.is_paid, aa.id_stage, st.stage_name, aa.cycle, aa.article, aa.fee, aa.outgoings,";
+	query += " aa.is_paid, aa.id_stage, st.stage_name, aa.cycle, aa.article,";
+	query += " aa.fee, aa.outgoings, aa.outg_post, aa.outg_daynight,";
 	query += " aa.id_informer, inf.informer_name, aa.id_act, aa.act_date, aa.act_reg_date,";
 	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
 	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,u.user_full_name,aa.id_checker ";
@@ -262,12 +314,14 @@ void CPaymentsList::displayWidgets(XWindow *parent) {
 	panel_sizer.createWidget(panel, parent, FL_WINDOW_VISIBLE, _T(""));
 	cr_panel = true;
 
-	grid->HideField(0);
-	grid->HideField(1);
-	grid->HideField(2);
-	grid->HideField(4);
-	grid->HideField(10);
-	grid->HideField(31);
+	auto &meta_info = db_table->getQuery().getMetaInfo();
+
+	grid->HideField(meta_info.getFieldIndexByName("id_center"));
+	grid->HideField(meta_info.getFieldIndexByName("id_order"));
+	grid->HideField(meta_info.getFieldIndexByName("order_date"));
+	grid->HideField(meta_info.getFieldIndexByName("id_stage"));
+	grid->HideField(meta_info.getFieldIndexByName("id_informer"));
+	grid->HideField(meta_info.getFieldIndexByName("id_checker"));
 }
 
 CPaymentsList::~CPaymentsList() {

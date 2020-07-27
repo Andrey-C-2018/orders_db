@@ -12,7 +12,7 @@
 #include "AdvDbTableEventsHandler.h"
 #include "OrdersDbTableEventsHandler.h"
 
-constexpr char acts_form_version[] = "1.0.10";
+constexpr char acts_form_version[] = "1.0.11";
 
 CActsForm::CActsForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
@@ -77,8 +77,9 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 													payments_db_table, orders_prim_key, params);
 	orders_list.initDbTableEvtHandler(orders_evt_handler);
 
+	def_center = CParametersManager::getInstance().getDefaultCenter();
 	auto payments_evt_handler = std::make_shared<CPaymentsDbTableEvtHandler>(payments_db_table, \
-										CPaymentsDbTableEvtHandler::REGIONAL, "id_center", \
+										def_center, "id_center", \
 										true, true, true, constraints);
 	payments_list.initDbTableEvtHandler(payments_evt_handler);
 

@@ -32,7 +32,7 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 								const int x, const int y, \
 								const int width, const int height) {
 	const int DEF_HEIGHT = 25, VERT_GAP = 10, HORZ_GAP = 5, QA_ITEM_WIDTH = 15;
-	const int QA_LABELS_HEIGHT = 15;
+	const int LABELS_HEIGHT = 15;
 	const int edit_flags = FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
 							FL_WINDOW_CLIPSIBLINGS | FL_EDIT_AUTOHSCROLL | \
 							FL_WINDOW_CLIPCHILDREN;
@@ -44,6 +44,22 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 	CVerticalSizer main_sizer(this, 0, 0, 2000, height, 0, 0, 0, 0, HORZ_GAP, DEF_HEIGHT);
 	CHorizontalSizer sizer(CSizerPreferences(0, 0, 0, 0, HORZ_GAP));
 	
+	XNullWidget null_widget;
+	main_sizer.pushNestedSizer(sizer);
+		sizer.addWidget(&null_widget, _T(""), 0, XSize(20, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Стадія"), label_flags, XSize(90, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("#"), label_flags, XSize(25, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Стаття"), label_flags, XSize(150, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Сума"), label_flags, XSize(70, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Витр."), label_flags, XSize(50, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Пошт."), label_flags, XSize(50, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Добові"), label_flags, XSize(50, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Інформатор"), label_flags, XSize(180, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Акт"), label_flags, XSize(80, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Дата акту"), label_flags, XSize(80, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Дт. розрах"), label_flags, XSize(80, LABELS_HEIGHT));
+	main_sizer.popNestedSizer();
+
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(btn_get_curr, _T("->"), FL_WINDOW_VISIBLE, XSize(20, DEF_HEIGHT));
 
@@ -67,7 +83,15 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 
 		auto outgoings = new XCurrencyField(this);
 		inserter.setOutgoingsWidget(outgoings);
-		sizer.addWidget(outgoings, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
+		sizer.addWidget(outgoings, _T(""), edit_flags, XSize(50, DEF_HEIGHT));
+
+		auto outg_post = new XCurrencyField(this);
+		inserter.setOutgPostWidget(outg_post);
+		sizer.addWidget(outg_post, _T(""), edit_flags, XSize(50, DEF_HEIGHT));
+
+		auto outg_daynight = new XCurrencyField(this);
+		inserter.setOutgDayNightWidget(outg_daynight);
+		sizer.addWidget(outg_daynight, _T(""), edit_flags, XSize(50, DEF_HEIGHT));
 
 		auto informer = new CDbComboBox(rs_inf, 1, 0);
 		inserter.setInformerWidget(informer);
@@ -90,26 +114,24 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		sizer.addWidget(btn_add, _T("+"), FL_WINDOW_VISIBLE, XSize(20, DEF_HEIGHT));
 	main_sizer.popNestedSizer();
 
-	XNullWidget null_widget;
 	main_sizer.pushNestedSizer(sizer);
-		sizer.addWidget(&null_widget, _T(""), 0, XSize(20, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Вік"), label_flags, XSize(25, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Вади"), label_flags, XSize(35, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Мова"), label_flags, XSize(35, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Хвороба"), label_flags, XSize(58, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("ЗЕК"), label_flags, XSize(30, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Випр."), label_flags, XSize(40, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Зменш"), label_flags, XSize(47, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Зміна"), label_flags, XSize(40, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Закр."), label_flags, XSize(40, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Звільн"), label_flags, XSize(55, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Мін."), label_flags, XSize(35, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Найм. сув."), label_flags, XSize(70, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Звільн. кр"), label_flags, XSize(70, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Без зм 1 інст"), label_flags, XSize(90, QA_LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Кзвіт"), label_flags, XSize(40, QA_LABELS_HEIGHT));
-		sizer.addWidget(&null_widget, _T(""), 0, XSize(80, QA_LABELS_HEIGHT));
-		sizer.addWidget(btn_remove, _T("-"), FL_WINDOW_VISIBLE, XSize(20, QA_LABELS_HEIGHT));
+		sizer.addWidget(&null_widget, _T(""), 0, XSize(20, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Вік"), label_flags, XSize(25, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Вади"), label_flags, XSize(35, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Мова"), label_flags, XSize(35, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Хвороба"), label_flags, XSize(58, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("ЗЕК"), label_flags, XSize(30, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Випр."), label_flags, XSize(40, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Зменш"), label_flags, XSize(47, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Зміна"), label_flags, XSize(40, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Закр."), label_flags, XSize(40, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Звільн"), label_flags, XSize(55, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Мін."), label_flags, XSize(35, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Найм. сув."), label_flags, XSize(70, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Звільн. кр"), label_flags, XSize(70, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Без зм 1 інст"), label_flags, XSize(90, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Кзвіт"), label_flags, XSize(40, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Перевірив"), label_flags, XSize(70, LABELS_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -180,6 +202,9 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		sizer.addResizeableWidget(checker, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 									XSize(108, DEF_HEIGHT), 200);
 		checker->setTabStopManager(this);
+
+		sizer.addWidget(&null_widget, _T(""), 0, XSize(57, LABELS_HEIGHT));
+		sizer.addWidget(btn_remove, _T("-"), FL_WINDOW_VISIBLE, XSize(20, LABELS_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	inserter.prepare(conn);

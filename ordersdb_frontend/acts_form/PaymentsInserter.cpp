@@ -90,7 +90,8 @@ public:
 CPaymentsInserter::CPaymentsInserter(std::shared_ptr<CDbTable> db_table_) : db_table(db_table_), \
 				CDbInserter("payments", FIELDS_COUNT), \
 				stage(nullptr), informer(nullptr), cycle(nullptr), article(nullptr), \
-				fee(nullptr), outgoings(nullptr), id_act(nullptr), act_date(nullptr), \
+				fee(nullptr), outgoings(nullptr), outg_post(nullptr), outg_daynight(nullptr), \
+				id_act(nullptr), act_date(nullptr), \
 				act_reg_date(nullptr), age(nullptr), inv(nullptr), lang(nullptr), ill(nullptr), \
 				zek(nullptr), vpr(nullptr), reduce(nullptr), change(nullptr), \
 				close(nullptr), zv(nullptr), min_penalty(nullptr), nm_suv(nullptr), \
@@ -123,6 +124,8 @@ void CPaymentsInserter::getCurrRecord() {
 	setStrWidgetLabel(article, rs, meta_info, "article");
 	setStrWidgetLabel(fee, rs, meta_info, "fee");
 	setStrWidgetLabel(outgoings, rs, meta_info, "outgoings");
+	setStrWidgetLabel(outg_post, rs, meta_info, "outg_post");
+	setStrWidgetLabel(outg_daynight, rs, meta_info, "outg_daynight");
 
 	informer->SetCurrRecord(rs, meta_info.getFieldIndexByName("id_informer"), INT_TYPE_HINT);
 
@@ -161,6 +164,9 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(article);
 	assert(fee);
 	assert(outgoings);
+	assert(outg_post);
+	assert(outg_daynight);
+
 	assert(informer);
 	assert(id_act);
 	assert(act_date);
@@ -202,7 +208,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	addBinder(14, _T("Дата прийняття акта"), std::make_shared<CActRegDateBinder>(db_table, act_reg_date, false));
 	defStaticInsertion(15, "NULL");
 	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false, false));
-	defStaticInsertion(17, "0.0");
+	defStaticInsertion(17, "0.0"); // fee_parus
 
 	addBinder(18, _T("Вік"), std::make_shared<CQaParamBinder>(age, false));
 	addBinder(19, _T("Вади"), std::make_shared<CQaParamBinder>(inv, false));
@@ -223,6 +229,9 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	addBinder(33, _T("Дата реєстр. в ДКС"), std::make_shared<UIDateInsertBinder>(act_date, false));
 	addBinder(34, _T("Перевірив"), std::make_shared<CDbComboBoxInsertBinder>(checker, false, false));
 	
+	addBinder(35, _T("Витрати поштові"), std::make_shared<CFeeBinder>(outg_post, false, false));
+	addBinder(36, _T("Витрати добові"), std::make_shared<CFeeBinder>(outg_daynight, false, false));
+
 	CDbInserter::prepare(conn);
 }
 

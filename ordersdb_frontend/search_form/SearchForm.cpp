@@ -260,7 +260,7 @@ void CSearchForm::setFieldsSizes() {
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("fee_parus"), _T("Сума 1С"));
 
 	field_index = meta_info.getFieldIndexByName("outgoings");
-	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldWidth(field_index, 6);
 	grid->SetFieldLabel(field_index, _T("Різні"));
 
 	field_index = meta_info.getFieldIndexByName("outg_post");
