@@ -257,7 +257,7 @@ void CPaymentsNavPanel::OnRemoveButtonClick(XCommandEvent *eve) {
 	}
 
 	if (constraints->wrong_zone) {
-		ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до іншого центру"));
+		ErrorBox(_T("Неможливо видалити цю стадію, оскільки вона належить до іншого центру"));
 		return;
 	}
 	

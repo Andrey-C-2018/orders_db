@@ -124,8 +124,9 @@ const std::string &CParametersManager::getCenterFilteringStr() const {
 		str.resize(10);
 		XConv::ToString(default_center, &str[0]);
 
-		center_flt_str = "a.id_center_legalaid = ";
+		center_flt_str = "a.id_center_legalaid IN (1,";
 		center_flt_str += str.c_str();
+		center_flt_str += ')';
 	}
 
 	return center_flt_str;

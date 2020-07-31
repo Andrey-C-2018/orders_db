@@ -25,9 +25,10 @@
     <ClInclude Include="CommonRoutines.h" />
     <ClInclude Include="Constraints.h" />
     <ClInclude Include="FormsInsertionBinders.h" />
+    <ClInclude Include="Messages.h" />
     <ClInclude Include="ParametersManager.h" />
     <ClInclude Include="PaymentsDbTableEvtHandler.h" />
-    <ClInclude Include="PaymentsGridEvtHandler.h" />
+    <ClInclude Include="FormsGridEvtHandler.h" />
     <ClInclude Include="PermissionsManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Validators.h" />
@@ -40,7 +41,7 @@
     <ClCompile Include="CommonRoutines.cpp" />
     <ClCompile Include="ParametersManager.cpp" />
     <ClCompile Include="PaymentsDbTableEvtHandler.cpp" />
-    <ClCompile Include="PaymentsGridEvtHandler.cpp" />
+    <ClCompile Include="FormsGridEvtHandler.cpp" />
     <ClCompile Include="PermissionsManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

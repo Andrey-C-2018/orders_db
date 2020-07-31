@@ -161,7 +161,8 @@ void CSearchForm::createDbGrid(std::shared_ptr<CPaymentsConstraints> constraints
 	const auto &meta_info = db_table->getQuery().getMetaInfo();
 	size_t allowed_indexes[] = { meta_info.getFieldIndexByName("reason"), \
 								meta_info.getFieldIndexByName("cancel_order"), \
-								meta_info.getFieldIndexByName("cancel_date") };
+								meta_info.getFieldIndexByName("cancel_date"), \
+								meta_info.getFieldIndexByName("article") };
 		
 	auto orders_indexes = meta_info.getAllTableFieldsIndexes("orders");
 	orders_indexes.erase(orders_indexes.end() - 3, orders_indexes.end());

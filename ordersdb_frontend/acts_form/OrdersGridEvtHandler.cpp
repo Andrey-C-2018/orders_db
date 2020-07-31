@@ -23,13 +23,8 @@ void COrdersGridEvtHandler::OnCellChangedCommon(IGridCellWidget *cell_widget, \
 			action.executeAction(label);
 	}
 	catch (CDbException &e) {
-		if (e.GetErrorCode() == CDbException::E_DB_PRIMARY_KEY_DUPLICATE) {
-			Tstring err_str = _T("Це доручення уже існує: ");
-			err_str += label.str;
-			ErrorBox(err_str.c_str());
-		}
-		else
-			ErrorBox(e.what());
+		assert(e.GetErrorCode() != CDbException::E_DB_PRIMARY_KEY_DUPLICATE);
+		ErrorBox(e.what());
 	}
 }
 

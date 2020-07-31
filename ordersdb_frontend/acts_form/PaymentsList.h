@@ -10,10 +10,12 @@ class CDbGrid;
 class CDbTable;
 class CDbComboBoxCellWidget;
 struct CPaymentsConstraints;
+class CPaymentsGridEvtHandler;
 
 class CPaymentsList {
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
+	std::shared_ptr<CPaymentsGridEvtHandler> grid_evt_handler;
 	CDbGrid *grid;
 	XWidget *grid_as_window;
 	XWidget *db_navigator;

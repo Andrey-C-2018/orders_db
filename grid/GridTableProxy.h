@@ -29,6 +29,7 @@ public:
 	inline size_t GetFieldsCount() const;
 	inline size_t GetAbsoluteFieldsCount() const;
 	inline size_t GetAbsoluteFieldIndex(const size_t field) const;
+	inline size_t GetRelativeFieldIndex(const size_t abs_field_index) const;
 	inline size_t GetRecordsCount() const;
 	inline ImmutableString<Tchar> GetCellAsString(const size_t field, const size_t record) const;
 	inline void SetCell(const size_t field, const size_t record, const Tchar *value);
@@ -40,7 +41,6 @@ public:
 	inline const Tchar *GetFieldNameAbs(const size_t field) const;
 	void SetFieldName(const size_t field, const Tchar *new_name);
 	inline bool IsFieldHidden(const size_t field) const;
-	inline size_t GetRelativeFieldIndex(const size_t abs_field_index) const;
 	void HideField(const size_t field);
 
 	void OnFieldsCountChanged(const size_t new_fields_count) override;

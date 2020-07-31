@@ -9,7 +9,7 @@
 #include <forms_common/ActNameCellWidget.h>
 #include <forms_common/ActDateCellWidget.h>
 #include <xwindows/XButton.h>
-#include <forms_common/PaymentsGridEvtHandler.h>
+#include "PaymentsGridEvtHandler.h"
 #include "PaymentsList.h"
 
 CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_) : \
@@ -32,10 +32,12 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 
 	this->conn = conn_;
 	db_table = createDbTable(conn_, def_center, def_order, def_order_date);
-	grid = new CDbGrid(false, db_table, \
-						std::make_shared<CPaymentsGridEvtHandler>(db_table, constraints));
 
 	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	grid_evt_handler = std::make_shared<CPaymentsGridEvtHandler>(db_table, \
+																	constraints);
+	grid = new CDbGrid(false, db_table, grid_evt_handler);
+
 	size_t field_index = meta_info.getFieldIndexByName("is_paid");
 	grid->SetFieldLabel(field_index, _T("Îïë."));
 	grid->SetFieldWidth(field_index, 4);
@@ -322,6 +324,10 @@ void CPaymentsList::displayWidgets(XWindow *parent) {
 	grid->HideField(meta_info.getFieldIndexByName("id_stage"));
 	grid->HideField(meta_info.getFieldIndexByName("id_informer"));
 	grid->HideField(meta_info.getFieldIndexByName("id_checker"));
+
+	size_t index = meta_info.getFieldIndexByName("article");
+	grid_evt_handler->addAllowedField(grid->GetFieldRelativeIndex(index));
+	grid_evt_handler.reset();
 }
 
 CPaymentsList::~CPaymentsList() {

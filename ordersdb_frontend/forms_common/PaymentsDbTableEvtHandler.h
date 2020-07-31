@@ -60,7 +60,8 @@ void CPaymentsDbTableEvtHandler::calcConstraintsValues() {
 
 		constraints->wrong_zone = (this_center == REGIONAL && \
 			this_center != id_center && order_date >= CDate(1, 1, 2017)) || \
-			(this_center != REGIONAL && this_center != id_center);
+			(this_center != REGIONAL && id_center != REGIONAL && \
+				this_center != id_center);
 	}
 
 	if (lock_old_orders) {

@@ -106,6 +106,7 @@ public:
 	inline const Tchar *GetFieldLabelAbs(const size_t field) const;
 	inline void SetFieldLabel(const size_t field, const Tchar *label);
 	void HideField(const size_t field_index);
+	inline size_t GetFieldRelativeIndex(const size_t abs_field_index) const;
 
 	void Reload() override;
 	virtual ~CGrid();
@@ -127,6 +128,12 @@ template <class TCell> \
 LayoutObjects CGrid::CreateLayoutObjectsHelper(const int kind_of_layout) {
 
 	return data_table_proxy->CreateLayoutObjects<TCell>(kind_of_layout);
+}
+
+size_t CGrid::GetFieldRelativeIndex(const size_t abs_field_index) const {
+
+	CheckWhetherAbsFieldIndexValid(abs_field_index);
+	return data_table_proxy->GetRelativeFieldIndex(abs_field_index);
 }
 
 void CGrid::SetFieldWidth(const size_t field, const int new_width) {

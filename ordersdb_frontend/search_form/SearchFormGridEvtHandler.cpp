@@ -1,25 +1,28 @@
 #include "SearchFormGridEvtHandler.h"
 #include <xwindows/platform_specific.h>
 #include <forms_common/Constraints.h>
+#include <forms_common/Messages.h>
 
 void CSearchFormGridEvtHandler::OnSearchFormCellChanged(IGridCellWidget *cell_widget, \
 												IOnCellChangedAction &action) const {
 
-	if (constraints->wrong_zone) {
-		ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до іншого центру"));
-		return;
-	}
-	else if (constraints->old_stage_locked) {
+	size_t field = this->getActiveField();
 
-		auto p_field = ordersCellChanged();
-		if (p_field != orders_fields_indexes.cend()) {
-			if (constraints->old_order_locked && !p_field->change_allowed) {
-				ErrorBox(_T("Неможливо змінити це доручення, оскільки воно було додане більше року тому"));
-				return;
-			}
-		}
-		else {
-			ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до минулого періоду"));
+	if (constraints->wrong_zone)
+		ErrorBox(E_WRONG_ZONE);
+	else {
+		auto p_field = orders_fields_indexes.find(field);
+		bool orders_field = p_field != orders_fields_indexes.cend();
+
+		int msg_index = 0;
+		msg_index = (E_OLD_ORDER_INDEX + 1) * \
+					(orders_field && constraints->old_order_locked);
+		msg_index += (E_OLD_STAGE_INDEX + 1) * \
+					(!orders_field && constraints->old_stage_locked);
+		msg_index *= !changesAllowed(this->getActiveField());
+		
+		if (msg_index) {
+			ErrorBox(E_ENTRIES[msg_index - 1]);
 			return;
 		}
 	}
