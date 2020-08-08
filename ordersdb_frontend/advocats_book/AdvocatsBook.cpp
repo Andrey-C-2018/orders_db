@@ -315,14 +315,8 @@ void CAdvocatsBook::OnFilterButtonClick(XCommandEvent *eve) {
 
 void CAdvocatsBook::OnAddRecordButtonClick(XCommandEvent *eve) {
 
-	Tstring err_str;
-	bool bound = adv_inserter.bind(err_str);
-	if (bound && err_str.empty()) {
-		adv_inserter.insert();
+	if (adv_inserter.insert())
 		db_table->reload();
-	}
-	else
-		ErrorBox(err_str.c_str());
 }
 
 void CAdvocatsBook::OnRemoveButtonClick(XCommandEvent *eve) {

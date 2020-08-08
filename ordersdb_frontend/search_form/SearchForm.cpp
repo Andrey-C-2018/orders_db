@@ -623,7 +623,7 @@ void CSearchForm::displayWidgets() {
 		sizer.addResizeableWidget(flt_advocat, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(250, DEF_GUI_ROW_HEIGHT), 250);
 		flt_advocat->setTabStopManager(this);
-		inserter.getOrdersInserter().SetAdvocatWidget(flt_advocat);
+		inserter.getOrdersInsertHelper().SetAdvocatWidget(flt_advocat);
 
 		sizer.addWidget(new XLabel(), _T("Центр: "), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT));
@@ -637,7 +637,7 @@ void CSearchForm::displayWidgets() {
 		sizer.addResizeableWidget(flt_informer, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(270, DEF_GUI_ROW_HEIGHT), 250);
 		flt_informer->setTabStopManager(this);
-		inserter.getPaymentsInserter().setInformerWidget(flt_informer);
+		inserter.getPaymentsInsertHelper().setInformerWidget(flt_informer);
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -652,7 +652,7 @@ void CSearchForm::displayWidgets() {
 		sizer.addResizeableWidget(flt_order_type, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(100, DEF_GUI_ROW_HEIGHT), 250);
 		flt_order_type->setTabStopManager(this);
-		inserter.getOrdersInserter().SetOrderTypeWidget(flt_order_type);
+		inserter.getOrdersInsertHelper().SetOrderTypeWidget(flt_order_type);
 
 		sizer.addWidget(new XLabel(), _T("Дата з: "), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT + 10));
@@ -667,7 +667,7 @@ void CSearchForm::displayWidgets() {
 						XSize(40, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *article = new XTabStopEdit(this);
 		sizer.addWidget(article, _T(""), edit_flags, XSize(340, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setArticleWidget(article);
+		inserter.getPaymentsInsertHelper().setArticleWidget(article);
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -675,55 +675,55 @@ void CSearchForm::displayWidgets() {
 						XSize(60, DEF_GUI_ROW_HEIGHT));
 		sizer.addWidget(flt_act, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setActWidget(flt_act);
+		inserter.getPaymentsInsertHelper().setActWidget(flt_act);
 
 		sizer.addWidget(new XLabel(), _T("Етап: "), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT));
 		sizer.addResizeableWidget(flt_stage, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(110, DEF_GUI_ROW_HEIGHT), 250);
 		flt_stage->setTabStopManager(this);
-		inserter.getPaymentsInserter().setStageWidget(flt_stage);
+		inserter.getPaymentsInsertHelper().setStageWidget(flt_stage);
 
 		sizer.addWidget(new XLabel(), _T("№ розгляду:"), FL_WINDOW_VISIBLE, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *cycle = new XTabStopEdit(this);
 		sizer.addWidget(cycle, _T(""), edit_flags, XSize(30, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setCycleWidget(cycle);
+		inserter.getPaymentsInsertHelper().setCycleWidget(cycle);
 
 		sizer.addWidget(new XLabel(), _T("Сума: "), FL_WINDOW_VISIBLE, \
 						XSize(45, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *fee = new XCurrencyField(this);
 		sizer.addWidget(fee, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setFeeWidget(fee);
+		inserter.getPaymentsInsertHelper().setFeeWidget(fee);
 
 		sizer.addWidget(new XLabel(), _T("Витрати різні: "), FL_WINDOW_VISIBLE, \
 						XSize(55, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *outgoings = new XCurrencyField(this);
 		sizer.addWidget(outgoings, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
 						FL_EDIT_AUTOHSCROLL, XSize(50, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setOutgExtraWidget(outgoings);
+		inserter.getPaymentsInsertHelper().setOutgExtraWidget(outgoings);
 
 		sizer.addWidget(new XLabel(), _T("Поштові: "), FL_WINDOW_VISIBLE, \
 						XSize(62, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *outg_post = new XCurrencyField(this);
 		sizer.addWidget(outg_post, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
 						FL_EDIT_AUTOHSCROLL, XSize(50, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setOutgPostWidget(outg_post);
+		inserter.getPaymentsInsertHelper().setOutgPostWidget(outg_post);
 
 		sizer.addWidget(new XLabel(), _T("Добові: "), FL_WINDOW_VISIBLE, \
 						XSize(55, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *outg_daynight = new XCurrencyField(this);
 		sizer.addWidget(outg_daynight, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
 						FL_EDIT_AUTOHSCROLL, XSize(50, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setOutgDayNightWidget(outg_daynight);
+		inserter.getPaymentsInsertHelper().setOutgDayNightWidget(outg_daynight);
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(new XLabel(), _T("Дата розрах. з: "), FL_WINDOW_VISIBLE, \
 						XSize(70, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_act_reg_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setActRegDateWidget(flt_act_reg_date_from);
+		inserter.getPaymentsInsertHelper().setActRegDateWidget(flt_act_reg_date_from);
 
 		sizer.addWidget(new XLabel(), _T("Дата розрах. до: "), FL_WINDOW_VISIBLE, \
 						XSize(80, DEF_GUI_ROW_HEIGHT + 10));
@@ -732,7 +732,7 @@ void CSearchForm::displayWidgets() {
 		sizer.addWidget(new XLabel(), _T("Дата акту з: "), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_act_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setActDateWidget(flt_act_date_from);
+		inserter.getPaymentsInsertHelper().setActDateWidget(flt_act_date_from);
 
 		sizer.addWidget(new XLabel(), _T("Дата акту до: "), FL_WINDOW_VISIBLE, \
 						XSize(65, DEF_GUI_ROW_HEIGHT + 10));
@@ -741,7 +741,7 @@ void CSearchForm::displayWidgets() {
 		sizer.addWidget(new XLabel(), _T("Дата оплати з: "), FL_WINDOW_VISIBLE, \
 						XSize(70, DEF_GUI_ROW_HEIGHT + 10));
 		sizer.addWidget(flt_payment_date_from, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInserter().setPaymentDateWidget(flt_payment_date_from);
+		inserter.getPaymentsInsertHelper().setPaymentDateWidget(flt_payment_date_from);
 
 		sizer.addWidget(new XLabel(), _T("Дата оплати до: "), FL_WINDOW_VISIBLE, \
 						XSize(75, DEF_GUI_ROW_HEIGHT + 10));
@@ -752,13 +752,13 @@ void CSearchForm::displayWidgets() {
 		sizer.addWidget(new XLabel(), _T("Клієнт:"), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
 		sizer.addWidget(flt_client, _T(""), edit_flags, XSize(320, DEF_GUI_ROW_HEIGHT));
-		inserter.getOrdersInserter().SetClientWidget(flt_client);
+		inserter.getOrdersInsertHelper().SetClientWidget(flt_client);
 
 		sizer.addWidget(new XLabel(), _T("Дата народж:"), FL_WINDOW_VISIBLE, \
 						XSize(55, DEF_GUI_ROW_HEIGHT + 10));
 		XDateField *bdate = new XDateField(this);
 		sizer.addWidget(bdate, _T(""), edit_flags, XSize(80, DEF_GUI_ROW_HEIGHT));
-		inserter.getOrdersInserter().SetClientBirthDateWidget(bdate);
+		inserter.getOrdersInsertHelper().SetClientBirthDateWidget(bdate);
 
 		sizer.addWidget(new XLabel(), _T("Зона відп.:"), FL_WINDOW_VISIBLE, \
 						XSize(85, DEF_GUI_ROW_HEIGHT + 10));
@@ -774,7 +774,7 @@ void CSearchForm::displayWidgets() {
 		sizer.addResizeableWidget(checkers_list_ctl, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 									XSize(110, DEF_GUI_ROW_HEIGHT), 250);
 		checkers_list_ctl->setTabStopManager(this);
-		inserter.getPaymentsInserter().setCheckerWidget(checkers_list_ctl);
+		inserter.getPaymentsInsertHelper().setCheckerWidget(checkers_list_ctl);
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);

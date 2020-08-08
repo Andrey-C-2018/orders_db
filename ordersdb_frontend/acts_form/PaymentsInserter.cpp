@@ -1,5 +1,6 @@
 #include <db/DbException.h>
 #include <db_ext/DbTable.h>
+#include <db_ext/InsParamNoGuard.h>
 #include <db_controls/DbComboBox.h>
 #include <forms_common/FormsInsertionBinders.h>
 #include <forms_common/ParametersManager.h>
@@ -87,8 +88,8 @@ public:
 
 //*****************************************************
 
-CPaymentsInserter::CPaymentsInserter(std::shared_ptr<CDbTable> db_table_) : db_table(db_table_), \
-				CDbInserter("payments", FIELDS_COUNT), \
+CPaymentsInserter::CPaymentsInserter(std::shared_ptr<CDbTable> db_table_) : \
+				ins_helper(FIELDS_COUNT), db_table(db_table_), \
 				stage(nullptr), informer(nullptr), cycle(nullptr), article(nullptr), \
 				fee(nullptr), outgoings(nullptr), outg_post(nullptr), outg_daynight(nullptr), \
 				id_act(nullptr), act_date(nullptr), \
@@ -193,62 +194,92 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	int id_user = params_manager.getIdUser();
 	assert(id_user != -1);
 
-	addBinder(0, _T("Реквізити доручення"), std::make_shared<COrderParamsBinder>(db_table));
-	addBinder(3, _T("Сума"), std::make_shared<CFeeBinder>(fee, false, false));
-	addBinder(4, _T("Стадія"), std::make_shared<CDbComboBoxInsertBinder>(stage, false, false));
-	addBinder(5, _T("Стаття"), std::make_shared<UITextInsertBinder>(article, false));
-	addBinder(6, _T("Інформатор"), std::make_shared<CDbComboBoxInsertBinder>(informer, false, false));
-	addBinder(7, _T("Акт"), std::make_shared<CActNameBinder>(id_act, false));
-	addBinder(8, _T("Дата акта"), std::make_shared<CActDateBinder>(db_table, act_date, false, act_reg_date));
-	addBinder(9, _T("Цикл"), std::make_shared<UIIntInsertBinder>(cycle, false));
-	addBinder(10, _T("Користувач"), std::make_shared<CIntInsertBinder>(id_user));
-	defStaticInsertion(11, "NOW()");
-	defStaticInsertion(12, "NULL");
-	defStaticInsertion(13, "NULL"); 
-	addBinder(14, _T("Дата прийняття акта"), std::make_shared<CActRegDateBinder>(db_table, act_reg_date, false));
-	defStaticInsertion(15, "NULL");
-	addBinder(16, _T("Витрати"), std::make_shared<CFeeBinder>(outgoings, false, false));
-	defStaticInsertion(17, "0.0"); // fee_parus
+	ins_helper.addBinder(0, _T("Реквізити доручення"), \
+							std::make_shared<COrderParamsBinder>(db_table));
+	ins_helper.addBinder(3, _T("Сума"), \
+							std::make_shared<CFeeBinder>(fee, false, false));
+	ins_helper.addBinder(4, _T("Стадія"), \
+					std::make_shared<CDbComboBoxInsertBinder>(stage, false, false));
+	ins_helper.addBinder(5, _T("Стаття"), \
+						std::make_shared<UITextInsertBinder>(article, false));
+	ins_helper.addBinder(6, _T("Інформатор"), \
+				std::make_shared<CDbComboBoxInsertBinder>(informer, false, false));
+	ins_helper.addBinder(7, _T("Акт"), \
+						std::make_shared<CActNameBinder>(id_act, false));
+	ins_helper.addBinder(8, _T("Дата акта"), \
+		std::make_shared<CActDateBinder>(db_table, act_date, false, act_reg_date));
+	ins_helper.addBinder(9, _T("Цикл"), \
+						std::make_shared<UIIntInsertBinder>(cycle, false));
+	ins_helper.addBinder(10, _T("Користувач"), \
+						std::make_shared<CIntInsertBinder>(id_user));
+	ins_helper.defStaticInsertion(11, "NOW()");
+	ins_helper.defStaticInsertion(12, "NULL");
+	ins_helper.defStaticInsertion(13, "NULL");
+	ins_helper.addBinder(14, _T("Дата прийняття акта"), \
+			std::make_shared<CActRegDateBinder>(db_table, act_reg_date, false));
+	ins_helper.defStaticInsertion(15, "NULL");
+	ins_helper.addBinder(16, _T("Витрати"), \
+						std::make_shared<CFeeBinder>(outgoings, false, false));
+	ins_helper.defStaticInsertion(17, "0.0"); // fee_parus
 
-	addBinder(18, _T("Вік"), std::make_shared<CQaParamBinder>(age, false));
-	addBinder(19, _T("Вади"), std::make_shared<CQaParamBinder>(inv, false));
-	addBinder(20, _T("Мова"), std::make_shared<CQaParamBinder>(lang, false));
-	addBinder(21, _T("Хвороба"), std::make_shared<CQaParamBinder>(ill, false));
-	addBinder(22, _T("ЗЕК"), std::make_shared<CQaParamBinder>(zek, false));
-	addBinder(23, _T("Випр."), std::make_shared<CQaParamBinder>(vpr, false));
-	addBinder(24, _T("Зменш."), std::make_shared<CQaParamBinder>(reduce, false));
-	addBinder(25, _T("Зміни"), std::make_shared<CQaParamBinder>(change, false));
-	addBinder(26, _T("Закр."), std::make_shared<CQaParamBinder>(close, false));
-	addBinder(27, _T("Звільн."), std::make_shared<CQaParamBinder>(zv, false));
-	addBinder(28, _T("Мін."), std::make_shared<CQaParamBinder>(min_penalty, false));
-	addBinder(29, _T("Найм. сув."), std::make_shared<CQaParamBinder>(nm_suv, false));
-	addBinder(30, _T("Звільн. крим."), std::make_shared<CQaParamBinder>(zv_kr, false));
-	addBinder(31, _T("Без зм. 1 інст."), std::make_shared<CQaParamBinder>(no_ch_Ist, false));
+	ins_helper.addBinder(18, _T("Вік"), std::make_shared<CQaParamBinder>(age, false));
+	ins_helper.addBinder(19, _T("Вади"), std::make_shared<CQaParamBinder>(inv, false));
+	ins_helper.addBinder(20, _T("Мова"), std::make_shared<CQaParamBinder>(lang, false));
+	ins_helper.addBinder(21, _T("Хвороба"), std::make_shared<CQaParamBinder>(ill, false));
+	ins_helper.addBinder(22, _T("ЗЕК"), std::make_shared<CQaParamBinder>(zek, false));
+	ins_helper.addBinder(23, _T("Випр."), std::make_shared<CQaParamBinder>(vpr, false));
+	ins_helper.addBinder(24, _T("Зменш."), std::make_shared<CQaParamBinder>(reduce, false));
+	ins_helper.addBinder(25, _T("Зміни"), std::make_shared<CQaParamBinder>(change, false));
+	ins_helper.addBinder(26, _T("Закр."), std::make_shared<CQaParamBinder>(close, false));
+	ins_helper.addBinder(27, _T("Звільн."), std::make_shared<CQaParamBinder>(zv, false));
+	ins_helper.addBinder(28, _T("Мін."), std::make_shared<CQaParamBinder>(min_penalty, false));
+	ins_helper.addBinder(29, _T("Найм. сув."), std::make_shared<CQaParamBinder>(nm_suv, false));
+	ins_helper.addBinder(30, _T("Звільн. крим."), std::make_shared<CQaParamBinder>(zv_kr, false));
+	ins_helper.addBinder(31, _T("Без зм. 1 інст."), std::make_shared<CQaParamBinder>(no_ch_Ist, false));
 
-	addBinder(32, _T("Коеф."), std::make_shared<CQaKoefBinder>(Koef, false));
-	addBinder(33, _T("Дата реєстр. в ДКС"), std::make_shared<UIDateInsertBinder>(act_date, false));
-	addBinder(34, _T("Перевірив"), std::make_shared<CDbComboBoxInsertBinder>(checker, false, false));
+	ins_helper.addBinder(32, _T("Коеф."), \
+						std::make_shared<CQaKoefBinder>(Koef, false));
+	ins_helper.addBinder(33, _T("Дата реєстр. в ДКС"), \
+						std::make_shared<UIDateInsertBinder>(act_date, false));
+	ins_helper.addBinder(34, _T("Перевірив"), \
+				std::make_shared<CDbComboBoxInsertBinder>(checker, false, false));
 	
-	addBinder(35, _T("Витрати поштові"), std::make_shared<CFeeBinder>(outg_post, false, false));
-	addBinder(36, _T("Витрати добові"), std::make_shared<CFeeBinder>(outg_daynight, false, false));
+	ins_helper.addBinder(35, _T("Витрати поштові"), \
+						std::make_shared<CFeeBinder>(outg_post, false, false));
+	ins_helper.addBinder(36, _T("Витрати добові"), \
+						std::make_shared<CFeeBinder>(outg_daynight, false, false));
 
-	CDbInserter::prepare(conn);
+	std::string query = "INSERT INTO payments VALUES(";
+	ins_helper.buildQuery(query);
+	query += ')';
+
+	stmt = conn->PrepareQuery(query.c_str());
 }
 
-void CPaymentsInserter::insert() {
+bool CPaymentsInserter::insert() {
+
+	Tstring error_str;
+	if (!ins_helper.bind(stmt, 0, error_str)) {
+		ErrorBox(error_str.c_str());
+		return false;
+	}
 
 	try {
-		CDbInserter::insert();
+		stmt->execScalar();
 	}
 	catch (CDbException &e) {
 
 		if (e.GetErrorCode() == CDbException::E_DB_PRIMARY_KEY_DUPLICATE) {
-			Tstring error_str = _T("Така стадія уже існує в цьому дорученні: ");
+			
+			error_str = _T("Така стадія уже існує в цьому дорученні: ");
 			error_str += stage->GetLabel();
 			ErrorBox(error_str.c_str());
+			return false;
 		}
 		else throw;
 	}
+
+	return true;
 }
 
 void CPaymentsInserter::Dispose() {

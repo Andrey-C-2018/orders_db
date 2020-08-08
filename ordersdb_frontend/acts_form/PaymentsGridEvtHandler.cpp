@@ -1,5 +1,6 @@
 #include <xwindows/platform_specific.h>
 #include <forms_common/Constraints.h>
+#include <forms_common/Messages.h>
 #include "PaymentsGridEvtHandler.h"
 
 CPaymentsGridEvtHandler::CPaymentsGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
@@ -10,11 +11,11 @@ void CPaymentsGridEvtHandler::OnSearchFormCellChanged(IGridCellWidget *cell_widg
 												IOnCellChangedAction &action) const {
 
 	if (constraints->wrong_zone) {
-		ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до іншого центру"));
+		ErrorBox(E_WRONG_ZONE);
 		return;
 	}
 	else if (constraints->old_stage_locked && !changesAllowed(getActiveField())) {
-		ErrorBox(_T("Неможливо змінити цю стадію, оскільки вона належить до минулого періоду"));
+		ErrorBox(E_OLD_STAGE);
 		return;
 	}
 

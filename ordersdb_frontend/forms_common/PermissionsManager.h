@@ -17,7 +17,8 @@ struct IDbConnection;
 
 class CPermissionsManager {
 
-	bool admins, orders_inserters, orders_deleters, accountants;
+	bool admins, orders_inserters, orders_deleters;
+	bool payments_deleters, payments_inserters;
 public:
 	CPermissionsManager();
 	CPermissionsManager(std::shared_ptr<IDbConnection> conn, \
@@ -34,7 +35,8 @@ public:
 	inline bool isAdmin() const { return admins; }
 	inline bool isOrdersInserter() const { return orders_inserters; }
 	inline bool isOrdersDeleter() const { return orders_deleters; }
-	inline bool isAccountant() const { return accountants; }
+	inline bool isPaymentsInserter() const { return payments_inserters; }
+	inline bool isPaymentsDeleter() const { return payments_deleters; }
 
 	~CPermissionsManager();
 };

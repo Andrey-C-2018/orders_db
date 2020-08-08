@@ -1,11 +1,16 @@
 #pragma once
-#include "OrdersInserter.h"
-#include "PaymentsInserter.h"
+#include <db_ext/IDbInserter.h>
+#include "OrdersInsertHelper.h"
+#include "PaymentsInsertHelper.h"
 
-class CInserter {
+struct IDbStatement;
+
+class CInserter : public IDbInserter {
 	bool allow_orders, allow_payments;
-	COrdersInserter orders_inserter;
-	CPaymentsInserter payments_inserter;
+
+	COrdersInsertHelper ins_orders;
+	CPaymentsInsertHelper ins_payments;
+	std::shared_ptr<IDbStatement> stmt;
 
 public:
 	CInserter();
@@ -16,15 +21,15 @@ public:
 	CInserter &operator=(const CInserter &obj) = delete;
 	CInserter &operator=(CInserter &&obj) = delete;
 
-	inline COrdersInserter &getOrdersInserter() { return orders_inserter; }
-	inline CPaymentsInserter &getPaymentsInserter() { return payments_inserter; }
+	inline COrdersInsertHelper &getOrdersInsertHelper() { return ins_orders; }
+	inline CPaymentsInsertHelper &getPaymentsInsertHelper() { return ins_payments; }
 
 	inline void SetCenterBox(CDbComboBox *center);
 	inline void SetIdOrderWidget(XWidget *id_order);
 	inline void SetOrderDateWidget(XWidget *order_date);
 
-	void prepare(std::shared_ptr<IDbConnection> conn);
-	bool insert();
+	void prepare(std::shared_ptr<IDbConnection> conn) override;
+	bool insert() override;
 
 	virtual ~CInserter();
 };
@@ -33,19 +38,19 @@ public:
 
 void CInserter::SetCenterBox(CDbComboBox *center) {
 
-	orders_inserter.SetCenterBox(center);
-	payments_inserter.setCenterBinder(orders_inserter.getCenterBinder(), center);
+	ins_orders.SetCenterBox(center);
+	ins_payments.setCenterBinder(ins_orders.getCenterBinder(), center);
 }
 
 void CInserter::SetIdOrderWidget(XWidget *id_order) {
 
-	orders_inserter.SetIdOrderWidget(id_order);
-	payments_inserter.setIdOrderBinder(orders_inserter.getIdOrderBinder());
+	ins_orders.SetIdOrderWidget(id_order);
+	ins_payments.setIdOrderBinder(ins_orders.getIdOrderBinder());
 }
 
 void CInserter::SetOrderDateWidget(XWidget *order_date) {
 
-	orders_inserter.SetOrderDateWidget(order_date);
-	payments_inserter.setOrderDateBinder(orders_inserter.getOrderDateBinder(), \
+	ins_orders.SetOrderDateWidget(order_date);
+	ins_payments.setOrderDateBinder(ins_orders.getOrderDateBinder(), \
 											order_date);
 }

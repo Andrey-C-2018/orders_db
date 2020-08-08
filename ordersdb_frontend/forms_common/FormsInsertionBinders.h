@@ -1,6 +1,6 @@
 #pragma once
 #include <basic/XConv.h>
-#include <db_ext/DbInserter.h>
+#include <db_ext/InsParamNoGuard.h>
 #include <db_controls/InsertionBinders.h>
 #include <xwindows/XWidget.h>
 #include "Validators.h"

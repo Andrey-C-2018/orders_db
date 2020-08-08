@@ -1,15 +1,20 @@
 #pragma once
-#include <db_ext/DbInserter.h>
+#include <db_ext/IDbInserter.h>
+#include <db_ext/DbInsertHelper.h>
 #include <db_controls/InsertionBinders.h>
 
+struct IDbStatement;
 class XComboBox;
 class CDbTable;
 
-class CPaymentsInserter : public CDbInserter {
+class CPaymentsInserter : public IDbInserter {
 	enum {
 		FIELDS_COUNT = 37
 	};
+	CDbInsertHelper ins_helper;
+
 	std::shared_ptr<IDbConnection> conn;
+	std::shared_ptr<IDbStatement> stmt;
 	std::shared_ptr<CDbTable> db_table;
 
 	CDbComboBox *stage;
@@ -70,7 +75,7 @@ public:
 	void getCurrRecord();
 
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
-	void insert() override;
+	bool insert() override;
 
 	void Dispose();
 	virtual ~CPaymentsInserter();

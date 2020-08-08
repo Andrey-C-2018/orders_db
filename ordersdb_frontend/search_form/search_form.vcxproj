@@ -163,9 +163,9 @@
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
     <ClInclude Include="OrderingComboBox.h" />
-    <ClInclude Include="OrdersInserter.h" />
+    <ClInclude Include="OrdersInsertHelper.h" />
     <ClInclude Include="PaidFilter.h" />
-    <ClInclude Include="PaymentsInserter.h" />
+    <ClInclude Include="PaymentsInsertHelper.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SearchForm.h" />
     <ClInclude Include="FilteringComboBox.h" />
@@ -179,9 +179,9 @@
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />
     <ClCompile Include="OrderingComboBox.cpp" />
-    <ClCompile Include="OrdersInserter.cpp" />
+    <ClCompile Include="OrdersInsertHelper.cpp" />
     <ClCompile Include="PaidFilter.cpp" />
-    <ClCompile Include="PaymentsInserter.cpp" />
+    <ClCompile Include="PaymentsInsertHelper.cpp" />
     <ClCompile Include="SearchForm.cpp" />
     <ClCompile Include="FilteringComboBox.cpp" />
     <ClCompile Include="SearchFormGridEvtHandler.cpp" />

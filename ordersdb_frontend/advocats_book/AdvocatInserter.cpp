@@ -2,7 +2,9 @@
 #include <basic/TextConv.h>
 #include <db/IDbConnection.h>
 #include <db/IDbResultSet.h>
+#include <db/IDbStatement.h>
 #include <db/DbException.h>
+#include <db_ext/InsParamNoGuard.h>
 #include <xwindows/XWidget.h>
 #include <xwindows/XComboBox.h>
 #include <db_controls/DbComboBox.h>
@@ -195,7 +197,7 @@ public:
 
 //*****************************************************
 
-CAdvocatInserter::CAdvocatInserter() : CDbInserter("advocats", FIELDS_COUNT), \
+CAdvocatInserter::CAdvocatInserter() : ins_helper(FIELDS_COUNT), \
 						id_advocat(nullptr), adv_name(nullptr), license_no(nullptr), \
 						license_date(nullptr), examiner(nullptr), post_index(nullptr), \
 						address(nullptr), tel(nullptr), email(nullptr), \
@@ -218,29 +220,50 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(org_name);
 	assert(org_type);
 	
-	addBinder(0, _T("ID"), std::make_shared<CAdvocatIdBinder>(conn, id_advocat, false));
-	addBinder(1, _T("ПІБ"), std::make_shared<CAdvNameBinder>(adv_name, false));
-	addBinder(3, _T("mark"), std::make_shared<CIntInsertBinder>(0));
-	addBinder(4, _T("Номер свідоцтва"), std::make_shared<UITextInsertBinder>(license_no, false));
-	addBinder(5, _T("Дата свідоцтва"), std::make_shared<UIDateInsertBinder>(license_date, false));
-	addBinder(6, _T("Екзаменатор"), std::make_shared<CDbComboBoxInsertBinder>(examiner, false, false));
-	addBinder(7, _T("Поштовий індекс"), std::make_shared<CPostIndexBinder>(post_index, false));
-	addBinder(8, _T("Адреса"), std::make_shared<UITextInsertBinder>(address, false));
-	addBinder(9, _T("Телефон"), std::make_shared<UITextInsertBinder>(tel, false));
-	addBinder(10, _T("E-mail"), std::make_shared<UITextInsertBinder>(email, false));
-	addBinder(11, _T("Дата народження"), std::make_shared<UIDateInsertBinder>(adv_bdate, false));
-	addBinder(12, _T("Основний район роботи"), \
+	ins_helper.addBinder(0, _T("ID"), \
+					std::make_shared<CAdvocatIdBinder>(conn, id_advocat, false));
+	ins_helper.addBinder(1, _T("ПІБ"), \
+						std::make_shared<CAdvNameBinder>(adv_name, false));
+	ins_helper.addBinder(3, _T("mark"), \
+							std::make_shared<CIntInsertBinder>(0));
+	ins_helper.addBinder(4, _T("Номер свідоцтва"), \
+							std::make_shared<UITextInsertBinder>(license_no, false));
+	ins_helper.addBinder(5, _T("Дата свідоцтва"), \
+						std::make_shared<UIDateInsertBinder>(license_date, false));
+	ins_helper.addBinder(6, _T("Екзаменатор"), \
+				std::make_shared<CDbComboBoxInsertBinder>(examiner, false, false));
+	ins_helper.addBinder(7, _T("Поштовий індекс"), \
+						std::make_shared<CPostIndexBinder>(post_index, false));
+	ins_helper.addBinder(8, _T("Адреса"), \
+						std::make_shared<UITextInsertBinder>(address, false));
+	ins_helper.addBinder(9, _T("Телефон"), \
+						std::make_shared<UITextInsertBinder>(tel, false));
+	ins_helper.addBinder(10, _T("E-mail"), \
+							std::make_shared<UITextInsertBinder>(email, false));
+	ins_helper.addBinder(11, _T("Дата народження"), \
+						std::make_shared<UIDateInsertBinder>(adv_bdate, false));
+	ins_helper.addBinder(12, _T("Основний район роботи"), \
 				std::make_shared<CDbComboBoxInsertBinder>(district, false, false));
-	addBinder(13, _T("Організація"), \
+	ins_helper.addBinder(13, _T("Організація"), \
 				std::make_shared<CAdvOrgBinder>(org_name, org_type, false, false));
 
-	CDbInserter::prepare(conn);
+	std::string query = "INSERT INTO payments VALUES(";
+	ins_helper.buildQuery(query);
+	query += ')';
+
+	stmt = conn->PrepareQuery(query.c_str());
 }
 
-void CAdvocatInserter::insert() {
+bool CAdvocatInserter::insert() {
+
+	Tstring error_str;
+	if (!ins_helper.bind(stmt, 0, error_str)) {
+		ErrorBox(error_str.c_str());
+		return false;
+	}
 
 	try {
-		CDbInserter::insert();
+		stmt->execScalar();
 	}
 	catch (CDbException &e) {
 
@@ -248,9 +271,11 @@ void CAdvocatInserter::insert() {
 			Tstring error_str = _T("Адвокат із таким ID уже доданий: ");
 			error_str += id_advocat->GetLabel();
 			ErrorBox(error_str.c_str());
+			return false;
 		}
 		else throw;
 	}
+	return true;
 }
 
 CAdvocatInserter::~CAdvocatInserter() {

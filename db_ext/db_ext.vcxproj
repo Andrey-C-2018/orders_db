@@ -158,7 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DbInserter.cpp" />
+    <ClCompile Include="DbInsertHelper.cpp" />
     <ClCompile Include="DbTable.cpp" />
     <ClCompile Include="DependentTableUpdater.cpp" />
     <ClCompile Include="FilteringManager.cpp" />
@@ -171,14 +171,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbEventsHandlersContainer.h" />
-    <ClInclude Include="DbInserter.h" />
+    <ClInclude Include="DbInsertHelper.h" />
     <ClInclude Include="DbTable.h" />
     <ClInclude Include="DependentTableUpdater.h" />
     <ClInclude Include="FilteringManager.h" />
     <ClInclude Include="IBinder.h" />
+    <ClInclude Include="IDbInserter.h" />
     <ClInclude Include="IDbTableEventsHandler.h" />
     <ClInclude Include="IInsertBinder.h" />
     <ClInclude Include="IndexedSearchPredicates.h" />
+    <ClInclude Include="InsParamNoGuard.h" />
     <ClInclude Include="MetaInfo.h" />
     <ClInclude Include="MetaInfoBasic.h" />
     <ClInclude Include="Query.h" />

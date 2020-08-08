@@ -2,6 +2,7 @@
 #include <db/DbException.h>
 #include <xwindows/platform_specific.h>
 #include <forms_common/Constraints.h>
+#include <forms_common/Messages.h>
 
 COrdersGridEvtHandler::COrdersGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
 									std::shared_ptr<CPaymentsConstraints> constraints_) : \
@@ -12,7 +13,7 @@ void COrdersGridEvtHandler::OnCellChangedCommon(IGridCellWidget *cell_widget, \
 												IOnCellChangedAction &action) const {
 	
 	if (constraints->old_order_locked) {
-		ErrorBox(_T("Неможливо змінити це доручення, оскільки воно було додане більше року тому"));
+		ErrorBox(E_OLD_ORDER);
 		return;
 	}
 	

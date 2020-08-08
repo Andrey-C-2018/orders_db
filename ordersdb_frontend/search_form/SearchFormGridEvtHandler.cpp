@@ -3,6 +3,12 @@
 #include <forms_common/Constraints.h>
 #include <forms_common/Messages.h>
 
+const wchar_t *E_ENTRIES[] = { E_OLD_ORDER, E_OLD_STAGE };
+enum E_Indexes {
+	E_OLD_ORDER_INDEX = 0, \
+	E_OLD_STAGE_INDEX = 1
+};
+
 void CSearchFormGridEvtHandler::OnSearchFormCellChanged(IGridCellWidget *cell_widget, \
 												IOnCellChangedAction &action) const {
 

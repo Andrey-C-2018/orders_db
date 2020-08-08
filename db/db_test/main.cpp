@@ -11,6 +11,7 @@ TEST(Sanity) {
 int main() {
 
 	setLocaleToCurrOS_Locale();
+
 	int ret_value = UnitTest::RunAllTests();
 
 	return ret_value;

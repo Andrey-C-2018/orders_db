@@ -1,10 +1,12 @@
 #include <basic/XConv.h>
 #include <db/DbException.h>
+#include <db_ext/InsParamNoGuard.h>
+#include <db_ext/DbInsertHelper.h>
 #include <xwindows/XWidget.h>
 #include <db_controls/DbComboBox.h>
 #include <forms_common/FormsInsertionBinders.h>
 #include <forms_common/ParametersManager.h>
-#include "PaymentsInserter.h"
+#include "PaymentsInsertHelper.h"
 
 class CheckerInsertBinder : public IInsertBinder {
 	enum {
@@ -100,15 +102,19 @@ public:
 
 //*****************************************************
 
-CPaymentsInserter::CPaymentsInserter() : CDbInserter("payments", FIELDS_COUNT), \
-						order_date(nullptr), stage(nullptr), \
-						cycle(nullptr), article(nullptr), fee(nullptr), \
-						outg_extra(nullptr), outg_post(nullptr), outg_daynight(nullptr), \
-						informer(nullptr), id_act(nullptr), \
-						act_date(nullptr), act_reg_date(nullptr), payment_date(nullptr), \
-						checker(nullptr) { }
+CPaymentsInsertHelper::CPaymentsInsertHelper() : incl_order_props(true) {
 
-void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
+	init();
+}
+
+CPaymentsInsertHelper::CPaymentsInsertHelper(const bool incl_order_props_) : \
+				incl_order_props(incl_order_props_), \
+				ins_helper(incl_order_props ? FIELDS_COUNT : FIELDS_COUNT - 4) {
+
+	init();
+}
+
+void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 
 	assert(id_order_binder);
 	assert(order_date_binder);
@@ -133,80 +139,71 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	const char *qa_part = def_center == 1 ? "NULL" : "0";
 	const char center_str[] = { '0' + (char)def_center , 0 };
 
-	if (center_binder)
-		addBinder(0, _T("Центр"), center_binder);
-	else
-		defStaticInsertion(0, center_str);
-	addBinder(1, _T("Номер доручення"), id_order_binder);
-	addBinder(2, _T("Дата доручення"), order_date_binder);
-	addBinder(3, _T("Сума"), std::make_shared<CFeeBinder>(fee, false, true));
-	addBinder(4, _T("Етап"), std::make_shared<CDbComboBoxInsertBinder>(stage, false, false));
-	addBinder(5, _T("Стаття"), std::make_shared<UITextInsertBinder>(article, false));
-	addBinder(6, _T("Інформатор"), std::make_shared<CDbComboBoxInsertBinder>(informer, false, true));
-	addBinder(7, _T("Акт"), std::make_shared<CActNameBinder>(id_act, false));
-	addBinder(8, _T("Дата акта"), std::make_shared<CActDateBinderNoDb>(order_date, act_date, false, act_reg_date));
-	addBinder(9, _T("№ розгляду"), std::make_shared<UIIntInsertBinder>(cycle, false));
-	addBinder(10, _T("Користувач"), std::make_shared<CIntInsertBinder>(id_user));
-	defStaticInsertion(11, "NOW()");
-	defStaticInsertion(12, "NULL");
-	defStaticInsertion(13, "NULL");
-	addBinder(14, _T("Дата прийняття акта"), std::make_shared<UIDateInsertBinder>(act_reg_date, false));
-	addBinder(15, _T("Дата оплати"), std::make_shared<UIDateInsertBinder>(payment_date, false));
-	addBinder(16, _T("Різні витрати"), std::make_shared<CFeeBinder>(outg_extra, false, true));
-	defStaticInsertion(17, "0.0");
-	defStaticInsertion(18, "NULL");
-	defStaticInsertion(19, "NULL");
-	defStaticInsertion(20, "NULL");
-	defStaticInsertion(21, "NULL");
-	defStaticInsertion(22, "NULL");
-	defStaticInsertion(23, qa_part);
-	defStaticInsertion(24, qa_part);
-	defStaticInsertion(25, qa_part);
-	defStaticInsertion(26, qa_part);
-	defStaticInsertion(27, qa_part);
-	defStaticInsertion(28, qa_part);
-	defStaticInsertion(29, qa_part);
-	defStaticInsertion(30, qa_part);
-	defStaticInsertion(31, qa_part);
-	defStaticInsertion(32, "0.0");
+	if (incl_order_props) {
+		if (center_binder)
+			ins_helper.addBinder(0, _T("Центр"), center_binder);
+		else
+			ins_helper.defStaticInsertion(0, center_str);
+		ins_helper.addBinder(1, _T("Номер доручення"), id_order_binder);
+		ins_helper.addBinder(2, _T("Дата доручення"), order_date_binder);
+		ins_helper.addBinder(10, _T("Користувач"), \
+							std::make_shared<CIntInsertBinder>(id_user));
+	}
+	ins_helper.addBinder(3, _T("Сума"), \
+							std::make_shared<CFeeBinder>(fee, false, true));
+	ins_helper.addBinder(4, _T("Етап"), \
+			std::make_shared<CDbComboBoxInsertBinder>(stage, false, false));
+	ins_helper.addBinder(5, _T("Стаття"), \
+						std::make_shared<UITextInsertBinder>(article, false));
+	ins_helper.addBinder(6, _T("Інформатор"), \
+			std::make_shared<CDbComboBoxInsertBinder>(informer, false, true));
+	ins_helper.addBinder(7, _T("Акт"), \
+							std::make_shared<CActNameBinder>(id_act, false));
+	ins_helper.addBinder(8, _T("Дата акта"), \
+		std::make_shared<CActDateBinderNoDb>(order_date, act_date, \
+											false, act_reg_date));
+	ins_helper.addBinder(9, _T("№ розгляду"), \
+							std::make_shared<UIIntInsertBinder>(cycle, false));
+	ins_helper.addBinder(11, _T("Дата прийняття акта"), \
+						std::make_shared<UIDateInsertBinder>(act_reg_date, false));
+	ins_helper.addBinder(12, _T("Дата оплати"), \
+						std::make_shared<UIDateInsertBinder>(payment_date, false));
+	ins_helper.addBinder(13, _T("Різні витрати"), \
+						std::make_shared<CFeeBinder>(outg_extra, false, true));
 	if(def_center == 1)
-		addBinder(33, _T("Дата реєстр. в ДКС"), \
+		ins_helper.addBinder(14, _T("Дата реєстр. в ДКС"), \
 					std::make_shared<UIDateInsertBinder>(act_date, false));
 	else
-		defStaticInsertion(33, "NULL");
-	addBinder(34, _T("Перевірив"), \
+		ins_helper.defStaticInsertion(14, "NULL");
+
+	ins_helper.addBinder(15, _T("Перевірив"), \
 					std::make_shared<CheckerInsertBinder>(checker, def_center, \
 															act_reg_date, conn));
 	if(outg_post)
-		addBinder(35, _T("Поштові витрати"), \
+		ins_helper.addBinder(16, _T("Поштові витрати"), \
 					std::make_shared<CFeeBinder>(outg_post, false, true));
 	else
-		defStaticInsertion(35, "0.0");
+		ins_helper.defStaticInsertion(16, "0.0");
+
 	if (outg_daynight)
-		addBinder(36, _T("Добові витрати"), \
+		ins_helper.addBinder(17, _T("Добові витрати"), \
 					std::make_shared<CFeeBinder>(outg_daynight, false, true));
 	else
-		defStaticInsertion(36, "0.0");
-	
-	CDbInserter::prepare(conn);
+		ins_helper.defStaticInsertion(17, "0.0");
 }
 
-void CPaymentsInserter::insert() {
+void CPaymentsInsertHelper::errMsgOnPrimKeyDuplicate(Tstring &err_str) const {
 
-	try {
-		CDbInserter::insert();
-	}
-	catch (CDbException &e) {
-
-		if (e.GetErrorCode() == CDbException::E_DB_PRIMARY_KEY_DUPLICATE) {
-			Tstring error_str = _T("Така стадія уже існує в цьому дорученні: ");
-			error_str += stage->GetLabel();
-			ErrorBox(error_str.c_str());
-		}
-		else if (e.GetErrorCode() == CDbException::E_DB_NO_REF_IN_MASTER_TABLE)
-			ErrorBox(_T("Відсутні права на додавання нових доручень. Зверніться до адміністратора БД"));
-		else throw;
-	}
+	err_str = _T("Стадія уже існує: ");
+	err_str += stage->GetLabel();
 }
 
-CPaymentsInserter::~CPaymentsInserter() { }
+void CPaymentsInsertHelper::errMsgOnInvalidRef(Tstring &err_str) const {
+
+	err_str = _T("Стадія не може бути додана, оскільки ");
+	err_str += _T("поточний обліковий запис має право додавати стадії лише до існуючих доручень, а ");
+	err_str += _T("задане доручення в БД не існує.\nСтадія: ");
+	err_str += stage->GetLabel();
+}
+
+CPaymentsInsertHelper::~CPaymentsInsertHelper() { }

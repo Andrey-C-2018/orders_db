@@ -1,16 +1,18 @@
 #pragma once
-#include <db_ext/DbInserter.h>
+#include <db_ext/DbInsertHelper.h>
 #include <db_controls/InsertionBinders.h>
 
-class CPaymentsInserter : public CDbInserter {
-	enum {
-		FIELDS_COUNT = 37
-	};
-	std::shared_ptr<IDbConnection> conn;
+struct IDbConnection;
+
+class CPaymentsInsertHelper {
+	
+	bool incl_order_props;
+
 	std::shared_ptr<IInsertBinder> center_binder;
 	std::shared_ptr<IInsertBinder> id_order_binder;
 	std::shared_ptr<IInsertBinder> order_date_binder;
 	
+	CDbInsertHelper ins_helper;
 	XWidget *order_date;
 
 	CDbComboBox *stage;
@@ -25,13 +27,22 @@ class CPaymentsInserter : public CDbInserter {
 	XWidget *payment_date;
 	CDbComboBox *checker;
 
-public:
-	CPaymentsInserter();
+	inline void init();
 
-	CPaymentsInserter(const CPaymentsInserter &obj) = delete;
-	CPaymentsInserter(CPaymentsInserter &&obj) = delete;
-	CPaymentsInserter &operator=(const CPaymentsInserter &obj) = delete;
-	CPaymentsInserter &operator=(CPaymentsInserter &&obj) = delete;
+public:
+	enum {
+		FIELDS_COUNT = 18
+	};
+
+	CPaymentsInsertHelper();
+	CPaymentsInsertHelper(const bool incl_order_props_);
+
+	inline void init(const bool incl_order_props_);
+
+	CPaymentsInsertHelper(const CPaymentsInsertHelper &obj) = delete;
+	CPaymentsInsertHelper(CPaymentsInsertHelper &&obj) = delete;
+	CPaymentsInsertHelper &operator=(const CPaymentsInsertHelper &obj) = delete;
+	CPaymentsInsertHelper &operator=(CPaymentsInsertHelper &&obj) = delete;
 
 	inline void setStageWidget(CDbComboBox *stage) { this->stage = stage; }
 	inline void setCycleWidget(XWidget *cycle) { this->cycle = cycle; }
@@ -52,26 +63,54 @@ public:
 	inline void setIdOrderBinder(std::shared_ptr<IInsertBinder> binder);
 	inline void setOrderDateBinder(std::shared_ptr<IInsertBinder> binder, \
 									XWidget *order_date);
-	void prepare(std::shared_ptr<IDbConnection> conn) override;
-	void insert() override;
 
-	virtual ~CPaymentsInserter();
+	void createBinders(std::shared_ptr<IDbConnection> conn);
+	inline const CDbInsertHelper &getHelper() const { return ins_helper; }
+	void errMsgOnPrimKeyDuplicate(Tstring &err_str) const;
+	void errMsgOnInvalidRef(Tstring &err_str) const;
+
+	virtual ~CPaymentsInsertHelper();
 };
 
-//*****************************************************.
+//*****************************************************
 
-void CPaymentsInserter::setCenterBinder(std::shared_ptr<IInsertBinder> binder, \
+void CPaymentsInsertHelper::init() {
+
+	order_date = nullptr;
+	stage = nullptr;
+	cycle = nullptr;
+	article = nullptr;
+	fee = nullptr;
+	outg_extra = nullptr;
+	outg_post = nullptr;
+	outg_daynight = nullptr;
+	informer = nullptr;
+	id_act = nullptr;
+	act_date = nullptr;
+	act_reg_date = nullptr;
+	payment_date = nullptr;
+	checker = nullptr;
+}
+
+void CPaymentsInsertHelper::init(const bool incl_order_props_) {
+
+	this->incl_order_props = incl_order_props_;
+	ins_helper.init(this->incl_order_props ? FIELDS_COUNT : \
+												FIELDS_COUNT - 4);
+}
+
+void CPaymentsInsertHelper::setCenterBinder(std::shared_ptr<IInsertBinder> binder, \
 										CDbComboBox *center) {
 
 	this->center_binder = binder;
 }
 
-void CPaymentsInserter::setIdOrderBinder(std::shared_ptr<IInsertBinder> binder) {
+void CPaymentsInsertHelper::setIdOrderBinder(std::shared_ptr<IInsertBinder> binder) {
 
 	this->id_order_binder = binder;
 }
 
-void CPaymentsInserter::setOrderDateBinder(std::shared_ptr<IInsertBinder> binder, \
+void CPaymentsInsertHelper::setOrderDateBinder(std::shared_ptr<IInsertBinder> binder, \
 											XWidget *order_date) {
 
 	this->order_date_binder = binder;

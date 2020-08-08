@@ -15,13 +15,14 @@ CPermissionsManagerException::~CPermissionsManagerException() { }
 //*****************************************************
 
 CPermissionsManager::CPermissionsManager() : admins(false), orders_inserters(false), \
-											orders_deleters(false), accountants(false) { }
+											orders_deleters(false), payments_inserters(false) { }
 
 CPermissionsManager::CPermissionsManager(std::shared_ptr<IDbConnection> conn, \
 										const int id_user, \
 										const Tstring &user_name) : \
 								admins(false), orders_inserters(false), \
-								orders_deleters(false), accountants(false) {
+								orders_deleters(false), payments_deleters(false), \
+								payments_inserters(false) {
 
 	init(conn, id_user, user_name);
 }
@@ -55,8 +56,11 @@ void CPermissionsManager::init(std::shared_ptr<IDbConnection> conn, \
 				if (!strcmp(group_name, "Orders deleters"))
 					orders_deleters = true;
 				else
-					if (!strcmp(group_name, "Accountants"))
-						accountants = true;
+					if (!strcmp(group_name, "Payments inserters"))
+						payments_inserters = true;
+					else
+						if (!strcmp(group_name, "Payments deleters"))
+							payments_deleters = true;
 	}
 }
 

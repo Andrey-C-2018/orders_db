@@ -1,14 +1,18 @@
 #pragma once
-#include <db_ext/DbInserter.h>
+#include <db_ext/IDbInserter.h>
+#include <db_ext/DbInsertHelper.h>
 #include <db_controls/InsertionBinders.h>
 
+struct IDbStatement;
 class XComboBox;
 
-class CAdvocatInserter : public CDbInserter {
+class CAdvocatInserter : public IDbInserter {
 	enum {
 		FIELDS_COUNT = 15
 	};
+	CDbInsertHelper ins_helper;
 	std::shared_ptr<IDbConnection> conn;
+	std::shared_ptr<IDbStatement> stmt;
 
 	XWidget *id_advocat;
 	XWidget *adv_name;
@@ -49,7 +53,7 @@ public:
 	inline void setOrgTypeWidget(XComboBox *org_type) { this->org_type = org_type; }
 
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
-	void insert() override;
+	bool insert() override;
 
 	virtual ~CAdvocatInserter();
 };

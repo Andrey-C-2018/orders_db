@@ -9,6 +9,7 @@
 #include <xwindows_ex/XDateField.h>
 #include <xwindows_ex/XCurrencyField.h>
 #include <forms_common/Constraints.h>
+#include <forms_common/ParametersManager.h>
 #include "PaymentsNavPanel.h"
 
 CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn_, \
@@ -204,7 +205,11 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		checker->setTabStopManager(this);
 
 		sizer.addWidget(&null_widget, _T(""), 0, XSize(57, LABELS_HEIGHT));
-		sizer.addWidget(btn_remove, _T("-"), FL_WINDOW_VISIBLE, XSize(20, LABELS_HEIGHT));
+
+		auto &perm_mgr = CParametersManager::getInstance().getPermissions();
+		int rm_button_flags = FL_WINDOW_VISIBLE * \
+							(perm_mgr.isPaymentsDeleter() || perm_mgr.isAdmin());
+		sizer.addWidget(btn_remove, _T("-"), rm_button_flags, XSize(20, LABELS_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	inserter.prepare(conn);
@@ -229,14 +234,8 @@ void CPaymentsNavPanel::OnAddRecordButtonClick(XCommandEvent *eve) {
 		return;
 	}
 
-	Tstring err_str;
-	bool bound = inserter.bind(err_str);
-	if (bound && err_str.empty()) {
-		inserter.insert();
+	if (inserter.insert())
 		db_table->reload();
-	}
-	else
-		ErrorBox(err_str.c_str());
 }
 
 void CPaymentsNavPanel::OnRemoveButtonClick(XCommandEvent *eve) {
