@@ -7,7 +7,8 @@ CDbInsertHelper::CDbInsertHelper(const size_t fields_count_) : \
 
 void CDbInsertHelper::addBinder(const size_t field_no, \
 							const Tchar *field_name, \
-							std::shared_ptr<IInsertBinder> binder) {
+							std::shared_ptr<IInsertBinder> binder, \
+							const size_t affected_params_count) {
 
 	assert(this->fields_count != (size_t)-1);
 	assert(binders.size() <= fields_count);
@@ -17,6 +18,7 @@ void CDbInsertHelper::addBinder(const size_t field_no, \
 	item.field_no = field_no;
 	item.field_name = field_name;
 	item.binder = binder;
+	item.affected_params_count = affected_params_count;
 
 	auto p = std::lower_bound(binders.begin(), binders.end(), item);
 	binders.insert(p, item);
@@ -25,7 +27,7 @@ void CDbInsertHelper::addBinder(const size_t field_no, \
 void CDbInsertHelper::defStaticInsertion(const size_t field_no, const char *expr) {
 
 	assert(this->fields_count != (size_t)-1);
-	assert(binders.size() <= fields_count);
+	assert(static_insertions.size() <= fields_count);
 	assert(expr);
 	static_insertions[field_no] = std::string(expr);
 }
@@ -39,31 +41,32 @@ void CDbInsertHelper::buildQuery(std::string &query) const {
 		for (size_t i = 0; i < times; ++i)	str1 += str2;
 	};
 
-	assert(!binders.empty());
-	assert(binders.size() + static_insertions.size() == fields_count);
+	assert(binders.size() + static_insertions.size() <= fields_count);
 	query.reserve(QUERY_RESERVED_SIZE);
 
 	auto p = static_insertions.cbegin();
-	size_t start = 0;
-	Binders item;
+	size_t i = 0, fields = 0;
 	while (p != static_insertions.cend()) {
 
-		item.field_no = p->first;
-		size_t end = std::distance(binders.cbegin(), \
-				std::lower_bound(binders.cbegin(), binders.cend(), item));
-		
-		assert(start <= end);
-		appendToStr(query, "?,", end - start);
+		while (i < binders.size() && binders[i].field_no < p->first) {
+			appendToStr(query, "?,", binders[i].affected_params_count);
+			fields += binders[i].affected_params_count;
+			++i;
+		}
+		assert(binders[i].field_no != p->first);
+
 		query += p->second;
 		query += ',';
 
-		start = end + 1;
-		++p;
+		++p; ++fields;
 	}
 
-	start -= (start > fields_count);
-	assert(start <= fields_count);
-	appendToStr(query, "?,", fields_count - start);
+	while (i < binders.size()) {
+		appendToStr(query, "?,", binders[i].affected_params_count);
+		fields += binders[i].affected_params_count;
+		++i;
+	}
+	assert(fields == fields_count);
 	query.erase(query.end() - 1);
 }
 

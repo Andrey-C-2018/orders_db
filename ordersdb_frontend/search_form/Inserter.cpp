@@ -18,7 +18,7 @@ void CInserter::evalPermissions() {
 	allow_payments = admin || (!admin && perm_mgr.isPaymentsInserter());
 
 	ins_orders.adminLogged(admin);
-	ins_payments.init(!allow_orders);
+	ins_payments.includeOrdersProps(!allow_orders);
 }
 
 void CInserter::prepare(std::shared_ptr<IDbConnection> conn) {
@@ -26,7 +26,8 @@ void CInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	std::string query;
 	if (allow_orders) {
 		query = "call insertFull(";
-		query += '0' + (char)((int)allow_payments);
+		char ignore_existing_order = '0' + (char)((int)allow_payments);
+		query += ignore_existing_order;
 		query += ',';
 							
 		ins_orders.createBinders();

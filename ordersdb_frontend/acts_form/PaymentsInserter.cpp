@@ -195,7 +195,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(id_user != -1);
 
 	ins_helper.addBinder(0, _T("Реквізити доручення"), \
-							std::make_shared<COrderParamsBinder>(db_table));
+							std::make_shared<COrderParamsBinder>(db_table), 3);
 	ins_helper.addBinder(3, _T("Сума"), \
 							std::make_shared<CFeeBinder>(fee, false, false));
 	ins_helper.addBinder(4, _T("Стадія"), \

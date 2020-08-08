@@ -137,13 +137,9 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 
 	const int def_center = params_manager.getDefaultCenter();
 	const char *qa_part = def_center == 1 ? "NULL" : "0";
-	const char center_str[] = { '0' + (char)def_center , 0 };
-
+	
 	if (incl_order_props) {
-		if (center_binder)
-			ins_helper.addBinder(0, _T("Центр"), center_binder);
-		else
-			ins_helper.defStaticInsertion(0, center_str);
+		ins_helper.addBinder(0, _T("Центр"), center_binder);
 		ins_helper.addBinder(1, _T("Номер доручення"), id_order_binder);
 		ins_helper.addBinder(2, _T("Дата доручення"), order_date_binder);
 		ins_helper.addBinder(10, _T("Користувач"), \

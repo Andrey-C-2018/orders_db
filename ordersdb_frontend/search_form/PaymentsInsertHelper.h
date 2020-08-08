@@ -37,7 +37,7 @@ public:
 	CPaymentsInsertHelper();
 	CPaymentsInsertHelper(const bool incl_order_props_);
 
-	inline void init(const bool incl_order_props_);
+	inline void includeOrdersProps(const bool incl_order_props_);
 
 	CPaymentsInsertHelper(const CPaymentsInsertHelper &obj) = delete;
 	CPaymentsInsertHelper(CPaymentsInsertHelper &&obj) = delete;
@@ -92,7 +92,7 @@ void CPaymentsInsertHelper::init() {
 	checker = nullptr;
 }
 
-void CPaymentsInsertHelper::init(const bool incl_order_props_) {
+void CPaymentsInsertHelper::includeOrdersProps(const bool incl_order_props_) {
 
 	this->incl_order_props = incl_order_props_;
 	ins_helper.init(this->incl_order_props ? FIELDS_COUNT : \

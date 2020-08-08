@@ -14,6 +14,7 @@ class CDbInsertHelper {
 		size_t field_no;
 		const Tchar *field_name;
 		std::shared_ptr<IInsertBinder> binder;
+		size_t affected_params_count;
 
 		inline bool operator<(const Binders &obj) const { 
 			
@@ -34,8 +35,11 @@ public:
 	CDbInsertHelper &operator=(const CDbInsertHelper &obj) = default;
 	CDbInsertHelper &operator=(CDbInsertHelper &&obj) = default;
 
-	void addBinder(const size_t field_no, const Tchar *field_name, \
+	inline void addBinder(const size_t field_no, const Tchar *field_name, \
 							std::shared_ptr<IInsertBinder> binder);
+	void addBinder(const size_t field_no, const Tchar *field_name, \
+					std::shared_ptr<IInsertBinder> binder, \
+					const size_t affected_params_count);
 	void defStaticInsertion(const size_t field_no, const char *expr);
 	inline size_t getBindersCount() const;
 
@@ -52,6 +56,12 @@ void CDbInsertHelper::init(const size_t fields_count_) {
 
 	assert(this->fields_count == (size_t)-1);
 	this->fields_count = fields_count_;
+}
+
+void CDbInsertHelper::addBinder(const size_t field_no, const Tchar *field_name, \
+								std::shared_ptr<IInsertBinder> binder) {
+
+	addBinder(field_no, field_name, binder, 1);
 }
 
 size_t CDbInsertHelper::getBindersCount() const {
@@ -72,6 +82,7 @@ bool CDbInsertHelper::bind(std::shared_ptr<IDbBindingTarget> stmt, \
 
 		cancel = !p_item->binder->bind(stmt, params, p_item->field_name);
 		assert(param_no < params.param_no);
+		assert(param_no + p_item->affected_params_count == params.param_no);
 		assert(params.param_no <= initial_param_no + fields_count);
 		assert(err_str_size <= params.error_str.size());
 	}

@@ -223,7 +223,7 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	ins_helper.addBinder(0, _T("ID"), \
 					std::make_shared<CAdvocatIdBinder>(conn, id_advocat, false));
 	ins_helper.addBinder(1, _T("ПІБ"), \
-						std::make_shared<CAdvNameBinder>(adv_name, false));
+						std::make_shared<CAdvNameBinder>(adv_name, false), 2);
 	ins_helper.addBinder(3, _T("mark"), \
 							std::make_shared<CIntInsertBinder>(0));
 	ins_helper.addBinder(4, _T("Номер свідоцтва"), \
@@ -245,9 +245,9 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	ins_helper.addBinder(12, _T("Основний район роботи"), \
 				std::make_shared<CDbComboBoxInsertBinder>(district, false, false));
 	ins_helper.addBinder(13, _T("Організація"), \
-				std::make_shared<CAdvOrgBinder>(org_name, org_type, false, false));
+				std::make_shared<CAdvOrgBinder>(org_name, org_type, false, false), 2);
 
-	std::string query = "INSERT INTO payments VALUES(";
+	std::string query = "INSERT INTO advocats VALUES(";
 	ins_helper.buildQuery(query);
 	query += ')';
 
