@@ -52,6 +52,8 @@ public:
 	inline const CDbInsertHelper &getHelper() const { return ins_helper; }
 	inline void errMsgOnPrimKeyDuplicate(Tstring &err_str) const;
 	void appendOrderInfo(Tstring &err_str) const;
+
+	void resetControls();
 	
 	virtual ~COrdersInsertHelper();
 };

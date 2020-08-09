@@ -202,4 +202,13 @@ void CPaymentsInsertHelper::errMsgOnInvalidRef(Tstring &err_str) const {
 	err_str += stage->GetLabel();
 }
 
+void CPaymentsInsertHelper::resetControls() {
+
+	article->SetLabel(_T(""));
+	fee->SetLabel(_T(""));
+	outg_extra->SetLabel(_T("")); 
+	outg_post->SetLabel(_T(""));
+	outg_daynight->SetLabel(_T(""));
+}
+
 CPaymentsInsertHelper::~CPaymentsInsertHelper() { }

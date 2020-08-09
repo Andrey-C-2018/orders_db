@@ -31,6 +31,8 @@ public:
 	void prepare(std::shared_ptr<IDbConnection> conn) override;
 	bool insert() override;
 
+	inline void resetControls();
+
 	virtual ~CInserter();
 };
 
@@ -53,4 +55,10 @@ void CInserter::SetOrderDateWidget(XWidget *order_date) {
 	ins_orders.SetOrderDateWidget(order_date);
 	ins_payments.setOrderDateBinder(ins_orders.getOrderDateBinder(), \
 											order_date);
+}
+
+void CInserter::resetControls() {
+
+	ins_orders.resetControls();
+	ins_payments.resetControls();
 }

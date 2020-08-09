@@ -204,4 +204,9 @@ void COrdersInsertHelper::appendOrderInfo(Tstring &err_str) const {
 	err_str += center->GetLabel();
 }
 
+void COrdersInsertHelper::resetControls() {
+
+	bdate->SetLabel(_T(""));
+}
+
 COrdersInsertHelper::~COrdersInsertHelper() { }

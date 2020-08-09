@@ -69,6 +69,8 @@ public:
 	void errMsgOnPrimKeyDuplicate(Tstring &err_str) const;
 	void errMsgOnInvalidRef(Tstring &err_str) const;
 
+	void resetControls();
+
 	virtual ~CPaymentsInsertHelper();
 };
 

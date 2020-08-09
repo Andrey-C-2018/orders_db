@@ -62,7 +62,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.5";
+constexpr char search_form_version[] = "1.0.7";
 
 #ifdef DUTY
 const char main_query_fields[] = "\
@@ -991,6 +991,7 @@ void CSearchForm::OnResetButtonClick(XCommandEvent *eve) {
 
 	filtering_manager.disableAll();
 	loadInitialFilterToControls();
+	inserter.resetControls();
 	OnFilterButtonClick(eve);
 }
 
