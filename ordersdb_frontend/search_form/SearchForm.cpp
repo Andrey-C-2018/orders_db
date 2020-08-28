@@ -70,14 +70,27 @@ SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
  a.reason, a.cancel_order, a.cancel_date, inf.informer_name, aa.article,\
  aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.id_act,\
- aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date, uu.user_full_name,";
+ aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date, uu.user_full_name,\
+ aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_, \
+ aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef,";
+#elif LEVEN
+const char main_query_fields[] = "\
+SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
+ t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
+ aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.id_act,\
+ aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,\
+ aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_, \
+ aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef, \
+ a.reason, a.cancel_order, a.cancel_date, inf.informer_name, aa.article, uu.user_full_name,";
 #else
 const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
  aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,\
- aa.article, uu.user_full_name, a.reason, a.cancel_order, a.cancel_date, inf.informer_name,";
+ aa.article, uu.user_full_name, a.reason, a.cancel_order, a.cancel_date, inf.informer_name,\
+ aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_, \
+ aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef,";
 #endif
 
 const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
@@ -565,8 +578,6 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	std::string query = main_query_fields;
 
-	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
-	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,";
 	query += " aa.id_stage,a.id_center_legalaid,a.id_adv,a.id_order_type,aa.id_informer,aa.id_checker ";
 	query += "FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
 	query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat";
@@ -913,17 +924,14 @@ void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
 		def_binding_target->replaceFirst(stmt);
 		def_binding_target->replaceSecond(stmt_aggregate);
 
-		if (filtering_manager.apply(def_binding_target)) {
-			db_table->reload(stmt);
-			reloadStatisticsControls(stmt_aggregate);
-		}
+		filtering_manager.apply(def_binding_target);
+		db_table->reload(stmt);
+		reloadStatisticsControls(stmt_aggregate);
 	}
 	else {
-
-		if (filtering_manager.apply(def_binding_target)) {
-			db_table->reload();
-			reloadStatisticsControls();
-		}
+		filtering_manager.apply(def_binding_target);
+		db_table->reload();
+		reloadStatisticsControls();
 	}
 }
 
