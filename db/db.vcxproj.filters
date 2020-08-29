@@ -27,9 +27,6 @@
     <ClCompile Include="DbException.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="MySQL\MySQLCommon.cpp">
-      <Filter>MySQL</Filter>
-    </ClCompile>
     <ClCompile Include="MySQL\MySQLConnection.cpp">
       <Filter>MySQL</Filter>
     </ClCompile>
@@ -69,6 +66,18 @@
     <ClCompile Include="MySQL\MySQLConnectionFactory.cpp">
       <Filter>MySQL</Filter>
     </ClCompile>
+    <ClCompile Include="MySQL\MySQLStmtData.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLException.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLStmtDataEx.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQL\MySQLStatementException.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IDbResultSet.h">
@@ -94,9 +103,6 @@
     </ClInclude>
     <ClInclude Include="IDbField.h">
       <Filter>interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="MySQL\MySQLCommon.h">
-      <Filter>MySQL</Filter>
     </ClInclude>
     <ClInclude Include="MySQL\MySQLConnection.h">
       <Filter>MySQL</Filter>
@@ -139,6 +145,21 @@
     </ClInclude>
     <ClInclude Include="NullDbBindingTarget.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLStmtData.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLBindingItem.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLException.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLStmtDataEx.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLStatementException.h">
+      <Filter>MySQL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -73,9 +73,6 @@ public:
 	inline void SetString(const wchar_t *value);
 	inline void SetString(const wchar_t *value, const size_t len);
 
-	inline void SetDecimal(const char *value);
-	inline void SetDecimal(const wchar_t *value);
-
 	~CMySQLVariant();
 };
 

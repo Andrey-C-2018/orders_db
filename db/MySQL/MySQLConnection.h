@@ -1,6 +1,6 @@
 #pragma once
 #include "../IDbConnection.h"
-#include "MySQLStatement.h"
+#include "MySQLException.h"
 
 class CMySQLConnectionException : public CMySQLException {
 public:
@@ -51,6 +51,8 @@ public:
 	void Disconnect() override;
 	virtual ~CMySQLConnection();
 };
+
+//*****************************************************
 
 void CMySQLConnection::CheckConnected() const {
 

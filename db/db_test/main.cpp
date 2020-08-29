@@ -14,5 +14,6 @@ int main() {
 
 	int ret_value = UnitTest::RunAllTests();
 
+	std::wcin.get();
 	return ret_value;
 }

@@ -1,5 +1,7 @@
-#include "MySQLResultSet.h"
 #include "../IDbBindingTarget.h"
+#include "MySQLResultSet.h"
+#include "MySQLStmtDataEx.h"
+#include "MySQLBindingItem.h"
 
 CMySQLResultSetException::CMySQLResultSetException(const int err_code, \
 													const Tchar *err_descr) : \
@@ -18,24 +20,29 @@ CMySQLResultSetException::~CMySQLResultSetException() { }
 
 //*************************************************************
 
-CMySQLResultSet::CMySQLResultSet(std::shared_ptr<MYSQL_STMT> stmt_, \
-									std::shared_ptr<MYSQL_RES> metadata_) : \
+CMySQLResultSet::CMySQLResultSet(std::shared_ptr<const MySQLStmtDataEx> stmt_) : \
 								fields_count(0), records_count(0), \
-								stmt(stmt_), metadata(metadata_), \
-								curr_record((size_t)-1) {
+								stmt(stmt_), curr_record((size_t)-1) {
 	assert(stmt);
-	assert(metadata);
+	assert(stmt->stmt);
+	assert(stmt->metadata);
 
-	fields_count = mysql_num_fields(metadata.get());
-	records_count = (size_t)mysql_stmt_num_rows(stmt.get());
+	if (mysql_stmt_store_result(stmt->stmt))
+		throw CMySQLResultSetException(stmt->stmt);
+
+	fields_count = mysql_num_fields(stmt->metadata);
+	assert(fields_count > 0);
+
+	records_count = (size_t)mysql_stmt_num_rows(stmt->stmt);
 	fields.reserve(fields_count);
 	fields_bindings.reserve(fields_count);
 
+	mysql_field_seek(stmt->metadata, (MYSQL_FIELD_OFFSET)0);
 	for (size_t i = 0; i < fields_count; ++i) {
-		MYSQL_FIELD *field = mysql_fetch_field(metadata.get());
+		MYSQL_FIELD *field = mysql_fetch_field(stmt->metadata);
 		assert(field);
 
-		CMySQLBindingTarget rec;
+		MySQLBindingItem rec;
 		rec.value = CMySQLVariant(field->type, field->length);
 		fields.emplace_back(std::move(rec));
 
@@ -52,15 +59,14 @@ CMySQLResultSet::CMySQLResultSet(std::shared_ptr<MYSQL_STMT> stmt_, \
 		fields_bindings.push_back(field_binding);
 	}
 
-	if (mysql_stmt_bind_result(stmt.get(), &fields_bindings[0]))
-		throw CMySQLResultSetException(stmt.get());
+	if (mysql_stmt_bind_result(stmt->stmt, &fields_bindings[0]))
+		throw CMySQLResultSetException(stmt->stmt);
 }
 
 CMySQLResultSet::CMySQLResultSet(CMySQLResultSet &&obj) : \
 								fields_count(obj.fields_count), \
 								records_count(obj.records_count), \
 								stmt(std::move(obj.stmt)), \
-								metadata(std::move(obj.metadata)), \
 								curr_record(obj.curr_record), \
 								fields(std::move(obj.fields)), \
 								fields_bindings(std::move(obj.fields_bindings)) {
@@ -78,7 +84,6 @@ CMySQLResultSet &CMySQLResultSet::operator=(CMySQLResultSet &&obj) {
 	fields_count = obj.fields_count;
 	records_count = obj.records_count;
 	stmt = std::move(obj.stmt);
-	metadata = std::move(obj.metadata);
 	curr_record = obj.curr_record;
 	
 	obj.records_count = 0;
@@ -111,9 +116,9 @@ void CMySQLResultSet::gotoRecord(const size_t record) const {
 	if (curr_record == record) return;
 
 	assert(stmt);
-	mysql_stmt_data_seek(stmt.get(), record);
+	mysql_stmt_data_seek(stmt->stmt, record);
 
-	volatile int success = mysql_stmt_fetch(stmt.get());
+	volatile int success = mysql_stmt_fetch(stmt->stmt);
 	if (success == MYSQL_DATA_TRUNCATED)
 		throw CMySQLResultSetException(CMySQLResultSetException::E_TRUNC, \
 										_T("fetched data was truncated"));
@@ -193,40 +198,31 @@ CDate CMySQLResultSet::getDate(const size_t field, bool &is_null) const {
 void CMySQLResultSet::reload() {
 
 	assert(stmt);
-	assert(metadata);
+	assert(stmt->stmt);
+	assert(stmt->metadata);
 
-	if (mysql_stmt_execute(stmt.get()))
-		throw CMySQLResultSetException(stmt.get());
+	stmt->applyParamsBindings();
 
-	if (mysql_stmt_store_result(stmt.get()))
-		throw CMySQLResultSetException(stmt.get());
+	if (mysql_stmt_execute(stmt->stmt))
+		throw CMySQLResultSetException(stmt->stmt);
 
-	records_count = (size_t)mysql_stmt_num_rows(stmt.get());
+	if (mysql_stmt_store_result(stmt->stmt))
+		throw CMySQLResultSetException(stmt->stmt);
+
+	records_count = (size_t)mysql_stmt_num_rows(stmt->stmt);
 	if (records_count) {
 		curr_record = (curr_record >= records_count) * (records_count - 1) + \
 						(curr_record < records_count) * curr_record;
-		mysql_stmt_data_seek(stmt.get(), curr_record);
+		mysql_stmt_data_seek(stmt->stmt, curr_record);
 
-		volatile int success = mysql_stmt_fetch(stmt.get());
+		volatile int success = mysql_stmt_fetch(stmt->stmt);
 		if (success == MYSQL_DATA_TRUNCATED)
 			throw CMySQLResultSetException(CMySQLResultSetException::E_TRUNC, \
-				_T("fetched data was truncated"));
+										_T("fetched data was truncated"));
 		assert(success == 0);
 	}
 	else
 		curr_record = (size_t)-1;
 }
 
-void CMySQLResultSet::Release() {
-
-	curr_record = (size_t)-1;
-	records_count = fields_count = 0;
-
-	metadata.reset();
-	stmt.reset();
-}
-
-CMySQLResultSet::~CMySQLResultSet() {
-
-	Release();
-}
+CMySQLResultSet::~CMySQLResultSet() { }

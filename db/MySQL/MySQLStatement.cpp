@@ -1,64 +1,38 @@
 #include "MySQLStatement.h"
+#include "MySQLStatementException.h"
+#include "MySQLResultSet.h"
 #include "MySQLResultSetMetadata.h"
-
-CMySQLStatementException::CMySQLStatementException(const int err_code, \
-													const Tchar *err_descr) : \
-													CMySQLException(err_code, err_descr) { }
-
-CMySQLStatementException::CMySQLStatementException(MYSQL *conn) : \
-													CMySQLException(conn) { }
-
-CMySQLStatementException::CMySQLStatementException(MYSQL_STMT *stmt) : \
-													CMySQLException(stmt) { }
-
-CMySQLStatementException::CMySQLStatementException(const CMySQLStatementException &obj) : \
-													CMySQLException(obj) { }
-
-CMySQLStatementException::~CMySQLStatementException() { }
-
-//*************************************************************
+#include "MySQLVariant.h"
+#include "MySQLStmtDataEx.h"
+#include "MySQLBindingItem.h"
 
 CMySQLStatement::CMySQLStatement(MYSQL_STMT *stmt_) {
 
 	assert(stmt_);
-	stmt = std::shared_ptr<MYSQL_STMT>(stmt_, \
-				[](MYSQL_STMT *stmt_) { mysql_stmt_close(stmt_); });
-
-	params_count = mysql_stmt_param_count(stmt.get());
-
-	if (params_count) {
-		params.resize(params_count);
-
-		MYSQL_BIND def_param_binding;
-		memset((void *)&def_param_binding, 0, sizeof(MYSQL_BIND));
-
-		params_bindings.insert(params_bindings.begin(), \
-								params_count, def_param_binding);
-	}
+	stmt = std::make_shared<MySQLStmtDataEx>(stmt_);
+	
+	params.resize(stmt->getParamsCount());
 }
 
 CMySQLStatement::CMySQLStatement(CMySQLStatement &&obj) : stmt(std::move(obj.stmt)), \
-														params_count(obj.params_count), \
-														params(std::move(obj.params)), 
-														params_bindings(std::move(obj.params_bindings)), \
-														metadata(std::move(obj.metadata)){ 
-	obj.params_count = 0;
-}
+												params(std::move(obj.params)) { }
 
 CMySQLStatement &CMySQLStatement::operator=(CMySQLStatement &&obj) {
 
 	stmt = std::move(obj.stmt);
-	params_count = obj.params_count;
 	params = std::move(obj.params);
-	params_bindings = std::move(obj.params_bindings);
-	metadata = std::move(obj.metadata);
-
-	obj.params_count = 0;
 	return *this;
 }
 
-void CMySQLStatement::assignParamBindingWithScalar(MYSQL_BIND &param_binding, \
+size_t CMySQLStatement::getParamsCount() const {
+
+	return stmt->getParamsCount();
+}
+
+void CMySQLStatement::assignParamBindingWithScalar(const size_t param_no, \
 													CMySQLVariant &value) {
+
+	MYSQL_BIND &param_binding = stmt->getBinding(param_no);
 
 	param_binding.buffer_type = value.GetValueType();
 	param_binding.buffer = value.GetValuePtr();
@@ -66,138 +40,132 @@ void CMySQLStatement::assignParamBindingWithScalar(MYSQL_BIND &param_binding, \
 	param_binding.length = 0;
 }
 
-void CMySQLStatement::assignParamBindingWithVector(MYSQL_BIND &param_binding, \
-													CMySQLBindingTarget &param) {
+void CMySQLStatement::assignParamBindingWithVector(const size_t param_no, \
+													MySQLBindingItem &param_item) {
 
-	param_binding.buffer_length = (unsigned long)param.value.GetBufferSize();
-	param_binding.buffer_type = param.value.GetValueType();
-	param_binding.buffer = param.value.GetValuePtr();
+	MYSQL_BIND &param_binding = stmt->getBinding(param_no);
+
+	param_binding.buffer_length = (unsigned long)param_item.value.GetBufferSize();
+	param_binding.buffer_type = param_item.value.GetValueType();
+	param_binding.buffer = param_item.value.GetValuePtr();
 	param_binding.is_null = 0;
 
-	param.length = (unsigned long)param.value.GetValueLength();
-	param_binding.length = &param.length;
+	param_item.length = (unsigned long)param_item.value.GetValueLength();
+	param_binding.length = &param_item.length;
 }
 
 void CMySQLStatement::bindValue(const size_t param_no, const int value) {
 
-	assert(param_no < params_count);
+	assert(param_no < stmt->getParamsCount());
 	if(params[param_no].value.IsNull())
 		params[param_no].value = CMySQLVariant(MYSQL_TYPE_LONG);
 	params[param_no].value.SetInt(value);
 
-	assignParamBindingWithScalar(params_bindings[param_no], params[param_no].value);
+	assignParamBindingWithScalar(param_no, params[param_no].value);
 }
 
 void CMySQLStatement::bindValue(const size_t param_no, const char *value) {
 
-	assert(param_no < params_count);
+	assert(param_no < stmt->getParamsCount());
 	size_t len = strlen(value);
 	if (params[param_no].value.IsNull())
 		params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, len);
 	params[param_no].value.SetString(value);
 
-	assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
+	assignParamBindingWithVector(param_no, params[param_no]);
 }
 
 void CMySQLStatement::bindValue(const size_t param_no, const wchar_t *value) {
 
-	assert(param_no < params_count);
+	assert(param_no < stmt->getParamsCount());
 	size_t len = wcslen(value);
 	if (params[param_no].value.IsNull())
 		params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, len);
 	params[param_no].value.SetString(value);
 
-	assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
+	assignParamBindingWithVector(param_no, params[param_no]);
 }
 
 void CMySQLStatement::bindValue(const size_t param_no, \
 								const ImmutableString<char> value) {
 
-	assert(param_no < params_count);
+	assert(param_no < stmt->getParamsCount());
 	if (params[param_no].value.IsNull())
 		params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, value.size);
 	params[param_no].value.SetString(value.str, value.size);
 
-	assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
+	assignParamBindingWithVector(param_no, params[param_no]);
 }
 
 void CMySQLStatement::bindValue(const size_t param_no, \
 								const ImmutableString<wchar_t> value) {
 
-	assert(param_no < params_count);
+	assert(param_no < stmt->getParamsCount());
 	if (params[param_no].value.IsNull())
 		params[param_no].value = CMySQLVariant(MYSQL_TYPE_STRING, value.size);
 	params[param_no].value.SetString(value.str, value.size);
 
-	assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
+	assignParamBindingWithVector(param_no, params[param_no]);
 }
 
 void CMySQLStatement::bindValue(const size_t param_no, const CDate &value) {
 
-	assert(param_no < params_count);
+	assert(param_no < stmt->getParamsCount());
 	if (params[param_no].value.IsNull())
 		params[param_no].value = CMySQLVariant(MYSQL_TYPE_DATE);
 	params[param_no].value.SetDate(value);
 
-	assignParamBindingWithScalar(params_bindings[param_no], params[param_no].value);
+	assignParamBindingWithScalar(param_no, params[param_no].value);
 }
 
 void CMySQLStatement::bindValue(const size_t param_no, const CMySQLVariant &value) {
 
-	assert(param_no < params_count);
+	assert(param_no < stmt->getParamsCount());
 	params[param_no].value = value;
 
 	if(value.IsVectorType())
-		assignParamBindingWithVector(params_bindings[param_no], params[param_no]);
+		assignParamBindingWithVector(param_no, params[param_no]);
 	else
-		assignParamBindingWithScalar(params_bindings[param_no], params[param_no].value);
+		assignParamBindingWithScalar(param_no, params[param_no].value);
 }
 
 void CMySQLStatement::bindNull(const size_t param_no) {
 
-	params_bindings[param_no].buffer_length = 0;
-	params_bindings[param_no].buffer_type = MYSQL_TYPE_NULL;
-	params_bindings[param_no].buffer = nullptr;
+	MYSQL_BIND &param_binding = stmt->getBinding(param_no);
+	param_binding.buffer_length = 0;
+	param_binding.buffer_type = MYSQL_TYPE_NULL;
+	param_binding.buffer = nullptr;
 
 	params[param_no].is_null = 1;
 	params[param_no].length = 0;
-	params_bindings[param_no].is_null = &params[param_no].is_null;
-	params_bindings[param_no].length = &params[param_no].length;
+	param_binding.is_null = &params[param_no].is_null;
+	param_binding.length = &params[param_no].length;
 }
 
 std::shared_ptr<IDbResultSet> CMySQLStatement::exec() {
 
-	if (params_count)
-		mysql_stmt_bind_param(stmt.get(), &params_bindings[0]);
+	stmt->applyParamsBindings();
 
-	if (mysql_stmt_execute(stmt.get()))
-		throw CMySQLStatementException(stmt.get());
+	if (mysql_stmt_execute(stmt->stmt))
+		throw CMySQLStatementException(stmt->stmt);
 
-	MYSQL_RES *metadata_ptr = mysql_stmt_result_metadata(stmt.get());
-	if (!metadata_ptr)
+	if (!stmt->metadata)
 		throw CMySQLStatementException(CMySQLStatementException::E_EXEC, \
 										_T("exec() used instead of execScalar()"));
 
-	metadata = std::shared_ptr<MYSQL_RES>(metadata_ptr, \
-										[](MYSQL_RES *ptr) { mysql_free_result(ptr); });
-
-	if (mysql_stmt_store_result(stmt.get()))
-		throw CMySQLStatementException(stmt.get());
-
-	return std::make_shared<CMySQLResultSet>(stmt, metadata);
+	return std::make_shared<CMySQLResultSet>(stmt);
 }
 
 record_t CMySQLStatement::execScalar() {
 
-	if (params_count)
-		mysql_stmt_bind_param(stmt.get(), &params_bindings[0]);
+	stmt->applyParamsBindings();
 
-	if (mysql_stmt_execute(stmt.get()))
-		throw CMySQLStatementException(stmt.get());
+	if (mysql_stmt_execute(stmt->stmt))
+		throw CMySQLStatementException(stmt->stmt);
 
-	my_ulonglong affected_rows = mysql_stmt_affected_rows(stmt.get());
+	my_ulonglong affected_rows = mysql_stmt_affected_rows(stmt->stmt);
 
-	if (mysql_stmt_result_metadata(stmt.get()))
+	if (stmt->metadata)
 		throw CMySQLStatementException(CMySQLStatementException::E_EXEC, \
 										_T("execScalar() used instead of exec()"));
 
@@ -206,16 +174,11 @@ record_t CMySQLStatement::execScalar() {
 
 std::shared_ptr<IDbResultSetMetadata> CMySQLStatement::getResultSetMetadata() {
 
-	if (!metadata) {
-		MYSQL_RES *metadata_ptr = mysql_stmt_result_metadata(stmt.get());
-		if (!metadata_ptr)
-			throw CMySQLStatementException(stmt.get());
+	if (!stmt->metadata)
+		throw CMySQLStatementException(CMySQLStatementException::E_METADATA, \
+									_T("this prepared statement has no metadata"));
 
-		metadata = std::shared_ptr<MYSQL_RES>(metadata_ptr, \
-			[](MYSQL_RES *ptr) { mysql_free_result(ptr); });
-	}
-
-	return std::make_shared<CMySQLResultSetMetadata>(metadata);
+	return std::make_shared<CMySQLResultSetMetadata>(stmt);
 }
 
 CMySQLStatement::~CMySQLStatement() { }

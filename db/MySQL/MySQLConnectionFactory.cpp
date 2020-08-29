@@ -1,6 +1,7 @@
 #include "MySQLConnectionFactory.h"
 #include <basic/PropertiesFile.h>
 #include <basic/Cryptor.h>
+#include <basic/TextConv.h>
 
 inline const Tchar *getPropertyValue(const CPropertiesFile &props, \
 						const Tchar *prop_name, const Tchar *prop_descr, \

@@ -925,11 +925,12 @@ void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
 		def_binding_target->replaceSecond(stmt_aggregate);
 
 		filtering_manager.apply(def_binding_target);
+		filtering_manager.apply(stmt);
 		db_table->reload(stmt);
 		reloadStatisticsControls(stmt_aggregate);
 	}
 	else {
-		filtering_manager.apply(def_binding_target);
+		filtering_manager.apply(def_binding_target->getFirst());
 		db_table->reload();
 		reloadStatisticsControls();
 	}

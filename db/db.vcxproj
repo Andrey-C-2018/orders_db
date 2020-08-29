@@ -20,13 +20,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DbException.cpp" />
-    <ClCompile Include="MySQL\MySQLCommon.cpp" />
+    <ClCompile Include="MySQL\MySQLException.cpp" />
     <ClCompile Include="MySQL\MySQLConnection.cpp" />
     <ClCompile Include="MySQL\MySQLConnectionFactory.cpp" />
     <ClCompile Include="MySQL\MySQLField.cpp" />
     <ClCompile Include="MySQL\MySQLResultSet.cpp" />
     <ClCompile Include="MySQL\MySQLResultSetMetadata.cpp" />
     <ClCompile Include="MySQL\MySQLStatement.cpp" />
+    <ClCompile Include="MySQL\MySQLStatementException.cpp" />
+    <ClCompile Include="MySQL\MySQLStmtData.cpp" />
+    <ClCompile Include="MySQL\MySQLStmtDataEx.cpp" />
     <ClCompile Include="MySQL\MySQLVariant.cpp" />
     <ClCompile Include="SQLite\SQLiteCommon.cpp" />
     <ClCompile Include="SQLite\SQLiteConnection.cpp" />
@@ -44,13 +47,17 @@
     <ClInclude Include="IDbResultSet.h" />
     <ClInclude Include="IDbResultSetMetadata.h" />
     <ClInclude Include="IDbStatement.h" />
-    <ClInclude Include="MySQL\MySQLCommon.h" />
+    <ClInclude Include="MySQL\MySQLBindingItem.h" />
+    <ClInclude Include="MySQL\MySQLException.h" />
     <ClInclude Include="MySQL\MySQLConnection.h" />
     <ClInclude Include="MySQL\MySQLConnectionFactory.h" />
     <ClInclude Include="MySQL\MySQLField.h" />
     <ClInclude Include="MySQL\MySQLResultSet.h" />
     <ClInclude Include="MySQL\MySQLResultSetMetadata.h" />
     <ClInclude Include="MySQL\MySQLStatement.h" />
+    <ClInclude Include="MySQL\MySQLStatementException.h" />
+    <ClInclude Include="MySQL\MySQLStmtData.h" />
+    <ClInclude Include="MySQL\MySQLStmtDataEx.h" />
     <ClInclude Include="MySQL\MySQLVariant.h" />
     <ClInclude Include="NullDbBindingTarget.h" />
     <ClInclude Include="SQLite\SQLiteCommon.h" />

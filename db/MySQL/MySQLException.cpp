@@ -1,4 +1,5 @@
-#include "MySQLCommon.h"
+#include "MySQLException.h"
+#include <mysql.h>
 #include <mysqld_error.h>
 
 CMySQLException::CMySQLException(const int err_code, const Tchar *err_descr) : \

@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include "../IDbResultSet.h"
-#include "MySQLCommon.h"
+#include "MySQLException.h"
 
 class CMySQLResultSetException : public CMySQLException {
 public:
@@ -20,18 +20,19 @@ public:
 	~CMySQLResultSetException();
 };
 
+struct MySQLStmtDataEx;
+struct MySQLBindingItem;
+
 class CMySQLResultSet : public IDbResultSet {
 	size_t fields_count, records_count;
-	mutable std::shared_ptr<MYSQL_STMT> stmt;
-	std::shared_ptr<MYSQL_RES> metadata;
+	mutable std::shared_ptr<const MySQLStmtDataEx> stmt;
 	mutable size_t curr_record;
 
-	std::vector<CMySQLBindingTarget> fields;
+	std::vector<MySQLBindingItem> fields;
 	std::vector<MYSQL_BIND> fields_bindings;
 
 public:
-	CMySQLResultSet(std::shared_ptr<MYSQL_STMT> stmt_, 
-						std::shared_ptr<MYSQL_RES> metadata_);
+	CMySQLResultSet(std::shared_ptr<const MySQLStmtDataEx> stmt_);
 
 	CMySQLResultSet(const CMySQLResultSet &obj) = delete;
 	CMySQLResultSet(CMySQLResultSet &&obj);
@@ -53,7 +54,6 @@ public:
 
 	void reload() override;
 
-	void Release();
 	virtual ~CMySQLResultSet();
 };
 

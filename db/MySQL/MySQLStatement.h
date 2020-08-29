@@ -1,37 +1,21 @@
 #pragma once
 #include <vector>
+#include <mysql.h>
 #include "../IDbStatement.h"
-#include "MySQLResultSet.h"
 
-class CMySQLStatementException : public CMySQLException {
-public:
-	enum {
-		E_EXEC = 1
-	};
-
-	CMySQLStatementException(const int err_code, const Tchar *err_descr);
-	CMySQLStatementException(MYSQL *conn);
-	CMySQLStatementException(MYSQL_STMT *stmt);
-
-	CMySQLStatementException(const CMySQLStatementException &obj);
-	CMySQLStatementException(CMySQLStatementException &&obj) = default;
-
-	~CMySQLStatementException();
-};
+struct MySQLStmtDataEx;
+struct MySQLBindingItem;
+class CMySQLVariant;
 
 class CMySQLStatement : public IDbStatement {
-	std::shared_ptr<MYSQL_STMT> stmt;
-	size_t params_count;
-	
-	std::vector<CMySQLBindingTarget> params;
-	std::vector<MYSQL_BIND> params_bindings;
 
-	std::shared_ptr<MYSQL_RES> metadata;
+	std::shared_ptr<MySQLStmtDataEx> stmt;
+	std::vector<MySQLBindingItem> params;
 
-	void assignParamBindingWithScalar(MYSQL_BIND &param_binding, \
+	void assignParamBindingWithScalar(const size_t param_no, \
 										CMySQLVariant &value);
-	void assignParamBindingWithVector(MYSQL_BIND &param_binding, \
-										CMySQLBindingTarget &param);
+	void assignParamBindingWithVector(const size_t param_no, \
+										MySQLBindingItem &param_item);
 public:
 	CMySQLStatement(MYSQL_STMT *stmt_);
 	CMySQLStatement(const CMySQLStatement &obj) = delete;
@@ -39,7 +23,7 @@ public:
 	CMySQLStatement &operator=(const CMySQLStatement &obj) = delete;
 	CMySQLStatement &operator=(CMySQLStatement &&obj);
 
-	size_t getParamsCount() const { return params_count; }
+	size_t getParamsCount() const;
 	void bindValue(const size_t param_no, const int value) override;
 
 	void bindValue(const size_t param_no, const char *value) override;

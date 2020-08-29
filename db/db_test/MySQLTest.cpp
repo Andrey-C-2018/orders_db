@@ -2,6 +2,8 @@
 #include <basic/tstream.h>
 #include <UnitTest++/UnitTest++.h>
 #include <db/MySQL/MySQLConnection.h>
+#include <db/IDbStatement.h>
+#include <db/IDbResultSet.h>
 
 class CMySQLTest {
 	static std::shared_ptr<CMySQLConnection> conn;
@@ -23,6 +25,11 @@ protected:
 				exit(1);
 			}
 		}
+	}
+
+	std::shared_ptr<CMySQLConnection> getConn() {
+
+		return conn;
 	}
 
 	void createDatabase() {
@@ -230,5 +237,38 @@ SUITE(MySQL_tests) {
 		bool is_null;
 		CDate bdate = rs->getDate(5, is_null);
 		CHECK(is_null);
+	}
+
+	TEST_FIXTURE(CMySQLTest, SelectParametrized) {
+
+		clearOrdersTable();
+		auto stmt = getInsertionStmtOrders();
+
+		auto recs_count = insertIntoOrders(stmt, 1, 1, CDate(5, 2, 1992), 1, \
+											"Іванов А. А.", CDate(5, 6, 1970), \
+											"ЗЗП", "503.7");
+		CHECK_EQUAL(1, recs_count);
+		recs_count = insertIntoOrders(stmt, 1, 2, CDate(1, 1, 2013), 1, \
+											"Іванов А. В.", CDate(), \
+											"ЗЗП", "504.7");
+		CHECK_EQUAL(1, recs_count);
+		recs_count = insertIntoOrders(stmt, 1, 3, CDate(1, 1, 2013), 1, \
+											"Іванов В. В.", CDate(), \
+											"ЗЗП", "504.7");
+		CHECK_EQUAL(1, recs_count);
+
+		auto q_stmt = getConn()->PrepareQuery("SELECT * FROM orders WHERE client_name LIKE ?");
+		q_stmt->bindValue(0, "Іванов%");
+
+		auto rs = q_stmt->exec();
+		CHECK_EQUAL(3, rs->getRecordsCount());
+
+		q_stmt->bindValue(0, "Іванов А%");
+		rs->reload();
+		CHECK_EQUAL(2, rs->getRecordsCount());
+
+		q_stmt->bindValue(0, "Іванов В%");
+		rs->reload();
+		CHECK_EQUAL(1, rs->getRecordsCount());
 	}
 }

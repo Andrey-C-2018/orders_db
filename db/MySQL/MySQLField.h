@@ -2,10 +2,15 @@
 #include <basic/XConv.h>
 #include "../IDbField.h"
 #include "../IDbBindingTarget.h"
-#include "MySQLResultSet.h"
+#include "../IDbResultSet.h"
+#include "MySQLException.h"
 
 class CMySQLFieldException : public CMySQLException {
 public:
+	enum Errors {
+		E_STMT_RELEASED = 1
+	};
+
 	CMySQLFieldException(const int err_code, const Tchar *err_descr);
 	CMySQLFieldException(MYSQL *conn);
 	CMySQLFieldException(MYSQL_STMT *stmt);
@@ -16,20 +21,23 @@ public:
 	~CMySQLFieldException();
 };
 
+struct MySQLStmtData;
+
 class CMySQLField : public IDbField{
-	std::shared_ptr<MYSQL_RES> metadata;
+	std::weak_ptr<const MySQLStmtData> stmt;
 
 	bool is_primary_key;
 	size_t max_size;
 
-	inline MYSQL_FIELD *getMySQLFieldHandle() const;
+	MYSQL_FIELD *getMySQLFieldHandle() const;
+
 protected:
 	const size_t field;
 
-	CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
+	CMySQLField(std::weak_ptr<const MySQLStmtData> stmt_, \
 				const size_t field_, const size_t max_field_size);
 public:
-	CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
+	CMySQLField(std::weak_ptr<const MySQLStmtData> stmt_, const size_t field_);
 
 	CMySQLField(const CMySQLField &obj) = delete;
 	CMySQLField(CMySQLField &&obj) = default;
@@ -52,7 +60,7 @@ template <typename Tint> \
 class CMySQLIntegerField : public CMySQLField {
 	mutable wchar_t buffer[getDigitsCountOfType<Tint>() + 1];
 public:
-	CMySQLIntegerField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
+	CMySQLIntegerField(std::weak_ptr<const MySQLStmtData> stmt_, const size_t field_);
 
 	CMySQLIntegerField(const CMySQLField &obj) = delete;
 	CMySQLIntegerField(CMySQLIntegerField &&obj) = default;
@@ -85,7 +93,7 @@ public:
 class CMySQLDateField : public CMySQLField {
 	mutable wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1];
 public:
-	CMySQLDateField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
+	CMySQLDateField(std::weak_ptr<const MySQLStmtData> stmt_, const size_t field_);
 
 	CMySQLDateField(const CMySQLDateField &obj) = delete;
 	CMySQLDateField(CMySQLDateField &&obj) = default;
@@ -117,7 +125,7 @@ public:
 
 class CMySQLStringField : public CMySQLField {
 public:
-	CMySQLStringField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_);
+	CMySQLStringField(std::weak_ptr<const MySQLStmtData> stmt_, const size_t field_);
 
 	CMySQLStringField(const CMySQLStringField &obj) = delete;
 	CMySQLStringField(CMySQLStringField &&obj) = default;
@@ -149,17 +157,9 @@ public:
 
 //**************************************************
 
-MYSQL_FIELD *CMySQLField::getMySQLFieldHandle() const {
-
-	mysql_field_seek(metadata.get(), (MYSQL_FIELD_OFFSET)field);
-	return mysql_fetch_field(metadata.get());
-}
-
-//**************************************************
-
 template <typename Tint> \
-CMySQLIntegerField<Tint>::CMySQLIntegerField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
-											CMySQLField(metadata_, field_, getDigitsCountOfType<Tint>()) { }
+CMySQLIntegerField<Tint>::CMySQLIntegerField(std::weak_ptr<const MySQLStmtData> stmt_, const size_t field_) : \
+											CMySQLField(stmt_, field_, getDigitsCountOfType<Tint>()) { }
 
 template <typename Tint> \
 const char *CMySQLIntegerField<Tint>::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {

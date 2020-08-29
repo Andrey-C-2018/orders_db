@@ -1,4 +1,7 @@
+#include <vector>
+#include <basic/TextConv.h>
 #include "MySQLField.h"
+#include "MySQLStmtData.h"
 
 CMySQLFieldException::CMySQLFieldException(const int err_code, \
 											const Tchar *err_descr) : \
@@ -17,18 +20,30 @@ CMySQLFieldException::~CMySQLFieldException() { }
 
 //*************************************************************
 
-CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
+CMySQLField::CMySQLField(std::weak_ptr<const MySQLStmtData> stmt_, \
 							const size_t field_, const size_t max_field_size) : \
-							metadata(metadata_), max_size(max_field_size), \
+							stmt(stmt_), max_size(max_field_size), \
 							field(field_) {
 
 	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
 	is_primary_key = (mysql_field->flags & PRI_KEY_FLAG) > 0;
 }
 
-CMySQLField::CMySQLField(std::shared_ptr<MYSQL_RES> metadata_, \
+MYSQL_FIELD *CMySQLField::getMySQLFieldHandle() const {
+
+	std::shared_ptr<const MySQLStmtData> sh_stmt = stmt.lock();
+	if (!sh_stmt)
+		throw CMySQLFieldException(CMySQLFieldException::E_STMT_RELEASED, \
+			_T("the statement this field belongs to has been already released"));
+
+	assert(sh_stmt->metadata);
+	mysql_field_seek(sh_stmt->metadata, (MYSQL_FIELD_OFFSET)field);
+	return mysql_fetch_field(sh_stmt->metadata);
+}
+
+CMySQLField::CMySQLField(std::weak_ptr<const MySQLStmtData> stmt_, \
 							const size_t field_) : \
-							metadata(metadata_), field(field_) {
+							stmt(stmt_), field(field_) {
 
 	MYSQL_FIELD *mysql_field = this->getMySQLFieldHandle();
 	max_size = mysql_field->length;
@@ -100,8 +115,8 @@ CMySQLField::~CMySQLField() { }
 
 //**************************************************
 
-CMySQLDateField::CMySQLDateField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
-								CMySQLField(metadata_, field_, CDate::GERMAN_FORMAT_LEN) { }
+CMySQLDateField::CMySQLDateField(std::weak_ptr<const MySQLStmtData> stmt_, const size_t field_) : \
+								CMySQLField(stmt_, field_, CDate::GERMAN_FORMAT_LEN) { }
 
 const char *CMySQLDateField::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
 	
@@ -188,8 +203,8 @@ CMySQLDateField::~CMySQLDateField() { }
 
 //**************************************************
 
-CMySQLStringField::CMySQLStringField(std::shared_ptr<MYSQL_RES> metadata_, const size_t field_) : \
-									CMySQLField(metadata_, field_) { }
+CMySQLStringField::CMySQLStringField(std::weak_ptr<const MySQLStmtData> stmt_, const size_t field_) : \
+									CMySQLField(stmt_, field_) { }
 
 const char *CMySQLStringField::getValueAsString(const std::shared_ptr<const IDbResultSet> result_set) const {
 

@@ -1,4 +1,5 @@
 #include "MySQLConnection.h"
+#include "MySQLStatement.h"
 
 CMySQLConnectionException::CMySQLConnectionException(const int err_code, \
 											const Tchar *err_descr) : \
@@ -89,6 +90,7 @@ std::shared_ptr<IDbResultSet> CMySQLConnection::ExecQuery(const char *query_text
 	if (stmt.getParamsCount() > 0)
 		throw CMySQLConnectionException(CMySQLConnectionException::E_WRONG_QUERY, \
 				_T("Parameters are forbidden in the query text passed to ExecQuery()"));
+	
 	return stmt.exec();
 }
 
