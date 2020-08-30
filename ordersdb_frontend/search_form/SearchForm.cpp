@@ -62,7 +62,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.7";
+constexpr char search_form_version[] = "1.0.10";
 
 #ifdef DUTY
 const char main_query_fields[] = "\

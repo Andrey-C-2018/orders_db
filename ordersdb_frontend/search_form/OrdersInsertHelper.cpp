@@ -90,6 +90,74 @@ public:
 	virtual ~COrderNoBinder() { }
 };
 
+class COrderDateBinder : public CVisualInsertBinder {
+	CDbComboBox *center_widget;
+
+public:
+	COrderDateBinder(XWidget *order_date_holder, CDbComboBox *center_widget_, \
+					bool free_widget) : \
+				CVisualInsertBinder(order_date_holder, free_widget), \
+				center_widget(center_widget_) {
+	
+		assert(center_widget);
+	}
+
+	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+				Params &params, const Tchar *field_name) override {
+
+		CInsParamNoGuard param_no_guard(params.param_no, 1);
+
+		size_t size;
+		auto date_str = widget->GetLabel(size);
+		if (size == 0) {
+			params.error_str += field_name;
+			params.error_str += _T(": дата не введена\n");
+			return true;
+		}
+
+		CDate date(date_str, CDate::GERMAN_FORMAT);
+		if (date.isNull()) {
+
+			params.error_str += field_name;
+			params.error_str += _T(": невірний формат дати\n");
+			return true;
+		}
+		if (date > CDate::now()) {
+
+			params.error_str += field_name;
+			params.error_str += _T(": '");
+			params.error_str += date_str;
+
+			params.error_str += _T("' дата в майбутньому\n");
+			return true;
+		}
+
+		if (center_widget->isEmptySelection()) {
+			params.error_str += field_name;
+			params.error_str += _T(": неможливо перевірити, оскільки Центр не вибраний");
+			params.error_str += _T('\n');
+			return true;
+		}
+
+		int center = center_widget->getPrimaryKeyAsInteger();
+		if ((center != REGIONAL && date < CDate(1, 7, 2015)) || \
+			(center == REGIONAL && date < CDate(1, 1, 2013))) {
+
+			params.error_str += field_name;
+			params.error_str += _T(": '");
+			params.error_str += date_str;
+
+			params.error_str += _T("' дата до створення Центру\n");
+			return true;
+		}
+
+		binding_target->bindValue(params.param_no, date);
+		return true;
+	}
+
+	virtual ~COrderDateBinder() { }
+};
+
 class ZoneInsertBinder : public IInsertBinder {
 	CDbComboBox *center_widget;
 	XWidget *order_date;
@@ -160,7 +228,7 @@ void COrdersInsertHelper::SetOrderDateWidget(XWidget *order_date) {
 	assert(order_date);
 	assert(!this->order_date);
 	this->order_date = order_date;
-	order_date_binder = std::make_shared<UIDateInsertBinder>(order_date, false);
+	order_date_binder = std::make_shared<COrderDateBinder>(order_date, center, false);
 }
 
 void COrdersInsertHelper::createBinders() {
