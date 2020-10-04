@@ -1,19 +1,19 @@
 #include "ActDateCellWidget.h"
 
 CActDateCellWidget::CActDateCellWidget(std::shared_ptr<CDbTable> db_table) : \
+										CDateCellWidget(true), \
 										validator(db_table, nullptr) { }
 
 bool CActDateCellWidget::Validate() const {
 
-	auto label = XEdit::GetLabel(label_cache);
-	ImmutableString<Tchar> date_str(label, label_cache.size());
-
-	return InternalValidate(date_str);
+	bool date_validated = CDateCellWidget::Validate();
+	return date_validated && ValidateActDate(getCachedLabel());
 }
 
 bool CActDateCellWidget::Validate(ImmutableString<Tchar> label) const {
 
-	return InternalValidate(label);
+	bool date_validated = CDateCellWidget::Validate(label);
+	return date_validated && ValidateActDate(label);
 }
 
 CActDateCellWidget::~CActDateCellWidget() { }

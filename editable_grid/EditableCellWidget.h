@@ -4,6 +4,7 @@
 
 class CEditableCellWidget : public XEdit, public IGridCellWidget {
 	const bool def_readonly;
+
 public:
 	CEditableCellWidget();
 	CEditableCellWidget(const bool def_readonly_);

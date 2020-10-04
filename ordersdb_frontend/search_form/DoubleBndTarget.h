@@ -18,11 +18,6 @@ public:
 	inline void replaceFirst(std::shared_ptr<IDbBindingTarget> target1);
 	inline void replaceSecond(std::shared_ptr<IDbBindingTarget> target2);
 
-	inline std::shared_ptr<IDbBindingTarget> getFirst() {
-
-		return target1;
-	}
-
 	void bindValue(const size_t param_no, const int value) override;
 
 	void bindValue(const size_t param_no, const char *value) override;

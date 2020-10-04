@@ -1,12 +1,12 @@
 #pragma once
-#include <editable_grid/EditableCellWidget.h>
+#include <editable_grid/DateCellWidget.h>
 #include "Validators.h"
 
-class CActDateCellWidget : public CEditableCellWidget {
+class CActDateCellWidget : public CDateCellWidget {
 	CActDateValidator validator;
-	mutable std::vector<Tchar> label_cache;
+	
+	inline bool ValidateActDate(ImmutableString<Tchar> date_str) const;
 
-	inline bool InternalValidate(ImmutableString<Tchar> date_str) const;
 public:
 	CActDateCellWidget(std::shared_ptr<CDbTable> db_table);
 
@@ -23,7 +23,7 @@ public:
 
 //*****************************************************
 
-bool CActDateCellWidget::InternalValidate(ImmutableString<Tchar> date_str) const {
+bool CActDateCellWidget::ValidateActDate(ImmutableString<Tchar> date_str) const {
 
 	CDate dt(date_str.str, CDate::GERMAN_FORMAT);
 	if (dt.isNull()) return true;

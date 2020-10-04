@@ -10,6 +10,7 @@
 #include <xwindows_ex/XCurrencyField.h>
 #include <editable_grid/BooleanCellWidget.h>
 #include <editable_grid/CurrencyCellWidget.h>
+#include <editable_grid/DateCellWidget.h>
 #include <db_controls/DbGrid.h>
 #include <db_controls/DbComboBoxCellWidget.h>
 #include <db_controls/FilteringEdit.h>
@@ -20,6 +21,7 @@
 #include <db_controls/DbStaticNumField.h>
 #include <forms_common/ParametersManager.h>
 #include <forms_common/ActNameCellWidget.h>
+#include <forms_common/ActDateCellWidget.h>
 #include <forms_common/PaymentsDbTableEvtHandler.h>
 #include <forms_common/CommonRoutines.h>
 #include <forms_common/VernamOneTimePad.h>
@@ -62,7 +64,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.10";
+constexpr char search_form_version[] = "1.0.11";
 
 #ifdef DUTY
 const char main_query_fields[] = "\
@@ -371,7 +373,8 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 	
 	auto readonly_widget = creator.createAndAttachToGrid<CEditableCellWidget>(\
 										"zone", true);
-
+	creator.createAndAttachToGrid<CDateCellWidget>("order_date", false);
+		
 	auto stmt = conn->PrepareQuery("SELECT id_advocat, adv_name_short, adv_name FROM advocats ORDER BY 2");
 	auto result_set = stmt->exec();
 	auto rs_metadata = stmt->getResultSetMetadata();
@@ -423,6 +426,14 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 	CCurrencyCellWidget *currency_widget = creator.createAndAttachToGrid<CCurrencyCellWidget>("fee", true);
 	grid->SetWidgetForFieldByName("outgoings", currency_widget);
 
+	creator.createAndAttachToGrid<CActDateCellWidget>("act_date", db_table);
+	auto dt_widget = creator.createAndAttachToGrid<CDateCellWidget>(
+													"act_reg_date", true);
+	grid->SetWidgetForFieldByName("bank_reg_date", dt_widget);
+	grid->SetWidgetForFieldByName("payment_date", dt_widget);
+	grid->SetWidgetForFieldByName("cancel_date", dt_widget);
+	grid->SetWidgetForFieldByName("bdate", dt_widget);
+
 	qa_widget = creator.createAndAttachToGrid<CBooleanCellWidget>("age");
 	grid->SetWidgetForFieldByName("inv", qa_widget);
 	grid->SetWidgetForFieldByName("lang", qa_widget);
@@ -470,8 +481,12 @@ void CSearchForm::loadInitialFilterToControls() {
 	const auto &params_manager = CParametersManager::getInstance();
 
 	flt_center->SetCurrRecord(params_manager.getDefaultCenter());
-	flt_order_date_from->SetLabel(params_manager.getInitialDateW());
-	flt_order_date_from->enableIfChanged();
+
+	auto &initial_date = params_manager.getInitialDateW();
+	if (!initial_date.empty()) {
+		flt_order_date_from->SetLabel(params_manager.getInitialDateW().c_str());
+		flt_order_date_from->enableIfChanged();
+	}
 }
 
 void CSearchForm::initFilteringControls() {
@@ -930,7 +945,7 @@ void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
 		reloadStatisticsControls(stmt_aggregate);
 	}
 	else {
-		filtering_manager.apply(def_binding_target->getFirst());
+		filtering_manager.apply(def_binding_target);
 		db_table->reload();
 		reloadStatisticsControls();
 	}

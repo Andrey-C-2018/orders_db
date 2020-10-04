@@ -17,9 +17,8 @@ class CParametersManager {
 	int default_center;
 	mutable std::string center_flt_str;
 
-	CDate initial_order_date;
-	char date_buffer[CDate::SQL_FORMAT_LEN + 1];
-	wchar_t date_buffer_w[CDate::GERMAN_FORMAT_LEN + 1];
+	std::string date_buffer;
+	std::wstring date_buffer_w;
 	
 	CParametersManager();
 	void getParamsValuesFromFile(CPropertiesFile *props, \
@@ -42,8 +41,10 @@ public:
 	inline int getIdUser() const { return id_user; }
 	inline const CPermissionsManager &getPermissions() const { return permissions_mgr; }
 	inline int getDefaultCenter() const;
-	inline const wchar_t *getInitialDateW() const;
+
+	inline const std::wstring &getInitialDateW() const;
 	std::string getInitialFilteringStr() const;
+
 	const std::string &getCenterFilteringStr() const;
 
 	virtual ~CParametersManager();
@@ -56,8 +57,7 @@ int CParametersManager::getDefaultCenter() const {
 	return default_center;
 }
 
-const wchar_t *CParametersManager::getInitialDateW() const {
+const std::wstring &CParametersManager::getInitialDateW() const {
 
-	assert(date_buffer_w[0] != '\0');
 	return date_buffer_w;
 }

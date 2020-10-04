@@ -191,9 +191,9 @@ std::map<std::wstring, size_t> createFieldsMap() {
 
 	std::map<std::wstring, size_t> fields;
 	fields[FIELD_ID_w] = 1;
-	fields[FIELD_ADV_w] = 36;
-	fields[FIELD_ACT_w] = 45;
-	fields[FIELD_FEE_w] = 14;
+	fields[FIELD_ADV_w] = 35;
+	fields[FIELD_ACT_w] = 41;
+	fields[FIELD_FEE_w] = 7;
 
 	return fields;
 }

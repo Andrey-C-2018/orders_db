@@ -22,10 +22,9 @@ void CParametersManager::getParamsValuesFromFile(CPropertiesFile *props, \
 	determineUserAndPermissions(props, conn, buffer);
 
 	auto str_date = props->getStringProperty(_T("initial_order_date"), buffer);
-	if (!str_date)
-		throw XException(0, \
-			_T("Параметр початкової дати 'initial_order_date' відсутній у config.ini"));
+	if (!str_date) return;
 
+	CDate initial_order_date;
 	if (!initial_order_date.setDateGerman(str_date)) {
 		XException e(0, _T("Невірний формат початкової дати: "));
 		e << str_date;
@@ -36,8 +35,11 @@ void CParametersManager::getParamsValuesFromFile(CPropertiesFile *props, \
 		e << str_date;
 		throw e;
 	}
-	initial_order_date.toStringSQL(date_buffer);
-	initial_order_date.toStringGerman(date_buffer_w);
+	date_buffer.resize(CDate::SQL_FORMAT_LEN);
+	initial_order_date.toStringSQL(&date_buffer[0]);
+
+	date_buffer_w.resize(CDate::GERMAN_FORMAT_LEN);
+	initial_order_date.toStringGerman(&date_buffer_w[0]);
 }
 
 void CParametersManager::determineUserAndPermissions(CPropertiesFile *props, \
@@ -100,9 +102,12 @@ std::string CParametersManager::getInitialFilteringStr() const {
 	std::string initial_flt = "a.id_center_legalaid = ";
 	XConv::ToString(default_center, int_buffer);
 	initial_flt += int_buffer;
-	initial_flt += " AND a.order_date >= '";
-	initial_flt += date_buffer;
-	initial_flt += "'";
+
+	if (!date_buffer.empty()) {
+		initial_flt += " AND a.order_date >= '";
+		initial_flt += date_buffer;
+		initial_flt += "'";
+	}
 
 	return std::move(initial_flt);
 }

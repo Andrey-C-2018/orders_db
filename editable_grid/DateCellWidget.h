@@ -13,6 +13,9 @@ class CDateCellWidget : public CEditableCellWidget {
 	void OnChange(XCommandEvent *eve);
 	inline bool InternalValidate(ImmutableString<Tchar> validated_label) const;
 
+protected:
+	inline ImmutableString<Tchar> getCachedLabel() const;
+
 public:
 	CDateCellWidget();
 	CDateCellWidget(const bool null_value_allowed_);
@@ -60,4 +63,9 @@ bool CDateCellWidget::InternalValidate(ImmutableString<Tchar> validated_label) c
 	}
 
 	return validated;
+}
+
+ImmutableString<Tchar> CDateCellWidget::getCachedLabel() const {
+
+	return date_filter.getCachedLabel();
 }
