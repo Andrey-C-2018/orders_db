@@ -64,7 +64,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.11";
+constexpr char search_form_version[] = "1.0.12";
 
 #ifdef DUTY
 const char main_query_fields[] = "\
@@ -130,18 +130,21 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 	auto &perm_mgr = CParametersManager::getInstance().getPermissions();
 	bool db_admin = perm_mgr.isAdmin();
+	bool db_local_admin = perm_mgr.isLocalAdmin();
 
-	auto constraints = std::make_shared<CPaymentsConstraints>();
-	constraints->old_stage_locked = !db_admin;
+	constraints = std::make_shared<CPaymentsConstraints>();
+	constraints->old_stage_locked = !db_admin && !db_local_admin;
 	constraints->wrong_zone = !db_admin;
-	constraints->old_order_locked = !db_admin;
+	constraints->old_order_locked = !db_admin && !db_local_admin;
 
 	db_table = createDbTable();
 	int def_center = CParametersManager::getInstance().getDefaultCenter();
 	std::shared_ptr<CPaymentsDbTableEvtHandler> payments_evt_handler = \
 						std::make_shared<CPaymentsDbTableEvtHandler>(db_table, \
 												def_center, "id_center_legalaid", \
-												!db_admin, !db_admin, !db_admin, \
+												constraints->old_stage_locked, \
+												constraints->wrong_zone, \
+												constraints->old_order_locked, \
 												constraints);
 	db_table->ConnectDbEventsHandler(payments_evt_handler);
 	
@@ -424,7 +427,10 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 	creator.createAndAttachToGrid<CActNameCellWidget>("id_act");
 
 	CCurrencyCellWidget *currency_widget = creator.createAndAttachToGrid<CCurrencyCellWidget>("fee", true);
+	grid->SetWidgetForFieldByName("fee_parus", currency_widget);
 	grid->SetWidgetForFieldByName("outgoings", currency_widget);
+	grid->SetWidgetForFieldByName("outg_post", currency_widget);
+	grid->SetWidgetForFieldByName("outg_daynight", currency_widget);
 
 	creator.createAndAttachToGrid<CActDateCellWidget>("act_date", db_table);
 	auto dt_widget = creator.createAndAttachToGrid<CDateCellWidget>(
@@ -822,7 +828,8 @@ void CSearchForm::displayWidgets() {
 
 		auto &perm_mgr = CParametersManager::getInstance().getPermissions();
 		int rm_button_flags = FL_WINDOW_VISIBLE * \
-							(perm_mgr.isOrdersDeleter() || perm_mgr.isAdmin());
+							(perm_mgr.isOrdersDeleter() || perm_mgr.isAdmin() || \
+								perm_mgr.isLocalAdmin());
 		btn_remove = new XButton();
 		sizer.addWidget(btn_remove, _T("-"), rm_button_flags, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
@@ -961,6 +968,13 @@ void CSearchForm::OnAddRecordButtonClick(XCommandEvent *eve) {
 
 void CSearchForm::OnRemoveButtonClick(XCommandEvent *eve) {
 
+	db_table->gotoCurrentRecord();
+	auto &perm_mgr = CParametersManager::getInstance().getPermissions();
+	if (!perm_mgr.isAdmin() && constraints->wrong_zone) {
+		ErrorBox(_T("Видаляти доручення/стадії інших центрів заборонено"));
+		return;
+	}
+
 	int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
 	if (option == IDYES) {
 		std::string query;
@@ -974,7 +988,6 @@ void CSearchForm::OnRemoveButtonClick(XCommandEvent *eve) {
 		auto stmt = conn->PrepareQuery(query.c_str());
 		auto rs_main = db_table->getResultSet();
 		
-		db_table->gotoCurrentRecord();
 		const size_t center = meta_info.getFieldIndexByName("id_center_legalaid");
 		const size_t id = meta_info.getFieldIndexByName("id", "orders");
 		const size_t order_date = meta_info.getFieldIndexByName("order_date", "orders");

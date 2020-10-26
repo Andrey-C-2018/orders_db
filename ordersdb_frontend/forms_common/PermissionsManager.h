@@ -17,7 +17,7 @@ struct IDbConnection;
 
 class CPermissionsManager {
 
-	bool admins, orders_inserters, orders_deleters;
+	bool admins, local_admins, orders_inserters, orders_deleters;
 	bool payments_deleters, payments_inserters;
 public:
 	CPermissionsManager();
@@ -33,6 +33,7 @@ public:
 				const int id_user, const Tstring &user_name);
 
 	inline bool isAdmin() const { return admins; }
+	inline bool isLocalAdmin() const { return local_admins; }
 	inline bool isOrdersInserter() const { return orders_inserters; }
 	inline bool isOrdersDeleter() const { return orders_deleters; }
 	inline bool isPaymentsInserter() const { return payments_inserters; }

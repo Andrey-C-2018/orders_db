@@ -16,6 +16,7 @@ class CheckerInsertBinder : public IInsertBinder {
 	CDbComboBox *checkers_list;
 	XWidget *act_reg_date_holder;
 	int id_checker;
+
 public:
 	CheckerInsertBinder(CDbComboBox *checkers_list_, \
 						const int def_center, \

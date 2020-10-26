@@ -14,8 +14,10 @@ void CSearchFormGridEvtHandler::OnSearchFormCellChanged(IGridCellWidget *cell_wi
 
 	size_t field = this->getActiveField();
 
-	if (constraints->wrong_zone)
+	if (constraints->wrong_zone) {
 		ErrorBox(E_WRONG_ZONE);
+		return;
+	}
 	else {
 		auto p_field = orders_fields_indexes.find(field);
 		bool orders_field = p_field != orders_fields_indexes.cend();

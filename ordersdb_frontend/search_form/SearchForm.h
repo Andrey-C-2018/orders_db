@@ -38,6 +38,7 @@ class CSearchForm : public XTabStopPanel {
 	CPropertiesFile props;
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
+	std::shared_ptr<CPaymentsConstraints> constraints;
 
 	CQueryModifier query_modifier, query_aggregate;
 	CFilteringManager filtering_manager;
