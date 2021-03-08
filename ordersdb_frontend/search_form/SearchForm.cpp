@@ -64,7 +64,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.12";
+constexpr char search_form_version[] = "1.0.13";
 
 #ifdef DUTY
 const char main_query_fields[] = "\
@@ -116,7 +116,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 				btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
 				btn_rev(nullptr), btn_reset(nullptr), btn_sort(nullptr), btn_upload(nullptr) {
 
-	props.open("config.ini");
+	props.open();
 	
 	conn = CMySQLConnectionFactory::createConnection(props, vernam_one_time_pad);
 	auto version = getFormVersion(conn, "search_form_version");

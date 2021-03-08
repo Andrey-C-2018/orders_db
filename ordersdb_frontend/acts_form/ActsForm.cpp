@@ -12,7 +12,7 @@
 #include "AdvDbTableEventsHandler.h"
 #include "OrdersDbTableEventsHandler.h"
 
-constexpr char acts_form_version[] = "1.0.18";
+constexpr char acts_form_version[] = "1.0.19";
 
 CActsForm::CActsForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
@@ -22,7 +22,7 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 				orders_list(DEF_GUI_MARGIN, 0.5F, DEF_DBNAVIGATOR_HEIGHT), \
 				payments_list(DEF_GUI_MARGIN, DEF_DBNAVIGATOR_HEIGHT) {
 
-	props.open("config.ini");
+	props.open();
 	conn = CMySQLConnectionFactory::createConnection(props, vernam_one_time_pad);
 	auto version = getFormVersion(conn, "acts_form_version");
 	if (version != acts_form_version)

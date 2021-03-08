@@ -1,9 +1,9 @@
 #include "MySQLConnectionFactory.h"
-#include <basic/PropertiesFile.h>
+#include <basic/IProperties.h>
 #include <basic/Cryptor.h>
 #include <basic/TextConv.h>
 
-inline const Tchar *getPropertyValue(const CPropertiesFile &props, \
+inline const Tchar *getPropertyValue(const IProperties &props, \
 						const Tchar *prop_name, const Tchar *prop_descr, \
 						Tstring &buffer) {
 
@@ -22,7 +22,7 @@ inline const Tchar *getPropertyValue(const CPropertiesFile &props, \
 	return curr_prop;
 }
 
-inline void getPropertyValue(const CPropertiesFile &props, \
+inline void getPropertyValue(const IProperties &props, \
 						const Tchar *prop_name, const Tchar *prop_descr, \
 						Tstring &buffer, std::string &dest) {
 
@@ -34,7 +34,7 @@ inline void getPropertyValue(const CPropertiesFile &props, \
 CMySQLConnectionFactory::CMySQLConnectionFactory() { }
 
 CMySQLConnectionFactory::Properties \
-CMySQLConnectionFactory::getProperties(const CPropertiesFile &props, \
+CMySQLConnectionFactory::getProperties(const IProperties &props, \
 										Tstring &buffer) {
 
 	CMySQLConnectionFactory::Properties p;
@@ -47,7 +47,7 @@ CMySQLConnectionFactory::getProperties(const CPropertiesFile &props, \
 	return p;
 }
 
-CMySQLConnectionPtr CMySQLConnectionFactory::createConnection(const CPropertiesFile &props) {
+CMySQLConnectionPtr CMySQLConnectionFactory::createConnection(const IProperties &props) {
 
 	Tstring buffer;
 	CMySQLConnectionFactory::Properties p = getProperties(props, buffer);
@@ -60,7 +60,7 @@ CMySQLConnectionPtr CMySQLConnectionFactory::createConnection(const CPropertiesF
 	return conn;
 }
 
-CMySQLConnectionPtr CMySQLConnectionFactory::createConnection(const CPropertiesFile &props, \
+CMySQLConnectionPtr CMySQLConnectionFactory::createConnection(const IProperties &props, \
 													const unsigned char(&key)[MAX_PWD_LEN]) {
 	Tstring buffer;
 	CMySQLConnectionFactory::Properties p = getProperties(props, buffer);

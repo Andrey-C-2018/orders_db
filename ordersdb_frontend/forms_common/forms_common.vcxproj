@@ -24,6 +24,7 @@
     <ClInclude Include="AutorizationManager.h" />
     <ClInclude Include="CommonRoutines.h" />
     <ClInclude Include="Constraints.h" />
+    <ClInclude Include="FlexiblePropepties.h" />
     <ClInclude Include="FormsInsertionBinders.h" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="ParametersManager.h" />
@@ -39,6 +40,7 @@
     <ClCompile Include="ActNameCellWidget.cpp" />
     <ClCompile Include="AutorizationManager.cpp" />
     <ClCompile Include="CommonRoutines.cpp" />
+    <ClCompile Include="FlexiblePropepties.cpp" />
     <ClCompile Include="ParametersManager.cpp" />
     <ClCompile Include="PaymentsDbTableEvtHandler.cpp" />
     <ClCompile Include="FormsGridEvtHandler.cpp" />

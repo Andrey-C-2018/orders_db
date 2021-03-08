@@ -1,6 +1,7 @@
 #pragma once
 #include "tstream.h"
 #include "Exception.h"
+#include "IProperties.h"
 
 class BASIC_DLL_EXPORT CPropertiesFileException : public XException {
 	Tstring prop_name;
@@ -23,7 +24,7 @@ public:
 	~CPropertiesFileException() throw();
 };
 
-class BASIC_DLL_EXPORT CPropertiesFile{
+class BASIC_DLL_EXPORT CPropertiesFile : public IProperties {
 	mutable Tfstream f;
 	Tstring buffer;
 
@@ -37,10 +38,10 @@ public:
 	CPropertiesFile &operator=(CPropertiesFile &&obj) = default;
 
 	void open(const char *path);
-	const Tchar *getStringProperty(const Tchar *name, Tstring &buffer) const;
-	const Tchar *getStringPropertyThreadUnsafe(const Tchar *name);
-	int getIntProperty(const Tchar *name, Tstring &buffer) const;
-	int getIntProperty(const Tchar *name, Tstring &buffer, bool &not_found) const;
+	const Tchar *getStringProperty(const Tchar *name, Tstring &buffer) const override;
+	const Tchar *getStringPropertyThreadUnsafe(const Tchar *name) override;
+	int getIntProperty(const Tchar *name, Tstring &buffer) const override;
+	int getIntProperty(const Tchar *name, Tstring &buffer, bool &not_found) const override;
 
 	virtual ~CPropertiesFile();
 };

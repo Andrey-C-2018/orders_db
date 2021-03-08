@@ -4,6 +4,14 @@
 #include "../Exception.h"
 #include "../Process.h"
 
+void getUserHomeDir(std::string &var_value) {
+
+	char buffer[MAX_PATH];
+	const DWORD var_size = GetEnvironmentVariableA("USERPROFILE", buffer, MAX_PATH);
+
+	var_value = buffer;
+}
+
 int exec(const char *exe_path, const char *cmd_line, const char *working_dir) {
 
 	STARTUPINFOA si;

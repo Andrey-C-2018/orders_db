@@ -1,5 +1,6 @@
 #include <basic/TextConv.h>
 #include <basic/Process.h>
+#include <basic/IProperties.h>
 #include <db_ext/DbTable.h>
 #include <grid/Grid.h>
 #include "Uploader.h"
@@ -19,7 +20,7 @@ Uploader::Uploader(const size_t hidden_count_) : \
 					hidden_count(hidden_count_) { }
 
 void Uploader::init(std::shared_ptr<CDbTable> db_table_, \
-					CPropertiesFile *props) {
+					IProperties *props) {
 
 	assert(props);
 	

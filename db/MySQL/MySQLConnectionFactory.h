@@ -1,7 +1,7 @@
 #pragma once
 #include "MySQLConnection.h"
 
-class CPropertiesFile;
+struct IProperties;
 typedef std::shared_ptr<CMySQLConnection> CMySQLConnectionPtr;
 
 class CMySQLConnectionFactory {
@@ -16,7 +16,7 @@ class CMySQLConnectionFactory {
 		inline Properties &operator=(Properties &&obj) = default;
 	};
 
-	static Properties getProperties(const CPropertiesFile &props, \
+	static Properties getProperties(const IProperties &props, \
 									Tstring &buffer);
 public:
 	enum {
@@ -25,8 +25,8 @@ public:
 
 	CMySQLConnectionFactory();
 
-	static CMySQLConnectionPtr createConnection(const CPropertiesFile &props);
-	static CMySQLConnectionPtr createConnection(const CPropertiesFile &props, \
+	static CMySQLConnectionPtr createConnection(const IProperties &props);
+	static CMySQLConnectionPtr createConnection(const IProperties &props, \
 												const unsigned char (&key)[MAX_PWD_LEN]);
 
 	virtual ~CMySQLConnectionFactory();

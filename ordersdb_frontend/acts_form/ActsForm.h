@@ -1,6 +1,6 @@
 #pragma once
-#include <basic/PropertiesFile.h>
 #include <xwindows_ex/XTabStopPanel.h>
+#include <forms_common/FlexiblePropepties.h>
 #include "AdvocatsList.h"
 #include "OrdersList.h"
 #include "PaymentsList.h"
@@ -10,7 +10,7 @@ class CDbTable;
 struct CPaymentsConstraints;
 
 class CActsForm : public XTabStopPanel {
-	CPropertiesFile props;
+	CFlexiblePropepties props;
 
 	std::shared_ptr<IDbConnection> conn;
 	CAdvocatsList adv_list;

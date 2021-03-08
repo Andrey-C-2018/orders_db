@@ -5,7 +5,7 @@
 #include <date/Date.h>
 #include "PermissionsManager.h"
 
-class CPropertiesFile;
+struct IProperties;
 struct IDbConnection;
 
 class CParametersManager {
@@ -21,15 +21,15 @@ class CParametersManager {
 	std::wstring date_buffer_w;
 	
 	CParametersManager();
-	void getParamsValuesFromFile(CPropertiesFile *props, \
+	void getParamsValuesFromFile(IProperties *props, \
 									std::shared_ptr<IDbConnection> conn);
-	void determineUserAndPermissions(CPropertiesFile *props, \
+	void determineUserAndPermissions(IProperties *props, \
 									std::shared_ptr<IDbConnection> conn, \
 									Tstring &buffer);
 	inline bool areParamsInitilized() const { return id_user != -1; }
 
 public:
-	static void init(CPropertiesFile *props, std::shared_ptr<IDbConnection> conn);
+	static void init(IProperties *props, std::shared_ptr<IDbConnection> conn);
 
 	CParametersManager(const CParametersManager &obj) = delete;
 	CParametersManager(CParametersManager &&obj) = delete;

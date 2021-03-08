@@ -2,7 +2,6 @@
 #include <memory>
 #include <fstream>
 #include <basic/XString.h>
-#include <basic/PropertiesFile.h>
 
 class CUploadException : public XException {
 public:
@@ -15,6 +14,7 @@ public:
 	~CUploadException();
 };
 
+struct IProperties;
 class CDbTable;
 class CGrid;
 
@@ -35,7 +35,7 @@ public:
 	Uploader &operator=(Uploader &&obj) = default;
 
 	void init(std::shared_ptr<CDbTable> db_table_, \
-				CPropertiesFile *props);
+				IProperties *props);
 	void upload(const CGrid *grid);
 	void execExcel();
 

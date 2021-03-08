@@ -2,7 +2,7 @@
 #include <basic/XString.h>
 #include <basic/XConv.h>
 #include <basic/TextConv.h>
-#include <basic/PropertiesFile.h>
+#include <basic/IProperties.h>
 #include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
@@ -12,7 +12,7 @@ CParametersManager CParametersManager::inst;
 
 CParametersManager::CParametersManager() : id_user(-1), default_center(-1) { }
 
-void CParametersManager::getParamsValuesFromFile(CPropertiesFile *props, \
+void CParametersManager::getParamsValuesFromFile(IProperties *props, \
 												std::shared_ptr<IDbConnection> conn) {
 	
 	assert(props);
@@ -42,7 +42,7 @@ void CParametersManager::getParamsValuesFromFile(CPropertiesFile *props, \
 	initial_order_date.toStringGerman(&date_buffer_w[0]);
 }
 
-void CParametersManager::determineUserAndPermissions(CPropertiesFile *props, \
+void CParametersManager::determineUserAndPermissions(IProperties *props, \
 												std::shared_ptr<IDbConnection> conn, \
 												Tstring &buffer) {
 
@@ -87,7 +87,7 @@ void CParametersManager::determineUserAndPermissions(CPropertiesFile *props, \
 	permissions_mgr.init(conn, id_user, user_name);
 }
 
-void CParametersManager::init(CPropertiesFile *props, std::shared_ptr<IDbConnection> conn) {
+void CParametersManager::init(IProperties *props, std::shared_ptr<IDbConnection> conn) {
 
 	if (!inst.areParamsInitilized())
 		inst.getParamsValuesFromFile(props, conn);

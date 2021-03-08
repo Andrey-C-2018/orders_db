@@ -1,12 +1,12 @@
 #pragma once
 #include <set>
-#include <basic/PropertiesFile.h>
 #include <db_ext/FilteringManager.h>
 #include <db_ext/SortingManager.h>
 #include <db_ext/QueryModifier.h>
 #include <xwindows_ex/XTabStopPanel.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
+#include <forms_common/FlexiblePropepties.h>
 #include "Inserter.h"
 #include "Uploader.h"
 
@@ -35,7 +35,7 @@ class CSearchForm : public XTabStopPanel {
 		FIELDS_COUNT = 37
 	};
 
-	CPropertiesFile props;
+	CFlexiblePropepties props;
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
 	std::shared_ptr<CPaymentsConstraints> constraints;

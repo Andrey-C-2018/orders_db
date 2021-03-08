@@ -95,7 +95,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>basic.lib;date.lib;db.lib;libsqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../0libs/Debug;%SQLITE_CONNECTOR_PATH%\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../0libs/Debug;%SQLITE_CONNECTOR_PATH%\Debug;D:\Apps\Visual Leak Detector\lib\Win32</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

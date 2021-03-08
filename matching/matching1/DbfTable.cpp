@@ -38,6 +38,14 @@ COleDbConnection::COleDbConnection(const wchar_t *database_folder) {
 void COleDbConnection::open(const wchar_t *database_folder) {
 
 	assert(database_folder);
+	DWORD dwAttrib = GetFileAttributes(database_folder);
+
+	if (dwAttrib == INVALID_FILE_ATTRIBUTES || !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
+		XException e(0, "folder does not exist: ");
+		e << database_folder;
+		throw e;
+	}
+
 	std::wstring init_str = L"Provider=VFPOLEDB.1; Data Source=";
 	init_str += database_folder;
 	init_str += L"\\; Collating Sequence=MACHINE;";
