@@ -12,7 +12,8 @@ void getUserHomeDir(std::string &var_value) {
 	var_value = buffer;
 }
 
-int exec(const char *exe_path, const char *cmd_line, const char *working_dir) {
+int exec(const char *exe_path, const char *cmd_line, \
+		const char *working_dir, const bool wait) {
 
 	STARTUPINFOA si;
 	PROCESS_INFORMATION pi;
@@ -39,7 +40,7 @@ int exec(const char *exe_path, const char *cmd_line, const char *working_dir) {
 						0, // Process handle not inheritable
 						0, // Thread handle not inheritable
 						FALSE, // Set handle inheritance to FALSE
-						0, // No creation flags
+						NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE, // create as detached
 						0, // Use parent's environment block
 						working_dir, 
 						&si, // Pointer to STARTUPINFO structure
@@ -50,16 +51,17 @@ int exec(const char *exe_path, const char *cmd_line, const char *working_dir) {
 		throw e;
 	}
 
-	// Wait until child process exits.
-	WaitForSingleObject(pi.hProcess, INFINITE);
-
 	DWORD exit_code = 0;
-	if (FALSE == GetExitCodeProcess(pi.hProcess, &exit_code)) {
-		XException e(0, "GetExitCodeProcess failed: last error code = ");
-		e << (size_t)GetLastError();
-		throw e;
+	if (wait) {
+		WaitForSingleObject(pi.hProcess, INFINITE);
+
+		if (FALSE == GetExitCodeProcess(pi.hProcess, &exit_code)) {
+			XException e(0, "GetExitCodeProcess failed: last error code = ");
+			e << (size_t)GetLastError();
+			throw e;
+		}
+		assert(STILL_ACTIVE != exit_code);
 	}
-	assert(STILL_ACTIVE != exit_code);
 
 	// Close process and thread handles. 
 	CloseHandle(pi.hProcess);

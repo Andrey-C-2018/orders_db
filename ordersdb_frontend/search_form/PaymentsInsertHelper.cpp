@@ -127,6 +127,7 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 	assert(outg_extra);
 	assert(informer);
 	assert(id_act);
+	assert(act_no);
 	assert(act_date);
 	assert(act_reg_date);
 	assert(payment_date);
@@ -143,7 +144,7 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 		ins_helper.addBinder(0, _T("Центр"), center_binder);
 		ins_helper.addBinder(1, _T("Номер доручення"), id_order_binder);
 		ins_helper.addBinder(2, _T("Дата доручення"), order_date_binder);
-		ins_helper.addBinder(10, _T("Користувач"), \
+		ins_helper.addBinder(11, _T("Користувач"), \
 							std::make_shared<CIntInsertBinder>(id_user));
 	}
 	ins_helper.addBinder(3, _T("Сума"), \
@@ -156,37 +157,40 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 			std::make_shared<CDbComboBoxInsertBinder>(informer, false, true));
 	ins_helper.addBinder(7, _T("Акт"), \
 							std::make_shared<CActNameBinder>(id_act, false));
-	ins_helper.addBinder(8, _T("Дата акта"), \
+	ins_helper.addBinder(8, _T("№ акту"), \
+							std::make_shared<UIIntInsertBinder>(act_no, false));
+
+	ins_helper.addBinder(9, _T("Дата акта"), \
 		std::make_shared<CActDateBinderNoDb>(order_date, act_date, \
 											false, act_reg_date));
-	ins_helper.addBinder(9, _T("№ розгляду"), \
+	ins_helper.addBinder(10, _T("№ розгляду"), \
 							std::make_shared<UIIntInsertBinder>(cycle, false));
-	ins_helper.addBinder(11, _T("Дата прийняття акта"), \
+	ins_helper.addBinder(12, _T("Дата прийняття акта"), \
 						std::make_shared<UIDateInsertBinder>(act_reg_date, false));
-	ins_helper.addBinder(12, _T("Дата оплати"), \
+	ins_helper.addBinder(13, _T("Дата оплати"), \
 						std::make_shared<UIDateInsertBinder>(payment_date, false));
-	ins_helper.addBinder(13, _T("Різні витрати"), \
+	ins_helper.addBinder(14, _T("Різні витрати"), \
 						std::make_shared<CFeeBinder>(outg_extra, false, true));
 	if(def_center == 1)
-		ins_helper.addBinder(14, _T("Дата реєстр. в ДКС"), \
+		ins_helper.addBinder(15, _T("Дата реєстр. в ДКС"), \
 					std::make_shared<UIDateInsertBinder>(act_date, false));
 	else
-		ins_helper.defStaticInsertion(14, "NULL");
+		ins_helper.defStaticInsertion(15, "NULL");
 
-	ins_helper.addBinder(15, _T("Перевірив"), \
+	ins_helper.addBinder(16, _T("Перевірив"), \
 					std::make_shared<CheckerInsertBinder>(checker, def_center, \
 															act_reg_date, conn));
 	if(outg_post)
-		ins_helper.addBinder(16, _T("Поштові витрати"), \
+		ins_helper.addBinder(17, _T("Поштові витрати"), \
 					std::make_shared<CFeeBinder>(outg_post, false, true));
 	else
-		ins_helper.defStaticInsertion(16, "0.0");
+		ins_helper.defStaticInsertion(17, "0.0");
 
 	if (outg_daynight)
-		ins_helper.addBinder(17, _T("Добові витрати"), \
+		ins_helper.addBinder(18, _T("Добові витрати"), \
 					std::make_shared<CFeeBinder>(outg_daynight, false, true));
 	else
-		ins_helper.defStaticInsertion(17, "0.0");
+		ins_helper.defStaticInsertion(18, "0.0");
 }
 
 void CPaymentsInsertHelper::errMsgOnPrimKeyDuplicate(Tstring &err_str) const {

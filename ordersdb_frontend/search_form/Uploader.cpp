@@ -114,7 +114,7 @@ void Uploader::execExcel() {
 
 	std::string cmd_line = "1 ";
 	cmd_line += path.c_str();
-	exec(excel_path.c_str(), cmd_line.c_str(), "C:\\");
+	exec(excel_path.c_str(), cmd_line.c_str(), "C:\\", false);
 }
 
 Uploader::~Uploader() { }

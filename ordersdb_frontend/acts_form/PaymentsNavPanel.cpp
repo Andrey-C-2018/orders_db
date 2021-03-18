@@ -50,13 +50,14 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		sizer.addWidget(&null_widget, _T(""), 0, XSize(20, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Стадія"), label_flags, XSize(90, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("#"), label_flags, XSize(25, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Стаття"), label_flags, XSize(150, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Стаття"), label_flags, XSize(140, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Сума"), label_flags, XSize(70, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Витр."), label_flags, XSize(50, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Пошт."), label_flags, XSize(50, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Добові"), label_flags, XSize(50, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Інформатор"), label_flags, XSize(180, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Акт"), label_flags, XSize(80, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Інформатор"), label_flags, XSize(170, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("№а"), label_flags, XSize(30, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Акт"), label_flags, XSize(70, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Дата акту"), label_flags, XSize(80, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Дт. розрах"), label_flags, XSize(80, LABELS_HEIGHT));
 	main_sizer.popNestedSizer();
@@ -76,7 +77,7 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 
 		auto article = new XTabStopEdit(this);
 		inserter.setArticleWidget(article);
-		sizer.addWidget(article, _T(""), edit_flags, XSize(150, DEF_HEIGHT));
+		sizer.addWidget(article, _T(""), edit_flags, XSize(140, DEF_HEIGHT));
 
 		auto fee = new XCurrencyField(this);
 		inserter.setFeeWidget(fee);
@@ -97,12 +98,16 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		auto informer = new CDbComboBox(rs_inf, 1, 0);
 		inserter.setInformerWidget(informer);
 		sizer.addResizeableWidget(informer, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
-									XSize(180, DEF_HEIGHT), 150);
+									XSize(170, DEF_HEIGHT), 150);
 		informer->setTabStopManager(this);
+
+		auto act_no = new XTabStopEdit(this);
+		inserter.setActNoWidget(act_no);
+		sizer.addWidget(act_no, _T(""), edit_flags, XSize(25, DEF_HEIGHT));
 
 		auto id_act = new XTabStopEdit(this);
 		inserter.setActWidget(id_act);
-		sizer.addWidget(id_act, _T(""), edit_flags, XSize(80, DEF_HEIGHT));
+		sizer.addWidget(id_act, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
 
 		auto act_date = new XDateField(this);
 		inserter.setActDateWidget(act_date);

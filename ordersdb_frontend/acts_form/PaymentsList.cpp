@@ -74,6 +74,10 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	grid->SetFieldLabel(field_index, _T("Інформатор"));
 	grid->SetFieldWidth(field_index, 30);
 
+	field_index = meta_info.getFieldIndexByName("act_no");
+	grid->SetFieldLabel(field_index, _T("№а"));
+	grid->SetFieldWidth(field_index, 2);
+
 	field_index = meta_info.getFieldIndexByName("id_act");
 	grid->SetFieldLabel(field_index, _T("Акт"));
 	grid->SetFieldWidth(field_index, 9);
@@ -159,14 +163,14 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 	std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date,";
 	query += " aa.is_paid, aa.id_stage, st.stage_name, aa.cycle, aa.article,";
 	query += " aa.fee, aa.outgoings, aa.outg_post, aa.outg_daynight,";
-	query += " aa.id_informer, inf.informer_name, aa.id_act, aa.act_date, aa.act_reg_date,";
+	query += " aa.id_informer, inf.informer_name, aa.act_no, aa.id_act, aa.act_date, aa.act_reg_date,";
 	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
 	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,u.user_full_name,aa.id_checker ";
 	query += "FROM payments aa INNER JOIN stages st ON aa.id_stage = st.id_st";
 	query += " INNER JOIN informers inf ON aa.id_informer = inf.id_inf";
 	query += " INNER JOIN users u ON aa.id_checker = u.id_user ";
 	query += "WHERE aa.id_center = ? AND aa.id_order = ? AND aa.order_date = ? ";
-	query += "ORDER BY id_center, order_date, id_order, cycle, id_stage";
+	query += "ORDER BY id_center, order_date, id_order, cycle, id_stage, act_no";
 
 	auto stmt = conn->PrepareQuery(query.c_str());
 	stmt->bindValue(0, def_center);
@@ -180,16 +184,17 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 	db_table->markFieldAsPrimaryKey("order_date", "payments");
 	db_table->markFieldAsPrimaryKey("cycle", "payments");
 	db_table->markFieldAsPrimaryKey("id_stage", "payments");
+	db_table->markFieldAsPrimaryKey("act_no", "payments");
 
 	return db_table;
 }
 
 void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
-	enum { CYCLE_MAX_LEN = 3, QA_MAX_LEN = 1};
+	enum { CYCLE_MAX_LEN = 3, QA_MAX_LEN = 1, ACT_NO_MAX_LEN = 3};
 
 	assert(grid);
 	CEditableCellWidget *is_paid_widget = nullptr;
-	CIntegerCellWidget *cycle_widget = nullptr;
+	CIntegerCellWidget *cycle_widget = nullptr, *act_no_widget;
 	CBooleanCellWidget *qa_widget = nullptr;
 	CCurrencyCellWidget *currency_widget = nullptr, *koef_widget = nullptr;
 	CDateCellWidget *date_widget = nullptr;
@@ -198,7 +203,7 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 	bool is_paid = false, cycle = false, stages = false, fee = false;
 	bool inf = false, act_name = false, date = false, chk = false, qa = false;
-	bool act_date = false, koef = false;
+	bool act_date = false, koef = false, act_no = false;
 	try {
 		is_paid_widget = new CEditableCellWidget(true);
 		grid->SetWidgetForFieldByName("is_paid", is_paid_widget);
@@ -207,6 +212,10 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		cycle_widget = new CIntegerCellWidget(CYCLE_MAX_LEN);
 		grid->SetWidgetForFieldByName("cycle", cycle_widget);
 		cycle = true;
+
+		act_no_widget = new CIntegerCellWidget(ACT_NO_MAX_LEN);
+		grid->SetWidgetForFieldByName("act_no", act_no_widget);
+		act_no = true;
 
 		stages_list = new CDbComboBoxCellWidget(conn, "stage_name", \
 											"stages", "payments", db_table);
@@ -298,6 +307,9 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 
 		if (!stages && stages_list && !stages_list->IsCreated())
 			delete stages_list;
+
+		if (!act_no && act_no_widget && !act_no_widget->IsCreated())
+			delete act_no_widget;
 
 		if (!cycle && cycle_widget && !cycle_widget->IsCreated())
 			delete cycle_widget;

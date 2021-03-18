@@ -92,7 +92,7 @@ CPaymentsInserter::CPaymentsInserter(std::shared_ptr<CDbTable> db_table_) : \
 				ins_helper(FIELDS_COUNT), db_table(db_table_), \
 				stage(nullptr), informer(nullptr), cycle(nullptr), article(nullptr), \
 				fee(nullptr), outgoings(nullptr), outg_post(nullptr), outg_daynight(nullptr), \
-				id_act(nullptr), act_date(nullptr), \
+				id_act(nullptr), act_date(nullptr), act_no(nullptr), \
 				act_reg_date(nullptr), age(nullptr), inv(nullptr), lang(nullptr), ill(nullptr), \
 				zek(nullptr), vpr(nullptr), reduce(nullptr), change(nullptr), \
 				close(nullptr), zv(nullptr), min_penalty(nullptr), nm_suv(nullptr), \
@@ -121,6 +121,7 @@ void CPaymentsInserter::getCurrRecord() {
 													CDate::GERMAN_FORMAT_LEN + 1;
 	Tchar buffer[BUFFER_SIZE];
 	setIntWidgetLabel(cycle, rs, meta_info, "cycle", buffer);
+	setIntWidgetLabel(act_no, rs, meta_info, "act_no", buffer);
 
 	setStrWidgetLabel(article, rs, meta_info, "article");
 	setStrWidgetLabel(fee, rs, meta_info, "fee");
@@ -162,6 +163,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
 	assert(stage);
 	assert(cycle);
+	assert(act_no);
 	assert(article);
 	assert(fee);
 	assert(outgoings);
@@ -206,47 +208,49 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 				std::make_shared<CDbComboBoxInsertBinder>(informer, false, false));
 	ins_helper.addBinder(7, _T("Акт"), \
 						std::make_shared<CActNameBinder>(id_act, false));
-	ins_helper.addBinder(8, _T("Дата акта"), \
+	ins_helper.addBinder(8, _T("№акту"), \
+						std::make_shared<UIIntInsertBinder>(act_no, false));
+	ins_helper.addBinder(9, _T("Дата акта"), \
 		std::make_shared<CActDateBinder>(db_table, act_date, false, act_reg_date));
-	ins_helper.addBinder(9, _T("Цикл"), \
+	ins_helper.addBinder(10, _T("Цикл"), \
 						std::make_shared<UIIntInsertBinder>(cycle, false));
-	ins_helper.addBinder(10, _T("Користувач"), \
+	ins_helper.addBinder(11, _T("Користувач"), \
 						std::make_shared<CIntInsertBinder>(id_user));
-	ins_helper.defStaticInsertion(11, "NOW()");
-	ins_helper.defStaticInsertion(12, "NULL");
+	ins_helper.defStaticInsertion(12, "NOW()");
 	ins_helper.defStaticInsertion(13, "NULL");
-	ins_helper.addBinder(14, _T("Дата прийняття акта"), \
+	ins_helper.defStaticInsertion(14, "NULL");
+	ins_helper.addBinder(15, _T("Дата прийняття акта"), \
 			std::make_shared<CActRegDateBinder>(db_table, act_reg_date, false));
-	ins_helper.defStaticInsertion(15, "NULL");
-	ins_helper.addBinder(16, _T("Витрати"), \
+	ins_helper.defStaticInsertion(16, "NULL");
+	ins_helper.addBinder(17, _T("Витрати"), \
 						std::make_shared<CFeeBinder>(outgoings, false, false));
-	ins_helper.defStaticInsertion(17, "0.0"); // fee_parus
+	ins_helper.defStaticInsertion(18, "0.0"); // fee_parus
 
-	ins_helper.addBinder(18, _T("Вік"), std::make_shared<CQaParamBinder>(age, false));
-	ins_helper.addBinder(19, _T("Вади"), std::make_shared<CQaParamBinder>(inv, false));
-	ins_helper.addBinder(20, _T("Мова"), std::make_shared<CQaParamBinder>(lang, false));
-	ins_helper.addBinder(21, _T("Хвороба"), std::make_shared<CQaParamBinder>(ill, false));
-	ins_helper.addBinder(22, _T("ЗЕК"), std::make_shared<CQaParamBinder>(zek, false));
-	ins_helper.addBinder(23, _T("Випр."), std::make_shared<CQaParamBinder>(vpr, false));
-	ins_helper.addBinder(24, _T("Зменш."), std::make_shared<CQaParamBinder>(reduce, false));
-	ins_helper.addBinder(25, _T("Зміни"), std::make_shared<CQaParamBinder>(change, false));
-	ins_helper.addBinder(26, _T("Закр."), std::make_shared<CQaParamBinder>(close, false));
-	ins_helper.addBinder(27, _T("Звільн."), std::make_shared<CQaParamBinder>(zv, false));
-	ins_helper.addBinder(28, _T("Мін."), std::make_shared<CQaParamBinder>(min_penalty, false));
-	ins_helper.addBinder(29, _T("Найм. сув."), std::make_shared<CQaParamBinder>(nm_suv, false));
-	ins_helper.addBinder(30, _T("Звільн. крим."), std::make_shared<CQaParamBinder>(zv_kr, false));
-	ins_helper.addBinder(31, _T("Без зм. 1 інст."), std::make_shared<CQaParamBinder>(no_ch_Ist, false));
+	ins_helper.addBinder(19, _T("Вік"), std::make_shared<CQaParamBinder>(age, false));
+	ins_helper.addBinder(20, _T("Вади"), std::make_shared<CQaParamBinder>(inv, false));
+	ins_helper.addBinder(21, _T("Мова"), std::make_shared<CQaParamBinder>(lang, false));
+	ins_helper.addBinder(22, _T("Хвороба"), std::make_shared<CQaParamBinder>(ill, false));
+	ins_helper.addBinder(23, _T("ЗЕК"), std::make_shared<CQaParamBinder>(zek, false));
+	ins_helper.addBinder(24, _T("Випр."), std::make_shared<CQaParamBinder>(vpr, false));
+	ins_helper.addBinder(25, _T("Зменш."), std::make_shared<CQaParamBinder>(reduce, false));
+	ins_helper.addBinder(26, _T("Зміни"), std::make_shared<CQaParamBinder>(change, false));
+	ins_helper.addBinder(27, _T("Закр."), std::make_shared<CQaParamBinder>(close, false));
+	ins_helper.addBinder(28, _T("Звільн."), std::make_shared<CQaParamBinder>(zv, false));
+	ins_helper.addBinder(29, _T("Мін."), std::make_shared<CQaParamBinder>(min_penalty, false));
+	ins_helper.addBinder(30, _T("Найм. сув."), std::make_shared<CQaParamBinder>(nm_suv, false));
+	ins_helper.addBinder(31, _T("Звільн. крим."), std::make_shared<CQaParamBinder>(zv_kr, false));
+	ins_helper.addBinder(32, _T("Без зм. 1 інст."), std::make_shared<CQaParamBinder>(no_ch_Ist, false));
 
-	ins_helper.addBinder(32, _T("Коеф."), \
+	ins_helper.addBinder(33, _T("Коеф."), \
 						std::make_shared<CQaKoefBinder>(Koef, false));
-	ins_helper.addBinder(33, _T("Дата реєстр. в ДКС"), \
+	ins_helper.addBinder(34, _T("Дата реєстр. в ДКС"), \
 						std::make_shared<UIDateInsertBinder>(act_date, false));
-	ins_helper.addBinder(34, _T("Перевірив"), \
+	ins_helper.addBinder(35, _T("Перевірив"), \
 				std::make_shared<CDbComboBoxInsertBinder>(checker, false, false));
 	
-	ins_helper.addBinder(35, _T("Витрати поштові"), \
+	ins_helper.addBinder(36, _T("Витрати поштові"), \
 						std::make_shared<CFeeBinder>(outg_post, false, false));
-	ins_helper.addBinder(36, _T("Витрати добові"), \
+	ins_helper.addBinder(37, _T("Витрати добові"), \
 						std::make_shared<CFeeBinder>(outg_daynight, false, false));
 
 	std::string query = "INSERT INTO payments VALUES(";

@@ -64,14 +64,14 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.13";
+constexpr char search_form_version[] = "1.0.14";
 
 #ifdef DUTY
 const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
  a.reason, a.cancel_order, a.cancel_date, inf.informer_name, aa.article,\
- aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.id_act,\
+ aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date, uu.user_full_name,\
  aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_, \
  aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef,";
@@ -79,7 +79,7 @@ SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
 const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
- aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.id_act,\
+ aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,\
  aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_, \
  aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef, \
@@ -88,14 +88,14 @@ SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
 const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
- aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.id_act,\
+ aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,\
  aa.article, uu.user_full_name, a.reason, a.cancel_order, a.cancel_date, inf.informer_name,\
  aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_, \
  aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef,";
 #endif
 
-const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage";
+const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage,aa.act_no";
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
@@ -290,6 +290,10 @@ void CSearchForm::setFieldsSizes() {
 	grid->SetFieldWidth(field_index, 6);
 	grid->SetFieldLabel(field_index, _T("Добові"));
 	
+	field_index = meta_info.getFieldIndexByName("act_no");
+	grid->SetFieldWidth(field_index, 6);
+	grid->SetFieldLabel(field_index, _T("№акту"));
+
 	field_index = meta_info.getFieldIndexByName("id_act");
 	grid->SetFieldWidth(field_index, 15);
 	grid->SetFieldLabel(field_index, _T("Акт"));
@@ -633,6 +637,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 									"order_date", "orders");
 	db_table->markFieldAsPrimaryKey("id_stage", "payments");
 	db_table->markFieldAsPrimaryKey("cycle", "payments");
+	db_table->markFieldAsPrimaryKey("act_no", "payments");
 	
 	return db_table;
 }
@@ -703,11 +708,17 @@ void CSearchForm::displayWidgets() {
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
-		sizer.addWidget(new XLabel(), _T("№ акта: "), FL_WINDOW_VISIBLE, \
-						XSize(60, DEF_GUI_ROW_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Акт: "), FL_WINDOW_VISIBLE, \
+						XSize(40, DEF_GUI_ROW_HEIGHT));
 		sizer.addWidget(flt_act, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInsertHelper().setActWidget(flt_act);
+
+		sizer.addWidget(new XLabel(), _T("№ акта: "), FL_WINDOW_VISIBLE, \
+						XSize(60, DEF_GUI_ROW_HEIGHT));
+		XTabStopEdit *act_no = new XTabStopEdit(this);
+		sizer.addWidget(act_no, _T(""), edit_flags, XSize(20, DEF_GUI_ROW_HEIGHT));
+		inserter.getPaymentsInsertHelper().setActNoWidget(act_no);
 
 		sizer.addWidget(new XLabel(), _T("Етап: "), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT));
@@ -729,7 +740,7 @@ void CSearchForm::displayWidgets() {
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInsertHelper().setFeeWidget(fee);
 
-		sizer.addWidget(new XLabel(), _T("Витрати різні: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Витрати загальні: "), FL_WINDOW_VISIBLE, \
 						XSize(55, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *outgoings = new XCurrencyField(this);
 		sizer.addWidget(outgoings, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
