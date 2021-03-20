@@ -3,14 +3,9 @@
 #include <db_ext/DbTable.h>
 #include "Constraints.h"
 #include "CommonRoutines.h"
+#include "Constants.h"
 
 class CPaymentsDbTableEvtHandler : public IDbTableEventsHandler {
-public:
-	enum Centers {
-		NULL_CENTER = 0,
-		REGIONAL = 1
-	};
-
 private:
 	std::weak_ptr<const CDbTable> db_table;
 	size_t center_index, order_date_index, act_date_index;
@@ -61,8 +56,10 @@ void CPaymentsDbTableEvtHandler::calcConstraintsValues() {
 
 		constraints->wrong_zone = (this_center == REGIONAL && \
 			this_center != id_center && order_date >= CDate(1, 1, 2017)) || \
-			(this_center != REGIONAL && id_center != REGIONAL && \
-				this_center != id_center);
+			(this_center != REGIONAL && ((id_center != REGIONAL && \
+				this_center != id_center) || id_center == MEDIATION));
+
+		// the local centers have to be able to add accepted acts of the RC
 	}
 
 	if (lock_old_orders) {

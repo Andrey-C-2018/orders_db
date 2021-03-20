@@ -23,6 +23,7 @@
     <ClInclude Include="ActNameCellWidget.h" />
     <ClInclude Include="AutorizationManager.h" />
     <ClInclude Include="CommonRoutines.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="Constraints.h" />
     <ClInclude Include="FlexiblePropepties.h" />
     <ClInclude Include="FormsInsertionBinders.h" />

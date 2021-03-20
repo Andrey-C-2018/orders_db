@@ -5,11 +5,8 @@
 #include <xwindows/XWidget.h>
 #include <db_controls/DbComboBox.h>
 #include <forms_common/ParametersManager.h>
+#include <forms_common/Constants.h>
 #include "OrdersInsertHelper.h"
-
-enum {
-	REGIONAL = 1
-};
 
 class CCenterBinder : public CVisualInsertBinder {
 	CDbComboBox *center_widget;
@@ -38,7 +35,18 @@ public:
 		}
 		
 		int center = center_widget->getPrimaryKeyAsInteger();
-		if (!is_admin && center != def_center && center != REGIONAL) {
+		if (def_center != REGIONAL && center == MEDIATION) {
+			params.error_str += field_name;
+			params.error_str += _T(": медіацію може додавати тільки РЦ");
+			params.error_str += _T('\n');
+			return true;
+		}
+
+		if (!is_admin && ((def_center == REGIONAL && def_center != center && \
+								center != MEDIATION) || \
+						(def_center != REGIONAL && ((center != REGIONAL && \
+								def_center != center) || center == MEDIATION)))) {
+
 			params.error_str += field_name;
 			params.error_str += _T(": заборонено додавати доручення іншого центру");
 			params.error_str += _T('\n');
