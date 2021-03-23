@@ -1,9 +1,9 @@
-#include <basic/PropertiesFile.h>
 #include <db_ext/FilteringManager.h>
 #include <db_ext/QueryModifier.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
 #include <xwindows_ex/XTabStopPanel.h>
+#include <forms_common/FlexiblePropepties.h>
 #include "AdvocatInserter.h"
 
 struct IDbConnection;
@@ -20,7 +20,7 @@ class CAdvocatsBook : public XTabStopPanel {
 		DEF_GUI_HORZ_GAP = 5
 	};
 
-	CPropertiesFile props;
+	CFlexiblePropepties props;
 	std::shared_ptr<IDbConnection> conn;
 	std::shared_ptr<CDbTable> db_table;
 

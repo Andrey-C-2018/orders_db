@@ -72,7 +72,7 @@ const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
  a.reason, a.cancel_order, a.cancel_date, inf.informer_name, aa.article,\
- aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,\
+ aa.fee, aa.fee_parus, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date, uu.user_full_name,\
  aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_, \
  aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef,";
@@ -80,7 +80,7 @@ SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
 const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
- aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,\
+ aa.fee, aa.fee_parus, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,\
  aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_, \
  aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef, \
@@ -89,14 +89,14 @@ SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
 const char main_query_fields[] = "\
 SELECT a.zone, c.center_short_name, b.adv_name_short, a.id, a.order_date,\
  t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle,\
- aa.fee, aa.fee_parus, aa.outgoings, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,\
+ aa.fee, aa.fee_parus, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,\
  aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,\
  aa.article, uu.user_full_name, a.reason, a.cancel_order, a.cancel_date, inf.informer_name,\
  aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_, \
  aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef,";
 #endif
 
-const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage,aa.act_no";
+const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage,aa.act_no DESC";
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
@@ -281,10 +281,6 @@ void CSearchForm::setFieldsSizes() {
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("fee"), _T("Сума"));
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("fee_parus"), _T("Сума 1С"));
 
-	field_index = meta_info.getFieldIndexByName("outgoings");
-	grid->SetFieldWidth(field_index, 6);
-	grid->SetFieldLabel(field_index, _T("Різні"));
-
 	field_index = meta_info.getFieldIndexByName("outg_post");
 	grid->SetFieldWidth(field_index, 5);
 	grid->SetFieldLabel(field_index, _T("Пошт."));
@@ -438,7 +434,6 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 
 	CCurrencyCellWidget *currency_widget = creator.createAndAttachToGrid<CCurrencyCellWidget>("fee", true);
 	grid->SetWidgetForFieldByName("fee_parus", currency_widget);
-	grid->SetWidgetForFieldByName("outgoings", currency_widget);
 	grid->SetWidgetForFieldByName("outg_post", currency_widget);
 	grid->SetWidgetForFieldByName("outg_daynight", currency_widget);
 
@@ -751,13 +746,6 @@ void CSearchForm::displayWidgets() {
 		sizer.addWidget(fee, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInsertHelper().setFeeWidget(fee);
-
-		sizer.addWidget(new XLabel(), _T("Витрати загальні: "), FL_WINDOW_VISIBLE, \
-						XSize(55, DEF_GUI_ROW_HEIGHT));
-		XTabStopEdit *outgoings = new XCurrencyField(this);
-		sizer.addWidget(outgoings, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
-						FL_EDIT_AUTOHSCROLL, XSize(50, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInsertHelper().setOutgExtraWidget(outgoings);
 
 		sizer.addWidget(new XLabel(), _T("Поштові: "), FL_WINDOW_VISIBLE, \
 						XSize(62, DEF_GUI_ROW_HEIGHT));

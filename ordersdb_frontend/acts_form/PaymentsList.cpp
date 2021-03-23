@@ -58,10 +58,6 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	grid->SetFieldLabel(field_index, _T("Сума"));
 	grid->SetFieldWidth(field_index, 8);
 
-	field_index = meta_info.getFieldIndexByName("outgoings");
-	grid->SetFieldLabel(field_index, _T("Різні"));
-	grid->SetFieldWidth(field_index, 6);
-
 	field_index = meta_info.getFieldIndexByName("outg_post");
 	grid->SetFieldLabel(field_index, _T("Пошт"));
 	grid->SetFieldWidth(field_index, 5);
@@ -76,7 +72,7 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 
 	field_index = meta_info.getFieldIndexByName("act_no");
 	grid->SetFieldLabel(field_index, _T("Тип акту"));
-	grid->SetFieldWidth(field_index, 8);
+	grid->SetFieldWidth(field_index, 10);
 
 	field_index = meta_info.getFieldIndexByName("id_act");
 	grid->SetFieldLabel(field_index, _T("Акт"));
@@ -162,7 +158,7 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 
 	std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date,";
 	query += " aa.is_paid, aa.id_stage, st.stage_name, aa.cycle, aa.article,";
-	query += " aa.fee, aa.outgoings, aa.outg_post, aa.outg_daynight,";
+	query += " aa.fee, aa.outg_post, aa.outg_daynight,";
 	query += " aa.id_informer, inf.informer_name, aa.act_no, aa.id_act, aa.act_date, aa.act_reg_date,";
 	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
 	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,u.user_full_name,aa.id_checker ";
@@ -227,7 +223,6 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("fee", currency_widget);
 		fee = true;
 
-		grid->SetWidgetForFieldByName("outgoings", currency_widget);
 		grid->SetWidgetForFieldByName("outg_post", currency_widget);
 		grid->SetWidgetForFieldByName("outg_daynight", currency_widget);
 		

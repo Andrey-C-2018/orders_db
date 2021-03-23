@@ -54,7 +54,6 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		sizer.addWidget(new XLabel(), _T("#"), label_flags, XSize(25, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Стаття"), label_flags, XSize(130, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Сума"), label_flags, XSize(70, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Витр."), label_flags, XSize(45, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Пошт."), label_flags, XSize(45, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Добові"), label_flags, XSize(45, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Інформатор"), label_flags, XSize(160, LABELS_HEIGHT));
@@ -85,10 +84,6 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		inserter.setFeeWidget(fee);
 		sizer.addWidget(fee, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
 
-		auto outgoings = new XCurrencyField(this);
-		inserter.setOutgoingsWidget(outgoings);
-		sizer.addWidget(outgoings, _T(""), edit_flags, XSize(45, DEF_HEIGHT));
-
 		auto outg_post = new XCurrencyField(this);
 		inserter.setOutgPostWidget(outg_post);
 		sizer.addWidget(outg_post, _T(""), edit_flags, XSize(45, DEF_HEIGHT));
@@ -106,7 +101,7 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		auto act_no = new XTabStopComboBox(this);
 		inserter.setActNoWidget(act_no);
 		sizer.addResizeableWidget(act_no, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | FL_COMBOBOX_DROPDOWN, \
-									XSize(60, DEF_HEIGHT), 100);
+									XSize(70, DEF_HEIGHT), 100);
 
 		auto id_act = new XTabStopEdit(this);
 		inserter.setActWidget(id_act);

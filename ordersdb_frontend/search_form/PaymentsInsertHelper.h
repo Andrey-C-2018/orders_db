@@ -19,7 +19,7 @@ class CPaymentsInsertHelper {
 	XWidget *cycle;
 	XWidget *article;
 	XWidget *fee;
-	XWidget *outg_extra, *outg_post, *outg_daynight;
+	XWidget *outg_post, *outg_daynight;
 	CDbComboBox *informer;
 	XWidget *id_act;
 	XComboBox *act_no;
@@ -32,7 +32,7 @@ class CPaymentsInsertHelper {
 
 public:
 	enum {
-		FIELDS_COUNT = 19
+		FIELDS_COUNT = 18
 	};
 
 	CPaymentsInsertHelper();
@@ -49,7 +49,6 @@ public:
 	inline void setCycleWidget(XWidget *cycle) { this->cycle = cycle; }
 	inline void setArticleWidget(XWidget *article) { this->article = article; }
 	inline void setFeeWidget(XWidget *fee) { this->fee = fee; }
-	inline void setOutgExtraWidget(XWidget *outg_extra) { this->outg_extra = outg_extra; }
 	inline void setOutgPostWidget(XWidget *outg_post) { this->outg_post = outg_post; }
 	inline void setOutgDayNightWidget(XWidget *outg_dn) { this->outg_daynight = outg_dn; }
 	inline void setInformerWidget(CDbComboBox *informer) { this->informer = informer; }
@@ -85,7 +84,6 @@ void CPaymentsInsertHelper::init() {
 	cycle = nullptr;
 	article = nullptr;
 	fee = nullptr;
-	outg_extra = nullptr;
 	outg_post = nullptr;
 	outg_daynight = nullptr;
 	informer = nullptr;

@@ -13,6 +13,7 @@
 #include <xwindows_ex/XTabStopWidget.h>
 #include <xwindows_ex/XTabStopEdit.h>
 #include <xwindows_ex/XDateField.h>
+#include <forms_common/VernamOneTimePad.h>
 #include "AdvocatsBook.h"
 #include "AdvocatsGridEvtHandler.h"
 #include "PostIndexCellWidget.h"
@@ -27,11 +28,11 @@ CAdvocatsBook::CAdvocatsBook(XWindow *parent, const int flags, \
 	grid(nullptr), examiners_list(nullptr), adv_org_types_list(nullptr), districts_list(nullptr), \
 	grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
 
-	props.open("config.ini");
+	props.open();
 
 	initFilteringControls();
 
-	conn = CMySQLConnectionFactory::createConnection(props);
+	conn = CMySQLConnectionFactory::createConnection(props, vernam_one_time_pad);
 	db_table = createDbTable(conn);
 	
 	grid = new CDbGrid(false, db_table, std::make_shared<CAdvocatsGridEvtHandler>(db_table));

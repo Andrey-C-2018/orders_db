@@ -124,7 +124,6 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 	assert(cycle);
 	assert(article);
 	assert(fee);
-	assert(outg_extra);
 	assert(informer);
 	assert(id_act);
 	assert(act_no);
@@ -169,28 +168,26 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 						std::make_shared<UIDateInsertBinder>(act_reg_date, false));
 	ins_helper.addBinder(13, _T("Дата оплати"), \
 						std::make_shared<UIDateInsertBinder>(payment_date, false));
-	ins_helper.addBinder(14, _T("Різні витрати"), \
-						std::make_shared<CFeeBinder>(outg_extra, false, true));
 	if(def_center == 1)
-		ins_helper.addBinder(15, _T("Дата реєстр. в ДКС"), \
+		ins_helper.addBinder(14, _T("Дата реєстр. в ДКС"), \
 					std::make_shared<UIDateInsertBinder>(act_date, false));
 	else
-		ins_helper.defStaticInsertion(15, "NULL");
+		ins_helper.defStaticInsertion(14, "NULL");
 
-	ins_helper.addBinder(16, _T("Перевірив"), \
+	ins_helper.addBinder(15, _T("Перевірив"), \
 					std::make_shared<CheckerInsertBinder>(checker, def_center, \
 															act_reg_date, conn));
 	if(outg_post)
-		ins_helper.addBinder(17, _T("Поштові витрати"), \
+		ins_helper.addBinder(16, _T("Поштові витрати"), \
 					std::make_shared<CFeeBinder>(outg_post, false, true));
 	else
-		ins_helper.defStaticInsertion(17, "0.0");
+		ins_helper.defStaticInsertion(16, "0.0");
 
 	if (outg_daynight)
-		ins_helper.addBinder(18, _T("Добові витрати"), \
+		ins_helper.addBinder(17, _T("Добові витрати"), \
 					std::make_shared<CFeeBinder>(outg_daynight, false, true));
 	else
-		ins_helper.defStaticInsertion(18, "0.0");
+		ins_helper.defStaticInsertion(17, "0.0");
 }
 
 void CPaymentsInsertHelper::errMsgOnPrimKeyDuplicate(Tstring &err_str) const {
@@ -211,7 +208,6 @@ void CPaymentsInsertHelper::resetControls() {
 
 	article->SetLabel(_T(""));
 	fee->SetLabel(_T(""));
-	outg_extra->SetLabel(_T("")); 
 	outg_post->SetLabel(_T(""));
 	outg_daynight->SetLabel(_T(""));
 }

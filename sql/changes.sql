@@ -10,3 +10,5 @@ INSERT INTO payments SELECT id_center,id_order,order_date,outgoings,id_stage,art
 
 UPDATE payments SET fee = fee - outgoings WHERE act_no = "Винагорода"
 UPDATE payments SET outgoings = 0, outg_post = 0, outg_daynight = 0 WHERE act_no = "Винагорода"
+
+ALTER TABLE `orders`.`payments` DROP COLUMN `outgoings`;

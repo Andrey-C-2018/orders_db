@@ -9,7 +9,7 @@ class CDbTable;
 
 class CPaymentsInserter : public IDbInserter {
 	enum {
-		FIELDS_COUNT = 38
+		FIELDS_COUNT = 37
 	};
 	CDbInsertHelper ins_helper;
 
@@ -22,7 +22,7 @@ class CPaymentsInserter : public IDbInserter {
 	XWidget *act_no;
 	XWidget *article;
 	XWidget *fee;
-	XWidget *outgoings, *outg_post, *outg_daynight;
+	XWidget *outg_post, *outg_daynight;
 	CDbComboBox *informer;
 	XWidget *id_act;
 	XWidget *act_date;
@@ -47,7 +47,6 @@ public:
 	inline void setActNoWidget(XWidget *act_no) { this->act_no = act_no; }
 	inline void setArticleWidget(XWidget *article) { this->article = article; }
 	inline void setFeeWidget(XWidget *fee) { this->fee = fee; }
-	inline void setOutgoingsWidget(XWidget *outgoings) { this->outgoings = outgoings; }
 	inline void setOutgPostWidget(XWidget *outg_post) { this->outg_post = outg_post; }
 	inline void setOutgDayNightWidget(XWidget *outg_daynight) { this->outg_daynight = outg_daynight; }
 
