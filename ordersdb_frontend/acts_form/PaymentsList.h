@@ -11,6 +11,7 @@ class CDbTable;
 class CDbComboBoxCellWidget;
 struct CPaymentsConstraints;
 class CPaymentsGridEvtHandler;
+class CComboBoxCellWidget;
 
 class CPaymentsList {
 	std::shared_ptr<IDbConnection> conn;
@@ -20,6 +21,7 @@ class CPaymentsList {
 	XWidget *grid_as_window;
 	XWidget *db_navigator;
 	CPaymentsNavPanel *panel;
+	CComboBoxCellWidget *act_no_widget;
 
 	bool cr_grid, cr_navigator, cr_panel;
 

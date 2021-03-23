@@ -1,9 +1,10 @@
 #pragma once
 #include <xwindows/XComboBox.h>
+#include <xwindows_ex/XTabStopWidget.h>
 
 class CFilteringManager;
 
-class CFilteringComboBox : public XComboBox {
+class CFilteringComboBox : public XTabStopWidget<XComboBox> {
 	size_t sel_index;
 	CFilteringManager &filtering_manager;
 	int id_expr;

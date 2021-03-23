@@ -15,6 +15,7 @@ protected:
 	virtual void OnKeyPress(XKeyboardEvent *eve);
 
 public:
+	XTabStopWidget() noexcept;
 	XTabStopWidget(ITabStopManager *manager_) noexcept;
 
 	XTabStopWidget(ITabStopManager *manager_, XWindow *parent, \
@@ -27,6 +28,8 @@ public:
 	XTabStopWidget &operator=(const XTabStopWidget &obj) = delete;
 	XTabStopWidget &operator=(XTabStopWidget &&obj) = default;
 
+	inline void setTabStopManager(ITabStopManager *manager_);
+
 	void Create(XWindow *parent, const int flags, \
 				const Tchar *label, \
 				const int x, const int y, \
@@ -36,6 +39,10 @@ public:
 };
 
 //*****************************************************
+
+template <class TWidget> \
+XTabStopWidget<TWidget>::XTabStopWidget() noexcept : \
+									manager(nullptr), action(nullptr) { }
 
 template <class TWidget> \
 XTabStopWidget<TWidget>::XTabStopWidget(ITabStopManager *manager_) noexcept : \
@@ -54,6 +61,13 @@ XTabStopWidget<TWidget>::XTabStopWidget(ITabStopManager *manager_, XWindow *pare
 	manager->RegisterTabStopControl(this);
 
 	OverrideWindowEvent(EVT_KEYDOWN, XEventHandlerData(this, &XTabStopWidget::OnKeyPress));
+}
+
+template <class TWidget> \
+void XTabStopWidget<TWidget>::setTabStopManager(ITabStopManager *manager_) {
+
+	assert(!this->manager);
+	this->manager = manager_;
 }
 
 template <class TWidget> \

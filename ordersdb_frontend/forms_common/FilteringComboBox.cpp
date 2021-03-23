@@ -12,7 +12,8 @@ void CFilteringComboBox::Create(XWindow *parent, const int flags, \
 						const int x, const int y, \
 						const int width, const int height) {
 
-	XComboBox::Create(parent, flags | FL_COMBOBOX_DROPDOWN, label, x, y, width, height);
+	XTabStopWidget<XComboBox>::Create(parent, flags | FL_COMBOBOX_DROPDOWN, \
+										label, x, y, width, height);
 	
 	fill();
 	parent->Connect(EVT_COMMAND, NCODE_COMBOBOX_SELCHANGED, \

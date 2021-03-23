@@ -25,6 +25,7 @@ class CFilteringDbComboBox;
 class CFilteringDateField;
 class CZoneFilter;
 class CPaidFilter;
+class CActNoFilter;
 class COrderingComboBox;
 
 class CSearchForm : public XTabStopPanel {
@@ -50,9 +51,10 @@ class CSearchForm : public XTabStopPanel {
 	CFilteringDateField *flt_payment_date_from, *flt_payment_date_to;
 	CFilteringDbComboBox *flt_advocat, *flt_center, *flt_informer;
 	CFilteringDbComboBox *flt_order_type, *flt_stage;
-	CComboBoxCellWidget *canceling_reasons_list;
+	CComboBoxCellWidget *canceling_reasons_list, *act_no_list;
 	CZoneFilter *flt_zone;
 	CPaidFilter *flt_paid;
+	CActNoFilter *flt_act_no;
 
 	CDbGrid *grid;
 	CDbComboBoxCellWidget *advocats_list, *centers_list, *informers_list;

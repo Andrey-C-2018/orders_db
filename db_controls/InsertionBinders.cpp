@@ -133,6 +133,35 @@ UIDateInsertBinder::~UIDateInsertBinder() { }
 
 //*****************************************************
 
+CComboBoxInsertBinder::CComboBoxInsertBinder(XComboBox *combo_, \
+											const bool deallocate_widget_object_, \
+											const bool allow_empty_) : \
+							UITextInsertBinder(combo_, deallocate_widget_object_), \
+							combo(combo_), allow_empty(allow_empty_) { }
+
+bool CComboBoxInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
+								Params &params, const Tchar *field_name) {
+
+	size_t sel_index = combo->GetCurrentSelectionIndex();
+	if (!sel_index || sel_index == -1) {
+		if (allow_empty) {
+			binding_target->bindValue(params.param_no, value_if_empty.c_str());
+			++params.param_no;
+			return true;
+		}
+		params.error_str += field_name;
+		params.error_str += _T(": значення із списку не вибрано\n");
+		++params.param_no;
+		return true;
+	}
+
+	return UITextInsertBinder::bind(binding_target, params, field_name);
+}
+
+CComboBoxInsertBinder::~CComboBoxInsertBinder() { }
+
+//*****************************************************
+
 CDbComboBoxInsertBinder::CDbComboBoxInsertBinder(CDbComboBox *db_combo_, \
 												const bool deallocate_widget_object_, \
 												const bool allow_empty_) : \
@@ -142,7 +171,7 @@ CDbComboBoxInsertBinder::CDbComboBoxInsertBinder(CDbComboBox *db_combo_, \
 
 bool CDbComboBoxInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 									Params &params, const Tchar *field_name) {
-
+	
 	if (db_combo->isEmptySelection()) {
 		if (allow_empty) {
 			binding_target->bindValue(params.param_no, value_if_empty);

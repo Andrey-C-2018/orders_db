@@ -27,9 +27,6 @@
     <ClInclude Include="PaidFilter.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="FilteringComboBox.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="ZoneFilter.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
@@ -69,9 +66,6 @@
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="PaidFilter.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="FilteringComboBox.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="ZoneFilter.cpp">

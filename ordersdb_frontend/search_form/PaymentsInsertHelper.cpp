@@ -157,8 +157,8 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 			std::make_shared<CDbComboBoxInsertBinder>(informer, false, true));
 	ins_helper.addBinder(7, _T("Акт"), \
 							std::make_shared<CActNameBinder>(id_act, false));
-	ins_helper.addBinder(8, _T("№ акту"), \
-							std::make_shared<UIIntInsertBinder>(act_no, false));
+	ins_helper.addBinder(8, _T("Тип акту"), \
+							std::make_shared<CComboBoxInsertBinder>(act_no, false, false));
 
 	ins_helper.addBinder(9, _T("Дата акта"), \
 		std::make_shared<CActDateBinderNoDb>(order_date, act_date, \

@@ -22,7 +22,7 @@ class CPaymentsInsertHelper {
 	XWidget *outg_extra, *outg_post, *outg_daynight;
 	CDbComboBox *informer;
 	XWidget *id_act;
-	XWidget *act_no;
+	XComboBox *act_no;
 	XWidget *act_date;
 	XWidget *act_reg_date;
 	XWidget *payment_date;
@@ -54,7 +54,7 @@ public:
 	inline void setOutgDayNightWidget(XWidget *outg_dn) { this->outg_daynight = outg_dn; }
 	inline void setInformerWidget(CDbComboBox *informer) { this->informer = informer; }
 	inline void setActWidget(XWidget *id_act) { this->id_act = id_act; }
-	inline void setActNoWidget(XWidget *act_no) { this->act_no = act_no; }
+	inline void setActNoWidget(XComboBox *act_no) { this->act_no = act_no; }
 	inline void setActDateWidget(XWidget *act_date) { this->act_date = act_date; }
 	inline void setActRegDateWidget(XWidget *act_reg_date) { this->act_reg_date = act_reg_date; }
 	inline void setPaymentDateWidget(XWidget *payment_date) { this->payment_date = payment_date; }

@@ -35,7 +35,7 @@ public:
 //*****************************************************
 
 CZoneFilter::CZoneFilter(CFilteringManager &filtering_manager_) : \
-						CFilteringComboBox(filtering_manager_) {
+							CFilteringComboBox(filtering_manager_) {
 
 	auto binder = std::make_shared<CZoneBinder>(this);
 	SetIdExpr(filtering_manager_.addExpr("zone = ?", binder));

@@ -121,8 +121,7 @@ void CPaymentsInserter::getCurrRecord() {
 													CDate::GERMAN_FORMAT_LEN + 1;
 	Tchar buffer[BUFFER_SIZE];
 	setIntWidgetLabel(cycle, rs, meta_info, "cycle", buffer);
-	setIntWidgetLabel(act_no, rs, meta_info, "act_no", buffer);
-
+	
 	setStrWidgetLabel(article, rs, meta_info, "article");
 	setStrWidgetLabel(fee, rs, meta_info, "fee");
 	setStrWidgetLabel(outgoings, rs, meta_info, "outgoings");
@@ -132,6 +131,7 @@ void CPaymentsInserter::getCurrRecord() {
 	informer->SetCurrRecord(rs, meta_info.getFieldIndexByName("id_informer"), INT_TYPE_HINT);
 
 	setStrWidgetLabel(id_act, rs, meta_info, "id_act");
+	setStrWidgetLabel(act_no, rs, meta_info, "act_no");
 	setDateWidgetLabel(act_date, rs, meta_info, "act_date", buffer);
 	setDateWidgetLabel(act_reg_date, rs, meta_info, "act_reg_date", buffer);
 
@@ -208,8 +208,8 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 				std::make_shared<CDbComboBoxInsertBinder>(informer, false, false));
 	ins_helper.addBinder(7, _T("Акт"), \
 						std::make_shared<CActNameBinder>(id_act, false));
-	ins_helper.addBinder(8, _T("№акту"), \
-						std::make_shared<UIIntInsertBinder>(act_no, false));
+	ins_helper.addBinder(8, _T("Тип акту"), \
+						std::make_shared<UITextInsertBinder>(act_no, false));
 	ins_helper.addBinder(9, _T("Дата акта"), \
 		std::make_shared<CActDateBinder>(db_table, act_date, false, act_reg_date));
 	ins_helper.addBinder(10, _T("Цикл"), \

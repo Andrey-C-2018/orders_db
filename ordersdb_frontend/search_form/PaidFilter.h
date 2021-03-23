@@ -1,8 +1,9 @@
 #pragma once
-#include "FilteringComboBox.h"
+#include <forms_common/FilteringComboBox.h>
 
 class CPaidFilter : public CFilteringComboBox {
 	void fill() override;
+
 public:
 	CPaidFilter(CFilteringManager &filtering_manager_);
 

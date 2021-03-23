@@ -47,7 +47,7 @@ public:
 //*****************************************************
 
 CPaidFilter::CPaidFilter(CFilteringManager &filtering_manager_) : \
-						CFilteringComboBox(filtering_manager_) {
+							CFilteringComboBox(filtering_manager_) {
 
 	auto binder = std::make_shared<CPaidBinder>(this);
 	SetIdExpr(filtering_manager_.addExpr("(? AND is_paid = ?) OR (? AND is_paid IS NULL)", \

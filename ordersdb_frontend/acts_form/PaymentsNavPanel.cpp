@@ -12,6 +12,8 @@
 #include <forms_common/ParametersManager.h>
 #include "PaymentsNavPanel.h"
 
+typedef XTabStopWidget<XComboBox> XTabStopComboBox;
+
 CPaymentsNavPanel::CPaymentsNavPanel(std::shared_ptr<IDbConnection> conn_, \
 										std::shared_ptr<CDbTable> db_table_, \
 										std::shared_ptr<CPaymentsConstraints> constraints_, \
@@ -50,13 +52,13 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		sizer.addWidget(&null_widget, _T(""), 0, XSize(20, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Стадія"), label_flags, XSize(90, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("#"), label_flags, XSize(25, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Стаття"), label_flags, XSize(140, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Стаття"), label_flags, XSize(130, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Сума"), label_flags, XSize(70, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Витр."), label_flags, XSize(50, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Пошт."), label_flags, XSize(50, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Добові"), label_flags, XSize(50, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Інформатор"), label_flags, XSize(170, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("№а"), label_flags, XSize(30, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Витр."), label_flags, XSize(45, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Пошт."), label_flags, XSize(45, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Добові"), label_flags, XSize(45, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Інформатор"), label_flags, XSize(160, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Тип акту"), label_flags, XSize(65, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Акт"), label_flags, XSize(70, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Дата акту"), label_flags, XSize(80, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Дт. розрах"), label_flags, XSize(80, LABELS_HEIGHT));
@@ -77,7 +79,7 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 
 		auto article = new XTabStopEdit(this);
 		inserter.setArticleWidget(article);
-		sizer.addWidget(article, _T(""), edit_flags, XSize(140, DEF_HEIGHT));
+		sizer.addWidget(article, _T(""), edit_flags, XSize(130, DEF_HEIGHT));
 
 		auto fee = new XCurrencyField(this);
 		inserter.setFeeWidget(fee);
@@ -85,25 +87,26 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 
 		auto outgoings = new XCurrencyField(this);
 		inserter.setOutgoingsWidget(outgoings);
-		sizer.addWidget(outgoings, _T(""), edit_flags, XSize(50, DEF_HEIGHT));
+		sizer.addWidget(outgoings, _T(""), edit_flags, XSize(45, DEF_HEIGHT));
 
 		auto outg_post = new XCurrencyField(this);
 		inserter.setOutgPostWidget(outg_post);
-		sizer.addWidget(outg_post, _T(""), edit_flags, XSize(50, DEF_HEIGHT));
+		sizer.addWidget(outg_post, _T(""), edit_flags, XSize(45, DEF_HEIGHT));
 
 		auto outg_daynight = new XCurrencyField(this);
 		inserter.setOutgDayNightWidget(outg_daynight);
-		sizer.addWidget(outg_daynight, _T(""), edit_flags, XSize(50, DEF_HEIGHT));
+		sizer.addWidget(outg_daynight, _T(""), edit_flags, XSize(45, DEF_HEIGHT));
 
 		auto informer = new CDbComboBox(rs_inf, 1, 0);
 		inserter.setInformerWidget(informer);
 		sizer.addResizeableWidget(informer, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
-									XSize(170, DEF_HEIGHT), 150);
+									XSize(160, DEF_HEIGHT), 150);
 		informer->setTabStopManager(this);
 
-		auto act_no = new XTabStopEdit(this);
+		auto act_no = new XTabStopComboBox(this);
 		inserter.setActNoWidget(act_no);
-		sizer.addWidget(act_no, _T(""), edit_flags, XSize(25, DEF_HEIGHT));
+		sizer.addResizeableWidget(act_no, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | FL_COMBOBOX_DROPDOWN, \
+									XSize(60, DEF_HEIGHT), 100);
 
 		auto id_act = new XTabStopEdit(this);
 		inserter.setActWidget(id_act);
@@ -218,6 +221,9 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 	main_sizer.popNestedSizer();
 
 	inserter.prepare(conn);
+
+	act_no->AddItem(_T("Винагорода"));
+	act_no->AddItem(_T("Витрати"));
 
 	Connect(EVT_COMMAND, btn_get_curr->GetId(), this, \
 			&CPaymentsNavPanel::OnGetCurrRecordButtonClick);

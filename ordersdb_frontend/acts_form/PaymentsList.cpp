@@ -20,7 +20,7 @@ CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_)
 								grid_sizer(margins_, 0), nav_sizer(margins_, margins_), \
 								panel_sizer(margins_, margins_), prev_sizer(nullptr), \
 								stages_list(nullptr), informers_list(nullptr), \
-								checkers_list(nullptr) { }
+								checkers_list(nullptr), act_no_widget(nullptr) { }
 
 void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_center, \
 								const int def_order, CDate def_order_date, \
@@ -75,8 +75,8 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	grid->SetFieldWidth(field_index, 30);
 
 	field_index = meta_info.getFieldIndexByName("act_no");
-	grid->SetFieldLabel(field_index, _T("№а"));
-	grid->SetFieldWidth(field_index, 2);
+	grid->SetFieldLabel(field_index, _T("Тип акту"));
+	grid->SetFieldWidth(field_index, 8);
 
 	field_index = meta_info.getFieldIndexByName("id_act");
 	grid->SetFieldLabel(field_index, _T("Акт"));
@@ -190,11 +190,11 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 }
 
 void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
-	enum { CYCLE_MAX_LEN = 3, QA_MAX_LEN = 1, ACT_NO_MAX_LEN = 3};
+	enum { CYCLE_MAX_LEN = 3, QA_MAX_LEN = 1};
 
 	assert(grid);
 	CEditableCellWidget *is_paid_widget = nullptr;
-	CIntegerCellWidget *cycle_widget = nullptr, *act_no_widget;
+	CIntegerCellWidget *cycle_widget = nullptr;
 	CBooleanCellWidget *qa_widget = nullptr;
 	CCurrencyCellWidget *currency_widget = nullptr, *koef_widget = nullptr;
 	CDateCellWidget *date_widget = nullptr;
@@ -213,7 +213,7 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("cycle", cycle_widget);
 		cycle = true;
 
-		act_no_widget = new CIntegerCellWidget(ACT_NO_MAX_LEN);
+		act_no_widget = new CComboBoxCellWidget();
 		grid->SetWidgetForFieldByName("act_no", act_no_widget);
 		act_no = true;
 
@@ -342,6 +342,10 @@ void CPaymentsList::displayWidgets(XWindow *parent) {
 	size_t index = meta_info.getFieldIndexByName("article");
 	grid_evt_handler->addAllowedField(grid->GetFieldRelativeIndex(index));
 	grid_evt_handler.reset();
+
+	assert(act_no_widget);
+	act_no_widget->AddItem(_T("Винагорода"));
+	act_no_widget->AddItem(_T("Витрати"));
 }
 
 CPaymentsList::~CPaymentsList() {

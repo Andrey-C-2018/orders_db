@@ -25,6 +25,7 @@
 #include <forms_common/PaymentsDbTableEvtHandler.h>
 #include <forms_common/CommonRoutines.h>
 #include <forms_common/VernamOneTimePad.h>
+#include <forms_common/ActNoFilter.h>
 #include "SearchForm.h"
 #include "SearchFormGridEvtHandler.h"
 #include "ZoneFilter.h"
@@ -64,7 +65,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.14";
+constexpr char search_form_version[] = "1.0.15";
 
 #ifdef DUTY
 const char main_query_fields[] = "\
@@ -108,9 +109,11 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 				flt_act_date_to(nullptr), flt_payment_date_from(nullptr), \
 				flt_payment_date_to(nullptr), flt_center(nullptr), flt_informer(nullptr), \
 				flt_order_type(nullptr), flt_stage(nullptr), flt_zone(nullptr), \
+				flt_act_no(nullptr), \
 				grid(nullptr), advocats_list(nullptr), flt_client(nullptr), \
 				centers_list(nullptr), order_types_list(nullptr), stages_list(nullptr), \
-				checkers_list(nullptr), canceling_reasons_list(nullptr), qa_widget(nullptr), \
+				checkers_list(nullptr), canceling_reasons_list(nullptr), act_no_list(nullptr), \
+				qa_widget(nullptr), \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0), \
 				total_fee(nullptr), total_paid(nullptr), total_orders(nullptr), \
 				btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
@@ -291,8 +294,8 @@ void CSearchForm::setFieldsSizes() {
 	grid->SetFieldLabel(field_index, _T("Добові"));
 	
 	field_index = meta_info.getFieldIndexByName("act_no");
-	grid->SetFieldWidth(field_index, 6);
-	grid->SetFieldLabel(field_index, _T("№акту"));
+	grid->SetFieldWidth(field_index, 10);
+	grid->SetFieldLabel(field_index, _T("Тип акту"));
 
 	field_index = meta_info.getFieldIndexByName("id_act");
 	grid->SetFieldWidth(field_index, 15);
@@ -428,6 +431,9 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 										"payments", db_table);
 	stages_list->AddRelation("id_st", "id_stage");
 
+	act_no_list = new CComboBoxCellWidget();
+	grid->SetWidgetForFieldByName("act_no", act_no_list);
+
 	creator.createAndAttachToGrid<CActNameCellWidget>("id_act");
 
 	CCurrencyCellWidget *currency_widget = creator.createAndAttachToGrid<CCurrencyCellWidget>("fee", true);
@@ -474,6 +480,7 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 void CSearchForm::adjustUIDependentCellWidgets() {
 
 	assert(canceling_reasons_list);
+	assert(act_no_list);
 
 	canceling_reasons_list->AddItem(_T("скасовано"));
 	canceling_reasons_list->AddItem(_T("припинено"));
@@ -484,6 +491,9 @@ void CSearchForm::adjustUIDependentCellWidgets() {
 	canceling_reasons_list->AddItem(_T("розшук"));
 	canceling_reasons_list->AddItem(_T("виключений з реєстру"));
 	canceling_reasons_list->AddItem(_T("завершено"));
+
+	act_no_list->AddItem(_T("Винагорода"));
+	act_no_list->AddItem(_T("Витрати"));
 }
 
 void CSearchForm::loadInitialFilterToControls() {
@@ -547,7 +557,8 @@ void CSearchForm::initFilteringControls() {
 	id_expr = filtering_manager.addExpr("a.client_name LIKE ?", str_binder);
 	flt_client->setExprId(id_expr);
 
-	flt_zone = new CZoneFilter(filtering_manager);
+	flt_zone = new CZoneFilter(filtering_manager); 
+	flt_act_no = new CActNoFilter(filtering_manager); 
 
 	flt_act = new CFilteringEdit(filtering_manager, this);
 	str_binder = std::make_shared<CStringWidgetBinderControl>(flt_act);
@@ -714,11 +725,12 @@ void CSearchForm::displayWidgets() {
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInsertHelper().setActWidget(flt_act);
 
-		sizer.addWidget(new XLabel(), _T("№ акта: "), FL_WINDOW_VISIBLE, \
-						XSize(60, DEF_GUI_ROW_HEIGHT));
-		XTabStopEdit *act_no = new XTabStopEdit(this);
-		sizer.addWidget(act_no, _T(""), edit_flags, XSize(20, DEF_GUI_ROW_HEIGHT));
-		inserter.getPaymentsInsertHelper().setActNoWidget(act_no);
+		sizer.addWidget(new XLabel(), _T("Тип акта: "), FL_WINDOW_VISIBLE, \
+						XSize(65, DEF_GUI_ROW_HEIGHT));
+		flt_act_no->setTabStopManager(this);
+		sizer.addResizeableWidget(flt_act_no, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+						XSize(80, DEF_GUI_ROW_HEIGHT), 100);
+		inserter.getPaymentsInsertHelper().setActNoWidget(flt_act_no);
 
 		sizer.addWidget(new XLabel(), _T("Етап: "), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT));
@@ -805,11 +817,13 @@ void CSearchForm::displayWidgets() {
 
 		sizer.addWidget(new XLabel(), _T("Зона відп.:"), FL_WINDOW_VISIBLE, \
 						XSize(85, DEF_GUI_ROW_HEIGHT + 10));
+		flt_zone->setTabStopManager(this);
 		sizer.addResizeableWidget(flt_zone, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(50, DEF_GUI_ROW_HEIGHT), 100);
 		
 		sizer.addWidget(new XLabel(), _T("Оплачено:"), FL_WINDOW_VISIBLE, \
 						XSize(85, DEF_GUI_ROW_HEIGHT + 10));
+		flt_paid->setTabStopManager(this);
 		sizer.addResizeableWidget(flt_paid, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(50, DEF_GUI_ROW_HEIGHT), 100);
 
@@ -1071,6 +1085,7 @@ CSearchForm::~CSearchForm() {
 
 	if (grid && !grid->IsCreated()) delete grid;
 
+	if (flt_act_no && !flt_act_no->IsCreated()) delete flt_act_no;
 	if (flt_zone && !flt_zone->IsCreated()) delete flt_zone;
 	if (flt_paid && !flt_paid->IsCreated()) delete flt_paid;
 	if (flt_order_type && !flt_order_type->IsCreated()) delete flt_order_type;

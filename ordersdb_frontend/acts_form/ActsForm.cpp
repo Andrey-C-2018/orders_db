@@ -12,7 +12,7 @@
 #include "AdvDbTableEventsHandler.h"
 #include "OrdersDbTableEventsHandler.h"
 
-constexpr char acts_form_version[] = "1.0.20";
+constexpr char acts_form_version[] = "1.0.21";
 
 CActsForm::CActsForm(XWindow *parent, const int flags, \
 					const Tchar *label, \

@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClInclude Include="ActDateCellWidget.h" />
     <ClInclude Include="ActNameCellWidget.h" />
+    <ClInclude Include="ActNoFilter.h" />
     <ClInclude Include="AutorizationManager.h" />
     <ClInclude Include="CommonRoutines.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Constraints.h" />
+    <ClInclude Include="FilteringComboBox.h" />
     <ClInclude Include="FlexiblePropepties.h" />
     <ClInclude Include="FormsInsertionBinders.h" />
     <ClInclude Include="Messages.h" />
@@ -32,15 +34,16 @@
     <ClInclude Include="PaymentsDbTableEvtHandler.h" />
     <ClInclude Include="FormsGridEvtHandler.h" />
     <ClInclude Include="PermissionsManager.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="Validators.h" />
     <ClInclude Include="VernamOneTimePad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActDateCellWidget.cpp" />
     <ClCompile Include="ActNameCellWidget.cpp" />
+    <ClCompile Include="ActNoFilter.cpp" />
     <ClCompile Include="AutorizationManager.cpp" />
     <ClCompile Include="CommonRoutines.cpp" />
+    <ClCompile Include="FilteringComboBox.cpp" />
     <ClCompile Include="FlexiblePropepties.cpp" />
     <ClCompile Include="ParametersManager.cpp" />
     <ClCompile Include="PaymentsDbTableEvtHandler.cpp" />

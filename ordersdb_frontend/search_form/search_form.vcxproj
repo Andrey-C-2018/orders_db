@@ -168,7 +168,6 @@
     <ClInclude Include="PaymentsInsertHelper.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SearchForm.h" />
-    <ClInclude Include="FilteringComboBox.h" />
     <ClInclude Include="SearchFormGridEvtHandler.h" />
     <ClInclude Include="Uploader.h" />
     <ClInclude Include="ZoneFilter.h" />
@@ -183,7 +182,6 @@
     <ClCompile Include="PaidFilter.cpp" />
     <ClCompile Include="PaymentsInsertHelper.cpp" />
     <ClCompile Include="SearchForm.cpp" />
-    <ClCompile Include="FilteringComboBox.cpp" />
     <ClCompile Include="SearchFormGridEvtHandler.cpp" />
     <ClCompile Include="Uploader.cpp" />
     <ClCompile Include="ZoneFilter.cpp" />
