@@ -39,7 +39,7 @@ int main() {
 		CParametersManager params(&props);
 
 		auto mysql_conn = CMySQLConnectionFactory::createConnection(props);
-		std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date, aa.id_stage, aa.cycle,";
+		std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date, aa.id_stage, aa.cycle, aa.act_no,";
 		query += " b.adv_name, aa.act_date, aa.fee as fee_DB, ";
 		if (params.useCachedActsNamesIfPossible())
 			query += "IF(ISNULL(aa.id_act_parus), aa.id_act, aa.id_act_parus) as id_act ";
@@ -48,7 +48,7 @@ int main() {
 		query += "FROM orders a INNER JOIN payments aa ON";
 		query += " a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
 		query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat ";
-		query += "WHERE a.zone = ? AND aa.act_date >= '";
+		query += "WHERE (a.zone = ? OR a.id_center_legalaid = 9) AND aa.act_date >= '";
 		query += params.getInitialDate();
 		query += "' AND aa.fee <> 0 ";
 		if (params.processOnlyUnpaidActs()) 

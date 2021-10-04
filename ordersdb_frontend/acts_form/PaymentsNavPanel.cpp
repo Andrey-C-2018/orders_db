@@ -57,7 +57,7 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		sizer.addWidget(new XLabel(), _T("Пошт."), label_flags, XSize(45, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Добові"), label_flags, XSize(45, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Інформатор"), label_flags, XSize(160, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Тип акту"), label_flags, XSize(65, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Тип акту"), label_flags, XSize(70, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Акт"), label_flags, XSize(70, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Дата акту"), label_flags, XSize(80, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Дт. розрах"), label_flags, XSize(80, LABELS_HEIGHT));

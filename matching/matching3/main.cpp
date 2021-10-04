@@ -36,17 +36,17 @@ int main() {
 		std::string query = "UPDATE payments SET id_act_parus = ?,";
 		query += " fee_parus = ?, payment_date = ? ";
 		query += "WHERE id_center = ? AND id_order = ? AND order_date = ?";
-		query += " AND id_stage = ? AND cycle = ?";
+		query += " AND id_stage = ? AND cycle = ? AND act_no = ?";
 		auto stmt = mysql_conn->PrepareQuery(query.c_str());
 
 		query = "SELECT id_act_parus, fee_parus, payment_date FROM payments ";
 		query += "WHERE id_center = ? AND id_order = ? AND order_date = ?";
-		query += " AND id_stage = ? AND cycle = ?";
+		query += " AND id_stage = ? AND cycle = ? AND act_no = ?";
 		auto check_stmt = mysql_conn->PrepareQuery(query.c_str());
 
 		size_t rec_count = csv_input->getRecordsCount();
 		record_t total_updated_recs = 0;
-		std::wstring act_name;
+		std::wstring act_name, act_no;
 		for (size_t i = 0; i < rec_count; ++i) {
 			auto rec = csv_input->getRecord(i);
 
@@ -90,6 +90,11 @@ int main() {
 			stmt->bindValue(7, cycle);
 			check_stmt->bindValue(4, cycle);
 
+			act_no = rec->getColValueAsCharArray(fields[L"act_no"]);
+			if (act_no.empty()) continue;
+			stmt->bindValue(8, act_no.c_str());
+			check_stmt->bindValue(5, act_no.c_str());
+
 			auto rs = check_stmt->exec();
 			wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1] = L"";
 			auto recs_count = rs->getRecordsCount();
@@ -115,7 +120,7 @@ int main() {
 				std::wcout << id_center << _T('-') << id << _T("-'");
 				order_date.toStringGerman(buffer);
 				std::wcout << buffer << _T("'-") << id_stage << _T('-');
-				std::wcout << cycle << _T(": '");
+				std::wcout << cycle << _T("'-") << act_no << _T(": '");
 
 				const Tchar *act_name_old = rs->getWString(0);
 				act_name_old = act_name_old ? act_name_old : _T("NULL");
