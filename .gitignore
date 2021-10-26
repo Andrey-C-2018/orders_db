@@ -43,6 +43,10 @@ Thumbs.db
 *.suo
 *.aps
 .vs/
+.idea/
+cmake-build-debug/
+cmake-build-release/
+build/
 Debug/
 Debug DLL/
 Release/

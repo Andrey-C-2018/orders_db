@@ -1,20 +1,22 @@
 #include <map>
 #include <iostream>
 #include <basic/PropertiesFile.h>
-#include <basic/TextConv.h>
 #include <basic/locale_init.h>
+#include <basic/XConv.h>
+#include <basic/tstream.h>
 #include <db/SQLite/SQLiteConnection.h>
 #include <db/MySQL/MySQLConnectionFactory.h>
 #include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
-#include <db/IDbResultSetMetaData.h>
+#include <db/IDbResultSetMetadata.h>
 #include "DbTable.h"
 #include "ParametersManager.h"
 #include "Matching.h"
 #include "CurrencyDiffCalc.h"
 #include "AdvActDistanceCalc.h"
 #include "OutputWrapper.h"
+#include "Convert.h"
 
 struct CAdvocatBlock {
 	size_t position;
@@ -26,7 +28,7 @@ typedef std::map<std::string, CAdvocatBlock> CAdvocats;
 std::shared_ptr<IDbConnection> createSQLiteConnection(const CPropertiesFile &props);
 void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
 								std::shared_ptr<IDbConnection> mysql_conn);
-CAdvocats fillAdvocatBlocks(std::shared_ptr<const ITable> in, const size_t col_index);
+CAdvocats fillAdvocatBlocks(std::shared_ptr<const ITable> in, size_t col_index);
 
 int main() {
 
@@ -60,7 +62,7 @@ int main() {
 			removeAlreadyProcessedActs(sqlite_conn, mysql_conn);
 
 		auto ordersdb_stmt = mysql_conn->PrepareQuery(query.c_str());
-		ordersdb_stmt->bindValue(0, L"РЦ");
+		ordersdb_stmt->bindValue(0, _T("Р Р¦"));
 		auto ordersdb_result_set = ordersdb_stmt->exec();
 		auto ordersdb_table = std::make_shared<CMySQLDbTable>(ordersdb_result_set, \
 														ordersdb_stmt->getResultSetMetadata());
@@ -76,15 +78,15 @@ int main() {
 		std::ofstream result;
 		result.open("result.csv", std::ios::out | std::ios::trunc);
 		if (!result.is_open())
-			throw XException(0, _T("Не вдається створити результуючий файл: results.csv"));
+			throw XException(0, _T("РќРµ РІРґР°С”С‚СЊСЃСЏ СЃС‚РІРѕСЂРёС‚Рё СЂРµР·СѓР»СЊС‚СѓСЋС‡РёР№ С„Р°Р№Р»: results.csv"));
 
 		size_t adv_name_index_in1 = ordersdb_table->getColIndexByName("adv_name");
 		if (adv_name_index_in1 == ITable::NOT_FOUND)
-			throw XException(0, _T("Поле 'adv_name' відсутнє в таблиці з БД"));
+			throw XException(0, _T("РџРѕР»Рµ 'adv_name' РІС–РґСЃСѓС‚РЅС” РІ С‚Р°Р±Р»РёС†С– Р· Р‘Р”"));
 
 		size_t adv_name_index_in2 = table_1c->getColIndexByName("adv_name_1C");
 		if (adv_name_index_in2 == ITable::NOT_FOUND)
-			throw XException(0, _T("Поле 'adv_name' відсутнє в таблиці з 1C"));
+			throw XException(0, _T("РџРѕР»Рµ 'adv_name' РІС–РґСЃСѓС‚РЅС” РІ С‚Р°Р±Р»РёС†С– Р· 1C"));
 
 		auto blocks1 = fillAdvocatBlocks(ordersdb_table, adv_name_index_in1);
 		auto blocks2 = fillAdvocatBlocks(table_1c, adv_name_index_in2);
@@ -103,7 +105,7 @@ int main() {
 		for (auto p = blocks1.begin(); p != blocks1.end(); ++p) {
 			const std::string &adv1 = p->first;
 
-			std::cout << adv1;
+			Tcout << adv1;
 			auto p2 = blocks2.lower_bound(adv1);
 			if (p2 != blocks2.end() && !(blocks2.key_comp()(adv1, p2->first))) {
 				results_table = matching.match(p->second.position, \
@@ -121,7 +123,7 @@ int main() {
 
 			CCsvOutputWrapper output_wrapper(results_table);
 			result << output_wrapper;
-			std::cout << " OK" << std::endl;
+			Tcout << " OK" << std::endl;
 		}
 
 		std::string empty_cells_filler;
@@ -133,7 +135,7 @@ int main() {
 		for (auto &p2 : blocks2) {
 			const std::string &adv2 = p2.first;
 
-			std::cout << adv2;
+			Tcout << adv2;
 
 			results_table = CMatchingResultsTable(CMatchingResultsTable::RIGHT_PART, table_1c, \
 													p2.second.position, \
@@ -141,18 +143,24 @@ int main() {
 													false);
 			CCsvOutputWrapper output_wrapper(results_table, empty_cells_filler);
 			result << output_wrapper;
-			std::cout << " OK" << std::endl;
+			Tcout << " OK" << std::endl;
 		}
 
 		CCsvOutputWrapper(results_table).writeTail(result);
 
 		result.close();
 	}
+	catch(std::exception &e) {
+
+		Tcerr << e.what();
+		Tcin.get();
+		return 1;
+	}
 	catch (XException &e) {
 
-		std::wcerr << e.what();
-		std::wcin.get();
-		exit(1);
+		Tcerr << e.what();
+		Tcin.get();
+		return 1;
 	}
 
 	return 0;
@@ -163,11 +171,11 @@ std::shared_ptr<IDbConnection> createSQLiteConnection(const CPropertiesFile &pro
 	std::shared_ptr<IDbConnection> conn = std::make_shared<SQLiteConnection>();
 
 	Tstring buffer;
-	const Tchar *curr_prop = nullptr;
+	const Tchar *curr_prop;
 	std::string db_file_location;
 
 	curr_prop = props.getStringProperty(_T("sqlite_db_file_location"), buffer);
-	const char *p = UCS16_ToUTF8(curr_prop, -1, db_file_location);
+	const char *p = convertIfNecessary(curr_prop, db_file_location);
 
 	conn->Connect(p, 0, nullptr, nullptr, "acts");
 	return conn;
@@ -194,7 +202,8 @@ void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
 
 			bool is_null;
 			int id = rs->getInt(0, is_null);
-			_itoa_s(id, buffer, 10);
+			XConv::ToString(id, buffer);
+
 			query += buffer;
 			query += ", \"";
 			query += rs->getString(1);
@@ -224,7 +233,7 @@ void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
 	rs = mysql_conn->ExecQuery(query.c_str());
 	records_count = rs->getRecordsCount();
 	if (records_count) {
-		XException e(0, _T("acts.db містить акти, які вже пройшли звірку і збережені в БД"));
+		XException e(0, _T("acts.db РјС–СЃС‚РёС‚СЊ Р°РєС‚Рё, СЏРєС– РІР¶Рµ РїСЂРѕР№С€Р»Рё Р·РІС–СЂРєСѓ С– Р·Р±РµСЂРµР¶РµРЅС– РІ Р‘Р”"));
 		std::wofstream out;
 
 		out.open("processed.csv", std::ios::out | std::ios::trunc);
@@ -251,7 +260,7 @@ void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
 			out.close();
 			rs.reset();
 
-			e << _T(". Список актів див. у файлі processed.csv");
+			e << _T(". РЎРїРёСЃРѕРє Р°РєС‚С–РІ РґРёРІ. Сѓ С„Р°Р№Р»С– processed.csv");
 		}
 		mysql_conn->ExecScalarQuery("DROP TABLE 1c_acts");
 		throw e;
@@ -260,11 +269,11 @@ void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
 }
 
 CAdvocats fillAdvocatBlocks(std::shared_ptr<const ITable> in, \
-	const size_t col_index) {
-	CAdvocats advocats_blocks;
+							size_t col_index) {
+							CAdvocats advocats_blocks;
 
 	size_t rec_count = in->getRecordsCount();
-	std::string adv_name_prev = "";
+	std::string adv_name_prev;
 	for (size_t i = 0; i < rec_count; ++i) {
 		auto rec = in->getRecord(i);
 
@@ -280,7 +289,7 @@ CAdvocats fillAdvocatBlocks(std::shared_ptr<const ITable> in, \
 		}
 		else {
 			if (adv_name_prev != adv_name) {
-				XException e(0, _T("Файл не відсортовано. Adv: "));
+				XException e(0, _T("Р¤Р°Р№Р» РЅРµ РІС–РґСЃРѕСЂС‚РѕРІР°РЅРѕ. Adv: "));
 				e << adv_name;
 				throw e;
 			}

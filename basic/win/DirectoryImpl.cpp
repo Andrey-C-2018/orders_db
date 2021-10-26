@@ -1,6 +1,6 @@
-#include "Directory.h"
 #include <assert.h>
 #include <exception>
+#include "DirectoryImpl.h"
 
 XDirectory::XDirectory() : hFind(INVALID_HANDLE_VALUE) {
 

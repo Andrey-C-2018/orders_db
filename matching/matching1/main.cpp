@@ -1,71 +1,65 @@
 #include <memory>
 #include <map>
-#include <vector>
 #include <iostream>
 #include <cctype>
 #include <basic/PropertiesFile.h>
 #include <basic/XConv.h>
-#include <basic/TextConv.h>
 #include <basic/FileSystem.h>
+#include <basic/Directory.h>
 #include <basic/locale_init.h>
+#include <basic/tstream.h>
+#include <basic/Path.h>
 #include <date/Date.h>
 #include <db/SQLite/SQLiteConnection.h>
 #include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
 #include <db/DbException.h>
-#include "DbfTable.h"
-#include "Directory.h"
+#include "DbfTableAdapter.h"
+#include "Convert.h"
 
 enum Defaults {
 	MAX_DBF_FILE_NAME_LEN = 30, \
 	MAX_DBF_FIELD_NAME_LEN = 50
 };
 
-constexpr const char FIELD_ID[] = "ND";
-constexpr const char FIELD_ADV[] = "POLUT";
-constexpr const char FIELD_ACT[] = "NDOC";
-constexpr const char FIELD_FEE[] = "S";
+constexpr const Tchar FIELD_ID[] = _T("ND");
+constexpr const Tchar FIELD_ADV[] = _T("POLUT");
+constexpr const Tchar FIELD_ACT[] = _T("NDOC");
+constexpr const Tchar FIELD_FEE[] = _T("S");
 
-constexpr const wchar_t FIELD_ID_w[] = L"ND";
-constexpr const wchar_t FIELD_ADV_w[] = L"POLUT";
-constexpr const wchar_t FIELD_ACT_w[] = L"NDOC";
-constexpr const wchar_t FIELD_FEE_w[] = L"S";
-
-std::map<std::wstring, size_t> createFieldsMap();
+std::map<Tstring, size_t> createFieldsMap();
 std::shared_ptr<IDbConnection> createSQLiteConnection(const CPropertiesFile &props);
 
-bool checkFileExt(std::wstring &file_name);
-void checkDbfFileStructure(const CDbfTable &table, const std::map<std::wstring, size_t> &fields, \
-							const wchar_t *dbf_file_name);
+bool checkFileExt(const Tstring &file_name);
+void checkDbfFileStructure(const CDbfTableAdapter &table, const std::map<Tstring, size_t> &fields, \
+							const Tchar *dbf_file_name);
 
-CDate getPaymentDateFromFileName(const wchar_t *file_name);
-const wchar_t *checkIfIsEmptyAndConvert(const char *value, \
-										const char *field_name, \
-										const size_t record_no, \
-										const wchar_t *dbf_file_name, \
-										std::vector<wchar_t> &buffer);
-void rtrimSpaces(std::vector<wchar_t> &str);
-void replaceAdvNameIfNecessary(std::vector<wchar_t> &adv_name, \
-								std::shared_ptr<IDbStatement> stmt);
+CDate getPaymentDateFromFileName(const Tchar *file_name);
+const char *checkIfIsEmptyAndConvert(const char *value, \
+										const Tchar *field_name, \
+										size_t record_no, \
+										const Tchar *dbf_file_name, \
+										std::vector<char> &buffer);
+void replaceAdvNameIfNecessary(std::vector<char> &adv_name, \
+								const std::shared_ptr<IDbStatement> &stmt);
 
 int main() {
 
 	setLocaleToCurrOS_Locale();
-	CCOMHelper init_COM;
 
 	try {
 		auto fields = createFieldsMap();
 
-		std::wcout << _T("Adding acts to act.db ...\n");
+		Tcout << _T("Adding acts to act.db ...") << std::endl;
 		CPropertiesFile props;
 		props.open("config.ini");
-		
+
 		Tstring props_buffer, dbf_folder_str;
 		dbf_folder_str = props.getStringProperty(_T("dbf_folder"), props_buffer);
-		COleDbConnection dbf_conn(dbf_folder_str.c_str());
-		CDbfTable dbf_table;
-		dbf_conn.getTable(dbf_table);
+
+		CDbfTableAdapter dbf_table;
+		dbf_table.setDbfDir(dbf_folder_str.c_str());
 
 		auto sqlite_conn = createSQLiteConnection(props);
 		std::string query;
@@ -84,19 +78,19 @@ int main() {
 
 		XDirectory dbf_dir;
 		std::vector<char> buffer;
-		std::vector<wchar_t> buffer_w;
 
 		size_t dbf_folder_str_size = dbf_folder_str.size();
-		dbf_folder_str += L"\\*.dbf";
+		dbf_folder_str += PATH_SLASH;
+		dbf_folder_str += _T("*.DBF");
 		bool not_end = dbf_dir.getFirstFile(dbf_folder_str.c_str());
 		while (not_end) {
-			std::wcout << _T("Processing ") << dbf_dir.getFileName() << std::endl;
+			Tcout << _T("Processing ") << dbf_dir.getFileName() << std::endl;
 
 			dbf_folder_str.erase(dbf_folder_str_size + 1, dbf_folder_str.size() - dbf_folder_str_size - 1);
 			dbf_folder_str += dbf_dir.getFileName();
 
 			if (!checkFileExt(dbf_folder_str)) {
-				std::wcerr << L"Íåâ³ðíèé òèï ôàéëó: " << dbf_folder_str << std::endl;
+				Tcerr << _T("ÐÐµÐ²Ñ–Ñ€Ð½Ð¸Ð¹ Ñ‚Ð¸Ð¿ Ñ„Ð°Ð¹Ð»Ñƒ: ") << dbf_folder_str << std::endl;
 				not_end = dbf_dir.getNextFile();
 				continue;
 			}
@@ -104,18 +98,18 @@ int main() {
 			CDate payment_date = getPaymentDateFromFileName(dbf_dir.getFileName());
 
 			if (!checkFileExists(dbf_folder_str.c_str())) {
-				std::wcerr << L"Íåìîæëèâî â³äêðèòè: " << dbf_folder_str << std::endl;
+				Tcerr << _T("ÐÐµÐ¼Ð¾Ð¶Ð»Ð¸Ð²Ð¾ Ð²Ñ–Ð´ÐºÑ€Ð¸Ñ‚Ð¸: ") << dbf_folder_str << std::endl;
 				not_end = dbf_dir.getNextFile();
 				continue;
 			}
 
-			dbf_table.open(dbf_dir.getFileName());
+			dbf_table.openByName(dbf_dir.getFileName());
 			checkDbfFileStructure(dbf_table, fields, dbf_dir.getFileName());
 			if (payment_date.isNull()) {
 
-				std::wcerr << _T("Íåâ³ðíèé ôîðìàò ³ìåí³ ôàéëó: '");
-				std::wcerr << dbf_dir.getFileName();
-				std::wcerr << _T("', ïî íüîìó íåìîæëèâî âèçíà÷èòè äàòó îïëàòè\n");
+				Tcerr << _T("ÐÐµÐ²Ñ–Ñ€Ð½Ð¸Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚ Ñ–Ð¼ÐµÐ½Ñ– Ñ„Ð°Ð¹Ð»Ñƒ: '");
+				Tcerr << dbf_dir.getFileName();
+				Tcerr << _T("', Ð¿Ð¾ Ð½ÑŒÐ¾Ð¼Ñƒ Ð½ÐµÐ¼Ð¾Ð¶Ð»Ð¸Ð²Ð¾ Ð²Ð¸Ð·Ð½Ð°Ñ‡Ð¸Ñ‚Ð¸ Ð´Ð°Ñ‚Ñƒ Ð¾Ð¿Ð»Ð°Ñ‚Ð¸\n");
 
 				not_end = dbf_dir.getNextFile();
 				continue;
@@ -124,39 +118,33 @@ int main() {
 			bool not_eot = dbf_table.gotoFirstRecord();
 			size_t record_no = 0;
 			while (not_eot) {
-				bool is_null = false;
-
-				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[FIELD_ID_w]), \
-					FIELD_ID, record_no, dbf_dir.getFileName(), buffer_w);
+				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[FIELD_ID]), \
+											FIELD_ID, record_no, dbf_dir.getFileName(), buffer);
 				int error, v;
-				v = XConv::ToInt(&buffer_w[0], error);
+				v = XConv::ToInt(&buffer[0], error);
 				check_stmt->bindValue(0, v);
 				auto rs = check_stmt->exec();
 				if (!rs->empty()) {
-					XException e(0, _T("Ðÿäîê ç ID = "));
-					e << v << _T(" óæå áóëî äîäàíî â acts.db");
+					XException e(0, _T("Ð ÑÐ´Ð¾Ðº Ð· ID = "));
+					e << v << _T(" ÑƒÐ¶Ðµ Ð±ÑƒÐ»Ð¾ Ð´Ð¾Ð´Ð°Ð½Ð¾ Ð² acts.db");
 					throw e;
 				}
 
 				ins_stmt->bindValue(0, v);
 
-				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[FIELD_ADV_w]), \
-					FIELD_ADV, record_no, dbf_dir.getFileName(), buffer_w);
-				rtrimSpaces(buffer_w);
+				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[FIELD_ADV]), \
+											FIELD_ADV, record_no, dbf_dir.getFileName(), buffer);
 
-				replaceAdvNameIfNecessary(buffer_w, adv_check_stmt);
-				ins_stmt->bindValue(1, &buffer_w[0]);
+				replaceAdvNameIfNecessary(buffer, adv_check_stmt);
+				ins_stmt->bindValue(1, &buffer[0]);
 
-				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[FIELD_ACT_w]), \
-					FIELD_ACT, record_no, dbf_dir.getFileName(), buffer_w);
-				rtrimSpaces(buffer_w);
-				ins_stmt->bindValue(2, &buffer_w[0]);
+				checkIfIsEmptyAndConvert(dbf_table.getCStringCellValue(fields[FIELD_ACT]), \
+											FIELD_ACT, record_no, dbf_dir.getFileName(), buffer);
+				ins_stmt->bindValue(2, &buffer[0]);
 
-				buffer.resize(12);
-				const char *fee = dbf_table.getNumericCellValue(fields[FIELD_FEE_w], &buffer[0], 10);
-				checkIfIsEmptyAndConvert(fee, FIELD_FEE, record_no, dbf_dir.getFileName(), buffer_w);
-				rtrimSpaces(buffer_w);
-				ins_stmt->bindValue(3, &buffer_w[0]);
+				const char *fee = dbf_table.getNumericCellValue(fields[FIELD_FEE]);
+				checkIfIsEmptyAndConvert(fee, FIELD_FEE, record_no, dbf_dir.getFileName(), buffer);
+				ins_stmt->bindValue(3, &buffer[0]);
 
 				ins_stmt->bindValue(4, payment_date);
 				ins_stmt->bindValue(5, dbf_dir.getFileName());
@@ -169,31 +157,31 @@ int main() {
 			not_end = dbf_dir.getNextFile();
 		}
 
-		std::wcout << _T("Done");
+		Tcout << _T("Done");
 	}
 	catch (XException &e) {
 
-		std::wcerr << e.what() << std::endl;
-		std::wcin.get();
+		Tcerr << e.what() << std::endl;
+		Tcin.get();
 		exit(1);
 	}
 	catch (std::exception &e) {
 
-		std::wcerr << e.what() << std::endl;
-		std::wcin.get();
-		exit(1);
+		Tcerr << e.what() << std::endl;
+		Tcin.get();
+		return 1;
 	}
 
 	return 0;
 }
 
-std::map<std::wstring, size_t> createFieldsMap() {
+std::map<Tstring, size_t> createFieldsMap() {
 
-	std::map<std::wstring, size_t> fields;
-	fields[FIELD_ID_w] = 1;
-	fields[FIELD_ADV_w] = 35;
-	fields[FIELD_ACT_w] = 41;
-	fields[FIELD_FEE_w] = 7;
+	std::map<Tstring, size_t> fields;
+	fields[FIELD_ID] = 1;
+	fields[FIELD_ADV] = 35;
+	fields[FIELD_ACT] = 41;
+	fields[FIELD_FEE] = 7;
 
 	return fields;
 }
@@ -203,137 +191,123 @@ std::shared_ptr<IDbConnection> createSQLiteConnection(const CPropertiesFile &pro
 	std::shared_ptr<IDbConnection> conn = std::make_shared<SQLiteConnection>();
 
 	Tstring buffer;
-	const Tchar *curr_prop = nullptr;
+	const Tchar *curr_prop;
 	std::string db_file_location;
 
 	curr_prop = props.getStringProperty(_T("sqlite_db_file_location"), buffer);
-	const char *p = UCS16_ToUTF8(curr_prop, -1, db_file_location);
+	const char *p = convertIfNecessary(curr_prop, db_file_location);
 
 	conn->Connect(p, 0, nullptr, nullptr, "acts");
 	return conn;
 }
 
-bool checkFileExt(std::wstring &file_name) {
+bool checkFileExt(const Tstring &file_name) {
 
-	auto p = file_name.rfind(L'.');
-	if (p == std::wstring::npos || \
-		(p != std::wstring::npos && file_name.size() - p < 4)) return false;
+	auto p = file_name.rfind(_T('.'));
+	if (p == Tstring::npos || file_name.size() - p < 4) return false;
 
-	bool valid = file_name[p] == L'.';
+	bool valid = file_name[p] == _T('.');
 	++p;
-	valid = valid && file_name[p] == L'd' || file_name[p] == L'D';
+	valid = valid && file_name[p] == _T('d') || file_name[p] == _T('D');
 	++p;
-	valid = valid && file_name[p] == L'b' || file_name[p] == L'B';
+	valid = valid && file_name[p] == _T('b') || file_name[p] == _T('B');
 	++p;
-	valid = valid && file_name[p] == L'f' || file_name[p] == L'F';
+	valid = valid && file_name[p] == _T('f') || file_name[p] == _T('F');
 
 	return valid;
 }
 
-void checkDbfFileStructure(const CDbfTable &table, const std::map<std::wstring, size_t> &fields, \
-							const wchar_t *dbf_file_name) {
+void checkDbfFileStructure(const CDbfTableAdapter &table, const std::map<Tstring, size_t> &fields, \
+							const Tchar *dbf_file_name) {
 	assert(dbf_file_name);
 
 	size_t dbf_fields_count = table.getFieldsCount();
-	for (auto field_item : fields) {
+	for (const auto &field_item : fields) {
 
 		if (field_item.second >= dbf_fields_count) {
-			XException e(0, _T("Íåìàº òàêîãî ïîëÿ: '"));
-			e << field_item.first << _T("' ó ïîçèö³¿ ");
-			e << field_item.second << _T(". Ïåðåâ³ðòå ñòðóêòóðó ôàéëó '");
+			XException e(0, _T("ÐÐµÐ¼Ð°Ñ” Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ð¿Ð¾Ð»Ñ: '"));
+			e << field_item.first << _T("' Ñƒ Ð¿Ð¾Ð·Ð¸Ñ†Ñ–Ñ— ");
+			e << field_item.second << _T(". ÐŸÐµÑ€ÐµÐ²Ñ–Ñ€Ñ‚Ðµ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñƒ Ñ„Ð°Ð¹Ð»Ñƒ '");
 			e << dbf_file_name;
 			throw e;
 		}
 
-		const wchar_t *dbf_field_name = table.getFieldName(field_item.second);
-		size_t dbf_field_name_size = wcsnlen(dbf_field_name, MAX_DBF_FIELD_NAME_LEN);
+		const Tchar *dbf_field_name = table.getFieldName(field_item.second);
+		size_t dbf_field_name_size = Tstrnlen(dbf_field_name, MAX_DBF_FIELD_NAME_LEN);
 
 		if (field_item.first.size() != dbf_field_name_size || \
 			(field_item.first.size() == dbf_field_name_size && \
 			!std::equal(field_item.first.cbegin(), \
 						field_item.first.cend(), \
-				dbf_field_name, [](const wchar_t l, const wchar_t r) -> bool {
-				
-					return std::toupper(l) == std::toupper(r);
-				}))) {
+						dbf_field_name, [](const Tchar l, const Tchar r) -> bool {
 
-			XException e(0, _T("Ïîëå ó ïîçèö³¿ "));
-			e << field_item.second << _T(" íå º '") << field_item.first;
-			e << _T("', ÿê öå ìàº áóòè. Éîãî ³ì'ÿ - '") << dbf_field_name;
-			e << _T("' ó ôàéë³ '") << dbf_file_name << _T("'");
+			return std::toupper(l) == std::toupper(r);
+		}))) {
+
+			XException e(0, _T("ÐŸÐ¾Ð»Ðµ Ñƒ Ð¿Ð¾Ð·Ð¸Ñ†Ñ–Ñ— "));
+			e << field_item.second << _T(" Ð½Ðµ Ñ” '") << field_item.first;
+			e << _T("', ÑÐº Ñ†Ðµ Ð¼Ð°Ñ” Ð±ÑƒÑ‚Ð¸. Ð™Ð¾Ð³Ð¾ Ñ–Ð¼'Ñ - '") << dbf_field_name;
+			e << _T("' Ñƒ Ñ„Ð°Ð¹Ð»Ñ– '") << dbf_file_name << _T("'");
 			throw e;
 		}
 	}
 }
 
-CDate getPaymentDateFromFileName(const wchar_t *file_name) {
+CDate getPaymentDateFromFileName(const Tchar *file_name) {
 
 	assert(file_name);
-	wchar_t buffer[CDate::GERMAN_FORMAT_LEN + 1];
-	size_t file_name_len = wcsnlen(file_name, MAX_DBF_FILE_NAME_LEN);
-	
-	if (file_name[file_name_len] != L'\0') {
-		XException e(0, _T("Äîâæèíà ³ìåí³ öüîãî ôàéëó: '"));
-		e << file_name << _T("' ïåðåâèùóº ë³ì³ò ó ") << MAX_DBF_FILE_NAME_LEN;
-		e << _T(" ñèìâîë³â");
+	Tchar buffer[CDate::GERMAN_FORMAT_LEN + 1];
+	size_t file_name_len = Tstrnlen(file_name, MAX_DBF_FILE_NAME_LEN);
+
+	if (file_name[file_name_len] != _T('\0')) {
+		XException e(0, _T("Ð”Ð¾Ð²Ð¶Ð¸Ð½Ð° Ñ–Ð¼ÐµÐ½Ñ– Ñ†ÑŒÐ¾Ð³Ð¾ Ñ„Ð°Ð¹Ð»Ñƒ: '"));
+		e << file_name << _T("' Ð¿ÐµÑ€ÐµÐ²Ð¸Ñ‰ÑƒÑ” Ð»Ñ–Ð¼Ñ–Ñ‚ Ñƒ ") << MAX_DBF_FILE_NAME_LEN;
+		e << _T(" ÑÐ¸Ð¼Ð²Ð¾Ð»Ñ–Ð²");
 		throw e;
 	}
 
-#pragma warning(push)
-#pragma warning(disable: 4996)
-	wcsncpy(buffer, file_name + file_name_len - 12, 2);
-	buffer[2] = L'.';
-	wcsncpy(buffer + 3, file_name + file_name_len - 10, 2);
-	buffer[5] = L'.';
-	wcsncpy(buffer + 6, file_name + file_name_len - 8, 4);
-	buffer[10] = L'\0';
-#pragma warning(pop)
+	Tstrncpy(buffer, file_name + file_name_len - 12, 2);
+	buffer[2] = _T('.');
+	Tstrncpy(buffer + 3, file_name + file_name_len - 10, 2);
+	buffer[5] = _T('.');
+	Tstrncpy(buffer + 6, file_name + file_name_len - 8, 4);
+	buffer[10] = _T('\0');
 
 	return CDate(buffer, CDate::GERMAN_FORMAT);
 }
 
-const wchar_t *checkIfIsEmptyAndConvert(const char *value, \
-										const char *field_name, \
-										const size_t record_no, \
-										const wchar_t *dbf_file_name, \
-										std::vector<wchar_t> &buffer) {
+const char *checkIfIsEmptyAndConvert(const char *value, \
+										const Tchar *field_name, \
+										size_t record_no, \
+										const Tchar *dbf_file_name, \
+										std::vector<char> &buffer) {
 
 	assert(field_name);
 	assert(dbf_file_name);
 
-	if (!value || (value && value[0] == '\0')) {
-		XException e(0, _T("Ïîëå '"));
-		e << field_name << _T("' = NULL àáî ïîðîæíº, Ðÿäîê ");
-		e << record_no << _T(" ó ôàéë³ '") << dbf_file_name << _T("'");
+	if (!value || value[0] == '\0') {
+		XException e(0, _T("ÐŸÐ¾Ð»Ðµ '"));
+		e << field_name << _T("' = NULL Ð°Ð±Ð¾ Ð¿Ð¾Ñ€Ð¾Ð¶Ð½Ñ”, Ð ÑÐ´Ð¾Ðº ");
+		e << record_no << _T(" Ñƒ Ñ„Ð°Ð¹Ð»Ñ– '") << dbf_file_name << _T("'");
 		throw e;
 	}
 
-	size_t value_size = strlen(value);
-	buffer.resize(value_size + 1);
-#pragma warning(push)
-#pragma warning(disable: 4996)
-	mbstowcs(&buffer[0], value, value_size + 1);
-#pragma warning(pop)
-
+	convertIfNecessary(value, buffer);
 	return &buffer[0];
 }
 
-void rtrimSpaces(std::vector<wchar_t> &str) {
+inline ImmutableString<char> getStringFromResultSet(std::shared_ptr<IDbResultSet> &rs, size_t field, char) {
 
-	size_t i = str.empty() ? 0 : str.size() - 1;
-	
-	size_t j = i;
-	while (i > 0 && (str[i] == L' ' || str[i] == L'\0')) --i;
-
-	if (j > i) {
-		++i;
-		str[i] = L'\0';
-		str.erase(str.begin() + i + 1, str.end());
-	}
+	return rs->getImmutableString(field);
 }
 
-void replaceAdvNameIfNecessary(std::vector<wchar_t> &adv_name, \
-								std::shared_ptr<IDbStatement> stmt) {
+inline ImmutableString<wchar_t> getStringFromResultSet(std::shared_ptr<IDbResultSet> &rs, size_t field, wchar_t) {
+
+	return rs->getImmutableWString(field);
+}
+
+void replaceAdvNameIfNecessary(std::vector<char> &adv_name, \
+								const std::shared_ptr<IDbStatement> &stmt) {
 
 	stmt->bindValue(0, &adv_name[0]);
 
@@ -342,13 +316,10 @@ void replaceAdvNameIfNecessary(std::vector<wchar_t> &adv_name, \
 	if (!records_count) return;
 
 	result_set->gotoRecord(0);
-	auto correct_adv_name = result_set->getImmutableWString(0);
+	auto correct_adv_name = result_set->getImmutableString(0);
 	assert(!correct_adv_name.isNull());
 	adv_name.resize(correct_adv_name.size + 1);
 
-#pragma warning(push)
-#pragma warning(disable: 4996)
-	wcsncpy(&adv_name[0], correct_adv_name.str, correct_adv_name.size);
-	adv_name[correct_adv_name.size] = L'\0';
-#pragma warning(pop)
+	strncpy(&adv_name[0], correct_adv_name.str, correct_adv_name.size);
+	adv_name[correct_adv_name.size] = '\0';
 }

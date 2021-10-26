@@ -89,13 +89,13 @@ void SQLiteStatement::bindValue(const size_t param_no, const char *value) {
 	assert(stmt->stmt);
 	if (!stmt->initial_state) sqlite3_reset(stmt->stmt);
 
-	int rc = sqlite3_bind_text(stmt->stmt, (int)param_no + 1, value, -1, nullptr);
+	int rc = sqlite3_bind_text(stmt->stmt, (int)param_no + 1, value, -1, SQLITE_TRANSIENT);
 	assert(rc != SQLITE_ERROR);
 
 	if (fields_count) {
 		if (!stmt->initial_state) sqlite3_reset(stmt->stmt_records_count);
 
-		int rc = sqlite3_bind_text(stmt->stmt_records_count, (int)param_no + 1, value, -1, nullptr);
+		int rc = sqlite3_bind_text(stmt->stmt_records_count, (int)param_no + 1, value, -1, SQLITE_TRANSIENT);
 		assert(rc != SQLITE_ERROR);
 	}
 	stmt->initial_state = true;
@@ -107,13 +107,13 @@ void SQLiteStatement::bindValue(const size_t param_no, const wchar_t *value) {
 	assert(stmt->stmt);
 	if (!stmt->initial_state) sqlite3_reset(stmt->stmt);
 
-	int rc = sqlite3_bind_text16(stmt->stmt, (int)param_no + 1, value, -1, nullptr);
+	int rc = sqlite3_bind_text16(stmt->stmt, (int)param_no + 1, value, -1, SQLITE_TRANSIENT);
 	assert(rc != SQLITE_ERROR);
 
 	if (fields_count) {
 		if (!stmt->initial_state) sqlite3_reset(stmt->stmt_records_count);
 
-		int rc = sqlite3_bind_text16(stmt->stmt_records_count, (int)param_no + 1, value, -1, nullptr);
+		int rc = sqlite3_bind_text16(stmt->stmt_records_count, (int)param_no + 1, value, -1, SQLITE_TRANSIENT);
 		assert(rc != SQLITE_ERROR);
 	}
 	stmt->initial_state = true;
@@ -125,13 +125,13 @@ void SQLiteStatement::bindValue(const size_t param_no, const ImmutableString<cha
 	assert(stmt->stmt);
 	if (!stmt->initial_state) sqlite3_reset(stmt->stmt);
 
-	int rc = sqlite3_bind_text(stmt->stmt, (int)param_no + 1, value.str, (int)value.size, nullptr);
+	int rc = sqlite3_bind_text(stmt->stmt, (int)param_no + 1, value.str, (int)value.size, SQLITE_TRANSIENT);
 	assert(rc != SQLITE_ERROR);
 
 	if (fields_count) {
 		if (!stmt->initial_state) sqlite3_reset(stmt->stmt_records_count);
 
-		int rc = sqlite3_bind_text(stmt->stmt_records_count, (int)param_no + 1, value.str, (int)value.size, nullptr);
+		int rc = sqlite3_bind_text(stmt->stmt_records_count, (int)param_no + 1, value.str, (int)value.size, SQLITE_TRANSIENT);
 		assert(rc != SQLITE_ERROR);
 	}
 	stmt->initial_state = true;
@@ -144,14 +144,14 @@ void SQLiteStatement::bindValue(const size_t param_no, const ImmutableString<wch
 	if (!stmt->initial_state) sqlite3_reset(stmt->stmt);
 
 	int rc = sqlite3_bind_text16(stmt->stmt, (int)param_no + 1, \
-									value.str, (int)(value.size * sizeof(wchar_t)), nullptr);
+									value.str, (int)(value.size * sizeof(wchar_t)), SQLITE_TRANSIENT);
 	assert(rc != SQLITE_ERROR);
 
 	if (fields_count) {
 		if (!stmt->initial_state) sqlite3_reset(stmt->stmt_records_count);
 
 		int rc = sqlite3_bind_text16(stmt->stmt_records_count, (int)param_no + 1, \
-			value.str, (int)(value.size * sizeof(wchar_t)), nullptr);
+			value.str, (int)(value.size * sizeof(wchar_t)), SQLITE_TRANSIENT);
 		assert(rc != SQLITE_ERROR);
 	}
 	stmt->initial_state = true;
@@ -163,18 +163,18 @@ void SQLiteStatement::bindValue(const size_t param_no, const CDate &value) {
 	assert(stmt->stmt);
 	if (!stmt->initial_state) sqlite3_reset(stmt->stmt);
 
-	wchar_t date_str[CDate::SQL_FORMAT_LEN + 1];
+	char date_str[CDate::SQL_FORMAT_LEN + 1];
 	value.toStringSQL(date_str);
 
-	int rc = sqlite3_bind_text16(stmt->stmt, (int)param_no + 1, \
-									date_str, CDate::SQL_FORMAT_LEN * sizeof(wchar_t), nullptr);
+	int rc = sqlite3_bind_text(stmt->stmt, (int)param_no + 1, \
+									date_str, CDate::SQL_FORMAT_LEN * sizeof(char), SQLITE_TRANSIENT);
 	assert(rc != SQLITE_ERROR);
 
 	if (fields_count) {
 		if (!stmt->initial_state) sqlite3_reset(stmt->stmt_records_count);
 
-		int rc = sqlite3_bind_text16(stmt->stmt_records_count, (int)param_no + 1, \
-			date_str, CDate::SQL_FORMAT_LEN * sizeof(wchar_t), nullptr);
+		int rc = sqlite3_bind_text(stmt->stmt_records_count, (int)param_no + 1, \
+			date_str, CDate::SQL_FORMAT_LEN * sizeof(char), SQLITE_TRANSIENT);
 		assert(rc != SQLITE_ERROR);
 	}
 	stmt->initial_state = true;

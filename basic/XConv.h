@@ -1,5 +1,4 @@
-#ifndef XCONV_H
-#define XCONV_H
+#pragma once
 #include <climits>
 #include <cmath>
 #include <string>
@@ -25,6 +24,7 @@ public:
 		E_CONV_WRONG_VALUE = 3, \
 		E_CONV_VALUE_OUT_OF_RANGE = 4
 	};
+	
 	template <typename Tchar_, typename TInt> static \
 		Tchar_ *ToString(const TInt value, Tchar_ *buffer, size_t &size) noexcept;
 		
@@ -86,8 +86,12 @@ Tchar_ *XConv::ToString(const TInt value, Tchar_ *buffer, size_t &size) noexcept
 		size = 0;
 		return nullptr;
 	}
+
+	Tchar_ _0 = getZeroChar(buffer[0]);
+	Tchar_ minus = getMinusChar(buffer[0]);
+
 	if (!value) {
-		buffer[0] = getZeroChar('0');
+		buffer[0] = _0;
 		buffer[1] = 0;
 		size = 1;
 		return buffer;
@@ -96,7 +100,7 @@ Tchar_ *XConv::ToString(const TInt value, Tchar_ *buffer, size_t &size) noexcept
 	TInt v = value;
 	size = 0;
 	if (value < 0) {
-		buffer[0] = getMinusChar('-');
+		buffer[0] = minus;
 		v *= -1;
 		++size;
 	}
@@ -105,7 +109,7 @@ Tchar_ *XConv::ToString(const TInt value, Tchar_ *buffer, size_t &size) noexcept
 
 	size_t i = size;
 	while (v) {
-		buffer[i - 1] = getZeroChar('0') + v % 10;
+		buffer[i - 1] = _0 + v % 10;
 		v /= 10;
 		--i;
 	}
@@ -122,23 +126,27 @@ TInt XConv::ToInt(const Tchar_ *str, int &error, \
 		return (TInt)-1;
 	}
 
+	Tchar_ _0 = getZeroChar(str[0]);
+	Tchar_ _9 = getNineChar(str[0]);
+	Tchar_ minus = getMinusChar(str[0]);
+
 	TInt number = 0;
 	TInt max = max_value / 10;
 	size_t i = 0;
-	bool neg = (str[0] == getMinusChar('-'));
+	bool neg = (str[0] == minus);
 	i += neg;
 
 	while (number < max && str[i] != 0 && \
-			str[i] >= getZeroChar('0') && str[i] <= getNineChar('9')) {
+			str[i] >= _0 && str[i] <= _9) {
 
 		number *= 10;
-		number += str[i] - getZeroChar('0');
+		number += str[i] - _0;
 		++i;
 	}
 
 	bool empty = (i == 0 && str[i] == 0);
 	if (empty || (str[i] != 0 && \
-		!(str[i] >= getZeroChar('0') && str[i] <= getNineChar('9')))) {
+		!(str[i] >= _0 && str[i] <= _9))) {
 		error = empty ? E_CONV_EMPTY_STR : E_CONV_WRONG_VALUE;
 		number *= neg ? -1 : 1;
 		return number;
@@ -146,18 +154,16 @@ TInt XConv::ToInt(const Tchar_ *str, int &error, \
 
 	const Tchar_ lowest_digit = max_value % 10;
 	if((number > max && str[i] != 0) || \
-		(number == max && (str[i] - getZeroChar('0')) > lowest_digit)) {
+		(number == max && (str[i] - _0) > lowest_digit)) {
 		error = E_CONV_VALUE_OUT_OF_RANGE;
 		number *= neg ? -1 : 1;
 		return number;
 	}
 	bool key = (number == max && str[i] != 0);
 	number *= 10 - 9 * (!key);
-	number += (str[i] - getZeroChar('0')) * key;
+	number += (str[i] - _0) * key;
 
 	number *= neg ? -1 : 1;
 	error = 0;
 	return number;
 }
-
-#endif // XCONV_H

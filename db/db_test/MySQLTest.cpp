@@ -4,6 +4,8 @@
 #include <db/MySQL/MySQLConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
+#include <db/IDbResultSetMetadata.h>
+#include <db/IDbField.h>
 
 class CMySQLTest {
 	static std::shared_ptr<CMySQLConnection> conn;
@@ -17,7 +19,7 @@ protected:
 				
 			try {
 				conn = std::make_shared<CMySQLConnection>();
-				conn->Connect("127.0.0.1", 3306, "root", "12345", "");
+				conn->Connect("127.0.0.1", 3306, "orders_user", "123", "");
 			}
 			catch (XException &e) {
 
@@ -65,7 +67,7 @@ protected:
 		query = "CREATE TABLE orders(id_center_legalaid INT(4) NOT NULL,";
 		query += " id INT(6) NOT NULL, order_date DATE NOT NULL, id_adv INT(6) NOT NULL,";
 		query += " client_name VARCHAR(255), client_bdate DATE,";
-		query += " order_type ENUM('КЗ', 'ЗЗП', 'АДМ'), fee DECIMAL(8,2), ";
+		query += " order_type ENUM('КЗ', 'ЗЗП', 'АДМ', 'ZZP'), fee DECIMAL(8,2), ";
 		query += " PRIMARY KEY(id_center_legalaid, id, order_date))";
 
 		try {
@@ -246,7 +248,7 @@ SUITE(MySQL_tests) {
 
 		auto recs_count = insertIntoOrders(stmt, 1, 1, CDate(5, 2, 1992), 1, \
 											"Іванов А. А.", CDate(5, 6, 1970), \
-											"ЗЗП", "503.7");
+											"ZZP", "503.7");
 		CHECK_EQUAL(1, recs_count);
 		recs_count = insertIntoOrders(stmt, 1, 2, CDate(1, 1, 2013), 1, \
 											"Іванов А. В.", CDate(), \
@@ -270,5 +272,22 @@ SUITE(MySQL_tests) {
 		q_stmt->bindValue(0, "Іванов В%");
 		rs->reload();
 		CHECK_EQUAL(1, rs->getRecordsCount());
+	}
+
+	TEST_FIXTURE(CMySQLTest, MetadataCheck) {
+
+		auto q_stmt = getConn()->PrepareQuery("SELECT * FROM orders WHERE order_type = 'ZZP'");
+		auto rs = q_stmt->exec();
+
+		auto metadata = q_stmt->getResultSetMetadata();
+		auto field_nm = metadata->getField(4);
+		auto field_type = metadata->getField(6);
+
+		rs->gotoRecord(0);
+		auto value_nm = field_nm->getValueAsImmutableString(rs);
+		CHECK_EQUAL("Іванов А. А.", value_nm.str);
+
+		auto value_type = field_type->getValueAsImmutableString(rs);
+		CHECK_EQUAL("ZZP", value_type.str);
 	}
 }

@@ -30,6 +30,10 @@ class CMySQLDbRecord : public IRecord {
 	size_t record_no;
 	mutable std::vector<char> buffer;
 
+	const char *getStringFromResultSet(wchar_t ,\
+								std::shared_ptr<IDbField> field) const;
+	const char *getStringFromResultSet(char ,\
+								std::shared_ptr<IDbField> field) const;
 public:
 	CMySQLDbRecord(std::shared_ptr<IDbResultSet> result_set_, \
 					std::shared_ptr<std::vector<std::shared_ptr<IDbField> > > fields_, \

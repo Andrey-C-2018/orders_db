@@ -3,6 +3,7 @@
 #include <chrono>
 #include <thread>
 #include <assert.h>
+#include <basic/Path.h>
 #include "SQLiteStatement.h"
 
 SQLiteConnectionException::SQLiteConnectionException(const int err_code, \
@@ -39,8 +40,8 @@ void SQLiteConnection::Connect(const char *location, const unsigned port, \
 	full_path = location;
 
 	size_t size = full_path.size();
-	if (size && full_path[size - 1] != '\\')
-		full_path += '\\';
+	if (size && full_path[size - 1] != PATH_SLASH)
+		full_path += PATH_SLASH;
 
 	full_path += schema_name;
 	full_path += ".db";

@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.0)
+
+project(dbf3 VERSION 0.2 LANGUAGES CXX)
+
+if(NOT CMAKE_BUILD_TYPE)
+       set(CMAKE_BUILD_TYPE Release)
+endif()
+set(CMAKE_SUPPRESS_REGENERATION true)
+
+if(MSVC_TOOLSET_VERSION GREATER 80)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs)
+else()
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs/${CMAKE_BUILD_TYPE})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs/${CMAKE_BUILD_TYPE})
+endif()
+
+add_library(dbf3 STATIC DbfTable.cpp DbfTable.h DbfStructs.h)
+target_include_directories(dbf3 PRIVATE ${CMAKE_SOURCE_DIR}/..)
+
+set_target_properties(dbf3 PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)

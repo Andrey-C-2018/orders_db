@@ -31,6 +31,16 @@ inline size_t Tstrlen(const Tstring &str){
 	return str.size();
 }
 
+inline size_t Tstrnlen(const char *str, size_t max_len) noexcept {
+
+	return strnlen(str, max_len);
+}
+
+inline size_t Tstrnlen(const wchar_t *str, size_t max_len) noexcept {
+
+	return wcsnlen(str, max_len);
+}
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4996)
@@ -118,4 +128,53 @@ inline int ToLower(const int ch) {
 inline wchar_t ToLower(const wchar_t ch) {
 
 	return towlower(ch);
+}
+
+inline const char *rtrim(char *str, const size_t len) {
+
+	assert(str);
+	assert(str[len] == '\0');
+	char *p = str + len;
+
+	while(p >= str + 1 && *(p - 1) == ' ') --p;
+	*p = '\0';
+	return str;
+}
+
+inline const char* ltrim(char* str, const size_t len) {
+
+	assert(str);
+	char* p = strrchr(str, ' ');
+	if(p) {
+		size_t gap = (size_t)(p - str + 1);
+		size_t i = 0;
+		while (i < len - gap && str[i + gap] != '\0') {
+			str[i] = str[i + gap];
+			++i;
+		}
+		str[len - gap] = '\0';
+	}
+	return str;
+}
+
+inline bool endsWith(const std::string &str, const char *suffix, const size_t suffix_len) {
+
+	assert(suffix);
+	assert(Tstrlen(suffix) >= suffix_len);
+
+	if(!suffix_len || suffix_len > str.size()) return !suffix_len;
+	return str.compare(str.size() - suffix_len, suffix_len, suffix);
+}
+
+template <typename Tchar> \
+inline bool endsWith(const Tchar *str, const Tchar *suffix, const size_t suffix_len) {
+
+	assert(str);
+	assert(suffix);
+	assert(Tstrlen(suffix) >= suffix_len);
+
+	size_t str_len = Tstrlen(str);
+
+	if(!suffix_len || suffix_len > str_len) return !suffix_len;
+	return !Tstrncmp(str + str_len - suffix_len, suffix, suffix_len);
 }

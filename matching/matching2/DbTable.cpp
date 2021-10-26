@@ -1,6 +1,8 @@
+#include <algorithm>
 #include "DbTable.h"
+#include <basic/tstring.h>
 #include <db/IDbResultSet.h>
-#include <db/IDbResultSetMetaData.h>
+#include <db/IDbResultSetMetadata.h>
 #include <db/IDbField.h>
 
 CDbRecord::CDbRecord(std::shared_ptr<IDbResultSet> result_set_, \
@@ -40,10 +42,10 @@ size_t CMySQLDbRecord::size() const {
 	return result_set->getFieldsCount();
 }
 
-const char *CMySQLDbRecord::getColValueAsCharArray(const size_t index) const {
+const char *CMySQLDbRecord::getStringFromResultSet(wchar_t ,\
+								std::shared_ptr<IDbField> field) const{
 
-	result_set->gotoRecord(record_no);
-	auto value = fields->at(index)->getValueAsImmutableWString(result_set);
+	auto value = field->getValueAsImmutableWString(result_set);
 	if (!value.str) return nullptr;
 
 	buffer.resize(value.size + 1);
@@ -56,13 +58,26 @@ const char *CMySQLDbRecord::getColValueAsCharArray(const size_t index) const {
 	return &buffer[0];
 }
 
+const char *CMySQLDbRecord::getStringFromResultSet(char ,\
+								std::shared_ptr<IDbField> field) const {
+
+	auto value = field->getValueAsImmutableString(result_set);
+	return value.str;
+}
+
+const char *CMySQLDbRecord::getColValueAsCharArray(const size_t index) const {
+
+	result_set->gotoRecord(record_no);
+	return getStringFromResultSet(Tchar(), fields->at(index));
+}
+
 CMySQLDbRecord::~CMySQLDbRecord(){ }
 
 //*****************************************************
 
 CDbTable::CDbTable(std::shared_ptr<IDbResultSet> result_set_, \
 					std::shared_ptr<IDbResultSetMetadata> metadata) : fields_names(), \
-				result_set(result_set_) {
+					result_set(result_set_) {
 
 	assert(result_set);
 	assert(metadata);

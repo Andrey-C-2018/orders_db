@@ -12,12 +12,12 @@ CryptorException::~CryptorException() { }
 Cryptor::CharsRange Cryptor::ranges[RANGES_COUNT] = { { 1, '0', '9' },{ 2, 'a', 'z' }, \
 														{3, 'A', 'Z'} };
 size_t Cryptor::ranges_chars_len = 0;
-const Tchar Cryptor::chars_set[CHARS_SET_LEN] = L",.#$%^&*_+";
+const Tchar Cryptor::chars_set[CHARS_SET_LEN] = _T(",.#$%^&*_+");
 
 Tstring Cryptor::encrypt(const Tchar *cler) const {
 
 	assert(cler);
-	const size_t len = wcslen(cler);
+	const size_t len = Tstrlen(cler);
 	if (len > key.size())
 		throw CryptorException(CryptorException::E_MESSAGE_TOO_BIG, \
 							_T("the message length is bigger than the key length"));

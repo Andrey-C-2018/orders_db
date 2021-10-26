@@ -53,5 +53,5 @@ Normalized r = normalize(str1, str2);
 
 if ((r.len1 == (size_t)-1 && r.len2 == (size_t)-1) || r.len1 != r.len2)
 	return false;
-return std::strncmp(r.act1, r.act2, r.len1) == 0;
+return strncmp(r.act1, r.act2, r.len1) == 0;
 }

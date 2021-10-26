@@ -1,7 +1,7 @@
 #include "MySQLConnectionFactory.h"
 #include <basic/IProperties.h>
 #include <basic/Cryptor.h>
-#include <basic/TextConv.h>
+#include "../Convert.h"
 
 inline const Tchar *getPropertyValue(const IProperties &props, \
 						const Tchar *prop_name, const Tchar *prop_descr, \
@@ -26,7 +26,7 @@ inline void getPropertyValue(const IProperties &props, \
 						const Tchar *prop_name, const Tchar *prop_descr, \
 						Tstring &buffer, std::string &dest) {
 
-	UCS16_ToUTF8(getPropertyValue(props, prop_name, prop_descr, buffer), -1, dest);
+	convertIfNecessary(getPropertyValue(props, prop_name, prop_descr, buffer), dest);
 }
 
 //*****************************************************
@@ -69,7 +69,7 @@ CMySQLConnectionPtr CMySQLConnectionFactory::createConnection(const IProperties 
 	auto pwd_e = getPropertyValue(props, _T("mysql_password_e"), \
 								_T("MySQL server password encrypted"), buffer);
 	auto pwd = cryptor.encrypt(pwd_e);
-	UCS16_ToUTF8(pwd.c_str(), -1, p.pwd);
+	convertIfNecessary(pwd.c_str(), p.pwd);
 
 	std::shared_ptr<CMySQLConnection> conn = std::make_shared<CMySQLConnection>();
 	conn->Connect(p.server.c_str(), p.port, p.user.c_str(), \

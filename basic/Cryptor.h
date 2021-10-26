@@ -89,7 +89,7 @@ void Cryptor::calcRangesCharsLen() const {
 
 short Cryptor::charToIndex(const Tchar ch) const {
 
-	auto p = wcschr(chars_set, ch);
+	auto p = Tstrchr(chars_set, ch);
 	if (p != nullptr)
 		return (short)(ranges_chars_len + p - chars_set);
 

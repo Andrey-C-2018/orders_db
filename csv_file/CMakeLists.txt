@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.0)
+
+project(csv_file VERSION 0.3.0 LANGUAGES CXX)
+
+if(NOT CMAKE_BUILD_TYPE)
+       set(CMAKE_BUILD_TYPE Release)
+endif()
+set(CMAKE_SUPPRESS_REGENERATION true)
+
+if(MSVC_TOOLSET_VERSION GREATER 80)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs)
+else()
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs/${CMAKE_BUILD_TYPE})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs/${CMAKE_BUILD_TYPE})
+endif()
+
+add_library(csv_file STATIC CsvTable.cpp CsvTable.h ITable.h)
+target_include_directories(csv_file PRIVATE ${CMAKE_SOURCE_DIR}/..)
+
+set_target_properties(csv_file PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)

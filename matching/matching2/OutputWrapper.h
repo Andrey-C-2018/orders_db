@@ -1,7 +1,8 @@
 #pragma once
 #include <memory>
 #include <ostream>
-#include <assert.h>
+#include <cassert>
+#include <cstring>
 
 class CMatchingResultsTable;
 
@@ -9,6 +10,7 @@ class CHTMLOutputWrapper{
 	const CMatchingResultsTable &table;
 public:
 	CHTMLOutputWrapper(const CMatchingResultsTable &table_);
+
 	CHTMLOutputWrapper(const CHTMLOutputWrapper &obj) = default;
 	CHTMLOutputWrapper(CHTMLOutputWrapper &&obj) = default;
 	CHTMLOutputWrapper &operator=(const CHTMLOutputWrapper &obj) = default;
