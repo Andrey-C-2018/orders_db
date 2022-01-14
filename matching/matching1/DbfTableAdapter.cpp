@@ -1,21 +1,24 @@
 #include "DbfTableAdapter.h"
-#include <basic/Path.h>
 
-CDbfTableAdapter::CDbfTableAdapter() { }
+CDbfTableAdapter::CDbfTableAdapter() : dbf_dir_path_len(0) { }
 
 void CDbfTableAdapter::open(const char *dbf_path) {
 
-	assert(dbf_path && dbf_path[0] != L'\0');
+	assert(dbf_path && dbf_path[0] != '\0');
 	dbf_table.open(dbf_path);
 }
 
-void CDbfTableAdapter::openByName(const char *dbf_file_name) {
+void CDbfTableAdapter::open(const wchar_t *dbf_path) {
 
-	assert(dbf_file_name && dbf_file_name[0] != L'\0');
-	std::string path = dbf_dir;
-	path += PATH_SLASH;
-	path += dbf_file_name;
-	dbf_table.open(path.c_str());
+	assert(dbf_path && dbf_path[0] != L'\0');
+	std::vector<char> buffer;
+	size_t len = wcslen(dbf_path);	
+
+	buffer.resize(len + 1);
+	wcstombs(&buffer[0], dbf_path, len);
+	buffer[len] = '\0';
+
+	dbf_table.open(&buffer[0]);
 }
 
 const char *CDbfTableAdapter::getCStringCellValue(const size_t field) {

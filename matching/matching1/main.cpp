@@ -55,11 +55,9 @@ int main() {
 		CPropertiesFile props;
 		props.open("config.ini");
 
-		Tstring props_buffer, dbf_folder_str;
-		dbf_folder_str = props.getStringProperty(_T("dbf_folder"), props_buffer);
-
 		CDbfTableAdapter dbf_table;
-		dbf_table.setDbfDir(dbf_folder_str.c_str());
+		Tstring props_buffer;
+		dbf_table.setDbfDir(props.getStringProperty(_T("dbf_folder"), props_buffer));
 
 		auto sqlite_conn = createSQLiteConnection(props);
 		std::string query;
@@ -79,31 +77,42 @@ int main() {
 		XDirectory dbf_dir;
 		std::vector<char> buffer;
 
-		size_t dbf_folder_str_size = dbf_folder_str.size();
+		Tstring dbf_folder_str = dbf_table.getDbfDir();
 		dbf_folder_str += PATH_SLASH;
 		dbf_folder_str += _T("*.DBF");
+
 		bool not_end = dbf_dir.getFirstFile(dbf_folder_str.c_str());
 		while (not_end) {
-			Tcout << _T("Processing ") << dbf_dir.getFileName() << std::endl;
+			auto curr_file = dbf_dir.getFileName();
+			Tcout << _T("Processing ") << curr_file << std::endl;
 
-			dbf_folder_str.erase(dbf_folder_str_size + 1, dbf_folder_str.size() - dbf_folder_str_size - 1);
-			dbf_folder_str += dbf_dir.getFileName();
-
-			if (!checkFileExt(dbf_folder_str)) {
-				Tcerr << _T("Невірний тип файлу: ") << dbf_folder_str << std::endl;
+			if (!checkFileExt(curr_file)) {
+				Tcerr << _T("Невірний тип файлу: ") << curr_file << std::endl;
 				not_end = dbf_dir.getNextFile();
 				continue;
 			}
 
 			CDate payment_date = getPaymentDateFromFileName(dbf_dir.getFileName());
 
+			dbf_folder_str = dbf_table.getDbfDir();
+			dbf_folder_str += PATH_SLASH;
+			dbf_folder_str += curr_file;
 			if (!checkFileExists(dbf_folder_str.c_str())) {
 				Tcerr << _T("Неможливо відкрити: ") << dbf_folder_str << std::endl;
 				not_end = dbf_dir.getNextFile();
 				continue;
 			}
 
-			dbf_table.openByName(dbf_dir.getFileName());
+			dbf_table.setDbfFileName(curr_file);
+			try {
+				dbf_table.open();
+			}
+			catch (XException &e) {
+				Tcerr << e.what() << std::endl;
+				not_end = dbf_dir.getNextFile();
+				continue;
+			}
+
 			checkDbfFileStructure(dbf_table, fields, dbf_dir.getFileName());
 			if (payment_date.isNull()) {
 
@@ -191,13 +200,13 @@ std::shared_ptr<IDbConnection> createSQLiteConnection(const CPropertiesFile &pro
 	std::shared_ptr<IDbConnection> conn = std::make_shared<SQLiteConnection>();
 
 	Tstring buffer;
+	std::vector<char> buffer2;
 	const Tchar *curr_prop;
-	std::string db_file_location;
 
 	curr_prop = props.getStringProperty(_T("sqlite_db_file_location"), buffer);
-	const char *p = convertIfNecessary(curr_prop, db_file_location);
+	const char *db_file_location = convertToCharIfNecessary(curr_prop, buffer2);
 
-	conn->Connect(p, 0, nullptr, nullptr, "acts");
+	conn->Connect(db_file_location, 0, nullptr, nullptr, "acts");
 	return conn;
 }
 
@@ -292,7 +301,7 @@ const char *checkIfIsEmptyAndConvert(const char *value, \
 		throw e;
 	}
 
-	convertIfNecessary(value, buffer);
+	convertFromCP1251IfNecessary(value, buffer);
 	return &buffer[0];
 }
 

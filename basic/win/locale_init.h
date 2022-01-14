@@ -1,4 +1,4 @@
-#include <locale.h>
+#include <clocale>
 
 inline const char *getOS_Locale() {
 

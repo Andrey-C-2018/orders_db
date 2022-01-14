@@ -163,7 +163,7 @@ inline bool endsWith(const std::string &str, const char *suffix, const size_t su
 	assert(Tstrlen(suffix) >= suffix_len);
 
 	if(!suffix_len || suffix_len > str.size()) return !suffix_len;
-	return str.compare(str.size() - suffix_len, suffix_len, suffix);
+	return str.compare(str.size() - suffix_len, suffix_len, suffix) == 0;
 }
 
 template <typename Tchar> \

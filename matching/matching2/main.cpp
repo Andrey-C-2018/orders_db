@@ -123,7 +123,7 @@ int main() {
 
 			CCsvOutputWrapper output_wrapper(results_table);
 			result << output_wrapper;
-			Tcout << " OK" << std::endl;
+			Tcout << _T(" OK") << std::endl;
 		}
 
 		std::string empty_cells_filler;
