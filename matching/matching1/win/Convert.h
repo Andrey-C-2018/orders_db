@@ -7,7 +7,14 @@ const char *convertToCharIfNecessary(const wchar_t *widechars, std::vector<char>
 	assert(widechars);
 	size_t len = wcslen(widechars);
 	chars.resize(len + 1);
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
 	wcstombs(&chars[0], widechars, len);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 	chars[len] = '\0';
 	return &chars[0];
 }

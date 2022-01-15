@@ -15,7 +15,14 @@ void CDbfTableAdapter::open(const wchar_t *dbf_path) {
 	size_t len = wcslen(dbf_path);	
 
 	buffer.resize(len + 1);
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
 	wcstombs(&buffer[0], dbf_path, len);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 	buffer[len] = '\0';
 
 	dbf_table.open(&buffer[0]);
@@ -57,12 +64,20 @@ const char *CDbfTableAdapter::getDateCellValue(const size_t field, char *buffer)
 	const char *value = dbf_table.getDateCellValue(field);
 	if(!value || value[0] == '\0') return nullptr;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
 	assert(strlen(value) == 8);
 	strncpy(buffer, value, 4);
 	strcpy(&buffer[4], "-");
 	strncpy(&buffer[5], value, 2);
 	strcpy(&buffer[7], "-");
 	strncpy(&buffer[8], value, 2);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 	return buffer;
 }
 

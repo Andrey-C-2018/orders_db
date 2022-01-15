@@ -58,6 +58,7 @@
     <ClCompile Include="Cryptor.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="PropertiesFile.cpp" />
+    <ClCompile Include="win\DirectoryImpl.cpp" />
     <ClCompile Include="win\FileSystemImpl.cpp" />
     <ClCompile Include="win\ProcessImpl.cpp" />
   </ItemGroup>

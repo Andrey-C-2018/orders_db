@@ -112,7 +112,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>basic.lib;date.lib;db.lib;libsqlite3.lib;dbf3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%SQLITE_CONNECTOR_PATH%x64/Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%SQLITE_CONNECTOR_PATH%\x64\Debug;%VLD_PATH%\lib\Win64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -154,17 +154,14 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>basic.lib;date.lib;db.lib;libsqlite3.lib;dbf3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../0libs/x64/Release;%SQLITE_CONNECTOR_PATH%x64/Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../0libs/x64/Release;%SQLITE_CONNECTOR_PATH%\x64\Release;%VLD_PATH%\lib\Win64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DbfTable.cpp" />
     <ClCompile Include="DbfTableAdapter.cpp" />
-    <ClCompile Include="Directory.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DbfTable.h" />
     <ClInclude Include="DbfTableAdapter.h" />
     <ClInclude Include="Directory.h" />
   </ItemGroup>

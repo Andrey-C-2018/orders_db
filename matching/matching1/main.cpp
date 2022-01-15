@@ -1,5 +1,4 @@
 #include <memory>
-#include <map>
 #include <iostream>
 #include <cctype>
 #include <basic/PropertiesFile.h>
@@ -57,7 +56,8 @@ int main() {
 
 		CDbfTableAdapter dbf_table;
 		Tstring props_buffer;
-		dbf_table.setDbfDir(props.getStringProperty(_T("dbf_folder"), props_buffer));
+		Tstring dbf_folder_str = props.getStringProperty(_T("dbf_folder"), props_buffer);
+		dbf_table.setDbfDir(dbf_folder_str.c_str());
 
 		auto sqlite_conn = createSQLiteConnection(props);
 		std::string query;
@@ -77,7 +77,6 @@ int main() {
 		XDirectory dbf_dir;
 		std::vector<char> buffer;
 
-		Tstring dbf_folder_str = dbf_table.getDbfDir();
 		dbf_folder_str += PATH_SLASH;
 		dbf_folder_str += _T("*.DBF");
 
@@ -94,16 +93,13 @@ int main() {
 
 			CDate payment_date = getPaymentDateFromFileName(dbf_dir.getFileName());
 
-			dbf_folder_str = dbf_table.getDbfDir();
-			dbf_folder_str += PATH_SLASH;
-			dbf_folder_str += curr_file;
-			if (!checkFileExists(dbf_folder_str.c_str())) {
+			dbf_table.setDbfFileName(curr_file);
+			if (!checkFileExists(dbf_table.getDbfFilePath())) {
 				Tcerr << _T("Неможливо відкрити: ") << dbf_folder_str << std::endl;
 				not_end = dbf_dir.getNextFile();
 				continue;
 			}
 
-			dbf_table.setDbfFileName(curr_file);
 			try {
 				dbf_table.open();
 			}
@@ -329,6 +325,13 @@ void replaceAdvNameIfNecessary(std::vector<char> &adv_name, \
 	assert(!correct_adv_name.isNull());
 	adv_name.resize(correct_adv_name.size + 1);
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
 	strncpy(&adv_name[0], correct_adv_name.str, correct_adv_name.size);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 	adv_name[correct_adv_name.size] = '\0';
 }
