@@ -35,12 +35,12 @@ void checkDbfFileStructure(const CDbfTableAdapter &table, const std::map<Tstring
 							const Tchar *dbf_file_name);
 
 CDate getPaymentDateFromFileName(const Tchar *file_name);
-const char *checkIfIsEmptyAndConvert(const char *value, \
+const Tchar *checkIfIsEmptyAndConvert(const char *value, \
 										const Tchar *field_name, \
 										size_t record_no, \
 										const Tchar *dbf_file_name, \
-										std::vector<char> &buffer);
-void replaceAdvNameIfNecessary(std::vector<char> &adv_name, \
+										std::vector<Tchar> &buffer);
+void replaceAdvNameIfNecessary(std::vector<Tchar> &adv_name, \
 								const std::shared_ptr<IDbStatement> &stmt);
 
 int main() {
@@ -75,11 +75,11 @@ int main() {
 		auto adv_check_stmt = sqlite_conn->PrepareQuery(query.c_str());
 
 		XDirectory dbf_dir;
-		std::vector<char> buffer;
-
+		
 		dbf_folder_str += PATH_SLASH;
 		dbf_folder_str += _T("*.DBF");
 
+		std::vector<Tchar> buffer;
 		bool not_end = dbf_dir.getFirstFile(dbf_folder_str.c_str());
 		while (not_end) {
 			auto curr_file = dbf_dir.getFileName();
@@ -91,7 +91,16 @@ int main() {
 				continue;
 			}
 
-			CDate payment_date = getPaymentDateFromFileName(dbf_dir.getFileName());
+			CDate payment_date = getPaymentDateFromFileName(curr_file);
+			if (payment_date.isNull()) {
+
+				Tcerr << _T("Невірний формат імені файлу: '");
+				Tcerr << curr_file;
+				Tcerr << _T("', по ньому неможливо визначити дату оплати\n");
+
+				not_end = dbf_dir.getNextFile();
+				continue;
+			}
 
 			dbf_table.setDbfFileName(curr_file);
 			if (!checkFileExists(dbf_table.getDbfFilePath())) {
@@ -110,15 +119,6 @@ int main() {
 			}
 
 			checkDbfFileStructure(dbf_table, fields, dbf_dir.getFileName());
-			if (payment_date.isNull()) {
-
-				Tcerr << _T("Невірний формат імені файлу: '");
-				Tcerr << dbf_dir.getFileName();
-				Tcerr << _T("', по ньому неможливо визначити дату оплати\n");
-
-				not_end = dbf_dir.getNextFile();
-				continue;
-			}
 
 			bool not_eot = dbf_table.gotoFirstRecord();
 			size_t record_no = 0;
@@ -168,7 +168,7 @@ int main() {
 
 		Tcerr << e.what() << std::endl;
 		Tcin.get();
-		exit(1);
+		return 1;
 	}
 	catch (std::exception &e) {
 
@@ -176,8 +176,6 @@ int main() {
 		Tcin.get();
 		return 1;
 	}
-
-	return 0;
 }
 
 std::map<Tstring, size_t> createFieldsMap() {
@@ -281,11 +279,11 @@ CDate getPaymentDateFromFileName(const Tchar *file_name) {
 	return CDate(buffer, CDate::GERMAN_FORMAT);
 }
 
-const char *checkIfIsEmptyAndConvert(const char *value, \
+const Tchar *checkIfIsEmptyAndConvert(const char *value, \
 										const Tchar *field_name, \
 										size_t record_no, \
 										const Tchar *dbf_file_name, \
-										std::vector<char> &buffer) {
+										std::vector<Tchar> &buffer) {
 
 	assert(field_name);
 	assert(dbf_file_name);
@@ -297,21 +295,23 @@ const char *checkIfIsEmptyAndConvert(const char *value, \
 		throw e;
 	}
 
-	convertFromCP1251IfNecessary(value, buffer);
+	convertToUTF(value, buffer);
 	return &buffer[0];
 }
 
-inline ImmutableString<char> getStringFromResultSet(std::shared_ptr<IDbResultSet> &rs, size_t field, char) {
+inline ImmutableString<char> getStringFromResultSet(std::shared_ptr<IDbResultSet> &rs, \
+													size_t field, char) {
 
 	return rs->getImmutableString(field);
 }
 
-inline ImmutableString<wchar_t> getStringFromResultSet(std::shared_ptr<IDbResultSet> &rs, size_t field, wchar_t) {
+inline ImmutableString<wchar_t> getStringFromResultSet(std::shared_ptr<IDbResultSet> &rs, \
+														size_t field, wchar_t) {
 
 	return rs->getImmutableWString(field);
 }
 
-void replaceAdvNameIfNecessary(std::vector<char> &adv_name, \
+void replaceAdvNameIfNecessary(std::vector<Tchar> &adv_name, \
 								const std::shared_ptr<IDbStatement> &stmt) {
 
 	stmt->bindValue(0, &adv_name[0]);
@@ -321,17 +321,7 @@ void replaceAdvNameIfNecessary(std::vector<char> &adv_name, \
 	if (!records_count) return;
 
 	result_set->gotoRecord(0);
-	auto correct_adv_name = result_set->getImmutableString(0);
-	assert(!correct_adv_name.isNull());
-	adv_name.resize(correct_adv_name.size + 1);
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
-	strncpy(&adv_name[0], correct_adv_name.str, correct_adv_name.size);
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-	adv_name[correct_adv_name.size] = '\0';
+	auto correct_adv_name = getStringFromResultSet(result_set, 0, Tchar());
+	
+	copyImmutableStrToVector(correct_adv_name, adv_name);
 }

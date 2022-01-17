@@ -2,42 +2,46 @@
 #include <string>
 #include <vector>
 
-const char *convertToCharIfNecessary(const wchar_t *widechars, std::vector<char> &chars) {
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
+
+inline const char *convertToCharIfNecessary(const wchar_t *widechars, \
+											std::vector<char> &chars) {
 
 	assert(widechars);
 	size_t len = wcslen(widechars);
 	chars.resize(len + 1);
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
+
 	wcstombs(&chars[0], widechars, len);
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+
 	chars[len] = '\0';
 	return &chars[0];
 }
 
-inline const char *convertFromCP1251IfNecessary(const char *value, std::string &buffer) {
+inline const wchar_t *convertToUTF(const char *value, \
+									std::vector<wchar_t> &buffer) {
 
-       buffer = value;
-       return buffer.c_str();
+	assert(value);
+	size_t len = strlen(value);
+	buffer.resize(len + 1);
+
+	mbstowcs(&buffer[0], value, len);
+
+	buffer[len] = L'\0';
+	return &buffer[0];
 }
 
-inline const char *convertFromCP1251IfNecessary(const char *value, std::vector<char> &buffer) {
+inline void copyImmutableStrToVector(ImmutableString<wchar_t> str, std::vector<wchar_t> &dest) {
 
-       size_t value_size = strlen(value);
-       buffer.resize(value_size + 1);
+	assert(!str.isNull());
+	dest.resize(str.size + 1);
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
-       strncpy(&buffer[0], value, value_size);
+	wcsncpy(&dest[0], str.str, str.size);
+	dest[str.size] = L'\0';
+}
+
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-       buffer[value_size] = '\0';
-       return &buffer[0];
-}

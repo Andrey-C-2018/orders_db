@@ -77,7 +77,7 @@ void CDbfTableAdapter::setDbfFileName(const Tchar *dbf_file_name) {
 	assert(dbf_file_name && dbf_file_name[0] != _T('\0'));
 
 	if(dbf_file_path.size() > dbf_dir_path_len)
-		dbf_file_path.erase(dbf_dir_path_len + 1, \
+		dbf_file_path.erase(dbf_dir_path_len, \
 							dbf_file_path.size() - dbf_dir_path_len - 1);
 	dbf_file_path += dbf_file_name;
 }
