@@ -12,9 +12,9 @@ inline const char *convertToCharIfNecessary(const char *chars, \
 inline const char *convertToUTF(const char *value, \
 								std::vector<char> &buffer) {
 
-       assert(text);
-       buffer.resize(cp1251_to_utf8_len(text) + 1);
-       return cp1251_to_utf8(text, &buffer[0]);
+       assert(value);
+       buffer.resize(cp1251_to_utf8_len(value) + 1);
+       return cp1251_to_utf8(value, &buffer[0]);
 }
 
 inline void copyImmutableStrToVector(ImmutableString<char> str, std::vector<char> &dest) {

@@ -104,7 +104,7 @@ int main() {
 
 			dbf_table.setDbfFileName(curr_file);
 			if (!checkFileExists(dbf_table.getDbfFilePath())) {
-				Tcerr << _T("Неможливо відкрити: ") << dbf_folder_str << std::endl;
+				Tcerr << _T("Неможливо відкрити: ") << curr_file << std::endl;
 				not_end = dbf_dir.getNextFile();
 				continue;
 			}

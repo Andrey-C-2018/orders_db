@@ -117,7 +117,7 @@ if(NOT MSVC OR MSVC_TOOLSET_VERSION LESS_EQUAL 80)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${CMAKE_BUILD_TYPE})
 endif()
 
-add_executable(matching1 main.cpp DbfTableAdapter.h Convert.h main.cpp)
+add_executable(matching1 main.cpp DbfTableAdapter.h DbfTableAdapter.cpp Convert.h main.cpp)
 set_target_properties(matching1 PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
 target_include_directories(matching1 PRIVATE ${CMAKE_SOURCE_DIR}/../..)
 target_include_directories(matching1 PUBLIC ${SQLite3_INCLUDE_DIRS})
