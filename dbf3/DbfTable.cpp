@@ -64,7 +64,7 @@ void DbfTable::initFields() {
 
 	assert(f.is_open());
 	assert(header->length > 0);
-	DBaseField field;
+	DBaseField field{};
 	size_t fields_count = ((size_t)header->length - 1) / 32 - 1;
 
 	fields.reserve(fields_count);

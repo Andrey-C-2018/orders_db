@@ -1,18 +1,19 @@
 #include <vector>
-#include <string>
 #include <algorithm>
 #include <iostream>
 #include <UnitTest++/UnitTest++.h>
 #include <basic/Directory.h>
 #include <basic/Exception.h>
+#include <basic/tstream.h>
 
-const wchar_t *all_files[] = {L"nested", L"1", L"1.txt", L"2.txt", L"2.tx", L"abc.dbf", L"abc"};
-const size_t all_files_count = sizeof(all_files) / sizeof(const char *);
+const Tchar *all_files[] = {_T("nested"), _T("1"), _T("1.txt"), _T("2.txt"), \
+							_T("2.tx"), _T("abc.dbf"), _T("abc")};
+const size_t all_files_count = sizeof(all_files) / sizeof(const Tchar *);
 
-inline std::vector<std::wstring> getDirContents(const wchar_t *path) {
+inline std::vector<Tstring> getDirContents(const Tchar *path) {
 
 	XDirectory dir;
-	std::vector<std::wstring> output;
+	std::vector<Tstring> output;
 
 	bool files_exist = dir.getFirstFile(path);
 	while (files_exist) {
@@ -23,7 +24,7 @@ inline std::vector<std::wstring> getDirContents(const wchar_t *path) {
 	return output;
 }
 
-void testEqualContents(std::vector<std::wstring> &etalon, const wchar_t *path) {
+void testEqualContents(std::vector<Tstring> &etalon, const Tchar *path) {
 
 	std::sort(etalon.begin(), etalon.end());
 	try {
@@ -42,14 +43,14 @@ void testEqualContents(std::vector<std::wstring> &etalon, const wchar_t *path) {
 	}
 }
 
-std::vector<std::wstring> copyIfEndsWith(const wchar_t *ext) {
+std::vector<Tstring> copyIfEndsWith(const Tchar *ext) {
 
-	size_t ext_len = wcslen(ext);
+	size_t ext_len = Tstrlen(ext);
 
-	std::vector<std::wstring> etalon;
+	std::vector<Tstring> etalon;
 	std::copy_if(all_files, all_files + all_files_count, \
 					std::back_inserter(etalon), \
-			[ext, ext_len](const wchar_t *file) -> bool {
+			[ext, ext_len](const Tchar *file) -> bool {
 
 		return endsWith(file, ext, ext_len);
 	});
@@ -60,18 +61,18 @@ std::vector<std::wstring> copyIfEndsWith(const wchar_t *ext) {
 SUITE(DirectoryTests) {
 
 	TEST(openDirNoSlashes) {
-		std::vector<std::wstring> etalon(all_files, all_files + all_files_count);
-		testEqualContents(etalon, L"test_data");
+		std::vector<Tstring> etalon(all_files, all_files + all_files_count);
+		testEqualContents(etalon, _T("test_data"));
 	}
 
 	TEST(openDirEndingSlash) {
-		std::vector<std::wstring> etalon(all_files, all_files + all_files_count);
-		testEqualContents(etalon, L"test_data/");
+		std::vector<Tstring> etalon(all_files, all_files + all_files_count);
+		testEqualContents(etalon, _T("test_data/"));
 	}
 
 	TEST(openDirNested) {
 		try {
-			auto output = getDirContents(L"test_data/nested");
+			auto output = getDirContents(_T("test_data/nested"));
 			CHECK_EQUAL(1, output.size());
 		}
 		catch(XException &e) {
@@ -82,55 +83,55 @@ SUITE(DirectoryTests) {
 	}
 
 	TEST(openDirAllFilesTemplate) {
-		std::vector<std::wstring> etalon(all_files, all_files + all_files_count);
-		testEqualContents(etalon, L"test_data/*");
+		std::vector<Tstring> etalon(all_files, all_files + all_files_count);
+		testEqualContents(etalon, _T("test_data/*"));
 	}
 
 	TEST(openDirFilesTemplateTXT) {
 
-		auto etalon = copyIfEndsWith(L"txt");
-		testEqualContents(etalon, L"test_data/*.txt");
+		auto etalon = copyIfEndsWith(_T("txt"));
+		testEqualContents(etalon, _T("test_data/*.txt"));
 	}
 
 	TEST(openDirFilesTemplateTX_DBF) {
 
-		auto etalon = copyIfEndsWith(L"tx");
-		testEqualContents(etalon, L"test_data/*.tx");
+		auto etalon = copyIfEndsWith(_T("tx"));
+		testEqualContents(etalon, _T("test_data/*.tx"));
 
-		etalon = copyIfEndsWith(L"dbf");
-		testEqualContents(etalon, L"test_data/*.dbf");
+		etalon = copyIfEndsWith(_T("dbf"));
+		testEqualContents(etalon, _T("test_data/*.dbf"));
 	}
 
 	TEST(openDirNotExistingTemplate) {
 
-		std::vector<std::wstring> output;
+		std::vector<Tstring> output;
 		try {
-			output = getDirContents(L"test_data/*.xyz");
+			output = getDirContents(_T("test_data/*.xyz"));
 			CHECK(output.empty());
 		}
 		catch(XException &e) {
 
-			std::cerr << e.what() << std::endl;
+			Tcerr << e.what() << std::endl;
 			CHECK(1 == 0);
 		}
 
 		bool nominal = false;
-		try { getDirContents(L"test_data/*-="); }
+		try { getDirContents(_T("test_data/*-=")); }
 		catch(XException &e) { nominal = true; }
 		CHECK(nominal);
 
 		nominal = false;
-		try { getDirContents(L"test_data/*.*"); }
+		try { getDirContents(_T("test_data/*.*")); }
 		catch(XException &e) { nominal = true; }
 		CHECK(nominal);
 
 		nominal = false;
-		try { getDirContents(L"test_data/xyz*"); }
+		try { getDirContents(_T("test_data/xyz*")); }
 		catch(XException &e) { nominal = true; }
 		CHECK(nominal);
 
 		nominal = false;
-		try { getDirContents(L"test_data/ab*.dbf"); }
+		try { getDirContents(_T("test_data/ab*.dbf")); }
 		catch(XException &e) { nominal = true; }
 		CHECK(nominal);
 	}

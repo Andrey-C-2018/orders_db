@@ -12,7 +12,7 @@ public:
 	SQLiteFieldException(const SQLiteFieldException &obj);
 	SQLiteFieldException(SQLiteFieldException &&obj) = default;
 
-	~SQLiteFieldException();
+	virtual ~SQLiteFieldException();
 };
 
 class SQLiteField : public IDbField{

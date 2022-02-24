@@ -16,7 +16,7 @@ public:
 	CMySQLMetadataException(const CMySQLMetadataException &obj);
 	CMySQLMetadataException(CMySQLMetadataException &&obj) = default;
 
-	~CMySQLMetadataException();
+	virtual ~CMySQLMetadataException();
 };
 
 struct MySQLStmtData;

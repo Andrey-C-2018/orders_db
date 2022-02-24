@@ -17,7 +17,7 @@ public:
 	CMySQLResultSetException(const CMySQLResultSetException &obj);
 	CMySQLResultSetException(CMySQLResultSetException &&obj) = default;
 
-	~CMySQLResultSetException();
+	virtual ~CMySQLResultSetException();
 };
 
 struct MySQLStmtDataEx;

@@ -6,7 +6,7 @@ struct MySQLStmtData {
 	MYSQL_RES *metadata;
 
 	inline MySQLStmtData() noexcept;
-	inline MySQLStmtData(MYSQL_STMT *stmt_);
+	inline explicit MySQLStmtData(MYSQL_STMT *stmt_);
 
 	inline MySQLStmtData(const MySQLStmtData &obj) = delete;
 	inline MySQLStmtData(MySQLStmtData &&obj) noexcept;
@@ -44,4 +44,5 @@ inline MySQLStmtData &MySQLStmtData::operator=(MySQLStmtData &&obj) noexcept {
 
 	obj.stmt = nullptr;
 	obj.metadata = nullptr;
+	return *this;
 }

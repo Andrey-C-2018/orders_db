@@ -21,7 +21,7 @@ class CMySQLVariant final {
 
 public:
 	CMySQLVariant();
-	CMySQLVariant(const enum_field_types type);
+	explicit CMySQLVariant(const enum_field_types type);
 	CMySQLVariant(const enum_field_types type, const size_t max_len);
 
 	CMySQLVariant(const CMySQLVariant &obj) = default;

@@ -3,7 +3,7 @@
 MySQLStmtDataEx::~MySQLStmtDataEx() {
 
 	if (params_bindings) {
-		assert(params_count);
+		assert(params_count > 0);
 		delete[] params_bindings;
 	}
 }

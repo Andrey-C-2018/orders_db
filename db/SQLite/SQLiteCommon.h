@@ -43,7 +43,7 @@ public:
 	SQLiteException(const SQLiteException &obj) = default;
 	SQLiteException(SQLiteException &&obj) = default;
 
-	~SQLiteException();
+	virtual ~SQLiteException();
 };
 
 inline sqlite3_stmt *prepareQuery(sqlite3 *db, const char *query_text) {

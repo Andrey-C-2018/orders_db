@@ -14,7 +14,7 @@ public:
 	SQLiteStatementException(const SQLiteStatementException &obj);
 	SQLiteStatementException(SQLiteStatementException &&obj) = default;
 
-	~SQLiteStatementException();
+	virtual ~SQLiteStatementException();
 };
 
 class SQLiteStatement : public IDbStatement {

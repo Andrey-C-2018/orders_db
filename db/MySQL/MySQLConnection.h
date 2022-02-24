@@ -18,7 +18,7 @@ public:
 	CMySQLConnectionException(const CMySQLConnectionException &obj);
 	CMySQLConnectionException(CMySQLConnectionException &&obj) = default;
 
-	~CMySQLConnectionException();
+	virtual ~CMySQLConnectionException();
 };
 
 class CMySQLConnection : public IDbConnection {

@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.15)
 
-project(db_test VERSION 0.1 LANGUAGES CXX)
+project(matching3 VERSION 0.5 LANGUAGES CXX)
 if(NOT CMAKE_BUILD_TYPE)
-       set(CMAKE_BUILD_TYPE Release)
+	set(CMAKE_BUILD_TYPE Release)
 endif()
 
 if(MSVC_TOOLSET_VERSION GREATER 80)
@@ -82,12 +82,7 @@ set_property(TARGET db PROPERTY IMPORTED_LOCATION ${DB_LIBRARY})
 
 #######################################
 
-find_package(UnitTest++ REQUIRED)
-if(NOT UTPP_INCLUDE_DIRS)
-	message(FATAL_ERROR "the toolkit UnitTest++ is not found on the system")
-	return()
-endif()
-message(STATUS "UnitTest++ include path: ${UTPP_INCLUDE_DIRS}")
+
 
 #######################################
 
@@ -99,22 +94,21 @@ endif()
 
 pkg_check_modules(MARIADB QUIET libmariadb)
 if(NOT ${MARIADB_FOUND})
-        message(FATAL_ERROR "the Mariadb library is not found on the system")
+	message(FATAL_ERROR "the Mariadb library is not found on the system")
 	return()
 endif()
-message(STATUS "libmariadb include path: ${MARIADB_INCLUDE_DIRS}")
+message(STATUS "libmariadb include path: ${MARIADB_INCLUDE_DIR}")
 
 #######################################
 
 if(NOT MSVC OR MSVC_TOOLSET_VERSION LESS_EQUAL 80)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${CMAKE_BUILD_TYPE})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 endif()
 
-add_executable(db_test main.cpp)
-set_target_properties(db_test PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
-target_include_directories(db_test PRIVATE ${CMAKE_SOURCE_DIR}/../..)
-target_include_directories(db_test PUBLIC ${UTPP_INCLUDE_DIRS})
-target_include_directories(db_test PUBLIC ${MARIADB_INCLUDE_DIRS})
-#target_sources(db_test PRIVATE MySQLTest.cpp)
+add_executable(matching3 main.cpp)
+set_target_properties(matching3 PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
+target_include_directories(matching3 PRIVATE ${CMAKE_SOURCE_DIR}/../..)
+target_include_directories(matching3 PUBLIC ${SQLite3_INCLUDE_DIRS})
+target_include_directories(matching3 PUBLIC ${MARIADB_INCLUDE_DIRS})
 
-target_link_libraries(db_test db basic date mariadb UnitTest++)
+target_link_libraries(matching3 db basic date mariadb)

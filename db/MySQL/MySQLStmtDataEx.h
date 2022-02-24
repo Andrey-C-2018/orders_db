@@ -9,7 +9,7 @@ private:
 
 public:
 	inline MySQLStmtDataEx() noexcept;
-	inline MySQLStmtDataEx(MYSQL_STMT *stmt_);
+	inline explicit MySQLStmtDataEx(MYSQL_STMT *stmt_);
 
 	inline MySQLStmtDataEx(const MySQLStmtDataEx &obj) = delete;
 	inline MySQLStmtDataEx(MySQLStmtDataEx &&obj) noexcept;

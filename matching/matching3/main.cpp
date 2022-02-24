@@ -100,15 +100,15 @@ int main() {
 			auto recs_count = rs->getRecordsCount();
 			if (!recs_count) {
 				
-				std::wcerr << _T("Немає такого доручення: рядок ") << i;
-				std::wcerr << _T(", значення полів: ");
+				std::wcerr << _T("РќРµРјР°С” С‚Р°РєРѕРіРѕ РґРѕСЂСѓС‡РµРЅРЅСЏ: СЂСЏРґРѕРє ") << i;
+				std::wcerr << _T(", Р·РЅР°С‡РµРЅРЅСЏ РїРѕР»С–РІ: ");
 				printOrderDetails(id_center, id, order_date, act_name);
 				continue;
 			}
 
 			if (payment_date.isNull()) {
-				std::wcerr << _T("Дата оплати не може бути порожньою: рядок ") << i;
-				std::wcerr << _T(", значення полів: ");
+				std::wcerr << _T("Р”Р°С‚Р° РѕРїР»Р°С‚Рё РЅРµ РјРѕР¶Рµ Р±СѓС‚Рё РїРѕСЂРѕР¶РЅСЊРѕСЋ: СЂСЏРґРѕРє ") << i;
+				std::wcerr << _T(", Р·РЅР°С‡РµРЅРЅСЏ РїРѕР»С–РІ: ");
 				printOrderDetails(id_center, id, order_date, act_name);
 				continue;
 			}
@@ -116,7 +116,7 @@ int main() {
 			auto affected_records = stmt->execScalar();
 			if(affected_records && recs_count) {
 				rs->gotoRecord(0);
-				std::wcout << _T("Оновлено: ");
+				std::wcout << _T("РћРЅРѕРІР»РµРЅРѕ: ");
 				std::wcout << id_center << _T('-') << id << _T("-'");
 				order_date.toStringGerman(buffer);
 				std::wcout << buffer << _T("'-") << id_stage << _T('-');
@@ -141,8 +141,8 @@ int main() {
 			total_updated_recs += affected_records;
 		}
 
-		std::wcout << _T("Рядків переглянуто: ") << rec_count;
-		std::wcout << _T(", Рядків оновлено: ") << total_updated_recs << std::endl;
+		std::wcout << _T("Р СЏРґРєС–РІ РїРµСЂРµРіР»СЏРЅСѓС‚Рѕ: ") << rec_count;
+		std::wcout << _T(", Р СЏРґРєС–РІ РѕРЅРѕРІР»РµРЅРѕ: ") << total_updated_recs << std::endl;
 	}
 	catch (XException &e) {
 
@@ -166,7 +166,7 @@ std::map<std::wstring, size_t> createFieldNamesMap(std::shared_ptr<TTable> csv) 
 		auto p = fields.lower_bound(name);
 		if (p == fields.end() || fields.key_comp()(p->first, name)) {
 
-			XException e(0, _T("csv-файл не містить поля '"));
+			XException e(0, _T("csv-С„Р°Р№Р» РЅРµ РјС–СЃС‚РёС‚СЊ РїРѕР»СЏ '"));
 			e << name << _T("'");
 			throw e;
 		}
@@ -206,9 +206,9 @@ int convAndCheckIntCell(std::shared_ptr<TRecord> rec, const wchar_t *field_name,
 
 	if (error) {
 		int a = 0;
-		XException e(0, _T("Невірне значення: '"));
-		e << value << _T("' поля '") << field_name;
-		e << _T("'. Це поле може містити тільки числа");
+		XException e(0, _T("РќРµРІС–СЂРЅРµ Р·РЅР°С‡РµРЅРЅСЏ: '"));
+		e << value << _T("' РїРѕР»СЏ '") << field_name;
+		e << _T("'. Р¦Рµ РїРѕР»Рµ РјРѕР¶Рµ РјС–СЃС‚РёС‚Рё С‚С–Р»СЊРєРё С‡РёСЃР»Р°");
 		throw e;
 	}
 

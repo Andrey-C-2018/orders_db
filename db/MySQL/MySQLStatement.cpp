@@ -14,10 +14,10 @@ CMySQLStatement::CMySQLStatement(MYSQL_STMT *stmt_) {
 	params.resize(stmt->getParamsCount());
 }
 
-CMySQLStatement::CMySQLStatement(CMySQLStatement &&obj) : stmt(std::move(obj.stmt)), \
+CMySQLStatement::CMySQLStatement(CMySQLStatement &&obj) noexcept : stmt(std::move(obj.stmt)), \
 												params(std::move(obj.params)) { }
 
-CMySQLStatement &CMySQLStatement::operator=(CMySQLStatement &&obj) {
+CMySQLStatement &CMySQLStatement::operator=(CMySQLStatement &&obj) noexcept {
 
 	stmt = std::move(obj.stmt);
 	params = std::move(obj.params);

@@ -18,7 +18,7 @@ public:
 	CMySQLFieldException(const CMySQLFieldException &obj);
 	CMySQLFieldException(CMySQLFieldException &&obj) = default;
 
-	~CMySQLFieldException();
+	virtual ~CMySQLFieldException();
 };
 
 struct MySQLStmtData;

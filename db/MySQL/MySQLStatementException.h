@@ -15,5 +15,5 @@ public:
 	CMySQLStatementException(const CMySQLStatementException &obj);
 	CMySQLStatementException(CMySQLStatementException &&obj) = default;
 
-	~CMySQLStatementException();
+	virtual ~CMySQLStatementException();
 };

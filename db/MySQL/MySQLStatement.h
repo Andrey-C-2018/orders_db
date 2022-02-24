@@ -19,9 +19,9 @@ class CMySQLStatement : public IDbStatement {
 public:
 	CMySQLStatement(MYSQL_STMT *stmt_);
 	CMySQLStatement(const CMySQLStatement &obj) = delete;
-	CMySQLStatement(CMySQLStatement &&obj);
+	CMySQLStatement(CMySQLStatement &&obj) noexcept;
 	CMySQLStatement &operator=(const CMySQLStatement &obj) = delete;
-	CMySQLStatement &operator=(CMySQLStatement &&obj);
+	CMySQLStatement &operator=(CMySQLStatement &&obj) noexcept;
 
 	size_t getParamsCount() const;
 	void bindValue(const size_t param_no, const int value) override;

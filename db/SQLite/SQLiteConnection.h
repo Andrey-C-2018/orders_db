@@ -16,7 +16,7 @@ public:
 	SQLiteConnectionException(const SQLiteConnectionException &obj);
 	SQLiteConnectionException(SQLiteConnectionException &&obj) = default;
 
-	~SQLiteConnectionException();
+	virtual ~SQLiteConnectionException();
 };
 
 class SQLiteConnection : public IDbConnection {

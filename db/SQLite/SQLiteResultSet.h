@@ -12,7 +12,7 @@ public:
 	SQLiteResultSetException(const SQLiteResultSetException &obj);
 	SQLiteResultSetException(SQLiteResultSetException &&obj) = default;
 
-	~SQLiteResultSetException();
+	virtual ~SQLiteResultSetException();
 };
 
 class SQLiteResultSet : public IDbResultSet {

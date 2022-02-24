@@ -280,7 +280,7 @@ CAdvocats fillAdvocatBlocks(std::shared_ptr<const ITable> in, \
 		std::string adv_name = rec->getColValueAsCharArray(col_index);
 		auto p = advocats_blocks.lower_bound(adv_name);
 		if (p == advocats_blocks.end() || (advocats_blocks.key_comp()(adv_name, p->first))) {
-			CAdvocatBlock block;
+			CAdvocatBlock block{};
 			typedef std::map<std::string, CAdvocatBlock>::value_type MVT;
 
 			block.position = i;

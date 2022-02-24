@@ -18,6 +18,6 @@ public:
 	CDbException(const CDbException &obj) = default;
 	CDbException(CDbException &&obj) = default;
 
-	~CDbException();
+	virtual ~CDbException();
 };
 

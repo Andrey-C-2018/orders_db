@@ -39,24 +39,26 @@ CMySQLResultSet::CMySQLResultSet(std::shared_ptr<const MySQLStmtDataEx> stmt_) :
 
 	mysql_field_seek(stmt->metadata, (MYSQL_FIELD_OFFSET)0);
 	for (size_t i = 0; i < fields_count; ++i) {
-		MYSQL_FIELD *field = mysql_fetch_field(stmt->metadata);
-		assert(field);
+		MYSQL_FIELD *field_props = mysql_fetch_field(stmt->metadata);
+		assert(field_props);
 
-		MySQLBindingItem rec;
-		rec.value = CMySQLVariant(field->type, field->length);
-		fields.emplace_back(std::move(rec));
+		fields.emplace_back();
+		auto &field = fields[i];
+		field.value = CMySQLVariant(field_props->type, field_props->length);
 
-		MYSQL_BIND field_binding;
-		field_binding.buffer_type = field->type;
-		if (rec.value.IsVectorType())
-			field_binding.buffer_length = field->length;
+		fields_bindings.emplace_back();
+		auto &field_binding = fields_bindings[i];
 
-		field_binding.buffer = fields[i].value.GetValuePtr();
-		field_binding.length = &fields[i].length;
-		field_binding.is_null = &fields[i].is_null;
-		field_binding.error = &fields[i].error;
+		field_binding.buffer_type = field_props->type;
+		if (field.value.IsVectorType())
+			field_binding.buffer_length = field_props->length;
+		else
+			field_binding.buffer_length = 0;
 
-		fields_bindings.push_back(field_binding);
+		field_binding.buffer = field.value.GetValuePtr();
+		field_binding.length = &field.length;
+		field_binding.is_null = &field.is_null;
+		field_binding.error = &field.error;
 	}
 
 	if (mysql_stmt_bind_result(stmt->stmt, &fields_bindings[0]))
