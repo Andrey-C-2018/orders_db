@@ -12,7 +12,7 @@ public:
 	CAutorizationManagerException(const int err_code, const Tchar *err_descr);
 	CAutorizationManagerException(const CAutorizationManagerException &obj);
 	CAutorizationManagerException(CAutorizationManagerException &&obj) = default;
-	~CAutorizationManagerException();
+	virtual ~CAutorizationManagerException();
 };
 
 struct IDbConnection;

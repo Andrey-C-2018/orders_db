@@ -184,7 +184,7 @@ public:
 	}
 };
 
-class XColor{
+class XColor final {
 	_plCOLOR color;
 	bool initialized;
 public:
@@ -203,7 +203,7 @@ public:
 	inline void Reset() { initialized = false; }
 };
 
-class XGC{
+class XGC {
 	int left_bound, upper_bound;
 
 	XGC(const XGC &obj) = delete;

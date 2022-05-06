@@ -1,8 +1,5 @@
 #include "Exception.h"
 #include "XConv.h"
-#ifdef _MSC_VER
-#include <vld.h>
-#endif
 
 template <typename Tchar_, class Tstring_> \
 inline void Append(const Tchar_ *str, Tstring_ &buffer) {

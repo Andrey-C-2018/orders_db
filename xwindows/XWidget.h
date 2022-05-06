@@ -2,7 +2,7 @@
 #include <basic/Exception.h>
 #include "XWindow.h"
 
-class XWidget : public XWindow{
+class XWidget : public XWindow {
 	class CRegisterPredicate {
 		XWidget &widget;
 		const Tchar *class_name;

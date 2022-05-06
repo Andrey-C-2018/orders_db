@@ -47,6 +47,7 @@
     <ClInclude Include="Process.h" />
     <ClInclude Include="PropertiesFile.h" />
     <ClInclude Include="TextConv.h" />
+    <ClInclude Include="tfstream.h" />
     <ClInclude Include="tstream.h" />
     <ClInclude Include="tstring.h" />
     <ClInclude Include="win\locale_init.h" />

@@ -11,7 +11,7 @@ public:
 	CUploadException(const int err_code, const Tchar *err_descr);
 	CUploadException(const CUploadException &obj);
 	CUploadException(CUploadException &&obj) = default;
-	~CUploadException();
+	virtual ~CUploadException();
 };
 
 struct IProperties;

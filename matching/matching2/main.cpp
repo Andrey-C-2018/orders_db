@@ -4,6 +4,7 @@
 #include <basic/locale_init.h>
 #include <basic/XConv.h>
 #include <basic/tstream.h>
+#include <basic/tfstream.h>
 #include <db/SQLite/SQLiteConnection.h>
 #include <db/MySQL/MySQLConnectionFactory.h>
 #include <db/IDbConnection.h>
@@ -23,7 +24,7 @@ struct CAdvocatBlock {
 	size_t size;
 };
 
-typedef std::map<std::string, CAdvocatBlock> CAdvocats;
+typedef std::map<Tstring, CAdvocatBlock> CAdvocats;
 
 std::shared_ptr<IDbConnection> createSQLiteConnection(const CPropertiesFile &props);
 void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
@@ -103,7 +104,7 @@ int main() {
 		CCsvOutputWrapper(results_table).writeHeader(result);
 
 		for (auto p = blocks1.begin(); p != blocks1.end(); ++p) {
-			const std::string &adv1 = p->first;
+			const Tstring &adv1 = p->first;
 
 			Tcout << adv1;
 			auto p2 = blocks2.lower_bound(adv1);
@@ -133,7 +134,7 @@ int main() {
 				empty_cells_filler += ',';
 		}
 		for (auto &p2 : blocks2) {
-			const std::string &adv2 = p2.first;
+			const Tstring &adv2 = p2.first;
 
 			Tcout << adv2;
 
@@ -143,7 +144,7 @@ int main() {
 													false);
 			CCsvOutputWrapper output_wrapper(results_table, empty_cells_filler);
 			result << output_wrapper;
-			Tcout << " OK" << std::endl;
+			Tcout << _T(" OK") << std::endl;
 		}
 
 		CCsvOutputWrapper(results_table).writeTail(result);
@@ -179,6 +180,18 @@ std::shared_ptr<IDbConnection> createSQLiteConnection(const CPropertiesFile &pro
 
 	conn->Connect(p, 0, nullptr, nullptr, "acts");
 	return conn;
+}
+
+const char *getStringFromResultSet(std::shared_ptr<IDbResultSet> &rs, \
+									size_t field, char) {
+
+	return rs->getString(field);
+}
+
+const wchar_t *getStringFromResultSet(std::shared_ptr<IDbResultSet> &rs, \
+										size_t field, wchar_t) {
+
+	return rs->getWString(field);
 }
 
 void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
@@ -234,10 +247,10 @@ void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
 	records_count = rs->getRecordsCount();
 	if (records_count) {
 		XException e(0, _T("acts.db містить акти, які вже пройшли звірку і збережені в БД"));
-		std::wofstream out;
+		Tofstream out;
 
 		out.open("processed.csv", std::ios::out | std::ios::trunc);
-		wchar_t wbuffer[11];
+		Tchar wbuffer[CDate::GERMAN_FORMAT_LEN + 1];
 		if (out.is_open()) {
 			out.unsetf(std::ios::skipws);
 			out.imbue(std::locale(getOS_Locale()));
@@ -248,9 +261,9 @@ void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
 
 				out << rs->getInt(0, is_null);
 				out << _T(',');
-				out << rs->getWString(1);
+				out << getStringFromResultSet(rs, 1, Tchar());
 				out << _T(',');
-				out << rs->getWString(2);
+				out << getStringFromResultSet(rs, 2, Tchar());
 				out << _T(',');
 				rs->getDate(3, is_null).toStringSQL(wbuffer);
 				out << wbuffer;
@@ -270,18 +283,22 @@ void removeAlreadyProcessedActs(std::shared_ptr<IDbConnection> sqlite_conn, \
 
 CAdvocats fillAdvocatBlocks(std::shared_ptr<const ITable> in, \
 							size_t col_index) {
-							CAdvocats advocats_blocks;
+	CAdvocats advocats_blocks;
 
 	size_t rec_count = in->getRecordsCount();
-	std::string adv_name_prev;
+	Tstring adv_name_prev;
+	std::vector<Tchar> buffer;
+	
 	for (size_t i = 0; i < rec_count; ++i) {
 		auto rec = in->getRecord(i);
 
-		std::string adv_name = rec->getColValueAsCharArray(col_index);
+		const char *p_adv_name = rec->getColValueAsCharArray(col_index);
+		Tstring adv_name = convertSimple(p_adv_name, buffer);
+
 		auto p = advocats_blocks.lower_bound(adv_name);
 		if (p == advocats_blocks.end() || (advocats_blocks.key_comp()(adv_name, p->first))) {
 			CAdvocatBlock block{};
-			typedef std::map<std::string, CAdvocatBlock>::value_type MVT;
+			typedef std::map<Tstring, CAdvocatBlock>::value_type MVT;
 
 			block.position = i;
 			block.size = 1;

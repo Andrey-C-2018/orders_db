@@ -15,7 +15,7 @@ public:
 	CDbTableException(const int err_code, const Tchar *err_descr);
 	CDbTableException(const CDbTableException &obj);
 	CDbTableException(CDbTableException &&obj) = default;
-	~CDbTableException();
+	virtual ~CDbTableException();
 };
 
 typedef std::shared_ptr<IDbTableEventsHandler> IDbTableEvtHandlerPtr;

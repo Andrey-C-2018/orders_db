@@ -1,7 +1,7 @@
 #pragma once
 #include <grid/TextCell.h>
 
-class CDbGridHeaderCell :	public CTextCell {
+class CDbGridHeaderCell : public CTextCell {
 	int arrow_state;
 	CDelegate on_click_action;
 

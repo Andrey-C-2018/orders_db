@@ -18,7 +18,7 @@ public:
 	CMetaInfoBasicException(const int err_code, const Tchar *err_descr);
 	CMetaInfoBasicException(const CMetaInfoBasicException &obj);
 	CMetaInfoBasicException(CMetaInfoBasicException &&obj) = default;
-	~CMetaInfoBasicException();
+	virtual ~CMetaInfoBasicException();
 };
 
 class CMetaInfoBasic{

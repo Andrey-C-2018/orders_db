@@ -27,7 +27,7 @@ if(NOT BASIC_LIBRARY)
 	return()
 endif()
 
-add_library(basic UNKNOWN IMPORTED)
+add_library(basic STATIC IMPORTED)
 
 if(MSVC_TOOLSET_VERSION GREATER 80)
 	string(REPLACE "Debug" "$(Configuration)" BASIC_LIBRARY ${BASIC_LIBRARY})
@@ -107,7 +107,7 @@ message(STATUS "libmariadb include path: ${MARIADB_INCLUDE_DIR}")
 #######################################
 
 if(NOT MSVC OR MSVC_TOOLSET_VERSION LESS_EQUAL 80)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${CMAKE_BUILD_TYPE})
 endif()
 
 add_executable(matching2 main.cpp)

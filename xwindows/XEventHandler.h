@@ -21,7 +21,7 @@ public:
 	XEventHandlerException(const int err_code, const Tchar *err_descr);
 	XEventHandlerException(const XEventHandlerException &obj);
 	XEventHandlerException(XEventHandlerException &&obj) = default;
-	~XEventHandlerException();
+	virtual ~XEventHandlerException();
 };
 
 //****************************************************************************

@@ -21,7 +21,7 @@ public:
 	XWindowException(const int err_code, const Tchar *err_descr);
 	XWindowException(const XWindowException &obj);
 	XWindowException(XWindowException &&obj) = default;
-	~XWindowException();
+	virtual ~XWindowException();
 };
 
 class XWindow : public XEventHandler{

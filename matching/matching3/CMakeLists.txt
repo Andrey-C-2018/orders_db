@@ -16,75 +16,39 @@ set(CMAKE_SUPPRESS_REGENERATION true)
 
 #######################################
 
-find_library(BASIC_LIBRARY NAMES basic PATHS ${Lib_Path1} ${Lib_Path2})
-if(NOT BASIC_LIBRARY)
-	set(Basic_Lib_Path ${Lib_Path1})
-	if(Lib_Path2)
-		string(APPEND Basic_Lib_Path " or " ${Lib_Path2})
+function (find_n_add_library LIBNAME1)
+
+	unset(Curr_lib_full_path CACHE)
+	find_library(Curr_lib_full_path NAMES ${LIBNAME1} PATHS ${Lib_Path1} ${Lib_Path2})
+	if(NOT CURR_LIB_FULL_PATH)
+		set(Lib_Paths_Msg ${Lib_Path1})
+		if(Lib_Path2)
+			string(APPEND Lib_Paths_Msg " or " ${Lib_Path2})
+		endif()
+
+		message(FATAL_ERROR "the library ${LIBNAME1} is not found at ${Lib_Paths_Msg}")
+		return()
 	endif()
 
-	message(FATAL_ERROR "the library basic is not found at ${Basic_Lib_Path}")
-	return()
-endif()
+	add_library(${LIBNAME1} STATIC IMPORTED)
 
-add_library(basic UNKNOWN IMPORTED)
-
-if(MSVC_TOOLSET_VERSION GREATER 80)
-	string(REPLACE "Debug" "$(Configuration)" BASIC_LIBRARY ${BASIC_LIBRARY})
-	string(REPLACE "Release" "$(Configuration)" BASIC_LIBRARY ${BASIC_LIBRARY})
-endif()
-message(STATUS "basic library path: ${BASIC_LIBRARY}")
-set_property(TARGET basic PROPERTY IMPORTED_LOCATION ${BASIC_LIBRARY})
-
-#######################################
-
-find_library(DATE_LIBRARY NAMES date PATHS ${Lib_Path1} ${Lib_Path2})
-if(NOT DATE_LIBRARY)
-	set(Date_Lib_Path ${Lib_Path1})
-	if(Lib_Path2)
-		string(APPEND Date_Lib_Path " or " ${Lib_Path2})
+	if(MSVC_TOOLSET_VERSION GREATER 80)
+		string(REPLACE "Debug" "$(Configuration)" Curr_lib_full_path ${Curr_lib_full_path})
+		string(REPLACE "Release" "$(Configuration)" Curr_lib_full_path ${Curr_lib_full_path})
 	endif()
 
-	message(FATAL_ERROR "the library date is not found at ${Date_Lib_Path}")
-	return()
-endif()
+	message(STATUS "${LIBNAME1} library path: ${Curr_lib_full_path}")
+	set_property(TARGET ${LIBNAME1} PROPERTY IMPORTED_LOCATION ${Curr_lib_full_path})
+endfunction()
 
-add_library(date UNKNOWN IMPORTED)
+######################################
 
-if(MSVC_TOOLSET_VERSION GREATER 80)
-	string(REPLACE "Debug" "$(Configuration)" DATE_LIBRARY ${DATE_LIBRARY})
-	string(REPLACE "Release" "$(Configuration)" DATE_LIBRARY ${DATE_LIBRARY})
-endif()
-message(STATUS "date library path: ${DATE_LIBRARY}")
-set_property(TARGET date PROPERTY IMPORTED_LOCATION ${DATE_LIBRARY})
+find_n_add_library(basic)
+find_n_add_library(date)
+find_n_add_library(csv_file)
+find_n_add_library(db)
 
-#######################################
-
-find_library(DB_LIBRARY NAMES db PATHS ${Lib_Path1} ${Lib_Path2})
-if(NOT DB_LIBRARY)
-	set(Db_Lib_Path ${Lib_Path1})
-	if(Lib_Path2)
-		string(APPEND Db_Lib_Path " or " ${Lib_Path2})
-	endif()
-
-	message(FATAL_ERROR "the library db is not found at ${Db_Lib_Path}")
-	return()
-endif()
-
-add_library(db UNKNOWN IMPORTED)
-
-if(MSVC_TOOLSET_VERSION GREATER 80)
-	string(REPLACE "Debug" "$(Configuration)" DB_LIBRARY ${DB_LIBRARY})
-	string(REPLACE "Release" "$(Configuration)" DB_LIBRARY ${DB_LIBRARY})
-endif()
-message(STATUS "db library path: ${DB_LIBRARY}")
-set_property(TARGET db PROPERTY IMPORTED_LOCATION ${DB_LIBRARY})
-
-#######################################
-
-
-
-#######################################
+######################################
 
 find_package(PkgConfig REQUIRED)
 if(NOT PKG_CONFIG_FOUND)
@@ -97,18 +61,22 @@ if(NOT ${MARIADB_FOUND})
 	message(FATAL_ERROR "the Mariadb library is not found on the system")
 	return()
 endif()
-message(STATUS "libmariadb include path: ${MARIADB_INCLUDE_DIR}")
+
+if(NOT MARIADB_INCLUDE_DIR)
+	message(STATUS "libmariadb is at the default include path")
+else()
+	message(STATUS "libmariadb include path: ${MARIADB_INCLUDE_DIR}")
+endif()
 
 #######################################
 
 if(NOT MSVC OR MSVC_TOOLSET_VERSION LESS_EQUAL 80)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${CMAKE_BUILD_TYPE})
 endif()
 
 add_executable(matching3 main.cpp)
 set_target_properties(matching3 PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
 target_include_directories(matching3 PRIVATE ${CMAKE_SOURCE_DIR}/../..)
-target_include_directories(matching3 PUBLIC ${SQLite3_INCLUDE_DIRS})
 target_include_directories(matching3 PUBLIC ${MARIADB_INCLUDE_DIRS})
 
-target_link_libraries(matching3 db basic date mariadb)
+target_link_libraries(matching3 date csv_file db basic mariadb)

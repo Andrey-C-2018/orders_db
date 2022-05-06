@@ -10,7 +10,7 @@ public:
 	CQueryModifierException(const int err_code, const Tchar *err_descr);
 	CQueryModifierException(const CQueryModifierException &obj);
 	CQueryModifierException(CQueryModifierException &&obj) = default;
-	~CQueryModifierException();
+	virtual ~CQueryModifierException();
 };
 
 class CQueryModifier {

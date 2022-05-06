@@ -15,7 +15,7 @@ public:
 	CGridException(const int err_code, const Tchar *err_descr);
 	CGridException(const CGridException &obj);
 	CGridException(CGridException &&obj) = default;
-	~CGridException();
+	virtual ~CGridException();
 };
 
 class CGrid : public XWidget, public IReloadable {

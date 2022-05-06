@@ -16,3 +16,8 @@ inline const char *convertIfNecessary(const char *text, std::vector<char> &buffe
        buffer.resize(cp1251_to_utf8_len(text) + 1);
        return cp1251_to_utf8(text, &buffer[0]);
 }
+
+inline const char *convertSimple(const char *value, std::vector<char> &buffer) {
+
+	return value;
+}

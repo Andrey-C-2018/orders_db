@@ -1,5 +1,5 @@
 #pragma once
-#include "tstream.h"
+#include "tfstream.h"
 #include "Exception.h"
 #include "IProperties.h"
 

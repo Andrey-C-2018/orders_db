@@ -10,7 +10,7 @@ public:
 	CPermissionsManagerException(const int err_code, const Tchar *err_descr);
 	CPermissionsManagerException(const CPermissionsManagerException &obj);
 	CPermissionsManagerException(CPermissionsManagerException &&obj) = default;
-	~CPermissionsManagerException();
+	virtual ~CPermissionsManagerException();
 };
 
 struct IDbConnection;
