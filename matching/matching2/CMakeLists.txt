@@ -4,81 +4,23 @@ project(matching2 VERSION 0.4 LANGUAGES CXX)
 if(NOT CMAKE_BUILD_TYPE)
        set(CMAKE_BUILD_TYPE Release)
 endif()
-
-if(MSVC_TOOLSET_VERSION GREATER 80)
-	set(Lib_Path1 ${CMAKE_SOURCE_DIR}/../../0libs/Debug)
-	set(Lib_Path2 ${CMAKE_SOURCE_DIR}/../../0libs/Release)
-else()
-	set(Lib_Path1 ${CMAKE_SOURCE_DIR}/../../0libs/${CMAKE_BUILD_TYPE})
-	set(Lib_Path2 "")
-endif()
 set(CMAKE_SUPPRESS_REGENERATION true)
 
-#######################################
+if(NOT XLIBS_ROOT_FOLDER)
+	set(XLIBS_ROOT_FOLDER ${CMAKE_SOURCE_DIR}/../..)
+endif()
 
-find_library(BASIC_LIBRARY NAMES basic PATHS ${Lib_Path1} ${Lib_Path2})
-if(NOT BASIC_LIBRARY)
-	set(Basic_Lib_Path ${Lib_Path1})
-	if(Lib_Path2)
-		string(APPEND Basic_Lib_Path " or " ${Lib_Path2})
+if(NOT XLIBS_OUTPUT_FOLDER)
+	if(MSVC_TOOLSET_VERSION GREATER 80)
+		set(XLIBS_OUTPUT_FOLDER ${XLIBS_ROOT_FOLDER}/0libs)
+	else()
+		set(XLIBS_OUTPUT_FOLDER ${XLIBS_ROOT_FOLDER}/0libs/${CMAKE_BUILD_TYPE})
 	endif()
-
-	message(FATAL_ERROR "the library basic is not found at ${Basic_Lib_Path}")
-	return()
 endif()
 
-add_library(basic STATIC IMPORTED)
-
-if(MSVC_TOOLSET_VERSION GREATER 80)
-	string(REPLACE "Debug" "$(Configuration)" BASIC_LIBRARY ${BASIC_LIBRARY})
-	string(REPLACE "Release" "$(Configuration)" BASIC_LIBRARY ${BASIC_LIBRARY})
-endif()
-message(STATUS "basic library path: ${BASIC_LIBRARY}")
-set_property(TARGET basic PROPERTY IMPORTED_LOCATION ${BASIC_LIBRARY})
-
-#######################################
-
-find_library(DATE_LIBRARY NAMES date PATHS ${Lib_Path1} ${Lib_Path2})
-if(NOT DATE_LIBRARY)
-	set(Date_Lib_Path ${Lib_Path1})
-	if(Lib_Path2)
-		string(APPEND Date_Lib_Path " or " ${Lib_Path2})
-	endif()
-
-	message(FATAL_ERROR "the library date is not found at ${Date_Lib_Path}")
-	return()
-endif()
-
-add_library(date UNKNOWN IMPORTED)
-
-if(MSVC_TOOLSET_VERSION GREATER 80)
-	string(REPLACE "Debug" "$(Configuration)" DATE_LIBRARY ${DATE_LIBRARY})
-	string(REPLACE "Release" "$(Configuration)" DATE_LIBRARY ${DATE_LIBRARY})
-endif()
-message(STATUS "date library path: ${DATE_LIBRARY}")
-set_property(TARGET date PROPERTY IMPORTED_LOCATION ${DATE_LIBRARY})
-
-#######################################
-
-find_library(DB_LIBRARY NAMES db PATHS ${Lib_Path1} ${Lib_Path2})
-if(NOT DB_LIBRARY)
-	set(Db_Lib_Path ${Lib_Path1})
-	if(Lib_Path2)
-		string(APPEND Db_Lib_Path " or " ${Lib_Path2})
-	endif()
-
-	message(FATAL_ERROR "the library db is not found at ${Db_Lib_Path}")
-	return()
-endif()
-
-add_library(db UNKNOWN IMPORTED)
-
-if(MSVC_TOOLSET_VERSION GREATER 80)
-	string(REPLACE "Debug" "$(Configuration)" DB_LIBRARY ${DB_LIBRARY})
-	string(REPLACE "Release" "$(Configuration)" DB_LIBRARY ${DB_LIBRARY})
-endif()
-message(STATUS "db library path: ${DB_LIBRARY}")
-set_property(TARGET db PROPERTY IMPORTED_LOCATION ${DB_LIBRARY})
+add_subdirectory(${XLIBS_ROOT_FOLDER}/basic basic_build)
+add_subdirectory(${XLIBS_ROOT_FOLDER}/date date_build)
+add_subdirectory(${XLIBS_ROOT_FOLDER}/db db_build)
 
 #######################################
 
@@ -112,7 +54,7 @@ endif()
 
 add_executable(matching2 main.cpp)
 set_target_properties(matching2 PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
-target_include_directories(matching2 PRIVATE ${CMAKE_SOURCE_DIR}/../..)
+target_include_directories(matching2 PRIVATE ${XLIBS_ROOT_FOLDER})
 target_include_directories(matching2 PUBLIC ${SQLite3_INCLUDE_DIRS})
 target_include_directories(matching2 PUBLIC ${MARIADB_INCLUDE_DIRS})
 target_sources(matching2 PRIVATE AdvActDistanceCalc.cpp Currency.cpp CurrencyDiffCalc.cpp DbTable.cpp main.cpp Matching.cpp MatchingResultsTable.cpp OutputWrapper.cpp ParametersManager.cpp StandartDistanceCalcs.cpp)

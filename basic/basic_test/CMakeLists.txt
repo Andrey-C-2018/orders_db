@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.10)
 project(basic_test VERSION 0.6.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 14)

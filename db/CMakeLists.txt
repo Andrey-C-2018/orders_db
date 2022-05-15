@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 
 project(db VERSION 0.3.2 LANGUAGES CXX)
 
@@ -7,12 +7,16 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 set(CMAKE_SUPPRESS_REGENERATION true)
 
-if(MSVC_TOOLSET_VERSION GREATER 80)
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs)
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs)
-else()
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs/${CMAKE_BUILD_TYPE})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs/${CMAKE_BUILD_TYPE})
+if(NOT XLIBS_ROOT_FOLDER)
+	set(XLIBS_ROOT_FOLDER ${CMAKE_SOURCE_DIR}/..)
+endif()
+
+if(NOT XLIBS_OUTPUT_FOLDER)
+	if(MSVC_TOOLSET_VERSION GREATER 80)
+		set(XLIBS_OUTPUT_FOLDER ${XLIBS_ROOT_FOLDER}/0libs)
+	else()
+		set(XLIBS_OUTPUT_FOLDER ${XLIBS_ROOT_FOLDER}/0libs/${CMAKE_BUILD_TYPE})
+	endif()
 endif()
 
 #######################################
@@ -33,7 +37,7 @@ message(STATUS "libmariadb include path: ${MARIADB_INCLUDE_DIR}")
 #######################################
 
 add_library(db STATIC DbException.cpp SQLite/SQLiteCommon.cpp SQLite/SQLiteConnection.cpp SQLite/SQLiteField.cpp SQLite/SQLiteResultSet.cpp SQLite/SQLiteResultSetMetadata.cpp SQLite/SQLiteStatement.cpp)
-target_include_directories(db PRIVATE ${CMAKE_SOURCE_DIR}/..)
+target_include_directories(db PRIVATE ${XLIBS_ROOT_FOLDER})
 target_include_directories(db PUBLIC ${MARIADB_INCLUDE_DIRS})
 
 target_sources(db PRIVATE MySQL/MySQLConnection.cpp MySQL/MySQLConnectionFactory.cpp MySQL/MySQLException.cpp MySQL/MySQLField.cpp MySQL/MySQLResultSet.cpp)

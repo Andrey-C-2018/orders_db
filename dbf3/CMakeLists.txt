@@ -1,21 +1,34 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.20)
 
-project(dbf3 VERSION 0.2 LANGUAGES CXX)
+project(dbf3 VERSION 0.4 LANGUAGES CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
        set(CMAKE_BUILD_TYPE Release)
 endif()
 set(CMAKE_SUPPRESS_REGENERATION true)
 
-if(MSVC_TOOLSET_VERSION GREATER 80)
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs)
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs)
-else()
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs/${CMAKE_BUILD_TYPE})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../0libs/${CMAKE_BUILD_TYPE})
+if(NOT XLIBS_ROOT_FOLDER)
+	set(XLIBS_ROOT_FOLDER ${CMAKE_SOURCE_DIR}/..)
 endif()
 
-add_library(dbf3 STATIC DbfTable.cpp DbfTable.h DbfStructs.h)
-target_include_directories(dbf3 PRIVATE ${CMAKE_SOURCE_DIR}/..)
+if(NOT XLIBS_OUTPUT_FOLDER)
+	if(MSVC_TOOLSET_VERSION GREATER 80)
+		set(XLIBS_OUTPUT_FOLDER ${XLIBS_ROOT_FOLDER}/0libs)
+	else()
+		set(XLIBS_OUTPUT_FOLDER ${XLIBS_ROOT_FOLDER}/0libs/${CMAKE_BUILD_TYPE})
+	endif()
+endif()
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${XLIBS_OUTPUT_FOLDER})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${XLIBS_OUTPUT_FOLDER})
+
+add_library(dbf3 STATIC DbfTable.cpp DbfTable.h DbfStructs.h)
+target_include_directories(dbf3 PRIVATE ${XLIBS_ROOT_FOLDER})
 set_target_properties(dbf3 PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
+
+#######################################
+
+add_subdirectory(dbf3tests)
+
+enable_testing()
+add_test(NAME dbf3_tests COMMAND dbf3tests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dbf3tests)
