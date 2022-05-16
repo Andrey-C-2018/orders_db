@@ -88,13 +88,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X32_PATH%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%ROOT64%\include;%ROOT64%\include\mariadb</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/Debug;%MYSQL_CONNECTOR_X32_PATH%\lib;%VLD_PATH%\lib\Win32</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;db.lib;csv_file.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/Debug;%ROOT64%\lib32</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;date.lib;db.lib;csv_file.lib;libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,13 +104,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X64_PATH%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%ROOT64%\include;%ROOT64%\include\mariadb</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%MYSQL_CONNECTOR_X64_PATH%\lib;%VLD_PATH%\lib\Win64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;db.lib;csv_file.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%ROOT64%\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;date.lib;db.lib;csv_file.lib;libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -122,15 +122,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X32_PATH%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%ROOT64%\include;%ROOT64%\include\mariadb</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/Release;%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;db.lib;csv_file.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/Release;%ROOT64%\lib32</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;date.lib;db.lib;csv_file.lib;libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,15 +142,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%MYSQL_CONNECTOR_X64_PATH%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%ROOT64%\include;%ROOT64%\include\mariadb</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/x64/Release;%MYSQL_CONNECTOR_X64_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;db.lib;csv_file.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/x64/Release;%ROOT64%\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;date.lib;db.lib;csv_file.lib;libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

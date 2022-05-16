@@ -1,7 +1,8 @@
 #pragma once
 #include <basic/Exception.h>
+#include "dll_definitions.h"
 
-class CDbException : public XException{
+class DBLIB_DLL_EXPORT CDbException : public XException{
 public:
 	enum Errors {
 		E_DB_WRONG_CODE = -1, \

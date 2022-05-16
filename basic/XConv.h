@@ -3,8 +3,9 @@
 #include <cmath>
 #include <string>
 #include "chars.h"
+#include "dll_definitions.h"
 
-class XConv {
+class BASIC_DLL_EXPORT XConv {
 	template <typename Tchar_, typename TInt> static \
 		TInt ToInt(const Tchar_ *str, int &error, \
 					const TInt max_value) noexcept;

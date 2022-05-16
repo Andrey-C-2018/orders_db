@@ -2,7 +2,7 @@
 #include "../DbException.h"
 #include <mysql.h>
 
-class CMySQLException : public CDbException {
+class DBLIB_DLL_EXPORT CMySQLException : public CDbException {
 
 	int MapMySQLErrorCodeToCommonCode(const int mysql_code) const;
 

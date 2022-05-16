@@ -1,13 +1,12 @@
 #include <basic/tstream.h>
+#include <basic/locale_init.h>
 #include <csv_file/CsvTable.h>
 
 int main() {
-	const char locale_str[] = "uk_UA.UTF-8";
-	
-	setlocale(LC_ALL, locale_str);
+	setLocaleToCurrOS_Locale();
 
 	try {
-		CCsvTable<std::wstring> t("1.csv", locale_str, L',', true);
+		CCsvTable<Tstring> t("1.csv", getOS_Locale(), _T(','), true, true);
 
 		size_t rec_count = t.getRecordsCount();
 		size_t cols_count = t.getColumnsCount();
@@ -15,8 +14,8 @@ int main() {
 			auto rec = t.getRecord(i);
 
 			for (size_t j = 0; j < cols_count - 1; ++j)
-				std::wcout << rec->getColValueAsCharArray(j) << L' ';
-			std::wcout << L"<--"<< std::endl;
+				Tcout << rec->getColValueAsCharArray(j) << _T(' ');
+			Tcout << _T("<--") << std::endl;
 		}
 	}
 	catch (XException &e) {
@@ -25,6 +24,6 @@ int main() {
 		return 1;
 	}
 
-	std::cin.get();
+	Tcin.get();
 	return 0;
 }

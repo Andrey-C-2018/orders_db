@@ -3,6 +3,11 @@
 #include "Exception.h"
 #include "IProperties.h"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+
 class BASIC_DLL_EXPORT CPropertiesFileException : public XException {
 	Tstring prop_name;
 public:
@@ -45,3 +50,7 @@ public:
 
 	virtual ~CPropertiesFile();
 };
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif

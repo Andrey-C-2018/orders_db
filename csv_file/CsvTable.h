@@ -8,6 +8,7 @@
 #include <basic/chars.h>
 #include <basic/XConv.h>
 #include "ITable.h"
+#include "dll_definitions.h"
 
 template <typename Tstring_> \
 class CCsvRecord : public IRecord<typename Tstring_::value_type>{
@@ -42,7 +43,7 @@ public:
 	virtual ~CCsvRecord();
 };
 
-class CCsvTableException : public XException{
+class CSVTABLE_DLL_EXPORT CCsvTableException : public XException{
 public:
 	enum Errors{
 		E_FILE_NOT_FOUND = 1, \

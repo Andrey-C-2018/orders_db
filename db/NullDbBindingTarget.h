@@ -1,7 +1,8 @@
 #pragma once
 #include "IDbBindingTarget.h"
+#include "dll_definitions.h"
 
-class CNullDbBindingTarget : public IDbBindingTarget {
+class DBLIB_DLL_EXPORT CNullDbBindingTarget : public IDbBindingTarget {
 public:
 	CNullDbBindingTarget() { }
 

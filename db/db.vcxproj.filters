@@ -161,5 +161,8 @@
     <ClInclude Include="MySQL\MySQLStatementException.h">
       <Filter>MySQL</Filter>
     </ClInclude>
+    <ClInclude Include="dll_definitions.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@
 #include "../IDbConnection.h"
 #include "SQLiteCommon.h"
 
-class SQLiteConnectionException : public SQLiteException {
+class DBLIB_DLL_EXPORT SQLiteConnectionException : public SQLiteException {
 public:
 	enum {
 		E_WRONG_QUERY = 1, \
@@ -19,7 +19,7 @@ public:
 	virtual ~SQLiteConnectionException();
 };
 
-class SQLiteConnection : public IDbConnection {
+class DBLIB_DLL_EXPORT SQLiteConnection : public IDbConnection {
 	std::shared_ptr<sqlite3> db;
 
 public:

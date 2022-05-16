@@ -3,7 +3,7 @@
 #include "../IDbResultSetMetadata.h"
 #include "MySQLException.h"
 
-class CMySQLMetadataException : public CMySQLException {
+class DBLIB_DLL_EXPORT CMySQLMetadataException : public CMySQLException {
 public:
 	enum Errors {
 		E_STMT_RELEASED = 1

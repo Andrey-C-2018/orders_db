@@ -4,7 +4,7 @@
 #include "../IDbResultSet.h"
 #include "MySQLException.h"
 
-class CMySQLResultSetException : public CMySQLException {
+class DBLIB_DLL_EXPORT CMySQLResultSetException : public CMySQLException {
 public:
 	enum Errors {
 		E_TRUNC = 1

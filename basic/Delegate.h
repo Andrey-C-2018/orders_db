@@ -1,8 +1,9 @@
 #pragma once
 #include <assert.h>
 #include <memory>
+#include "dll_definitions.h"
 
-struct IArguments { 
+struct BASIC_DLL_EXPORT IArguments {
 	virtual ~IArguments() { }
 };
 
@@ -113,7 +114,7 @@ public:
 	virtual ~CContainerSimple() { }
 };
 
-class CDelegate{
+class BASIC_DLL_EXPORT CDelegate{
 	std::shared_ptr<IContainer> container;
 public:
 	CDelegate() noexcept : container() {}

@@ -19,7 +19,7 @@ protected:
 				
 			try {
 				conn = std::make_shared<CMySQLConnection>();
-				conn->Connect("127.0.0.1", 3306, "orders_user", "123", "");
+				conn->Connect("127.0.0.1", 3306, "root", "12345", "");
 			}
 			catch (XException &e) {
 

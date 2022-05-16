@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
+#include "dll_definitions.h"
 
 template <typename Tchar_> \
-struct ImmutableString final {
+struct BASIC_DLL_EXPORT ImmutableString final {
 	const Tchar_ *str;
 	size_t size;
 

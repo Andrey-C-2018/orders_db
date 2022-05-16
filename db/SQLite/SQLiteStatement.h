@@ -2,7 +2,7 @@
 #include "SQLiteCommon.h"
 #include "../IDbStatement.h"
 
-class SQLiteStatementException : public SQLiteException {
+class DBLIB_DLL_EXPORT SQLiteStatementException : public SQLiteException {
 public:
 	enum {
 		E_EXEC = 1

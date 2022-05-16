@@ -4,7 +4,7 @@
 struct IProperties;
 typedef std::shared_ptr<CMySQLConnection> CMySQLConnectionPtr;
 
-class CMySQLConnectionFactory {
+class DBLIB_DLL_EXPORT CMySQLConnectionFactory {
 	struct Properties final {
 		std::string server, user, pwd, database;
 		int port;

@@ -2,7 +2,7 @@
 #include "../IDbConnection.h"
 #include "MySQLException.h"
 
-class CMySQLConnectionException : public CMySQLException {
+class DBLIB_DLL_EXPORT CMySQLConnectionException : public CMySQLException {
 public:
 	enum {
 		E_INIT = 1, \
@@ -21,7 +21,7 @@ public:
 	virtual ~CMySQLConnectionException();
 };
 
-class CMySQLConnection : public IDbConnection {
+class DBLIB_DLL_EXPORT CMySQLConnection : public IDbConnection {
 	enum {
 		DEF_CONN_TIMEOUT = 5
 	};

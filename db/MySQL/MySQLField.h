@@ -5,7 +5,7 @@
 #include "../IDbResultSet.h"
 #include "MySQLException.h"
 
-class CMySQLFieldException : public CMySQLException {
+class DBLIB_DLL_EXPORT CMySQLFieldException : public CMySQLException {
 public:
 	enum Errors {
 		E_STMT_RELEASED = 1

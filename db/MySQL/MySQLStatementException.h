@@ -1,7 +1,7 @@
 #pragma once
 #include "MySQLException.h"
 
-class CMySQLStatementException : public CMySQLException {
+class DBLIB_DLL_EXPORT CMySQLStatementException : public CMySQLException {
 public:
 	enum {
 		E_EXEC = 1, \

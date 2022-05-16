@@ -1,8 +1,9 @@
 #pragma once
 #include <assert.h>
 #include <basic/chars.h>
+#include "dll_definitions.h"
 
-class CDate {
+class DATELIB_DLL_EXPORT CDate {
 	unsigned day;
 	unsigned month;
 	unsigned year;
@@ -239,4 +240,3 @@ void CDate::toStringSQL(Tchar *buffer) const noexcept {
 
 	buffer[10] = 0;
 }
-

@@ -33,7 +33,7 @@ struct Statement final {
 	}
 };
 
-class SQLiteException : public CDbException {
+class DBLIB_DLL_EXPORT SQLiteException : public CDbException {
 
 	int MapSQLiteErrorCodeToCommonCode(const int err_code) const;
 public:

@@ -4,7 +4,6 @@
 #include <string.h>
 #include <cwctype>
 #include <cctype>
-#include "dll_definitions.h"
 
 #ifdef UNICODE
 	typedef wchar_t Tchar;

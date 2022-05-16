@@ -4,7 +4,7 @@
 #include "../IDbResultSet.h"
 #include "SQLiteCommon.h"
 
-class SQLiteResultSetException : public SQLiteException {
+class DBLIB_DLL_EXPORT SQLiteResultSetException : public SQLiteException {
 public:
 	SQLiteResultSetException(const int err_code, const Tchar *err_descr);
 	SQLiteResultSetException(sqlite3 *db);

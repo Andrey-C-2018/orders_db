@@ -4,7 +4,7 @@
 #include "../IDbBindingTarget.h"
 #include "SQLiteResultSet.h"
 
-class SQLiteFieldException : public SQLiteException {
+class DBLIB_DLL_EXPORT SQLiteFieldException : public SQLiteException {
 public:
 	SQLiteFieldException(const int err_code, const Tchar *err_descr);
 	SQLiteFieldException(sqlite3 *db);
