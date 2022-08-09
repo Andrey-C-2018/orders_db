@@ -4,6 +4,7 @@
 #include <db_ext/DbTable.h>
 #include <grid/Grid.h>
 #include "Uploader.h"
+#include "IUploadProgress.h"
 
 CUploadException::CUploadException(const int err_code, \
 									const Tchar *err_descr) : \
@@ -17,7 +18,7 @@ CUploadException::~CUploadException() { }
 //*****************************************************
 
 Uploader::Uploader(const size_t hidden_count_) : \
-					hidden_count(hidden_count_) { }
+					hidden_count(hidden_count_), cancel_upload(false) { }
 
 void Uploader::init(std::shared_ptr<CDbTable> db_table_, \
 					IProperties *props) {
@@ -29,7 +30,8 @@ void Uploader::init(std::shared_ptr<CDbTable> db_table_, \
 	
 	const Tchar *value = props->getStringProperty(_T("output_file"), buffer_w);
 	if (!value || (value && value[0] == _T('\0')))
-		throw XException(0, _T("Параметр 'output_file' відсутній у config.ini"));
+		throw CUploadException(CUploadException::E_CONFIG, \
+								_T("Параметр 'output_file' відсутній у config.ini"));
 
 	path.resize(Tstrlen(value));
 
@@ -40,7 +42,8 @@ void Uploader::init(std::shared_ptr<CDbTable> db_table_, \
 
 	const Tchar *p_excel_path = props->getStringProperty(_T("table_processor_path"), buffer_w);
 	if (!p_excel_path || (p_excel_path && p_excel_path[0] == _T('\0')))
-		throw XException(0, _T("Параметр 'table_processor_path' відсутній у config.ini"));
+		throw CUploadException(CUploadException::E_CONFIG, \
+								_T("Параметр 'table_processor_path' відсутній у config.ini"));
 
 	excel_path.resize(Tstrlen(p_excel_path));
 
@@ -52,6 +55,7 @@ void Uploader::init(std::shared_ptr<CDbTable> db_table_, \
 
 void Uploader::open() {
 
+	cancel_upload = false;
 	out.open(path.c_str(), std::ios::out | std::ios::trunc);
 	if (!out.is_open()) {
 		CUploadException e(CUploadException::E_FILE_OPEN, \
@@ -61,22 +65,30 @@ void Uploader::open() {
 	}
 }
 
-void Uploader::upload(const CGrid *grid) {
+size_t Uploader::getRecordsCount() const {
+
+	assert(db_table);
+	return db_table->GetRecordsCount();
+}
+
+void Uploader::upload(const CGrid *grid, std::shared_ptr<IUploadProgress> progress) noexcept {
 
 	assert(db_table);
 	assert(grid);
-	open();
+	assert(out.is_open());
+	assert(progress);
 
 	try {
 		const size_t fields_count = db_table->GetFieldsCount() - hidden_count;
 		const size_t records_count = db_table->GetRecordsCount();
 		auto rs = db_table->getResultSet();
 		const auto &meta_info = db_table->getQuery().getMetaInfo();
-
-		addHeader();
+		
+		except_in_thread.reset();
+		if (!cancel_upload) addHeader();
 
 		XString<char> buffer;
-		if (fields_count) {
+		if (!cancel_upload && fields_count) {
 			out << "   <tr align=center>";
 			for (size_t i = 0; i < fields_count; ++i) {
 				out << " <td>";
@@ -87,7 +99,7 @@ void Uploader::upload(const CGrid *grid) {
 			out << " </tr>" << std::endl;
 		}
 
-		for (size_t i = 0; i < records_count; ++i) {
+		for (size_t i = 0; !cancel_upload && i < records_count; ++i) {
 			out << "   <tr>";
 			rs->gotoRecord(i);
 			for (size_t j = 0; j < fields_count; ++j) {
@@ -96,25 +108,41 @@ void Uploader::upload(const CGrid *grid) {
 				out << " <td>" << (!p_cell.isNull() ? p_cell.str : "") << "</td>";
 			}
 			out << " </tr>" << std::endl;
+			progress->step();
 		}
 
 		out << "  </table>" << std::endl;
 		out << " </body>" << std::endl;
 		out << "</html>" << std::endl;
 	}
-	catch (...) {
-		out.close();
-		throw;
+	catch (XException &e) {
+		cancel_upload = true;
+		except_in_thread = std::make_shared<XException>(e.GetErrorCode(), e.what());
 	}
 
 	if(out.is_open()) out.close();
 }
 
-void Uploader::execExcel() {
+void Uploader::execExcel(std::shared_ptr<IUploadProgress> progress) noexcept {
 
 	std::string cmd_line = "1 ";
 	cmd_line += path.c_str();
-	exec(excel_path.c_str(), cmd_line.c_str(), "C:\\", false);
+	if (!cancel_upload) {
+		try {
+			exec(excel_path.c_str(), cmd_line.c_str(), "C:\\", false);
+		}
+		catch (XException &e) {
+			cancel_upload = true;
+			except_in_thread = std::make_shared<XException>(e.GetErrorCode(), e.what());
+		}
+	}
+
+	progress->completed();
+}
+
+std::shared_ptr<const XException> Uploader::getErrorIfPresent() const noexcept {
+
+	return except_in_thread;
 }
 
 Uploader::~Uploader() { }

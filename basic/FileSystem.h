@@ -1,11 +1,12 @@
 #pragma once
 #include <string>
 #include <assert.h>
+#include "dll_definitions.h"
 
-bool checkFileExists(const char *path);
+bool BASIC_DLL_EXPORT checkFileExists(const char *path);
 
-bool checkFileExists(const wchar_t *path);
+bool BASIC_DLL_EXPORT checkFileExists(const wchar_t *path);
 
-void getModuleFilePath(std::string &path);
+void BASIC_DLL_EXPORT getModuleFilePath(std::string &path);
 
-void getModuleDirectoryPath(std::string &path);
+void BASIC_DLL_EXPORT getModuleDirectoryPath(std::string &path);

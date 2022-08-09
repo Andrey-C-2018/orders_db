@@ -6,9 +6,10 @@
 #include <xwindows_ex/XTabStopPanel.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
+#include <xwindows/XProgressBar.h>
 #include <forms_common/FlexiblePropepties.h>
 #include "Inserter.h"
-#include "Uploader.h"
+#include "UploadDialog.h"
 
 struct IDbConnection;
 class CDoubleBndTarget;
@@ -69,7 +70,8 @@ class CSearchForm : public XTabStopPanel {
 	XButton *btn_apply_filter, *btn_add, *btn_remove, *btn_rev;
 	XButton *btn_reset, *btn_sort, *btn_upload;
 	CInserter inserter;
-	Uploader uploader;
+	UploadDialog uploader;
+	XProgressBar *progress;
 
 	std::shared_ptr<CDbTable> createDbTable();
 	void createStatisticsStatements();

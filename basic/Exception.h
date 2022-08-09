@@ -4,15 +4,7 @@
 
 class BASIC_DLL_EXPORT XException{
 	int err_code;
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
 	Tstring err_msg;
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 public:
 	XException(const int err_code, const char *err_descr);

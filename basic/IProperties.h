@@ -1,7 +1,7 @@
 #pragma once
 #include "tstring.h"
 
-struct BASIC_DLL_EXPORT IProperties {
+struct IProperties {
 
 	virtual const Tchar *getStringProperty(const Tchar *name, Tstring &buffer) const = 0;
 	virtual const Tchar *getStringPropertyThreadUnsafe(const Tchar *name) = 0;

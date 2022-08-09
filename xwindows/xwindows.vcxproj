@@ -157,6 +157,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="platform_specific.cpp" />
+    <ClCompile Include="XProgressBar.cpp" />
     <ClCompile Include="XApp.cpp" />
     <ClCompile Include="XButton.cpp" />
     <ClCompile Include="XComboBox.cpp" />
@@ -172,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="platform_specific.h" />
+    <ClInclude Include="XProgressBar.h" />
     <ClInclude Include="XApp.h" />
     <ClInclude Include="XButton.h" />
     <ClInclude Include="XComboBox.h" />

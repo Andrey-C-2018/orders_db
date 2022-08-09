@@ -161,7 +161,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
 			label, X, Y, width, height);
 	displayWidgets();
-	uploader.init(db_table, &props);
+	uploader.init(this->GetInternalHandle(), db_table, &props);
 	payments_evt_handler->calcConstraintsValues();
 
 	adjustUIDependentCellWidgets();
@@ -1054,7 +1054,6 @@ void CSearchForm::OnUploadButtonClick(XCommandEvent *eve) {
 		ErrorBox(e.what());
 		return;
 	}
-	uploader.execExcel();
 }
 
 void CSearchForm::OnSize(XSizeEvent *eve) {

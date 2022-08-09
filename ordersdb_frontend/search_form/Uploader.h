@@ -1,13 +1,16 @@
 #pragma once
 #include <memory>
 #include <fstream>
+#include <basic/Exception.h>
 #include <basic/XString.h>
 
 class CUploadException : public XException {
 public:
 	enum {
-		E_FILE_OPEN = 1
+		E_FILE_OPEN = 1,
+		E_CONFIG = 2
 	};
+
 	CUploadException(const int err_code, const Tchar *err_descr);
 	CUploadException(const CUploadException &obj);
 	CUploadException(CUploadException &&obj) = default;
@@ -15,6 +18,7 @@ public:
 };
 
 struct IProperties;
+struct IUploadProgress;
 class CDbTable;
 class CGrid;
 
@@ -23,8 +27,10 @@ class Uploader {
 	std::shared_ptr<CDbTable> db_table;
 	const size_t hidden_count;
 	XString<char> path, excel_path;
+
+	volatile bool cancel_upload;
+	std::shared_ptr<XException> except_in_thread;
 	
-	void open();
 	inline void addHeader();
 public:
 	Uploader(const size_t hidden_count_);
@@ -36,8 +42,13 @@ public:
 
 	void init(std::shared_ptr<CDbTable> db_table_, \
 				IProperties *props);
-	void upload(const CGrid *grid);
-	void execExcel();
+	void open();
+	size_t getRecordsCount() const;
+
+	void upload(const CGrid *grid, std::shared_ptr<IUploadProgress> progress) noexcept;
+	void execExcel(std::shared_ptr<IUploadProgress> progress) noexcept;
+	inline void cancelUpload();
+	std::shared_ptr<const XException> getErrorIfPresent() const noexcept;
 
 	virtual ~Uploader();
 };
@@ -55,4 +66,9 @@ void Uploader::addHeader() {
 	out << " </head>" << std::endl;
 	out << " <body>" << std::endl;
 	out << "  <table border=1>" << std::endl;
+}
+
+void Uploader::cancelUpload() {
+
+	cancel_upload = true;
 }

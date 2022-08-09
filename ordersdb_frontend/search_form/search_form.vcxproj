@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="DoubleBndTarget.h" />
     <ClInclude Include="Inserter.h" />
+    <ClInclude Include="IUploadProgress.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
     <ClInclude Include="OrderingComboBox.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SearchForm.h" />
     <ClInclude Include="SearchFormGridEvtHandler.h" />
+    <ClInclude Include="UploadDialog.h" />
     <ClInclude Include="Uploader.h" />
     <ClInclude Include="ZoneFilter.h" />
   </ItemGroup>
@@ -183,6 +185,7 @@
     <ClCompile Include="PaymentsInsertHelper.cpp" />
     <ClCompile Include="SearchForm.cpp" />
     <ClCompile Include="SearchFormGridEvtHandler.cpp" />
+    <ClCompile Include="UploadDialog.cpp" />
     <ClCompile Include="Uploader.cpp" />
     <ClCompile Include="ZoneFilter.cpp" />
   </ItemGroup>
