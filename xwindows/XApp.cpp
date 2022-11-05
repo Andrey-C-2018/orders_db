@@ -1,7 +1,6 @@
 #include "XApp.h"
 #include "platform_specific.h"
 #include "XEventHandler.h"
-#include <basic/Exception.h>
 
 XApp *XApp::instance = nullptr;
 
@@ -26,7 +25,6 @@ int XApp::LaunchMessageLoop() {
 
 void XApp::Destroy(){
 
-	this->~XApp();
 	if(instance) delete instance;
 }
 
@@ -57,7 +55,7 @@ int _plMAIN_FN_MODIFIERS _plMainEntryPoint(_plMainFnParams){
 		ret_value = RESULT_FAIL;
 	}
 
-	app->Destroy();
+	XApp::Destroy();
 	_plPlatformSpecificCleanup();
 
 	XEventHandler::DisconnectAll();

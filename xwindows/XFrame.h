@@ -3,6 +3,7 @@
 #include <basic/Exception.h>
 
 class XFrame : public XWindow{
+
 	class CRegisterPredicate {
 		XFrame &frame;
 		const Tchar *class_name;
@@ -42,5 +43,6 @@ public:
 	void Create(const Tchar *class_name, const int flags, \
 					 const Tchar *label, const int x, const int y,\
 					 const int width, const int height);
+
 	virtual ~XFrame();
 };

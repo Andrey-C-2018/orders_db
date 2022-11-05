@@ -1,20 +1,20 @@
-#include <assert.h>
+#include <cassert>
 #include "XGC.h"
 
 XGC::XGC() noexcept : left_bound(0), upper_bound(0){
 
-_plUnsetHWND(hwnd);
-_plUnsetHDC(dc);
+	_plUnsetHWND(hwnd);
+	_plUnsetHDC(dc);
 }
 
 XGC::XGC(XGC &&obj) noexcept : left_bound(obj.left_bound), \
 								upper_bound(obj.upper_bound), \
 								hwnd(obj.hwnd), dc(obj.dc){
 
-obj.left_bound = 0;
-obj.upper_bound = 0;
-_plUnsetHWND(obj.hwnd);
-_plUnsetHDC(obj.dc);
+	obj.left_bound = 0;
+	obj.upper_bound = 0;
+	_plUnsetHWND(obj.hwnd);
+	_plUnsetHDC(obj.dc);
 }
 
 XGC &XGC::operator=(XGC &&obj) noexcept {
@@ -33,13 +33,13 @@ XGC &XGC::operator=(XGC &&obj) noexcept {
 
 void XGC::DisplayText(int X, int Y, const Tchar *text, const size_t len) noexcept {
 
-_plTextOut(dc, X, Y, text, len);
+	_plTextOut(dc, X, Y, text, len);
 }
 
 void XGC::DisplayText(int X, int Y, int options, XRect &rect,\
 				  const Tchar *text, const size_t len) noexcept {
 
-_plTextOut(dc, X, Y, options, rect, text, len);
+	_plTextOut(dc, X, Y, options, rect, text, len);
 }
 
 void XGC::DisplayTextWithBounds(int X, int Y, int options, const XRect &rect, \
@@ -56,33 +56,33 @@ void XGC::DisplayTextWithBounds(int X, int Y, int options, const XRect &rect, \
 
 void XGC::Rectangle(int left, int top, int right, int bottom) noexcept {
 
-_plRectangle(dc, left, top, right, bottom);
+	_plRectangle(dc, left, top, right, bottom);
 }
 
 void XGC::RectangleWithBounds(int left, int top, int right, int bottom) noexcept {
 	
-_plRectangle(dc, LimitToLowerBound(left, left_bound), \
-					LimitToLowerBound(top, upper_bound), \
-					LimitToLowerBound(right, left_bound), \
-					LimitToLowerBound(bottom, upper_bound));
+	_plRectangle(dc, LimitToLowerBound(left, left_bound), \
+						LimitToLowerBound(top, upper_bound), \
+						LimitToLowerBound(right, left_bound), \
+						LimitToLowerBound(bottom, upper_bound));
 }
 
 void XGC::Polygon(const XPoint *points, const size_t count) noexcept {
 
-_plPolygon(dc, points, count);
+	_plPolygon(dc, points, count);
 }
 
 int XGC::SetBackgroundFillMode(const int mode) noexcept {
 
-return _plSetBackgroundFillMode(dc, mode);
+	return _plSetBackgroundFillMode(dc, mode);
 }
 
 XColor XGC::SetBackgroundColor(const XColor &color) noexcept {
 
-return XColor(_plSetBackgroundColor(dc, color.GetInternalHandle()));
+	return XColor(_plSetBackgroundColor(dc, color.GetInternalHandle()));
 }
 
-XGC::~XGC(){ }
+XGC::~XGC() { }
 
 //*************************************************************
 
@@ -118,16 +118,16 @@ XPaintEventGC::~XPaintEventGC() {
 
 XStandAloneGC::XStandAloneGC(XWindow *wnd) noexcept {
 
-assert(wnd);
-hwnd = wnd->GetInternalHandle();
-dc = _plGetStandAloneHDC(hwnd);
+	assert(wnd);
+	hwnd = wnd->GetInternalHandle();
+	dc = _plGetStandAloneHDC(hwnd);
 }
 
 XStandAloneGC::~XStandAloneGC(){
 
-if (_plIsHWNDSet(hwnd) && _plIsHDCSet(dc)) {
-	_plReleaseStandAloneHDC(hwnd, dc);
-	_plUnsetHWND(hwnd);
-	_plUnsetHDC(dc);
-}
+	if (_plIsHWNDSet(hwnd) && _plIsHDCSet(dc)) {
+		_plReleaseStandAloneHDC(hwnd, dc);
+		_plUnsetHWND(hwnd);
+		_plUnsetHDC(dc);
+	}
 }

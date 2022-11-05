@@ -18,7 +18,7 @@ public:
 };
 
 struct IProperties;
-struct IUploadProgress;
+struct IUploadNotifier;
 class CDbTable;
 class CGrid;
 
@@ -29,7 +29,6 @@ class Uploader {
 	XString<char> path, excel_path;
 
 	volatile bool cancel_upload;
-	std::shared_ptr<XException> except_in_thread;
 	
 	inline void addHeader();
 public:
@@ -45,10 +44,9 @@ public:
 	void open();
 	size_t getRecordsCount() const;
 
-	void upload(const CGrid *grid, std::shared_ptr<IUploadProgress> progress) noexcept;
-	void execExcel(std::shared_ptr<IUploadProgress> progress) noexcept;
+	void upload(const CGrid *grid, std::shared_ptr<IUploadNotifier> progress);
+	void execExcel(std::shared_ptr<IUploadNotifier> progress);
 	inline void cancelUpload();
-	std::shared_ptr<const XException> getErrorIfPresent() const noexcept;
 
 	virtual ~Uploader();
 };

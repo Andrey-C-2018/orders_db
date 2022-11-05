@@ -10,10 +10,8 @@
 #include <basic/Path.h>
 #include <date/Date.h>
 #include <db/SQLite/SQLiteConnection.h>
-#include <db/IDbConnection.h>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
-#include <db/DbException.h>
 #include "DbfTableAdapter.h"
 #include "Convert.h"
 

@@ -8,7 +8,7 @@ XFrame::XFrame(const Tchar *class_name, const int flags, \
 					 const Tchar *label, const int x, const int y,\
 					 const int width, const int height){
 
-Create(class_name, flags, label, x, y, width, height);
+	Create(class_name, flags, label, x, y, width, height);
 }
 
 void XFrame::Create(const Tchar *class_name, const int flags, \

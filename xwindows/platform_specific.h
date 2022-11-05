@@ -87,14 +87,14 @@ struct _plEventInfo{
 class CGlobalParams{
 	static std::shared_ptr<CGlobalParams> instance;
 	HINSTANCE hInst;
-	CGlobalParams() noexcept { }
+	CGlobalParams() noexcept : hInst(nullptr) { }
 public:
 	inline static std::shared_ptr<CGlobalParams> GetInstance(){
 
 		if(!instance) instance.reset(new CGlobalParams());
 		return instance;
 	}
-	inline void SetHInstance(HINSTANCE hInst){ this->hInst = hInst; }
+	inline void SetHInstance(HINSTANCE hInst_){ this->hInst = hInst_; }
 	inline HINSTANCE GetHInstance() const{ return this->hInst; }
 
 	inline static void Destroy() {

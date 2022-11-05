@@ -19,15 +19,15 @@ CParametersManager::CParametersManager(CPropertiesFile *props) : \
 	auto str_date = props->getStringProperty(_T("initial_acts_date"), buffer);
 	if (!str_date)
 		throw XException(0, \
-			_T("Параметр початкової дати 'initial_acts_date' відсутній у config.ini"));
+			_T("РџР°СЂР°РјРµС‚СЂ РїРѕС‡Р°С‚РєРѕРІРѕС— РґР°С‚Рё 'initial_acts_date' РІС–РґСЃСѓС‚РЅС–Р№ Сѓ config.ini"));
 
 	if (!initial_acts_date.setDateGerman(str_date)) {
-		XException e(0, _T("Невірний формат початкової дати: "));
+		XException e(0, _T("РќРµРІС–СЂРЅРёР№ С„РѕСЂРјР°С‚ РїРѕС‡Р°С‚РєРѕРІРѕС— РґР°С‚Рё: "));
 		e << str_date;
 		throw e;
 	}
 	if (initial_acts_date > CDate::now()) {
-		XException e(0, _T("Початкова дата в майбутньому: "));
+		XException e(0, _T("РџРѕС‡Р°С‚РєРѕРІР° РґР°С‚Р° РІ РјР°Р№Р±СѓС‚РЅСЊРѕРјСѓ: "));
 		e << str_date;
 		throw e;
 	}

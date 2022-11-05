@@ -2,7 +2,7 @@
 
 XLabel::XLabel() : XWidget() {
 
-CheckAndInitWindowClassName(_T("STATIC"));
+	CheckAndInitWindowClassName(_T("STATIC"));
 }
 
 XLabel::XLabel(XWindow *parent, const int flags, \
@@ -10,8 +10,8 @@ XLabel::XLabel(XWindow *parent, const int flags, \
 				const int x, const int y, \
 				const int width, const int height) {
 
-CheckAndInitWindowClassName(_T("STATIC"));
-Create(parent, flags, label, x, y, width, height);
+	CheckAndInitWindowClassName(_T("STATIC"));
+	Create(parent, flags, label, x, y, width, height);
 }
 
-XLabel::~XLabel(){ }
+XLabel::~XLabel() { }

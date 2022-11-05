@@ -10,11 +10,11 @@ const CGrid *grid_to_use = nullptr;
 
 //*****************************************************
 
-class UploadProgress : public IUploadProgress {
+class UploadNotifier : public IUploadNotifier {
 	HWND hwnd_dialog;
 
 public:
-	UploadProgress(HWND hwnd_dialog_) : hwnd_dialog(hwnd_dialog_) { }
+	UploadNotifier(HWND hwnd_dialog_) : hwnd_dialog(hwnd_dialog_) { }
 
 	void step() override {
 
@@ -26,7 +26,7 @@ public:
 		SendMessage(hwnd_dialog, WM_COMMAND, ID_UPLOADCOMPLETED, 0);
 	}
 
-	virtual ~UploadProgress() { }
+	virtual ~UploadNotifier() { }
 };
 
 //*****************************************************
@@ -70,11 +70,18 @@ LRESULT CALLBACK UploadDialog::DlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 			SendMessage(hwnd_progress, PBM_SETSTEP, (WPARAM)1, 0);
 
 			if (dialog->t.joinable()) dialog->t.join();
-			dialog->t = std::thread([hwnd] {
+			dialog->t = std::thread([hwnd, wparam] {
 
-				auto progress = std::make_shared<UploadProgress>(hwnd);
-				dialog->uploader.upload(grid_to_use, progress);
-				dialog->uploader.execExcel(progress);
+				auto progress = std::make_shared<UploadNotifier>(hwnd);
+				try {
+					dialog->uploader.upload(grid_to_use, progress);
+					dialog->uploader.execExcel(progress);
+				}
+				catch (XException &e) {
+
+					ErrorBox(e.what());
+					::EndDialog(hwnd, wparam);
+				}
 			});
 			return TRUE;
 
@@ -82,14 +89,8 @@ LRESULT CALLBACK UploadDialog::DlgProc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 			if (LOWORD(wparam) == IDC_CANCELBUTTON)
 				dialog->uploader.cancelUpload();
 
-			if (wparam == ID_UPLOADCOMPLETED || LOWORD(wparam) == IDC_CANCELBUTTON) {
-				
+			if (wparam == ID_UPLOADCOMPLETED || LOWORD(wparam) == IDC_CANCELBUTTON) 
 				::EndDialog(hwnd, wparam);
-
-				auto except_in_thread = dialog->uploader.getErrorIfPresent();
-				if (except_in_thread)
-					ErrorBox(except_in_thread->what());
-			}
 			return TRUE;
 	}
 	return FALSE;

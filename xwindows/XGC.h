@@ -5,15 +5,15 @@ template <typename TObject> class XGC_Object{
 	bool initialized;
 	TObject object;
 protected:
-	inline void Initialize(_plGCObject object) noexcept{
+	inline void Initialize(_plGCObject object_) noexcept{
 
-		this->object = (TObject)object; 
+		this->object = (TObject)object_;
 		initialized = true;
 	}
 public:
 	XGC_Object() noexcept : initialized(false){ }
 
-	inline XGC_Object(_plGCObject object) noexcept : initialized(false){
+	inline explicit XGC_Object(_plGCObject object) noexcept : initialized(false){
 
 		Initialize(object);
 	}
@@ -32,19 +32,19 @@ public:
 	}
 
 	inline TObject GetInternalHandle() const{ return object; }
-	inline bool IsNull() const{ return initialized == false; } 
+	inline bool IsNull() const{ return !initialized; }
 
 	inline void Reset() {
 
 		initialized = false;
 	}
 
-	inline void Destroy(){
+	virtual void Destroy(){
 
 		if(initialized) _plReleaseObject(object);
 	}
 
-	virtual ~XGC_Object(){ }
+	virtual ~XGC_Object() { }
 };
 
 class XPen : public XGC_Object<_plHPEN>{
@@ -81,7 +81,7 @@ public:
 		Initialize(_plCreateSpecialPen(special_pen));
 	}
 
-	void Destroy() noexcept {
+	void Destroy() noexcept override {
 
 		if(!is_special){
 			XGC_Object<_plHPEN>::Destroy();
@@ -90,8 +90,8 @@ public:
 	}
 
 	virtual ~XPen(){
-	
-		Destroy();
+
+		XPen::Destroy();
 	}
 };
 
@@ -124,12 +124,12 @@ public:
 		Initialize(_plCreateBrush(red, green, blue));
 	}
 
-	XBrush(const int special_brush) noexcept : is_special(true){
+	explicit XBrush(const int special_brush) noexcept : is_special(true){
 	
 		Initialize(_plCreateSpecialBrush(special_brush));
 	}
 
-	void Destroy() noexcept {
+	void Destroy() noexcept override {
 
 		if(!is_special){
 			XGC_Object<_plHBRUSH>::Destroy();
@@ -138,8 +138,8 @@ public:
 	}
 
 	virtual ~XBrush(){
-	
-		Destroy();
+
+		XBrush::Destroy();
 	}
 };
 
@@ -171,7 +171,7 @@ public:
 		Initialize(_plCreateFont(size, rotation_angle, \
 					symbols_angle, properties, charset, lpszFace));
 	}
-	void Destroy() noexcept {
+	void Destroy() noexcept override {
 
 		if(!is_special){
 			XGC_Object<_plHFONT>::Destroy();
@@ -179,8 +179,8 @@ public:
 		}
 	}
 	virtual ~XFont(){
-	
-		Destroy();
+
+		XFont::Destroy();
 	}
 };
 
@@ -213,7 +213,9 @@ protected:
 	_plHDC dc;
 
 	XGC() noexcept;
-	inline int LimitToLowerBound(const int value, const int lower_bound) const{
+	inline static int LimitToLowerBound(const int value, \
+										const int lower_bound) {
+
 		int bigger = (value >= lower_bound);
 		return  bigger * value + !bigger * lower_bound;
 	};
@@ -223,10 +225,10 @@ public:
 
 	inline _plHDC GetInternalHandle() const{ return dc; }
 
-	inline void SetBounds(int left_bound, int upper_bound) {
+	inline void SetBounds(int left_bound_, int upper_bound_) {
 
-		this->left_bound = left_bound;
-		this->upper_bound = upper_bound;
+		this->left_bound = left_bound_;
+		this->upper_bound = upper_bound_;
 	}
 
 	void DisplayText(int X, int Y, const Tchar *text, const size_t len) noexcept;
@@ -257,22 +259,23 @@ public:
 class XPaintEventGC : public XGC {
 	_plContextParams context_params;
 
+public:
+	explicit XPaintEventGC(XWindow *wnd) noexcept;
+
 	XPaintEventGC(const XPaintEventGC &obj) = delete;
 	XPaintEventGC &operator=(const XPaintEventGC &obj) = delete;
-public:
-	XPaintEventGC(XWindow *wnd) noexcept;
-
 	XPaintEventGC(XPaintEventGC &&obj) noexcept;
 	XPaintEventGC &operator=(XPaintEventGC &&obj) noexcept;
+
 	virtual ~XPaintEventGC();
 };
 
 class XStandAloneGC : public XGC{
-	XStandAloneGC(const XStandAloneGC &obj) = delete;
-	XStandAloneGC &operator=(const XStandAloneGC &obj) = delete;
 public:
 	XStandAloneGC(XWindow *wnd) noexcept;
 
+	XStandAloneGC(const XStandAloneGC &obj) = delete;
+	XStandAloneGC &operator=(const XStandAloneGC &obj) = delete;
 	XStandAloneGC(XStandAloneGC &&obj) noexcept : XGC(std::move(obj)) { }
 	XStandAloneGC &operator=(XStandAloneGC &&obj) noexcept {
 		XGC::operator=(std::move(obj));

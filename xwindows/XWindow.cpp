@@ -14,7 +14,7 @@ XWindowException::~XWindowException(){ }
 XWindow::XWindow() noexcept : removed_from_children_registry(false), send_destroy_event(true), tag(0), \
 								is_created(false), parent(nullptr), creation_flags(0){ }
 
-XWindow::XWindow(XWindow &&obj) : child_windows(std::move(obj.child_windows)),\
+XWindow::XWindow(XWindow &&obj) noexcept : child_windows(std::move(obj.child_windows)),\
 						removed_from_children_registry(obj.removed_from_children_registry), tag(obj.tag), \
 						send_destroy_event(obj.send_destroy_event), \
 						is_created(obj.is_created), parent(obj.parent), \
@@ -30,7 +30,7 @@ XWindow::XWindow(XWindow &&obj) : child_windows(std::move(obj.child_windows)),\
 	obj.creation_flags = 0;
 }
 
-XWindow &XWindow::operator=(XWindow &&obj) {
+XWindow &XWindow::operator=(XWindow &&obj) noexcept {
 
 	child_windows = std::move(obj.child_windows);
 	removed_from_children_registry = obj.removed_from_children_registry;
