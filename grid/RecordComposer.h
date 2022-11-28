@@ -3,7 +3,7 @@
 #include "RecordEvaluator.h"
 #include "ISizes.h"
 #include "IComposedDrawable.h"
-#include <xwindows\XGC.h>
+#include <xwindows/XGC.h>
 
 class CRecordComposer {
 	IComposedDrawable *items;

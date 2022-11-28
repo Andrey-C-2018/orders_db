@@ -17,5 +17,4 @@ typedef std::pair<IGridCellsContainer *, \
 typedef std::pair<std::shared_ptr<CCellConfigurator>, \
 					std::shared_ptr<CCellConfigurator> > GridConfigurators;
 
-typedef std::pair<std::shared_ptr<IGCParamsList>, \
-					std::shared_ptr<IGCParamsList> > GridGCParamsLists;
+typedef std::pair<std::shared_ptr<IGCParamsList>, std::shared_ptr<IGCParamsList> > GridGCParamsLists;

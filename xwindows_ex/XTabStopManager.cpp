@@ -36,7 +36,7 @@ void XTabStopManager::TabPressedOnControl(XWidget *widget) {
 	auto p = std::find(tabstop_widgets.begin(), tabstop_widgets.end(), item);
 	if (p == tabstop_widgets.end()) {
 		XException e(0, _T("the widget was not registered as tabstop: class name = "));
-		e << widget->GetClassNameW() << _T(", ID = ") << widget->GetId();
+		e << widget->GetClassName() << _T(", ID = ") << widget->GetId();
 		throw e;
 	}
 
