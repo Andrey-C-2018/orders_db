@@ -79,7 +79,7 @@ void Uploader::open() {
 	if (!out.is_open()) {
 		CUploadException e(CUploadException::E_FILE_OPEN, \
 							_T("Неможливо відкрити файл: "));
-		e << path.c_str();
+		e << path.c_str() << _T(" . Можливо він уже відкритий у іншій програмі (Excel)");
 		throw e;
 	}
 }

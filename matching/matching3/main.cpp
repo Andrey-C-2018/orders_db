@@ -147,8 +147,8 @@ int main() {
 			total_updated_recs += affected_records;
 		}
 
-		std::wcout << _T("Рядків переглянуто: ") << rec_count;
-		std::wcout << _T(", Рядків оновлено: ") << total_updated_recs << std::endl;
+		Tcout << _T("Рядків переглянуто: ") << rec_count;
+		Tcout << _T(", Рядків оновлено: ") << total_updated_recs << std::endl;
 	}
 	catch (XException &e) {
 

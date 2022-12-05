@@ -22,6 +22,7 @@
     <ClInclude Include="chars.h" />
     <ClInclude Include="Cryptor.h" />
     <ClInclude Include="Delegate.h" />
+    <ClInclude Include="Directory.h" />
     <ClInclude Include="dll_definitions.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FileSystem.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="tfstream.h" />
     <ClInclude Include="tstream.h" />
     <ClInclude Include="tstring.h" />
+    <ClInclude Include="win\DirectoryImpl.h" />
     <ClInclude Include="win\locale_init.h" />
     <ClInclude Include="win\TextConvImpl.h" />
     <ClInclude Include="XConv.h" />

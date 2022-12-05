@@ -1,7 +1,8 @@
 #pragma once
 #include <windows.h>
+#include "../dll_definitions.h"
 
-class XDirectory {
+class BASIC_DLL_EXPORT XDirectory {
 	WIN32_FIND_DATA ffd;
 	HANDLE hFind;
 
