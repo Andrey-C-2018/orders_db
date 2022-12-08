@@ -4,7 +4,7 @@
 
 class CPropertiesFile;
 
-class CFlexiblePropepties :	public IProperties {
+class CFlexiblePropepties : public IProperties {
 	std::unique_ptr<CPropertiesFile> per_machine, per_user;
 
 public:
