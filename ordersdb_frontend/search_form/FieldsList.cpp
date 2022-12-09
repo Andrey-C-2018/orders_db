@@ -1,5 +1,6 @@
 #include "FieldsList.h"
 #include <basic/XConv.h>
+#include <basic/TextConv.h>
 
 CFieldsListException::CFieldsListException(const int err_code, const Tchar *err_descr) : \
 								XException(err_code, err_descr) { }
@@ -10,24 +11,44 @@ CFieldsListException::~CFieldsListException() { }
 
 //****************************************************************************
 
+inline void openAndConv(FieldsList *fl, const char *field_indexes_str) {
+
+	assert(fl);
+	assert(field_indexes_str);
+	fl->open(field_indexes_str);
+}
+
+inline void openAndConv(FieldsList *fl, const wchar_t *field_indexes_str_w) {
+
+	assert(fl);
+	assert(field_indexes_str_w);
+	std::string conv_buffer;
+	int len = (int)wcslen(field_indexes_str_w);
+
+	const char *field_indexes_str = UCS16_ToUTF8(field_indexes_str_w, len, conv_buffer);
+	fl->open(field_indexes_str);
+}
+
+//****************************************************************************
+
 FieldsList::FieldsList() {
 
 	memset(indexes, 0xff, sizeof(indexes));
 }
 
-void FieldsList::open(const Tchar *field_indexes_str) {
+void FieldsList::open(const char *field_indexes_str) {
 
 	assert (indexes[0] == (size_t)-1);
-	Tstring field_indexes = field_indexes_str;
+	std::string field_indexes = field_indexes_str;
 	field_indexes += ',';
 
 	size_t unique_checker[FIELDS_COUNT];
 	memset(unique_checker, 0xff, sizeof(unique_checker));
 
 	size_t i = 0;
-	Tstring::size_type p = field_indexes.find(_T(','));
-	Tstring::size_type prev_p = 0;
-	while (i < FIELDS_COUNT && p != Tstring::npos) {
+	std::string::size_type p = field_indexes.find(',');
+	std::string::size_type prev_p = 0;
+	while (i < FIELDS_COUNT && p != std::string::npos) {
 		if(p <= prev_p) {
 			CFieldsListException e(CFieldsListException::E_WRONG_FORMAT, \
 									_T("wrong field list format at position "));
@@ -46,12 +67,12 @@ void FieldsList::open(const Tchar *field_indexes_str) {
 		unique_checker[field_index] = field_index;
 
 		prev_p = p + 1;
-		p = field_indexes.find(_T(','), prev_p);
+		p = field_indexes.find(',', prev_p);
 
 		i++;
 	}
 
-	if (i == FIELDS_COUNT && p != Tstring::npos)
+	if (i == FIELDS_COUNT && p != std::string::npos)
 		throw CFieldsListException(CFieldsListException::E_OUT_OF_RANGE, \
 									_T("fields count is out of range"));
 
@@ -63,14 +84,19 @@ void FieldsList::open(const Tchar *field_indexes_str) {
 void FieldsList::open(const IProperties &props) {
 
 	Tstring field_indexes_buffer;
-	Tstring field_indexes_str = props.getStringProperty(_T("query_fields"), field_indexes_buffer);
-	open(field_indexes_str.c_str());
+	auto field_indexes_str = props.getStringProperty(_T("query_fields"), field_indexes_buffer);
+
+	if (!field_indexes_str)
+		throw CFieldsListException(CFieldsListException::E_PROPERTY_NOT_FOUND, \
+			_T("the property 'query_fields' is not found in the config.ini"));
+
+	openAndConv(this, field_indexes_str);
 }
 
-size_t FieldsList::getFieldIndex(Tstring field_indexes_str, Tstring::size_type first, Tstring::size_type last) {
+size_t FieldsList::getFieldIndex(std::string field_indexes_str, size_t first, size_t last) {
 
 	const size_t MAX_FIELD_DIGITS_COUNT = 2;
-	Tchar buffer[MAX_FIELD_DIGITS_COUNT + 1];
+	char buffer[MAX_FIELD_DIGITS_COUNT + 1];
 
 	size_t field_digits = last - first;
 	if (field_digits == 0 || field_digits > MAX_FIELD_DIGITS_COUNT) {
@@ -81,7 +107,7 @@ size_t FieldsList::getFieldIndex(Tstring field_indexes_str, Tstring::size_type f
 	}
 
 	Tstrncpy(buffer, &field_indexes_str[first], field_digits);
-	buffer[field_digits] = _T('\0');
+	buffer[field_digits] = '\0';
 
 	int error;
 	size_t field_index = XConv::ToUnsigned(buffer, error);
@@ -104,7 +130,7 @@ size_t FieldsList::getFieldIndex(Tstring field_indexes_str, Tstring::size_type f
 
 std::string FieldsList::getFieldsList() const {
 
-	Tchar field_names[FIELDS_COUNT + 1][21] = {"a.zone", "c.center_short_name", "b.adv_name_short", "a.id", "a.order_date",\
+	char field_names[FIELDS_COUNT + 1][21] = {"a.zone", "c.center_short_name", "b.adv_name_short", "a.id", "a.order_date",\
 				 "t.type_name", "a.client_name", "a.bdate", "sta.stage_name", "aa.cycle",\
 				 "aa.fee", "aa.fee_parus", "aa.outg_post", "aa.outg_daynight", "aa.act_no", "aa.id_act",\
 				 "aa.act_reg_date", "aa.act_date", "aa.bank_reg_date", "aa.payment_date",\
@@ -114,9 +140,9 @@ std::string FieldsList::getFieldsList() const {
 				 "aa.id_stage", "a.id_center_legalaid", "a.id_adv", "a.id_order_type", "aa.id_informer", "aa.id_checker",\
 				 "?"};
 
-	Tstring list = field_names[indexes[0]];
+	std::string list = field_names[indexes[0]];
 	for (int i = 1; i < FIELDS_COUNT; i++) {
-		list += _T(',');
+		list += ',';
 		list += field_names[indexes[i]];
 	}
 

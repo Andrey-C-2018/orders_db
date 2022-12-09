@@ -10,6 +10,7 @@
 #include <forms_common/FlexiblePropepties.h>
 #include "Inserter.h"
 #include "UploadDialog.h"
+#include "FieldsList.h"
 
 struct IDbConnection;
 class CDoubleBndTarget;
@@ -72,6 +73,7 @@ class CSearchForm : public XTabStopPanel {
 	CInserter inserter;
 	UploadDialog uploader;
 	XProgressBar *progress;
+	FieldsList fields_list;
 
 	std::shared_ptr<CDbTable> createDbTable();
 	void createStatisticsStatements();

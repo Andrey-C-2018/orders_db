@@ -159,6 +159,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DoubleBndTarget.h" />
+    <ClInclude Include="FieldsList.h" />
     <ClInclude Include="Inserter.h" />
     <ClInclude Include="IUploadProgress.h" />
     <ClInclude Include="MyApp.h" />
@@ -176,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DoubleBndTarget.cpp" />
+    <ClCompile Include="FieldsList.cpp" />
     <ClCompile Include="Inserter.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />
