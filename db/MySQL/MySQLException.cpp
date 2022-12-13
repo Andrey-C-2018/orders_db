@@ -20,6 +20,12 @@ int CMySQLException::MapMySQLErrorCodeToCommonCode(const int mysql_code) const {
 		case ER_NO_REFERENCED_ROW_2:
 			return CDbException::E_DB_NO_REF_IN_MASTER_TABLE;
 
+		case ER_CONNECTION_KILLED:
+			return CDbException::E_DB_CONNECTION_KILLED;
+
+		case 2006:
+			return CDbException::E_DB_REPREP_NEEDED;
+
 		default:
 			return CDbException::E_DB_WRONG_CODE;
 	}

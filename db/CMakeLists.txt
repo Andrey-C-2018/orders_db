@@ -36,7 +36,7 @@ message(STATUS "libmariadb include path: ${MARIADB_INCLUDE_DIR}")
 
 #######################################
 
-add_library(db STATIC DbException.cpp SQLite/SQLiteCommon.cpp SQLite/SQLiteConnection.cpp SQLite/SQLiteField.cpp SQLite/SQLiteResultSet.cpp SQLite/SQLiteResultSetMetadata.cpp SQLite/SQLiteStatement.cpp)
+add_library(db STATIC DbException.cpp SQLite/SQLiteCommon.cpp SQLite/SQLiteConnection.cpp SQLite/SQLiteField.cpp SQLite/SQLiteResultSet.cpp SQLite/SQLiteResultSetMetadata.cpp SQLite/SQLiteStatement.cpp Renewable/DbConnection.cpp Renewable/DbConnection.h Renewable/Statement.cpp Renewable/Statement.h Renewable/ResultSet.cpp Renewable/ResultSet.h)
 target_include_directories(db PRIVATE ${XLIBS_ROOT_FOLDER})
 target_include_directories(db PUBLIC ${MARIADB_INCLUDE_DIRS})
 

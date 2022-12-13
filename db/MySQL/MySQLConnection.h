@@ -25,11 +25,9 @@ class DBLIB_DLL_EXPORT CMySQLConnection : public IDbConnection {
 	enum {
 		DEF_CONN_TIMEOUT = 5
 	};
-	MYSQL *conn;
+	std::shared_ptr<MYSQL> conn;
 	bool connected;
 
-	inline void CheckConnected() const;
-	MYSQL_STMT *InternalPrepareQuery(const char *query_text) const;
 public:
 	CMySQLConnection();
 	CMySQLConnection(const CMySQLConnection &obj) = delete;
@@ -38,6 +36,7 @@ public:
 	CMySQLConnection &operator=(const CMySQLConnection &obj) = delete;
 	CMySQLConnection &operator=(CMySQLConnection &&obj) = default;
 
+	inline void CheckConnected() const;
 	void Connect(const char *location, const unsigned port, \
 					const char *login, \
 					const char *pwd, \
@@ -47,8 +46,11 @@ public:
 	record_t ExecScalarQuery(const char *query_text) override;
 	std::shared_ptr<IDbResultSet> ExecQuery(const char *query_text) const override;
 	std::shared_ptr<IDbStatement> PrepareQuery(const char *query_text) const override;
+	static MYSQL_STMT *PrepareQuery(MYSQL *conn_handle, const char *query_text);
 
 	void Disconnect() override;
+	inline std::shared_ptr<MYSQL> getConnectionHandle();
+
 	virtual ~CMySQLConnection();
 };
 
@@ -59,4 +61,9 @@ void CMySQLConnection::CheckConnected() const {
 	if (!connected)	
 		throw CMySQLConnectionException(CMySQLConnectionException::E_CONNECTED, \
 										_T("No connection to a MySQL database"));
+}
+
+std::shared_ptr<MYSQL> CMySQLConnection::getConnectionHandle() {
+
+	return conn;
 }

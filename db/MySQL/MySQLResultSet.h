@@ -25,6 +25,7 @@ struct MySQLBindingItem;
 
 class CMySQLResultSet : public IDbResultSet {
 	size_t fields_count, records_count;
+	std::shared_ptr<MYSQL> conn;
 	mutable std::shared_ptr<const MySQLStmtDataEx> stmt;
 	mutable size_t curr_record;
 
@@ -32,12 +33,13 @@ class CMySQLResultSet : public IDbResultSet {
 	std::vector<MYSQL_BIND> fields_bindings;
 
 public:
-	CMySQLResultSet(std::shared_ptr<const MySQLStmtDataEx> stmt_);
+	CMySQLResultSet(std::shared_ptr<MYSQL> conn_, \
+					std::shared_ptr<const MySQLStmtDataEx> stmt_);
 
 	CMySQLResultSet(const CMySQLResultSet &obj) = delete;
-	CMySQLResultSet(CMySQLResultSet &&obj);
+	CMySQLResultSet(CMySQLResultSet &&obj) noexcept;
 	CMySQLResultSet &operator=(const CMySQLResultSet &obj) = delete;
-	CMySQLResultSet &operator=(CMySQLResultSet &&obj);
+	CMySQLResultSet &operator=(CMySQLResultSet &&obj) noexcept;
 
 	bool empty() const override;
 	size_t getFieldsCount() const override;

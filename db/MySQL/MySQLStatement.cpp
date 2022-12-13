@@ -6,22 +6,31 @@
 #include "MySQLStmtDataEx.h"
 #include "MySQLBindingItem.h"
 
-CMySQLStatement::CMySQLStatement(MYSQL_STMT *stmt_) {
-
+CMySQLStatement::CMySQLStatement(std::shared_ptr<MYSQL> conn_, MYSQL_STMT *stmt_) : \
+												conn(conn_) {
+	assert(conn_);
 	assert(stmt_);
 	stmt = std::make_shared<MySQLStmtDataEx>(stmt_);
 	
 	params.resize(stmt->getParamsCount());
 }
 
-CMySQLStatement::CMySQLStatement(CMySQLStatement &&obj) noexcept : stmt(std::move(obj.stmt)), \
+CMySQLStatement::CMySQLStatement(CMySQLStatement &&obj) noexcept : \
+												conn(std::move(obj.conn)), \
+												stmt(std::move(obj.stmt)), \
 												params(std::move(obj.params)) { }
 
 CMySQLStatement &CMySQLStatement::operator=(CMySQLStatement &&obj) noexcept {
 
+	conn = std::move(obj.conn);
 	stmt = std::move(obj.stmt);
 	params = std::move(obj.params);
 	return *this;
+}
+
+void CMySQLStatement::reconnect(MYSQL_STMT *stmt_) {
+
+	stmt->restoreStmt(stmt_);
 }
 
 size_t CMySQLStatement::getParamsCount() const {
@@ -153,7 +162,7 @@ std::shared_ptr<IDbResultSet> CMySQLStatement::exec() {
 		throw CMySQLStatementException(CMySQLStatementException::E_EXEC, \
 										_T("exec() used instead of execScalar()"));
 
-	return std::make_shared<CMySQLResultSet>(stmt);
+	return std::make_shared<CMySQLResultSet>(conn, stmt);
 }
 
 record_t CMySQLStatement::execScalar() {

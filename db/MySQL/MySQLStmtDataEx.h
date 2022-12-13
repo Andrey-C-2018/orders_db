@@ -16,6 +16,8 @@ public:
 	inline MySQLStmtDataEx &operator=(const MySQLStmtDataEx &obj) = delete;
 	inline MySQLStmtDataEx &operator=(MySQLStmtDataEx &&obj) noexcept;
 
+	void restoreStmt(MYSQL_STMT *stmt_) override;
+
 	inline size_t getParamsCount() const { return params_count; }
 	inline const MYSQL_BIND &getBinding(const size_t index) const;
 	inline MYSQL_BIND &getBinding(const size_t index);

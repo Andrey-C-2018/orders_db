@@ -9,6 +9,7 @@ class CMySQLVariant;
 
 class CMySQLStatement : public IDbStatement {
 
+	std::shared_ptr<MYSQL> conn;
 	std::shared_ptr<MySQLStmtDataEx> stmt;
 	std::vector<MySQLBindingItem> params;
 
@@ -17,11 +18,15 @@ class CMySQLStatement : public IDbStatement {
 	void assignParamBindingWithVector(const size_t param_no, \
 										MySQLBindingItem &param_item);
 public:
-	CMySQLStatement(MYSQL_STMT *stmt_);
+	CMySQLStatement(std::shared_ptr<MYSQL> conn_, MYSQL_STMT *stmt_);
+
 	CMySQLStatement(const CMySQLStatement &obj) = delete;
 	CMySQLStatement(CMySQLStatement &&obj) noexcept;
 	CMySQLStatement &operator=(const CMySQLStatement &obj) = delete;
 	CMySQLStatement &operator=(CMySQLStatement &&obj) noexcept;
+
+	void reconnect(MYSQL_STMT *stmt_);
+	inline std::shared_ptr<MYSQL> getConnection();
 
 	size_t getParamsCount() const;
 	void bindValue(const size_t param_no, const int value) override;
@@ -42,3 +47,10 @@ public:
 
 	virtual ~CMySQLStatement();
 };
+
+//*****************************************************
+
+std::shared_ptr<MYSQL> CMySQLStatement::getConnection() {
+
+	return conn;
+}

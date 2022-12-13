@@ -20,9 +20,12 @@ CMySQLResultSetException::~CMySQLResultSetException() { }
 
 //*************************************************************
 
-CMySQLResultSet::CMySQLResultSet(std::shared_ptr<const MySQLStmtDataEx> stmt_) : \
+CMySQLResultSet::CMySQLResultSet(std::shared_ptr<MYSQL> conn_, \
+								std::shared_ptr<const MySQLStmtDataEx> stmt_) : \
 								fields_count(0), records_count(0), \
+								conn(conn_), \
 								stmt(stmt_), curr_record((size_t)-1) {
+	assert(conn);
 	assert(stmt);
 	assert(stmt->stmt);
 	assert(stmt->metadata);
@@ -65,9 +68,10 @@ CMySQLResultSet::CMySQLResultSet(std::shared_ptr<const MySQLStmtDataEx> stmt_) :
 		throw CMySQLResultSetException(stmt->stmt);
 }
 
-CMySQLResultSet::CMySQLResultSet(CMySQLResultSet &&obj) : \
+CMySQLResultSet::CMySQLResultSet(CMySQLResultSet &&obj) noexcept : \
 								fields_count(obj.fields_count), \
 								records_count(obj.records_count), \
+								conn(std::move(obj.conn)), \
 								stmt(std::move(obj.stmt)), \
 								curr_record(obj.curr_record), \
 								fields(std::move(obj.fields)), \
@@ -79,12 +83,13 @@ CMySQLResultSet::CMySQLResultSet(CMySQLResultSet &&obj) : \
 	obj.curr_record = (size_t)-1;
 }
 
-CMySQLResultSet &CMySQLResultSet::operator=(CMySQLResultSet &&obj) {
+CMySQLResultSet &CMySQLResultSet::operator=(CMySQLResultSet &&obj) noexcept {
 
 	assert(fields_count || !records_count);
 	
 	fields_count = obj.fields_count;
 	records_count = obj.records_count;
+	conn = std::move(obj.conn);
 	stmt = std::move(obj.stmt);
 	curr_record = obj.curr_record;
 	
