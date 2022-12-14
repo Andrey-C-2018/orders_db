@@ -64,6 +64,11 @@ CMySQLResultSet::CMySQLResultSet(std::shared_ptr<MYSQL> conn_, \
 		field_binding.error = &field.error;
 	}
 
+	rebind(); // TODO: use from stmt
+}
+
+void CMySQLResultSet::rebind() {
+
 	if (mysql_stmt_bind_result(stmt->stmt, &fields_bindings[0]))
 		throw CMySQLResultSetException(stmt->stmt);
 }

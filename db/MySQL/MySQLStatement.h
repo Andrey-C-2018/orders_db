@@ -25,8 +25,7 @@ public:
 	CMySQLStatement &operator=(const CMySQLStatement &obj) = delete;
 	CMySQLStatement &operator=(CMySQLStatement &&obj) noexcept;
 
-	void reconnect(MYSQL_STMT *stmt_);
-	inline std::shared_ptr<MYSQL> getConnection();
+	void reprepare(MYSQL_STMT *stmt_);
 
 	size_t getParamsCount() const;
 	void bindValue(const size_t param_no, const int value) override;
@@ -47,10 +46,3 @@ public:
 
 	virtual ~CMySQLStatement();
 };
-
-//*****************************************************
-
-std::shared_ptr<MYSQL> CMySQLStatement::getConnection() {
-
-	return conn;
-}

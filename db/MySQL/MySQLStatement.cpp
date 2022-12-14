@@ -28,7 +28,7 @@ CMySQLStatement &CMySQLStatement::operator=(CMySQLStatement &&obj) noexcept {
 	return *this;
 }
 
-void CMySQLStatement::reconnect(MYSQL_STMT *stmt_) {
+void CMySQLStatement::reprepare(MYSQL_STMT *stmt_) {
 
 	stmt->restoreStmt(stmt_);
 }

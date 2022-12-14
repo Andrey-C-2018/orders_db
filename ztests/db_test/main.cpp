@@ -33,6 +33,7 @@ int main() {
 		}
 		Tcin.get();
 
+		rs->reload();
 		rec_count = rs->getRecordsCount();
 		for (int i = 0; i < rec_count; i++) {
 			rs->gotoRecord(i);

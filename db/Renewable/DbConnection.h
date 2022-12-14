@@ -1,11 +1,12 @@
 #pragma once
-#include "../MySQL/MySQLConnection.h"
+#include <db/MySQL/MySQLConnection.h>
 
 class DbConnection : public IDbConnection {
 	CMySQLConnection mysql_conn;
 	mutable std::shared_ptr<MYSQL> conn_handle;
 
 	void resetConnection(CDbException &e) const;
+	std::shared_ptr<IDbResultSet> ExecQueryInternal(const char *query_text) const;
 
 public:
 	DbConnection();

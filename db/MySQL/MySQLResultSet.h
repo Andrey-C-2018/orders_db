@@ -55,6 +55,7 @@ public:
 	CDate getDate(const size_t field, bool &is_null) const override;
 
 	void reload() override;
+	void rebind();
 
 	virtual ~CMySQLResultSet();
 };

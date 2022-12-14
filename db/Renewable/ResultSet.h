@@ -1,22 +1,37 @@
 #pragma once
-#include "../IDbResultSet.h"
+#include <memory>
+#include <db/IDbResultSet.h>
+#include "StmtData.h"
+
+class Statement;
 
 class ResultSet : public IDbResultSet {
+	StmtData data;
+	std::shared_ptr<IDbResultSet> mysql_rs;
+
 public:
-	bool empty() const;
-	size_t getFieldsCount() const;
-	size_t getRecordsCount() const;
+	ResultSet(StmtData data_, \
+				std::shared_ptr<IDbResultSet> mysql_rs_);
 
-	void gotoRecord(const size_t record) const;
+	ResultSet(const ResultSet &obj) = delete;
+	ResultSet(ResultSet &&obj) noexcept;
+	ResultSet &operator=(const ResultSet &obj) = delete;
+	ResultSet &operator=(ResultSet &&obj) noexcept;
 
-	int getInt(const size_t field, bool &is_null) const;
-	const char *getString(const size_t field) const;
-	const wchar_t *getWString(const size_t field) const;
-	ImmutableString<char> getImmutableString(const size_t field) const;
-	ImmutableString<wchar_t> getImmutableWString(const size_t field) const;
-	CDate getDate(const size_t field, bool &is_null) const;
+	bool empty() const override;
+	size_t getFieldsCount() const override;
+	size_t getRecordsCount() const override;
 
-	void reload();
+	void gotoRecord(const size_t record) const override;
 
-	~ResultSet() { }
+	int getInt(const size_t field, bool &is_null) const override;
+	const char *getString(const size_t field) const override;
+	const wchar_t *getWString(const size_t field) const override;
+	ImmutableString<char> getImmutableString(const size_t field) const override;
+	ImmutableString<wchar_t> getImmutableWString(const size_t field) const override;
+	CDate getDate(const size_t field, bool &is_null) const override;
+
+	void reload() override;
+
+	virtual ~ResultSet() { }
 };
