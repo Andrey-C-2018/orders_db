@@ -433,13 +433,21 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 
 	grid->SetWidgetForFieldByName("Koef", currency_widget);
 
-	stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE user_full_name IS NOT NULL ORDER BY user_name");
+	const auto &params_manager = CParametersManager::getInstance();
+	assert(params_manager.getDefaultCenter() < 10);
+	std::string query = "SELECT id_user,user_full_name FROM users ";
+	query += "WHERE id_center = ";
+	query += '0' + params_manager.getDefaultCenter();
+	query += " AND is_checker = 1 ";
+	query += "ORDER BY user_name";
+	stmt = conn->PrepareQuery(query.c_str());
 	result_set = stmt->exec();
 	rs_metadata = stmt->getResultSetMetadata();
 	checkers_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
 											"user_full_name", \
 											conn, 1, result_set, rs_metadata, \
 											"payments", db_table);
+	//checkers_list->setMasterPrimaryKey("id_user");
 	checkers_list->AddRelation("id_user", "id_checker");
 }
 

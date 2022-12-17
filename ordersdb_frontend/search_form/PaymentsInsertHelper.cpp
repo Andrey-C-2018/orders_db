@@ -27,7 +27,7 @@ public:
 	
 		assert(checkers_list);
 
-		auto stmt = conn->PrepareQuery("SELECT MAX(id_user) FROM users WHERE is_def_checker = 1 AND id_center = ?");
+		auto stmt = conn->PrepareQuery("SELECT MAX(id_user) FROM users WHERE id_center = ? AND is_checker = 1");
 		stmt->bindValue(0, def_center);
 		auto rs = stmt->exec();
 

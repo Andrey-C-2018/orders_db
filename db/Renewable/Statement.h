@@ -2,8 +2,11 @@
 #include "../MySQL/MySQLStatement.h"
 #include "StmtData.h"
 
+class ResultSet;
+
 class Statement : public IDbStatement {
 	StmtData data;
+	std::weak_ptr<ResultSet> rs;
 
 public:
 	Statement(std::shared_ptr<MYSQL> conn_, MYSQL_STMT *stmt_, \

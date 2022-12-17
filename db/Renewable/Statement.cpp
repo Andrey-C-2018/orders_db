@@ -8,26 +8,34 @@ Statement::Statement(std::shared_ptr<MYSQL> conn_, MYSQL_STMT *stmt_, \
 					data(conn_, stmt_, query_) { }
 
 Statement::Statement(Statement &&obj) noexcept : \
-					data(std::move(obj.data)) { }
+					data(std::move(obj.data)), \
+					rs(std::move(obj.rs)) { }
 
 Statement &Statement::operator=(Statement &&obj) noexcept {
 
 	data = std::move(obj.data);
+	rs = std::move(obj.rs);
 	return *this;
 }
 
 std::shared_ptr<IDbResultSet> Statement::exec() {
 
-	std::shared_ptr<IDbResultSet> rs;
+	std::shared_ptr<ResultSet> ret_value = rs.lock();
+	if (ret_value) {
+		ret_value->reload();
+		return ret_value;
+	}
 
 	try {
-		rs = std::make_shared<ResultSet>(data, data.getStmt()->exec());
+		ret_value = std::make_shared<ResultSet>(data, \
+										data.getStmt()->execMySQL());
 	}
 	catch (CDbException &e) {
 		data.reprepareStmt(e);
-		rs = std::make_shared<ResultSet>(data, data.getStmt()->exec());
+		ret_value = std::make_shared<ResultSet>(data, \
+										data.getStmt()->execMySQL());
 	}
-	return rs;
+	return ret_value;
 }
 
 record_t Statement::execScalar() {

@@ -37,7 +37,7 @@ void CMySQLConnection::Connect(const char *location, const unsigned port, \
 	mysql_options(conn.get(), MYSQL_OPT_CONNECT_TIMEOUT, &def_conn_timeout);
 	bool no_trunc_errors_rep = true;
 	mysql_options(conn.get(), MYSQL_REPORT_DATA_TRUNCATION, &no_trunc_errors_rep);
-	bool reconnect = true;
+	bool reconnect = false; // FIXME: should be a parameter
 	mysql_options(conn.get(), MYSQL_OPT_RECONNECT, &reconnect);
 
 	if (!mysql_real_connect(conn.get(), location, login, pwd, \

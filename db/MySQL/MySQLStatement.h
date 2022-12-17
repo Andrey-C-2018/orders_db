@@ -6,6 +6,7 @@
 struct MySQLStmtDataEx;
 struct MySQLBindingItem;
 class CMySQLVariant;
+class CMySQLResultSet;
 
 class CMySQLStatement : public IDbStatement {
 
@@ -41,6 +42,7 @@ public:
 	void bindNull(const size_t param_no) override;
 
 	std::shared_ptr<IDbResultSet> exec() override;
+	std::shared_ptr<CMySQLResultSet> execMySQL();
 	record_t execScalar() override;
 	std::shared_ptr<IDbResultSetMetadata> getResultSetMetadata() override;
 

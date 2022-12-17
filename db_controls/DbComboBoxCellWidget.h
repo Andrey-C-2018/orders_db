@@ -41,6 +41,7 @@ public:
 							const int x, const int y, \
 							const int width, const int height) override;
 
+	void setMasterPrimaryKey(const char *field);
 	void AddRelation(const char *master_field, const char *dependent_field);
 	inline std::shared_ptr<const IDbResultSet> getMasterResultSet() const;
 

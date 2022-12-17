@@ -47,7 +47,7 @@ int main() {
 	}
 	catch (XException &e) {
 
-		Tcerr << e.what() << std::endl;
+		Tcerr << e.GetErrorCode() << _T(": ") << e.what() << std::endl;
 	}
 
 	//int ret_value = UnitTest::RunAllTests();

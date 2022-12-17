@@ -70,6 +70,14 @@ void CDependentTableUpdater::setQueryConstantModifier(ImmutableString<char> modi
 	constant_modifier = modifier.str;
 }
 
+void CDependentTableUpdater::setMasterPrimaryKey(const char *field) {
+
+	assert(field);
+	size_t field_index = master_meta_info.getFieldIndexByName(field);
+	assert(!master_meta_info.isPrimaryKey(field_index));
+	master_meta_info.markFieldAsPrimaryKey(field_index);
+}
+
 void CDependentTableUpdater::AddRelation(const char *master_field, const char *dependent_field) {
 
 	assert(dependent_field);

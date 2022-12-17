@@ -151,7 +151,7 @@ void CMySQLStatement::bindNull(const size_t param_no) {
 	param_binding.length = &params[param_no].length;
 }
 
-std::shared_ptr<IDbResultSet> CMySQLStatement::exec() {
+std::shared_ptr<CMySQLResultSet> CMySQLStatement::execMySQL() {
 
 	stmt->applyParamsBindings();
 
@@ -163,6 +163,11 @@ std::shared_ptr<IDbResultSet> CMySQLStatement::exec() {
 										_T("exec() used instead of execScalar()"));
 
 	return std::make_shared<CMySQLResultSet>(conn, stmt);
+}
+
+std::shared_ptr<IDbResultSet> CMySQLStatement::exec() {
+
+	return execMySQL();
 }
 
 record_t CMySQLStatement::execScalar() {

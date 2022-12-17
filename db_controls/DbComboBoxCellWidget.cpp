@@ -94,6 +94,11 @@ void CDbComboBoxCellWidget::fillComboBox(std::shared_ptr<const IDbResultSet> mas
 	}
 }
 
+void CDbComboBoxCellWidget::setMasterPrimaryKey(const char *field) {
+
+	updater.setMasterPrimaryKey(field);
+}
+
 void CDbComboBoxCellWidget::AddRelation(const char *master_field, const char *dependent_field) {
 
 	updater.AddRelation(master_field, dependent_field);

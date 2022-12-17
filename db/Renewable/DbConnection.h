@@ -11,6 +11,11 @@ class DbConnection : public IDbConnection {
 public:
 	DbConnection();
 
+	DbConnection(const DbConnection &obj) = delete;
+	DbConnection(DbConnection &&obj) = default;
+	DbConnection &operator=(const DbConnection &obj) = delete;
+	DbConnection &operator=(DbConnection &&obj) = default;
+
 	void Connect(const char *location, const unsigned port, \
 							const char *login, \
 							const char *pwd, \

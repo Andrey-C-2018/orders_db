@@ -1,9 +1,10 @@
 #include <db/DbException.h>
+#include <db/MySQL/MySQLResultSet.h>
 #include "ResultSet.h"
 #include "Statement.h"
 
 ResultSet::ResultSet(StmtData data_, \
-					std::shared_ptr<IDbResultSet> mysql_rs_) : \
+					std::shared_ptr<CMySQLResultSet> mysql_rs_) : \
 				data(std::move(data_)), \
 				mysql_rs(mysql_rs_) { }
 
@@ -76,6 +77,7 @@ void ResultSet::reload() {
 	catch (CDbException &e) {
 
 		data.reprepareStmt(e);
+		mysql_rs->rebind();
 		mysql_rs->reload();
 	}
 }

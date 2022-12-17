@@ -7,11 +7,11 @@ class Statement;
 
 class ResultSet : public IDbResultSet {
 	StmtData data;
-	std::shared_ptr<IDbResultSet> mysql_rs;
+	std::shared_ptr<CMySQLResultSet> mysql_rs;
 
 public:
 	ResultSet(StmtData data_, \
-				std::shared_ptr<IDbResultSet> mysql_rs_);
+				std::shared_ptr<CMySQLResultSet> mysql_rs_);
 
 	ResultSet(const ResultSet &obj) = delete;
 	ResultSet(ResultSet &&obj) noexcept;
