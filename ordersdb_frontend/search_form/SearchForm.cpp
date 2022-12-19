@@ -298,6 +298,26 @@ void CSearchForm::setFieldsSizes() {
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("ill"), _T("Хв"));
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("zek"), _T("ЗЕК"));
 
+	field_index = meta_info.getFieldIndexByName("appeal_softer");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("Апл м"));
+
+	field_index = meta_info.getFieldIndexByName("detect_softer");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("Сл м"));
+
+	field_index = meta_info.getFieldIndexByName("reject_appeal");
+	grid->SetFieldWidth(field_index, 7);
+	grid->SetFieldLabel(field_index, _T("Відм ап"));
+
+	field_index = meta_info.getFieldIndexByName("change_kval_kr");
+	grid->SetFieldWidth(field_index, 10);
+	grid->SetFieldLabel(field_index, _T("Зм квал кр"));
+
+	field_index = meta_info.getFieldIndexByName("reduce_ep");
+	grid->SetFieldWidth(field_index, 8);
+	grid->SetFieldLabel(field_index, _T("Зменш еп"));
+
 	field_index = meta_info.getFieldIndexByName("vpr");
 	grid->SetFieldWidth(field_index, 4);
 	grid->SetFieldLabel(field_index, _T("Випр"));
@@ -331,6 +351,14 @@ void CSearchForm::setFieldsSizes() {
 	field_index = meta_info.getFieldIndexByName("No_Ch_Ist");
 	grid->SetFieldWidth(field_index, 14);
 	grid->SetFieldLabel(field_index, _T("Без зм. 1 інст"));
+
+	field_index = meta_info.getFieldIndexByName("change_med");
+	grid->SetFieldWidth(field_index, 7);
+	grid->SetFieldLabel(field_index, _T("Зм мед"));
+
+	field_index = meta_info.getFieldIndexByName("cancel_med");
+	grid->SetFieldWidth(field_index, 8);
+	grid->SetFieldLabel(field_index, _T("Скас мед"));
 
 	field_index = meta_info.getFieldIndexByName("Koef");
 	grid->SetFieldWidth(field_index, 5);

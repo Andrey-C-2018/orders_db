@@ -108,13 +108,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions);DUTY</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../;%ROOT64%\include\mariadb</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../;%ROOT64%\include\mariadb;%VLD_PATH%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%ROOT64%\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;xwindows.lib;xwindows_ex.lib;date.lib;table.lib;db.lib;db_ext.lib;grid.lib;editable_grid.lib;db_controls.lib;forms_common.lib;libmariadb.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%ROOT64%\lib;%VLD_PATH%\lib\Win64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

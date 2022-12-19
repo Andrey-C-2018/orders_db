@@ -2,6 +2,10 @@
 #include <basic/locale_init.h>
 #include <xwindows/platform_specific.h>
 
+/*#ifdef _DEBUG
+#include <vld.h>
+#endif*/
+
 IMPLEMENT_APP(CMyApp)
 
 void CMyApp::OnInit(){

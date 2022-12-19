@@ -135,8 +135,10 @@ std::string FieldsList::getFieldsList() const {
 				 "aa.fee", "aa.fee_parus", "aa.outg_post", "aa.outg_daynight", "aa.act_no", "aa.id_act",\
 				 "aa.act_reg_date", "aa.act_date", "aa.bank_reg_date", "aa.payment_date",\
 				 "aa.article", "uu.user_full_name", "a.reason", "a.cancel_order", "a.cancel_date", "inf.informer_name",\
-				 "aa.age", "aa.inv", "aa.lang", "aa.ill", "aa.zek", "aa.vpr", "aa.reduce", "aa.change_", \
-				 "aa.close", "aa.zv", "aa.min", "aa.nm_suv", "aa.zv_kr", "aa.No_Ch_Ist", "aa.Koef",
+				 "aa.age", "aa.inv", "aa.lang", "aa.ill", "aa.zek", "aa.appeal_softer", "aa.detect_softer", \
+				 "aa.reject_appeal", "aa.vpr", "aa.reduce", "aa.change_kval_kr", "aa.reduce_ep", "aa.change_", \
+				 "aa.close", "aa.zv", "aa.min", "aa.nm_suv", "aa.zv_kr", "aa.No_Ch_Ist", \
+				 "aa.change_med", "aa.cancel_med", "aa.Koef", \
 				 "aa.id_stage", "a.id_center_legalaid", "a.id_adv", "a.id_order_type", "aa.id_informer", "aa.id_checker",\
 				 "?"};
 

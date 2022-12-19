@@ -21,7 +21,7 @@ public:
 
 class FieldsList final {
 	enum {
-		FIELDS_COUNT = 47
+		FIELDS_COUNT = 54
 	};
 
 	size_t indexes[FIELDS_COUNT];
