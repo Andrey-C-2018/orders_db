@@ -58,6 +58,7 @@ MySQLStmtDataEx &MySQLStmtDataEx::operator=(MySQLStmtDataEx &&obj) noexcept {
 
 	obj.params_count = 0;
 	obj.params_bindings = nullptr;
+    return *this;
 }
 
 const MYSQL_BIND &MySQLStmtDataEx::getBinding(const size_t index) const {

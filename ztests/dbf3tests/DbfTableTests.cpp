@@ -39,7 +39,7 @@ SUITE(DbfTable_tests) {
 		DbfTable t;
 		try {
 			
-			t.open("test.dbf");
+			t.open("test_data/test.dbf");
 			CHECK(t.isOpen());
 			
 			CHECK_EQUAL(5, t.getFieldsCount());
@@ -72,7 +72,7 @@ SUITE(DbfTable_tests) {
 
 		DbfTable t;
 		try {
-			t.open("test2.DBF");
+			t.open("test_data/test2.DBF");
 			CHECK(t.isOpen());
 
 			CHECK_EQUAL(51, t.getFieldsCount());
@@ -93,7 +93,7 @@ SUITE(DbfTable_tests) {
 
 		DbfTable t;
 		try {
-			t.open("test2_norec.DBF");
+			t.open("test_data/test2_norec.DBF");
 			CHECK(t.isOpen());
 
 			CHECK_EQUAL(51, t.getFieldsCount());

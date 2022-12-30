@@ -18,7 +18,7 @@ if(NOT XLIBS_OUTPUT_FOLDER)
 	endif()
 endif()
 
-#add_subdirectory(${XLIBS_ROOT_FOLDER}/basic basic_build)
+add_subdirectory(${XLIBS_ROOT_FOLDER}/basic basic_build)
 add_subdirectory(${XLIBS_ROOT_FOLDER}/date date_build)
 add_subdirectory(${XLIBS_ROOT_FOLDER}/db db_build)
 add_subdirectory(${XLIBS_ROOT_FOLDER}/dbf3 dbf3_build)

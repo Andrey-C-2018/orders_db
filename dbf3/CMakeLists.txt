@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.15)
 
 project(dbf3 VERSION 0.4 LANGUAGES CXX)
 
@@ -25,10 +25,3 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${XLIBS_OUTPUT_FOLDER})
 add_library(dbf3 STATIC DbfTable.cpp DbfTable.h DbfStructs.h)
 target_include_directories(dbf3 PRIVATE ${XLIBS_ROOT_FOLDER})
 set_target_properties(dbf3 PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
-
-#######################################
-
-add_subdirectory(dbf3tests)
-
-enable_testing()
-add_test(NAME dbf3_tests COMMAND dbf3tests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dbf3tests)
