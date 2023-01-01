@@ -127,11 +127,12 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		sizer.addWidget(new XLabel(), _T("јпл м"), label_flags, XSize(45, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("—л м"), label_flags, XSize(40, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("¬≥дм ап"), label_flags, XSize(70, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("«м квал кр"), label_flags, XSize(90, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("«менш еп"), label_flags, XSize(75, LABELS_HEIGHT));
 
 		sizer.addWidget(new XLabel(), _T("¬ипр."), label_flags, XSize(40, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("«менш"), label_flags, XSize(47, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("«м квал кр"), label_flags, XSize(90, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("«менш еп"), label_flags, XSize(75, LABELS_HEIGHT));
+
 		sizer.addWidget(new XLabel(), _T("«м≥на"), label_flags, XSize(40, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("«акр."), label_flags, XSize(40, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("«в≥льн"), label_flags, XSize(55, LABELS_HEIGHT));
@@ -174,14 +175,6 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		inserter.setRejectAppeal(reject_appeal);
 		sizer.addWidget(reject_appeal, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
 
-		auto change_kval_kr = new XTabStopEdit(this);
-		inserter.setChangeKvalKr(change_kval_kr);
-		sizer.addWidget(change_kval_kr, _T(""), edit_flags, XSize(90, DEF_HEIGHT));
-
-		auto reduce_ep = new XTabStopEdit(this);
-		inserter.setReduceEp(reduce_ep);
-		sizer.addWidget(reduce_ep, _T(""), edit_flags, XSize(75, DEF_HEIGHT));
-
 		auto vpr = new XTabStopEdit(this);
 		inserter.setVprWidget(vpr);
 		sizer.addWidget(vpr, _T(""), edit_flags, XSize(40, DEF_HEIGHT));
@@ -189,6 +182,14 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		auto reduce = new XTabStopEdit(this);
 		inserter.setReduceWidget(reduce);
 		sizer.addWidget(reduce, _T(""), edit_flags, XSize(47, DEF_HEIGHT));
+
+		auto change_kval_kr = new XTabStopEdit(this);
+		inserter.setChangeKvalKr(change_kval_kr);
+		sizer.addWidget(change_kval_kr, _T(""), edit_flags, XSize(90, DEF_HEIGHT));
+
+		auto reduce_ep = new XTabStopEdit(this);
+		inserter.setReduceEp(reduce_ep);
+		sizer.addWidget(reduce_ep, _T(""), edit_flags, XSize(75, DEF_HEIGHT));
 
 		auto change = new XTabStopEdit(this);
 		inserter.setChangeWidget(change);

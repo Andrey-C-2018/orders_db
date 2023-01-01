@@ -26,7 +26,7 @@ class CPaymentsList {
 	bool cr_grid, cr_navigator, cr_panel;
 
 	enum {
-		NAV_PANEL_HEIGHT = 180
+		NAV_PANEL_HEIGHT = 170
 	};
 	int db_navigator_height;
 	float multiplier;

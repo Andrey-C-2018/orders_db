@@ -51,7 +51,7 @@ void CDbComboBox::setTabStopManager(ITabStopManager *manager_) {
 	manager->RegisterTabStopControl(this);
 
 	XComboBox::OverrideWindowEvent(EVT_KEYDOWN, \
-		XEventHandlerData(this, &CDbComboBox::OnKeyPress));
+				XEventHandlerData(this, &CDbComboBox::OnKeyPress));
 }
 
 int CDbComboBox::getPrimaryKeyAsInteger() const {

@@ -6,3 +6,5 @@ ADD COLUMN `change_kval_kr` TINYINT(1) NULL AFTER `reject_appeal`,
 ADD COLUMN `reduce_ep` TINYINT(1) NULL AFTER `change_kval_kr`,
 ADD COLUMN `change_med` TINYINT(1) NULL AFTER `reduce_ep`,
 ADD COLUMN `cancel_med` TINYINT(1) NULL AFTER `change_med`;
+
+UPDATE `orders`.`parameters` SET `search_form_version`='1.0.17', `acts_form_version`='1.0.22' WHERE `version`='100';
