@@ -1,4 +1,9 @@
-CREATE DEFINER=`root`@`%` PROCEDURE `insertFull`(ignore_existing_order INT(1), id_center INT, id INT, order_date DATE, id_order_type INT, id_adv INT, client_name VARCHAR(255), bdate DATE, id_user INT, zone CHAR(2), fee DECIMAL(10,2), id_stage INT, article VARCHAR(255), id_informer INT, id_act CHAR(40), act_no CHAR(11), act_date DATE, cycle INT, act_reg_date DATE, payment_date DATE, bank_reg_date DATE, id_checker INT, outg_post DECIMAL(8, 2), outg_daynight DECIMAL(8,2))
+USE `orders`;
+DROP procedure IF EXISTS `insertFull`;
+
+DELIMITER $$
+USE `orders`$$
+CREATE PROCEDURE `insertFull`(ignore_existing_order INT(1), id_center INT, id INT, order_date DATE, id_order_type INT, id_adv INT, client_name VARCHAR(255), bdate DATE, id_user INT, zone CHAR(2), fee DECIMAL(10,2), id_stage INT, article VARCHAR(255), id_informer INT, id_act CHAR(40), act_no CHAR(11), act_date DATE, cycle INT, act_reg_date DATE, payment_date DATE, bank_reg_date DATE, id_checker INT, outg_post DECIMAL(8, 2), outg_daynight DECIMAL(8,2))
 BEGIN
 	DECLARE table_id CHAR(15);
 	DECLARE order_exists INT;
@@ -32,7 +37,10 @@ BEGIN
 	END IF;
     
     SET table_id = "payments";
-    INSERT INTO payments VALUES(id_center, id, order_date, fee, id_stage, article, id_informer, id_act, act_no, act_date, cycle, id_user, NOW(), NULL, IF(payment_date IS NOT NULL,zone,NULL), act_reg_date, payment_date, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, bank_reg_date, id_checker, outg_post, outg_daynight);
+    INSERT INTO payments VALUES(id_center, id, order_date, fee, id_stage, article, id_informer, id_act, act_no, act_date, cycle, id_user, NOW(), NULL, IF(payment_date IS NOT NULL,zone,NULL), act_reg_date, payment_date, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, bank_reg_date, id_checker, outg_post, outg_daynight, 0, 0, 0, 0, 0, 0, 0);
     
     COMMIT;
-END
+END$$
+
+DELIMITER ;
+

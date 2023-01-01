@@ -10,8 +10,10 @@ public class Indexer {
 				"aa.fee, aa.fee_parus, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act,"+
 				"aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date,"+
 				"aa.article, uu.user_full_name, a.reason, a.cancel_order, a.cancel_date, inf.informer_name,"+
-				"aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_,"+
-				"aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef,"+
+				"aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.appeal_softer, aa.detect_softer,"+
+                                 "aa.reject_appeal, aa.vpr, aa.reduce, aa.change_kval_kr, aa.reduce_ep, aa.change_,"+
+				"aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist," +
+                                "aa.change_med, aa.cancel_med, aa.Koef,"+
 				"aa.id_stage,a.id_center_legalaid,a.id_adv,a.id_order_type,aa.id_informer,aa.id_checker");
 
 		System.out.println("Leven:");
@@ -19,8 +21,10 @@ public class Indexer {
 				" t.type_name, a.client_name, a.bdate, sta.stage_name, aa.cycle," +
 				" aa.fee, aa.fee_parus, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act," +
 				" aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date," +
-				" aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_," +
-				" aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef," +
+				" aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.appeal_softer, aa.detect_softer," +
+                                " aa.reject_appeal, aa.vpr, aa.reduce, aa.change_kval_kr, aa.reduce_ep, aa.change_," +
+				" aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist," +
+                                " aa.change_med, aa.cancel_med, aa.Koef," +
 				" a.reason, a.cancel_order, a.cancel_date, inf.informer_name, aa.article, uu.user_full_name,"+
 				"aa.id_stage,a.id_center_legalaid,a.id_adv,a.id_order_type,aa.id_informer,aa.id_checker");
 
@@ -30,8 +34,10 @@ public class Indexer {
 				" a.reason, a.cancel_order, a.cancel_date, inf.informer_name, aa.article," +
 				" aa.fee, aa.fee_parus, aa.outg_post, aa.outg_daynight, aa.act_no, aa.id_act," +
 				" aa.act_reg_date, aa.act_date, aa.bank_reg_date, aa.payment_date, uu.user_full_name," +
-				" aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.vpr, aa.reduce, aa.change_," +
-				" aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist, aa.Koef,"+
+				" aa.age, aa.inv, aa.lang, aa.ill, aa.zek, aa.appeal_softer, aa.detect_softer," +
+                                " aa.reject_appeal,aa.vpr, aa.reduce, aa.change_kval_kr, aa.reduce_ep, aa.change_," +
+				" aa.close, aa.zv, aa.min, aa.nm_suv, aa.zv_kr, aa.No_Ch_Ist," +
+                                " aa.change_med, aa.cancel_med, aa.Koef,"+
 				"aa.id_stage,a.id_center_legalaid,a.id_adv,a.id_order_type,aa.id_informer,aa.id_checker");
 	}
 
@@ -58,11 +64,13 @@ public class Indexer {
 	}
 
 	static String[] fields = {"a.zone", "c.center_short_name", "b.adv_name_short", "a.id", "a.order_date",
-			"t.type_name", "a.client_name", "a.bdate", "sta.stage_name", "aa.cycle",
-			"aa.fee", "aa.fee_parus", "aa.outg_post", "aa.outg_daynight", "aa.act_no", "aa.id_act",
-			"aa.act_reg_date", "aa.act_date", "aa.bank_reg_date", "aa.payment_date",
-			"aa.article", "uu.user_full_name", "a.reason", "a.cancel_order", "a.cancel_date", "inf.informer_name",
-			"aa.age", "aa.inv", "aa.lang", "aa.ill", "aa.zek", "aa.vpr", "aa.reduce", "aa.change_",
-			"aa.close", "aa.zv", "aa.min", "aa.nm_suv", "aa.zv_kr", "aa.No_Ch_Ist", "aa.Koef",
-			"aa.id_stage", "a.id_center_legalaid", "a.id_adv", "a.id_order_type", "aa.id_informer", "aa.id_checker"};
+				 "t.type_name", "a.client_name", "a.bdate", "sta.stage_name", "aa.cycle",
+				 "aa.fee", "aa.fee_parus", "aa.outg_post", "aa.outg_daynight", "aa.act_no", "aa.id_act",
+				 "aa.act_reg_date", "aa.act_date", "aa.bank_reg_date", "aa.payment_date",
+				 "aa.article", "uu.user_full_name", "a.reason", "a.cancel_order", "a.cancel_date", "inf.informer_name",
+				 "aa.age", "aa.inv", "aa.lang", "aa.ill", "aa.zek", "aa.appeal_softer", "aa.detect_softer",
+				 "aa.reject_appeal", "aa.vpr", "aa.reduce", "aa.change_kval_kr", "aa.reduce_ep", "aa.change_",
+				 "aa.close", "aa.zv", "aa.min", "aa.nm_suv", "aa.zv_kr", "aa.No_Ch_Ist",
+				 "aa.change_med", "aa.cancel_med", "aa.Koef",
+				 "aa.id_stage", "a.id_center_legalaid", "a.id_adv", "a.id_order_type", "aa.id_informer", "aa.id_checker"};
 }

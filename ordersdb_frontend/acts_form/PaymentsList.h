@@ -26,7 +26,7 @@ class CPaymentsList {
 	bool cr_grid, cr_navigator, cr_panel;
 
 	enum {
-		DEF_PANEL_HEIGHT = 120
+		NAV_PANEL_HEIGHT = 180
 	};
 	int db_navigator_height;
 	float multiplier;
@@ -75,7 +75,7 @@ void CPaymentsList::initSizers(XPoint initial_coords, XSize size, \
 	this->prev_sizer = prev_sizer;
 
 	grid_sizer.addToVertSizersChain(*prev_sizer);
-	grid_sizer.setMinusY(db_navigator_height + DEF_PANEL_HEIGHT);
+	grid_sizer.setMinusY(db_navigator_height + NAV_PANEL_HEIGHT);
 
 	nav_sizer.addToVertSizersChain(grid_sizer);
 	nav_sizer.setRelativeHeight(db_navigator_height);

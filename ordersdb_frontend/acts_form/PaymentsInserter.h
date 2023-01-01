@@ -9,7 +9,7 @@ class CDbTable;
 
 class CPaymentsInserter : public IDbInserter {
 	enum {
-		FIELDS_COUNT = 37
+		FIELDS_COUNT = 44
 	};
 	CDbInsertHelper ins_helper;
 
@@ -28,9 +28,11 @@ class CPaymentsInserter : public IDbInserter {
 	XWidget *act_date;
 	XWidget *act_reg_date;
 
-	XWidget *age, *inv, *lang, *ill, *zek, *vpr;
-	XWidget *reduce, *change, *close, *zv;
+	XWidget *age, *inv, *lang, *ill, *zek;
+	XWidget *appeal_softer, *detect_softer, *reject_appeal, *change_kval_kr, *reduce_ep;
+	XWidget *vpr, *reduce, *change, *close, *zv;
 	XWidget *min_penalty, *nm_suv, *zv_kr, *no_ch_Ist;
+	XWidget *change_med, *cancel_med;
 	XWidget *Koef;
 	CDbComboBox *checker;
 
@@ -60,6 +62,13 @@ public:
 	inline void setLangWidget(XWidget *lang) { this->lang = lang; }
 	inline void setIllWidget(XWidget *ill) { this->ill = ill; }
 	inline void setZekWidget(XWidget *zek) { this->zek = zek; }
+
+	inline void setAppealSofter(XWidget *appeal_softer) { this->appeal_softer = appeal_softer; }
+	inline void setDetectSofter(XWidget *detect_softer) { this->detect_softer = detect_softer; }
+	inline void setRejectAppeal(XWidget *reject_appeal) { this->reject_appeal = reject_appeal; }
+	inline void setChangeKvalKr(XWidget *change_kval_kr) { this->change_kval_kr = change_kval_kr; }
+	inline void setReduceEp(XWidget *reduce_ep) { this->reduce_ep = reduce_ep; }
+
 	inline void setVprWidget(XWidget *vpr) { this->vpr = vpr; }
 	inline void setReduceWidget(XWidget *reduce) { this->reduce = reduce; }
 	inline void setChangeWidget(XWidget *change) { this->change = change; }
@@ -69,6 +78,9 @@ public:
 	inline void setNmSuvWidget(XWidget *nm_suv) { this->nm_suv = nm_suv; }
 	inline void setZvilnKrWidget(XWidget *zv_kr) { this->zv_kr = zv_kr; }
 	inline void setNoCh1instWidget(XWidget *no_ch_Ist) { this->no_ch_Ist = no_ch_Ist; }
+
+	inline void setChangeMed(XWidget *change_med) { this->change_med = change_med; }
+	inline void setCancelMed(XWidget *cancel_med) { this->cancel_med = cancel_med; }
 
 	inline void setKoeffWidget(XWidget *Koef) { this->Koef = Koef; }
 	inline void setCheckerWidget(CDbComboBox *checker) { this->checker = checker; }

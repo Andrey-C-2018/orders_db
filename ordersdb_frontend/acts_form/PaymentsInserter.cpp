@@ -94,9 +94,12 @@ CPaymentsInserter::CPaymentsInserter(std::shared_ptr<CDbTable> db_table_) : \
 				fee(nullptr), outg_post(nullptr), outg_daynight(nullptr), \
 				id_act(nullptr), act_date(nullptr), act_no(nullptr), \
 				act_reg_date(nullptr), age(nullptr), inv(nullptr), lang(nullptr), ill(nullptr), \
-				zek(nullptr), vpr(nullptr), reduce(nullptr), change(nullptr), \
+				zek(nullptr), appeal_softer(nullptr), detect_softer(nullptr), \
+				reject_appeal(nullptr), change_kval_kr(nullptr), reduce_ep(nullptr), \
+				vpr(nullptr), reduce(nullptr), change(nullptr), \
 				close(nullptr), zv(nullptr), min_penalty(nullptr), nm_suv(nullptr), \
-				zv_kr(nullptr), no_ch_Ist(nullptr), Koef(nullptr), checker(nullptr) { }
+				zv_kr(nullptr), no_ch_Ist(nullptr), change_med(nullptr), cancel_med(nullptr), \
+				Koef(nullptr), checker(nullptr) { }
 
 void CPaymentsInserter::getCurrRecord() {
 	enum {
@@ -139,6 +142,13 @@ void CPaymentsInserter::getCurrRecord() {
 	setIntWidgetLabel(lang, rs, meta_info, "lang", buffer);
 	setIntWidgetLabel(ill, rs, meta_info, "ill", buffer);
 	setIntWidgetLabel(zek, rs, meta_info, "zek", buffer);
+
+	setIntWidgetLabel(appeal_softer, rs, meta_info, "appeal_softer", buffer);
+	setIntWidgetLabel(detect_softer, rs, meta_info, "detect_softer", buffer);
+	setIntWidgetLabel(reject_appeal, rs, meta_info, "reject_appeal", buffer);
+	setIntWidgetLabel(change_kval_kr, rs, meta_info, "change_kval_kr", buffer);
+	setIntWidgetLabel(reduce_ep, rs, meta_info, "reduce_ep", buffer);
+
 	setIntWidgetLabel(vpr, rs, meta_info, "vpr", buffer);
 	setIntWidgetLabel(reduce, rs, meta_info, "reduce", buffer);
 	setIntWidgetLabel(change, rs, meta_info, "change_", buffer);
@@ -148,6 +158,9 @@ void CPaymentsInserter::getCurrRecord() {
 	setIntWidgetLabel(nm_suv, rs, meta_info, "nm_suv", buffer);
 	setIntWidgetLabel(zv_kr, rs, meta_info, "zv_kr", buffer);
 	setIntWidgetLabel(no_ch_Ist, rs, meta_info, "No_Ch_Ist", buffer);
+
+	setIntWidgetLabel(change_med, rs, meta_info, "change_med", buffer);
+	setIntWidgetLabel(cancel_med, rs, meta_info, "cancel_med", buffer);
 
 	setStrWidgetLabel(Koef, rs, meta_info, "Koef");
 	const size_t checker_name_index = meta_info.getFieldIndexByName("user_full_name");
@@ -178,6 +191,13 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(lang);
 	assert(ill);
 	assert(zek);
+	
+	assert(appeal_softer);
+	assert(detect_softer);
+	assert(reject_appeal);
+	assert(change_kval_kr);
+	assert(reduce_ep);
+
 	assert(vpr);
 	assert(reduce);
 	assert(change);
@@ -187,6 +207,9 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(nm_suv);
 	assert(zv_kr);
 	assert(no_ch_Ist);
+
+	assert(change_med);
+	assert(cancel_med);
 	assert(Koef);
 	assert(checker);
 
@@ -249,6 +272,14 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	ins_helper.addBinder(36, _T("Витрати добові"), \
 						std::make_shared<CFeeBinder>(outg_daynight, false, false));
 
+	ins_helper.addBinder(37, _T("Апл м"), std::make_shared<CQaParamBinder>(appeal_softer, false));
+	ins_helper.addBinder(38, _T("Сл м"), std::make_shared<CQaParamBinder>(detect_softer, false));
+	ins_helper.addBinder(39, _T("Відм ап"), std::make_shared<CQaParamBinder>(reject_appeal, false));
+	ins_helper.addBinder(40, _T("Зм квал кр"), std::make_shared<CQaParamBinder>(change_kval_kr, false));
+	ins_helper.addBinder(41, _T("Зменш еп"), std::make_shared<CQaParamBinder>(reduce_ep, false));
+	ins_helper.addBinder(42, _T("Зм мед"), std::make_shared<CQaParamBinder>(change_med, false));
+	ins_helper.addBinder(43, _T("Скас мед"), std::make_shared<CQaParamBinder>(cancel_med, false));
+
 	std::string query = "INSERT INTO payments VALUES(";
 	ins_helper.buildQuery(query);
 	query += ')';
@@ -306,6 +337,22 @@ void CPaymentsInserter::Dispose() {
 	vpr = nullptr;
 	if (zek && !zek->IsCreated()) delete zek;
 	zek = nullptr;
+
+	if (appeal_softer && !appeal_softer->IsCreated()) delete appeal_softer;
+	appeal_softer = nullptr;
+	if (detect_softer && !detect_softer->IsCreated()) delete detect_softer;
+	detect_softer = nullptr;
+	if (reject_appeal && !reject_appeal->IsCreated()) delete reject_appeal;
+	reject_appeal = nullptr;
+	if (change_kval_kr && !change_kval_kr->IsCreated()) delete change_kval_kr;
+	change_kval_kr = nullptr;
+	if (reduce_ep && !reduce_ep->IsCreated()) delete reduce_ep;
+	reduce_ep = nullptr;
+	if (change_med && !change_med->IsCreated()) delete change_med;
+	change_med = nullptr;
+	if (cancel_med && !cancel_med->IsCreated()) delete cancel_med;
+	cancel_med = nullptr;
+
 	if (ill && !ill->IsCreated()) delete ill;
 	ill = nullptr;
 	if (lang && !lang->IsCreated()) delete lang;

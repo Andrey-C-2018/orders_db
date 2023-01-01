@@ -94,6 +94,26 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("ill"), _T("Хв"));
 	grid->SetFieldLabel(meta_info.getFieldIndexByName("zek"), _T("ЗЕК"));
 
+	field_index = meta_info.getFieldIndexByName("appeal_softer");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("Апл м"));
+
+	field_index = meta_info.getFieldIndexByName("detect_softer");
+	grid->SetFieldWidth(field_index, 5);
+	grid->SetFieldLabel(field_index, _T("Сл м"));
+
+	field_index = meta_info.getFieldIndexByName("reject_appeal");
+	grid->SetFieldWidth(field_index, 7);
+	grid->SetFieldLabel(field_index, _T("Відм ап"));
+
+	field_index = meta_info.getFieldIndexByName("change_kval_kr");
+	grid->SetFieldWidth(field_index, 10);
+	grid->SetFieldLabel(field_index, _T("Зм квал кр"));
+
+	field_index = meta_info.getFieldIndexByName("reduce_ep");
+	grid->SetFieldWidth(field_index, 8);
+	grid->SetFieldLabel(field_index, _T("Зменш еп"));
+
 	field_index = meta_info.getFieldIndexByName("vpr");
 	grid->SetFieldLabel(field_index, _T("Випр"));
 	grid->SetFieldWidth(field_index, 4);
@@ -128,6 +148,14 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	grid->SetFieldLabel(field_index, _T("Без зм. 1 інст"));
 	grid->SetFieldWidth(field_index, 12);
 
+	field_index = meta_info.getFieldIndexByName("change_med");
+	grid->SetFieldWidth(field_index, 7);
+	grid->SetFieldLabel(field_index, _T("Зм мед"));
+
+	field_index = meta_info.getFieldIndexByName("cancel_med");
+	grid->SetFieldWidth(field_index, 8);
+	grid->SetFieldLabel(field_index, _T("Скас мед"));
+
 	field_index = meta_info.getFieldIndexByName("Koef");
 	grid->SetFieldLabel(field_index, _T("Кзвіт"));
 	grid->SetFieldWidth(field_index, 5);
@@ -160,8 +188,10 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 	query += " aa.is_paid, aa.id_stage, st.stage_name, aa.cycle, aa.article,";
 	query += " aa.fee, aa.outg_post, aa.outg_daynight,";
 	query += " aa.id_informer, inf.informer_name, aa.act_no, aa.id_act, aa.act_date, aa.act_reg_date,";
-	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.vpr,aa.reduce,aa.change_,";
-	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,aa.Koef,u.user_full_name,aa.id_checker ";
+	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.appeal_softer,aa.detect_softer,aa.reject_appeal,";
+	query += " aa.vpr, aa.reduce, aa.change_kval_kr, aa.reduce_ep, aa.change_, ";
+	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,";
+	query += " aa.change_med, aa.cancel_med, aa.Koef, u.user_full_name, aa.id_checker ";
 	query += "FROM payments aa INNER JOIN stages st ON aa.id_stage = st.id_st";
 	query += " INNER JOIN informers inf ON aa.id_informer = inf.id_inf";
 	query += " INNER JOIN users u ON aa.id_checker = u.id_user ";
@@ -252,6 +282,11 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("lang", qa_widget);
 		grid->SetWidgetForFieldByName("ill", qa_widget);
 		grid->SetWidgetForFieldByName("zek", qa_widget);
+		grid->SetWidgetForFieldByName("appeal_softer", qa_widget);
+		grid->SetWidgetForFieldByName("detect_softer", qa_widget);
+		grid->SetWidgetForFieldByName("reject_appeal", qa_widget);
+		grid->SetWidgetForFieldByName("change_kval_kr", qa_widget);
+		grid->SetWidgetForFieldByName("reduce_ep", qa_widget);
 		grid->SetWidgetForFieldByName("vpr", qa_widget);
 		grid->SetWidgetForFieldByName("reduce", qa_widget);
 		grid->SetWidgetForFieldByName("change_", qa_widget);
@@ -261,12 +296,14 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("nm_suv", qa_widget);
 		grid->SetWidgetForFieldByName("zv_kr", qa_widget);
 		grid->SetWidgetForFieldByName("No_Ch_Ist", qa_widget);
+		grid->SetWidgetForFieldByName("change_med", qa_widget);
+		grid->SetWidgetForFieldByName("cancel_med", qa_widget);
 
 		koef_widget = new CCurrencyCellWidget(true);
 		grid->SetWidgetForFieldByName("Koef", koef_widget);
 		koef = true;
 
-		auto chk_stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE user_full_name IS NOT NULL ORDER BY user_name");
+		auto chk_stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE is_checker = 1 ORDER BY user_name");
 		auto chk_rs = chk_stmt->exec();
 		checkers_list = new CDbComboBoxCellWidget(conn, 1, chk_rs, \
 													 chk_stmt->getResultSetMetadata(), \

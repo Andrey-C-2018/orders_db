@@ -114,8 +114,6 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		auto act_reg_date = new XDateField(this);
 		inserter.setActRegDateWidget(act_reg_date);
 		sizer.addWidget(act_reg_date, _T(""), edit_flags, XSize(80, DEF_HEIGHT));
-
-		sizer.addWidget(btn_add, _T("+"), FL_WINDOW_VISIBLE, XSize(20, DEF_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -125,6 +123,13 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		sizer.addWidget(new XLabel(), _T("Ìîâà"), label_flags, XSize(35, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Õâîðîáà"), label_flags, XSize(58, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("ÇÅÊ"), label_flags, XSize(30, LABELS_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Àïë ì"), label_flags, XSize(45, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Ñë ì"), label_flags, XSize(40, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Â³äì àï"), label_flags, XSize(70, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Çì êâàë êð"), label_flags, XSize(90, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Çìåíø åï"), label_flags, XSize(75, LABELS_HEIGHT));
+
 		sizer.addWidget(new XLabel(), _T("Âèïð."), label_flags, XSize(40, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Çìåíø"), label_flags, XSize(47, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Çì³íà"), label_flags, XSize(40, LABELS_HEIGHT));
@@ -132,10 +137,6 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		sizer.addWidget(new XLabel(), _T("Çâ³ëüí"), label_flags, XSize(55, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Ì³í."), label_flags, XSize(35, LABELS_HEIGHT));
 		sizer.addWidget(new XLabel(), _T("Íàéì. ñóâ."), label_flags, XSize(70, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Çâ³ëüí. êð"), label_flags, XSize(70, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Áåç çì 1 ³íñò"), label_flags, XSize(90, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Êçâ³ò"), label_flags, XSize(40, LABELS_HEIGHT));
-		sizer.addWidget(new XLabel(), _T("Ïåðåâ³ðèâ"), label_flags, XSize(70, LABELS_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	main_sizer.pushNestedSizer(sizer);
@@ -160,6 +161,26 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		auto zek = new XTabStopEdit(this);
 		inserter.setZekWidget(zek);
 		sizer.addWidget(zek, _T(""), edit_flags, XSize(30, DEF_HEIGHT));
+
+		auto appeal_softer = new XTabStopEdit(this);
+		inserter.setAppealSofter(appeal_softer);
+		sizer.addWidget(appeal_softer, _T(""), edit_flags, XSize(45, DEF_HEIGHT));
+
+		auto detect_softer = new XTabStopEdit(this);
+		inserter.setDetectSofter(detect_softer);
+		sizer.addWidget(detect_softer, _T(""), edit_flags, XSize(40, DEF_HEIGHT));
+
+		auto reject_appeal = new XTabStopEdit(this);
+		inserter.setRejectAppeal(reject_appeal);
+		sizer.addWidget(reject_appeal, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
+
+		auto change_kval_kr = new XTabStopEdit(this);
+		inserter.setChangeKvalKr(change_kval_kr);
+		sizer.addWidget(change_kval_kr, _T(""), edit_flags, XSize(90, DEF_HEIGHT));
+
+		auto reduce_ep = new XTabStopEdit(this);
+		inserter.setReduceEp(reduce_ep);
+		sizer.addWidget(reduce_ep, _T(""), edit_flags, XSize(75, DEF_HEIGHT));
 
 		auto vpr = new XTabStopEdit(this);
 		inserter.setVprWidget(vpr);
@@ -189,6 +210,25 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		inserter.setNmSuvWidget(nm_suv);
 		sizer.addWidget(nm_suv, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
 
+		
+	main_sizer.popNestedSizer();
+
+	main_sizer.pushNestedSizer(sizer);
+		sizer.addWidget(&null_widget, _T(""), 0, XSize(20, LABELS_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Çâ³ëüí. êð"), label_flags, XSize(70, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Áåç çì 1 ³íñò"), label_flags, XSize(90, LABELS_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Çì ìåä"), label_flags, XSize(50, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Ñêàñ ìåä"), label_flags, XSize(60, LABELS_HEIGHT));
+
+		sizer.addWidget(new XLabel(), _T("Êçâ³ò"), label_flags, XSize(40, LABELS_HEIGHT));
+		sizer.addWidget(new XLabel(), _T("Ïåðåâ³ðèâ"), label_flags, XSize(70, LABELS_HEIGHT));
+	main_sizer.popNestedSizer();
+
+	main_sizer.pushNestedSizer(sizer);
+		sizer.addWidget(&null_widget, _T(""), 0, XSize(20, DEF_HEIGHT));
+
 		auto zv_kr = new XTabStopEdit(this);
 		inserter.setZvilnKrWidget(zv_kr);
 		sizer.addWidget(zv_kr, _T(""), edit_flags, XSize(70, DEF_HEIGHT));
@@ -197,22 +237,32 @@ void CPaymentsNavPanel::Create(XWindow *parent, const int flags, \
 		inserter.setNoCh1instWidget(no_ch_Ist);
 		sizer.addWidget(no_ch_Ist, _T(""), edit_flags, XSize(90, DEF_HEIGHT));
 
+		auto change_med = new XTabStopEdit(this);
+		inserter.setChangeMed(change_med);
+		sizer.addWidget(change_med, _T(""), edit_flags, XSize(50, DEF_HEIGHT));
+
+		auto cancel_med = new XTabStopEdit(this);
+		inserter.setCancelMed(cancel_med);
+		sizer.addWidget(cancel_med, _T(""), edit_flags, XSize(60, DEF_HEIGHT));
+
 		auto Koef = new XTabStopEdit(this);
 		inserter.setKoeffWidget(Koef);
 		sizer.addWidget(Koef, _T(""), edit_flags, XSize(40, DEF_HEIGHT));
-		
+
 		auto checker = new CDbComboBox(rs_checkers, 1, 0);
 		inserter.setCheckerWidget(checker);
 		sizer.addResizeableWidget(checker, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
-									XSize(108, DEF_HEIGHT), 200);
+			XSize(108, DEF_HEIGHT), 200);
 		checker->setTabStopManager(this);
 
 		sizer.addWidget(&null_widget, _T(""), 0, XSize(57, LABELS_HEIGHT));
+		sizer.addWidget(btn_add, _T("+"), FL_WINDOW_VISIBLE, XSize(100, DEF_HEIGHT));
 
+		sizer.addWidget(&null_widget, _T(""), 0, XSize(100, LABELS_HEIGHT));
 		auto &perm_mgr = CParametersManager::getInstance().getPermissions();
 		int rm_button_flags = FL_WINDOW_VISIBLE * \
-							(perm_mgr.isPaymentsDeleter() || perm_mgr.isAdmin());
-		sizer.addWidget(btn_remove, _T("-"), rm_button_flags, XSize(20, LABELS_HEIGHT));
+			(perm_mgr.isPaymentsDeleter() || perm_mgr.isAdmin());
+		sizer.addWidget(btn_remove, _T("-"), rm_button_flags, XSize(20, DEF_HEIGHT));
 	main_sizer.popNestedSizer();
 
 	inserter.prepare(conn);
