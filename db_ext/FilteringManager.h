@@ -15,10 +15,11 @@ class CFilteringManager {
 		size_t count_to_process;
 		bool enabled;
 
-		inline FilteringItem() noexcept : id(-1) { }
-		inline FilteringItem(const int id_) noexcept : id(id_) { }
+		inline FilteringItem() noexcept : id(-1), count_to_process(0), enabled(false) { }
+		inline FilteringItem(const int id_) noexcept : \
+										id(id_), count_to_process(0), enabled(false) { }
 
-		inline bool operator<(const FilteringItem &obj) const {
+		inline bool operator<(const FilteringItem &obj) const noexcept {
 
 			return id < obj.id;
 		}

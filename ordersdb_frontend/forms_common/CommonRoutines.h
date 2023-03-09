@@ -12,7 +12,7 @@ inline std::shared_ptr<TDbTable> getDbTablePtr(std::weak_ptr<TDbTable> &db_table
 	if (!ptr)
 		throw XException(0, _T("DbTableEvtHandler: the DbTable pointer is NULL"));
 
-	return std::move(ptr);
+	return ptr;
 }
 
 std::string getFormVersion(std::shared_ptr<IDbConnection>, const char *form_param);

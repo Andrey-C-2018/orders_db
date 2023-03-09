@@ -64,7 +64,7 @@ std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnecti
 	auto stmt = conn->PrepareQuery(query.c_str());
 	stmt->bindValue(0, def_adv_id);
 
-	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
+	auto db_table = std::make_shared<CDbTable>(conn, stmt);
 	db_table->setPrimaryTableForQuery("orders");
 	db_table->markFieldAsPrimaryKey("id_center_legalaid", "orders");
 	db_table->markFieldAsPrimaryKey("id", "orders");

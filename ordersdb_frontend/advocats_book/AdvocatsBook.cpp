@@ -62,7 +62,7 @@ std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnec
 
 	auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 
-	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
+	auto db_table = std::make_shared<CDbTable>(conn, stmt);
 	db_table->setPrimaryTableForQuery("advocats");
 	db_table->markFieldAsPrimaryKey("id_advocat", "advocats");
 

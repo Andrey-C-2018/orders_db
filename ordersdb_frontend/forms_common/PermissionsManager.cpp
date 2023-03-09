@@ -15,7 +15,8 @@ CPermissionsManagerException::~CPermissionsManagerException() { }
 //*****************************************************
 
 CPermissionsManager::CPermissionsManager() : admins(false), orders_inserters(false), \
-											orders_deleters(false), payments_inserters(false) { }
+											orders_deleters(false), payments_inserters(false), \
+											payments_deleters(false) { }
 
 CPermissionsManager::CPermissionsManager(std::shared_ptr<IDbConnection> conn, \
 										const int id_user, \

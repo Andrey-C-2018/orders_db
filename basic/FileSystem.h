@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <assert.h>
 #include "dll_definitions.h"
 
 bool BASIC_DLL_EXPORT checkFileExists(const char *path);

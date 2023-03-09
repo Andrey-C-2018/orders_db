@@ -7,7 +7,7 @@ XDirectory::XDirectory() : hFind(INVALID_HANDLE_VALUE) {
 	ZeroMemory(&ffd, sizeof(WIN32_FIND_DATA));
 }
 
-XDirectory::XDirectory(XDirectory &&obj) : hFind(obj.hFind) {
+XDirectory::XDirectory(XDirectory &&obj) noexcept : hFind(obj.hFind) {
 
 	memcpy_s(&ffd, sizeof(WIN32_FIND_DATA), &obj.ffd, sizeof(WIN32_FIND_DATA));
 
@@ -15,7 +15,7 @@ XDirectory::XDirectory(XDirectory &&obj) : hFind(obj.hFind) {
 	ZeroMemory(&obj.ffd, sizeof(WIN32_FIND_DATA));
 }
 
-XDirectory &XDirectory::operator=(XDirectory &&obj) {
+XDirectory &XDirectory::operator=(XDirectory &&obj) noexcept {
 
 	hFind = obj.hFind;
 	memcpy_s(&ffd, sizeof(WIN32_FIND_DATA), &obj.ffd, sizeof(WIN32_FIND_DATA));

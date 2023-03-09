@@ -32,7 +32,7 @@ public:
 	SQLiteStatement &operator=(const SQLiteStatement &obj) = delete;
 	SQLiteStatement &operator=(SQLiteStatement &&obj);
 
-	size_t getParamsCount() const { return params_count; }
+	size_t getParamsCount() const override { return params_count; }
 	void bindValue(const size_t param_no, const int value) override;
 
 	void bindValue(const size_t param_no, const char *value) override;

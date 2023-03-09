@@ -55,9 +55,10 @@ inline ImmutableString<wchar_t> getFieldName(const CMetaInfo &meta_info, \
 
 //****************************************************
 
-CDbTable::CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_, \
-					const bool rev_sorting_order_) : \
-				conn(conn_), query(std::move(query_)), curr_record(0), \
+CDbTable::CDbTable(std::shared_ptr<IDbConnection> conn_, \
+					std::shared_ptr<IDbStatement> stmt_, \
+					bool rev_sorting_order_) : \
+				conn(conn_), query(conn_, stmt_), curr_record(0), \
 				rev_sorting_order(rev_sorting_order_) {
 
 	result_set = query.exec(rev_sorting_order);

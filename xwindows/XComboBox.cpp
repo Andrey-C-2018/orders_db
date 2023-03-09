@@ -1,6 +1,6 @@
 #include "XComboBox.h"
 
-XComboBox::XComboBox() : items_count(0){
+XComboBox::XComboBox() : items_count(0) {
 
 	CheckAndInitWindowClassName(_T("COMBOBOX"));
 }
@@ -8,13 +8,13 @@ XComboBox::XComboBox() : items_count(0){
 XComboBox::XComboBox(XWindow *parent, const int flags, \
 					const Tchar *label, \
 					const int x, const int y, \
-					const int width, const int height){
+					const int width, const int height) : items_count(0) {
 
 	CheckAndInitWindowClassName(_T("COMBOBOX"));
 	Create(parent, flags, label, x, y, width, height);
 }
 
-void XComboBox::AddItem(const Tchar *item){
+void XComboBox::AddItem(const Tchar *item) {
 
 	assert(item);
 	_plComboBoxAddItem(GetInternalHandle(), item);
@@ -27,7 +27,7 @@ void XComboBox::DeleteItem(const size_t index) {
 	--items_count;
 }
 
-size_t XComboBox::GetCurrentSelectionIndex() const{
+size_t XComboBox::GetCurrentSelectionIndex() const {
 
 	return _plComboBoxGetCurrSel(GetInternalHandle());
 }
@@ -38,7 +38,7 @@ void XComboBox::SetSelectionIndex(const size_t index) {
 	_plComboBoxSetSel(GetInternalHandle(), index);
 }
 
-void XComboBox::GetItemText(const size_t index, XString<Tchar> &item_text) const{
+void XComboBox::GetItemText(const size_t index, XString<Tchar> &item_text) const {
 
 	GetItemTextInternal(index, item_text);
 }

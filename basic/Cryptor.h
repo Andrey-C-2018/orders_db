@@ -18,7 +18,7 @@ public:
 	CryptorException(const CryptorException &obj);
 	CryptorException(CryptorException &&obj) = default;
 
-	~CryptorException() throw();
+	~CryptorException() noexcept;
 };
 
 class BASIC_DLL_EXPORT Cryptor {

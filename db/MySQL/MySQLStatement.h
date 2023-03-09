@@ -28,7 +28,7 @@ public:
 
 	void reprepare(MYSQL_STMT *stmt_);
 
-	size_t getParamsCount() const;
+	size_t getParamsCount() const override;
 	void bindValue(const size_t param_no, const int value) override;
 
 	void bindValue(const size_t param_no, const char *value) override;

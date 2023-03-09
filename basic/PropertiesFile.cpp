@@ -17,7 +17,7 @@ CPropertiesFileException::CPropertiesFileException(const int err_code, \
 CPropertiesFileException::CPropertiesFileException(const CPropertiesFileException &obj) : \
 													XException(obj) { }
 
-CPropertiesFileException::~CPropertiesFileException() throw() { }
+CPropertiesFileException::~CPropertiesFileException() noexcept { }
 
 //****************************************************************************
 

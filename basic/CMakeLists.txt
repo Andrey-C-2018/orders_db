@@ -22,7 +22,7 @@ endif()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${XLIBS_OUTPUT_FOLDER})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${XLIBS_OUTPUT_FOLDER})
 
-add_library(basic STATIC Cryptor.h Cryptor.cpp Exception.cpp Exception.h chars.h Delegate.h dll_definitions.h FileSystem.h ImmutableString.h locale_init.h IProperties.h PropertiesFile.cpp PropertiesFile.h Process.h TextConv.h tstring.h tstream.h XConv.h XString.h)
+add_library(basic STATIC Cryptor.h Cryptor.cpp Exception.cpp Exception.h chars.h Delegate.h dll_definitions.h FileSystem.h ImmutableString.h locale_init.h IProperties.h PropertiesFile.cpp PropertiesFile.h Process.h TextConv.h tstring.h tstream.h XConv.h XString.h TestConv.cpp)
 target_sources(basic PRIVATE unix/DirectoryImpl.cpp unix/FileSystemImpl.cpp)
 
 set_target_properties(basic PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)

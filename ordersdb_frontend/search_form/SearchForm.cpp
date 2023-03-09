@@ -636,7 +636,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 
-	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt), true);
+	auto db_table = std::make_shared<CDbTable>(conn, stmt, true);
 	db_table->setPrimaryTableForQuery("orders");
 	db_table->markFieldAsPrimaryKey("id_center_legalaid", "orders");
 	db_table->markFieldAsPrimaryKey("id", "orders");
@@ -1048,6 +1048,7 @@ void CSearchForm::OnResetButtonClick(XCommandEvent *eve) {
 
 	filtering_manager.disableAll();
 	loadInitialFilterToControls();
+
 	inserter.resetControls();
 	OnFilterButtonClick(eve);
 }

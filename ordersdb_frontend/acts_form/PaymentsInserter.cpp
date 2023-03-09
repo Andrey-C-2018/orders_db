@@ -165,10 +165,19 @@ void CPaymentsInserter::getCurrRecord() {
 	setStrWidgetLabel(Koef, rs, meta_info, "Koef");
 	const size_t checker_name_index = meta_info.getFieldIndexByName("user_full_name");
 	const char *checker_name = rs->getString(checker_name_index);
-	if (checker_name)
-		checker->SetCurrRecord(rs, meta_info.getFieldIndexByName("id_checker"), INT_TYPE_HINT);
+	if (checker_name) {
+		try {
+			checker->SetCurrRecord(rs, meta_info.getFieldIndexByName("id_checker"), INT_TYPE_HINT);
+		}
+		catch (CDbComboBoxException &e) {
+			if (e.GetErrorCode() == CDbComboBoxException::E_NO_SUCH_PRIMARY_KEY)
+				checker->selectEmptyValue();
+			else
+				throw;
+		}
+	}
 	else
-		checker->SetCurrRecord(NULL_CHECKER_INDEX);
+		checker->selectEmptyValue();
 }
 
 void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {

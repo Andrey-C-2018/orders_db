@@ -203,7 +203,7 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 	stmt->bindValue(1, def_order);
 	stmt->bindValue(2, def_order_date);
 
-	auto db_table = std::make_shared<CDbTable>(conn, CQuery(conn, stmt));
+	auto db_table = std::make_shared<CDbTable>(conn, stmt);
 	db_table->setPrimaryTableForQuery("payments");
 	db_table->markFieldAsPrimaryKey("id_center", "payments");
 	db_table->markFieldAsPrimaryKey("id_order", "payments");
@@ -303,7 +303,7 @@ void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("Koef", koef_widget);
 		koef = true;
 
-		auto chk_stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE is_checker = 1 ORDER BY user_name");
+		auto chk_stmt = conn->PrepareQuery("SELECT id_user,user_full_name FROM users WHERE is_checker = 1 ORDER BY id_user");
 		auto chk_rs = chk_stmt->exec();
 		checkers_list = new CDbComboBoxCellWidget(conn, 1, chk_rs, \
 													 chk_stmt->getResultSetMetadata(), \

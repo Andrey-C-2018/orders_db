@@ -1,8 +1,8 @@
 #pragma once
-#include <string.h>
-#include <wchar.h>
+#include <cstring>
+#include <cwchar>
 #include <vector>
-#include <assert.h>
+#include <cassert>
 
 enum{
 	DEF_RESERVED_LEN = 32

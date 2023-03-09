@@ -1,12 +1,12 @@
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include "../Exception.h"
 #include "../TextConv.h"
 #include "DirectoryImpl.h"
 
-XDirectory::XDirectory() : dir(nullptr) { }
+XDirectory::XDirectory() : dir(nullptr), dir_entry(nullptr) { }
 
-XDirectory::XDirectory(XDirectory &&obj) : dir(obj.dir), dir_entry(obj.dir_entry), \
+XDirectory::XDirectory(XDirectory &&obj) noexcept : dir(obj.dir), dir_entry(obj.dir_entry), \
 						path(std::move(obj.path)), \
 						fileext(std::move(obj.fileext)), \
 						filename_buffer(std::move(obj.filename_buffer)) {
@@ -15,7 +15,7 @@ XDirectory::XDirectory(XDirectory &&obj) : dir(obj.dir), dir_entry(obj.dir_entry
 	obj.dir_entry = nullptr;
 }
 
-XDirectory &XDirectory::operator=(XDirectory &&obj) {
+XDirectory &XDirectory::operator=(XDirectory &&obj) noexcept {
 
 	dir = obj.dir;
 	dir_entry = obj.dir_entry;

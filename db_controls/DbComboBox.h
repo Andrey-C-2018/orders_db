@@ -4,6 +4,18 @@
 struct IDbResultSet;
 struct ITabStopManager;
 
+class CDbComboBoxException : public XException {
+public:
+	enum {
+		E_ITEM_NOT_CHOOSEN = 1, \
+		E_NO_SUCH_PRIMARY_KEY = 2
+	};
+	CDbComboBoxException(const int err_code, const Tchar *err_descr);
+	CDbComboBoxException(const CDbComboBoxException &obj);
+	CDbComboBoxException(CDbComboBoxException &&obj) = default;
+	virtual ~CDbComboBoxException();
+};
+
 class CDbComboBox : public XComboBox {
 	std::shared_ptr<const IDbResultSet> result_set;
 	size_t field_to_display, sel_index, empty_value_added;

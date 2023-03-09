@@ -37,7 +37,7 @@ protected:
 		pair.args = std::make_shared<CArgumentsOne<TEvent *> >(eve.get());
 		pair.eve = std::move(eve);
 
-		return std::move(pair);
+		return pair;
 	}
 public:
 	XEvent() noexcept;

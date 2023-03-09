@@ -34,9 +34,16 @@ class CDbTable : public ITable{
 
 	void ConnectEventsHandler(ITableEventsHandlerPtr handler) override;
 	void DisconnectEventsHandler(ITableEventsHandlerPtr handler) override;
+
 public:
-	CDbTable(std::shared_ptr<IDbConnection> conn_, CQuery query_, \
-				const bool rev_sorting_order_ = false);
+	CDbTable(std::shared_ptr<IDbConnection> conn_, \
+				std::shared_ptr<IDbStatement> stmt_, \
+				bool rev_sorting_order_ = false);
+
+	CDbTable(const CDbTable& obj) = delete;
+	CDbTable(CDbTable&& obj) = default;
+	CDbTable &operator=(const CDbTable& obj) = delete;
+	CDbTable &operator=(CDbTable&& obj) = default;
 
 	inline size_t getCurrentRecordNo() const;
 	inline void setCurrentRecordNo(const size_t rec_no);

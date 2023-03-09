@@ -130,10 +130,10 @@ template <typename Tchar> \
 bool CDate::setDateSQL(const Tchar *date_str) noexcept {
 	bool key = false;
 	unsigned Day(day), Month(month), Year(year);
-	const Tchar _0 = getZeroChar(Tchar());
-	const Tchar _1 = getOneChar(Tchar());
-	const Tchar _9 = getNineChar(Tchar());
-	const Tchar _minus = getMinusChar(Tchar());
+	constexpr Tchar _0 = getZeroChar(Tchar());
+	constexpr Tchar _1 = getOneChar(Tchar());
+	constexpr Tchar _9 = getNineChar(Tchar());
+	constexpr Tchar _minus = getMinusChar(Tchar());
 
 	key = date_str[0] >= _0 && date_str[0] <= _9;
 	key = key && (date_str[1] >= _0 && date_str[1] <= _9);
@@ -161,10 +161,10 @@ template <typename Tchar> \
 bool CDate::setDateGerman(const Tchar *date_str) noexcept {
 	bool key = false;
 	unsigned Day(day), Month(month), Year(year);
-	const Tchar _0 = getZeroChar(Tchar());
-	const Tchar _1 = getOneChar(Tchar());
-	const Tchar _9 = getNineChar(Tchar());
-	const Tchar _dot = getDotChar(Tchar());
+	constexpr Tchar _0 = getZeroChar(Tchar());
+	constexpr Tchar _1 = getOneChar(Tchar());
+	constexpr Tchar _9 = getNineChar(Tchar());
+	constexpr Tchar _dot = getDotChar(Tchar());
 
 	key = date_str[0] >= _0 && date_str[0] <= _9;
 	key = key && (date_str[1] >= _0 && date_str[1] <= _9);
@@ -191,8 +191,8 @@ bool CDate::setDateGerman(const Tchar *date_str) noexcept {
 
 template <typename Tchar> \
 void CDate::toStringGerman(Tchar *buffer) const noexcept {
-	const Tchar _0 = getZeroChar(Tchar());
-	const Tchar _dot = getDotChar(Tchar());
+	constexpr Tchar _0 = getZeroChar(Tchar());
+	constexpr Tchar _dot = getDotChar(Tchar());
 
 	assert(buffer);
 	buffer[0] = _0 + day / 10;
@@ -218,8 +218,8 @@ void CDate::toStringGerman(Tchar *buffer) const noexcept {
 template <typename Tchar> \
 void CDate::toStringSQL(Tchar *buffer) const noexcept {
 	unsigned Year = year;
-	const Tchar _0 = getZeroChar(Tchar());
-	const Tchar _minus = getMinusChar(Tchar());
+	constexpr Tchar _0 = getZeroChar(Tchar());
+	constexpr Tchar _minus = getMinusChar(Tchar());
 
 	assert(buffer);
 	buffer[3] = _0 + Year % 10;

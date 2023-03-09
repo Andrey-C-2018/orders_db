@@ -2,6 +2,16 @@
 #include <db/IDbResultSet.h>
 #include <xwindows_ex/ITabStopManager.h>
 
+CDbComboBoxException::CDbComboBoxException(const int err_code, const Tchar *err_descr) : \
+							XException(err_code, err_descr) { }
+
+CDbComboBoxException::CDbComboBoxException(const CDbComboBoxException &obj) : \
+							XException(obj) { }
+
+CDbComboBoxException::~CDbComboBoxException() { }
+
+//****************************************************************************
+
 CDbComboBox::CDbComboBox(std::shared_ptr<const IDbResultSet> result_set_, \
 							const size_t field_to_display_, const size_t prim_key_) : \
 					result_set(result_set_), field_to_display(field_to_display_), \
@@ -58,7 +68,8 @@ int CDbComboBox::getPrimaryKeyAsInteger() const {
 
 	assert(prim_key != (size_t)-1);
 	if (isEmptySelection())
-		throw XException(0, _T("the DbComboBox item is not choosen or empty"));
+		throw CDbComboBoxException(CDbComboBoxException::E_ITEM_NOT_CHOOSEN, \
+									_T("the DbComboBox item is not choosen or empty"));
 	
 	result_set->gotoRecord(sel_index);
 
@@ -80,7 +91,8 @@ void CDbComboBox::SetCurrRecord(const size_t prim_key_value) {
 		Found = (result_set->getInt(prim_key, is_null) == prim_key_value);
 	}
 	if (!Found) {
-		XException e(0, _T("DBComboBox: no such prim key value: "));
+		CDbComboBoxException e(CDbComboBoxException::E_NO_SUCH_PRIMARY_KEY,\
+								_T("DBComboBox: no such prim key value: "));
 		e << prim_key_value;
 		throw e;
 	}

@@ -14,7 +14,7 @@ protected:
 	
 public:
 	CGridLine() : grid_line_size(DEF_GRID_LINE_SIZE), \
-				bkgrnd_brush(nullptr){ }
+				bkgrnd_brush(nullptr), bkgrnd_pen(nullptr) { }
 
 	CGridLine(const CGridLine &obj) = default;
 	CGridLine &operator=(const CGridLine &obj) = default;

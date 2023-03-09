@@ -20,9 +20,9 @@ public:
 	XDirectory();
 
 	XDirectory(const XDirectory &obj) = delete;
-	XDirectory(XDirectory &&obj);
+	XDirectory(XDirectory &&obj) noexcept;
 	XDirectory &operator=(const XDirectory &obj) = delete;
-	XDirectory &operator=(XDirectory &&obj);
+	XDirectory &operator=(XDirectory &&obj) noexcept;
 
 	inline bool getFirstFile(const wchar_t *file_name_mask);
 	inline bool getFirstFile(const char *file_name_mask);
