@@ -1,6 +1,6 @@
-#include "CumulativeRS.h"
+#include "PaginalRS.h"
 
-CumulativeRS::CumulativeRS(std::shared_ptr<IDbStatement> stmt_, \
+PaginalRS::PaginalRS(std::shared_ptr<IDbStatement> stmt_, \
 							std::shared_ptr<IDbStatement> stmt_rec_count_) : \
 						stmt(stmt_), stmt_rec_count(stmt_rec_count_),
 						curr_page(0) {

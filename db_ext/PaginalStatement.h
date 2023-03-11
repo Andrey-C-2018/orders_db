@@ -1,8 +1,11 @@
 #pragma once
 #include <db/IDbStatement.h>
 
+class IDbConnection;
+
 class PaginalStatement : public IDbStatement {
 	std::shared_ptr<IDbStatement> stmt, stmt_rec_count;
+	int field_id_index;
 
 public:
 	PaginalStatement();
@@ -12,7 +15,8 @@ public:
 	PaginalStatement& operator=(const PaginalStatement &obj) = delete;
 	PaginalStatement& operator=(PaginalStatement &&obj) = default;
 
-	std::string& init(std::shared_ptr<IDbConnection> conn_, std::string &query);
+	std::string& init(std::shared_ptr<IDbConnection> conn_, \
+						std::string &query, int field_id_index_);
 
 	size_t getParamsCount() const override;
 	void bindValue(const size_t param_no, const int value) override;
@@ -24,7 +28,6 @@ public:
 
 	void bindValue(const size_t param_no, const CDate &value) override;
 
-	void bindValue(const size_t param_no, const CMySQLVariant &value);
 	void bindNull(const size_t param_no) override;
 
 	std::shared_ptr<IDbResultSet> exec() override;

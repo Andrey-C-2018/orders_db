@@ -2,7 +2,7 @@
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
 
-class CumulativeRS final {
+class PaginalRS final {
 	static constexpr size_t PAGE_SIZE = 100;
 	size_t param_limit_size; // LIMIT row_count OFFSET offset_in_rs
 
@@ -13,13 +13,13 @@ class CumulativeRS final {
 	mutable std::shared_ptr<IDbResultSet> rs;
 
 public:
-	CumulativeRS(std::shared_ptr<IDbStatement> stmt_,
-				 std::shared_ptr<IDbStatement> stmt_rec_count_);
+	PaginalRS(std::shared_ptr<IDbStatement> stmt_,
+			  std::shared_ptr<IDbStatement> stmt_rec_count_);
 
-	CumulativeRS(const CumulativeRS &obj) = delete;
-	CumulativeRS(CumulativeRS &&obj) = default;
-	CumulativeRS& operator=(const CumulativeRS &obj) = delete;
-	CumulativeRS& operator=(CumulativeRS &&obj) = default;
+	PaginalRS(const PaginalRS &obj) = delete;
+	PaginalRS(PaginalRS &&obj) = default;
+	PaginalRS& operator=(const PaginalRS &obj) = delete;
+	PaginalRS& operator=(PaginalRS &&obj) = default;
 
 	inline bool empty() const;
 	inline size_t getFieldsCount() const;
@@ -39,22 +39,22 @@ public:
 
 //*****************************************************
 
-bool CumulativeRS::empty() const {
+bool PaginalRS::empty() const {
 
 	return rec_count == 0;
 }
 
-size_t CumulativeRS::getFieldsCount() const {
+size_t PaginalRS::getFieldsCount() const {
 
 	return rs->getFieldsCount();
 }
 
-size_t CumulativeRS::getRecordsCount() const {
+size_t PaginalRS::getRecordsCount() const {
 
 	return rec_count;
 }
 
-void CumulativeRS::gotoRecord(const size_t record) const {
+void PaginalRS::gotoRecord(const size_t record) const {
 
 	assert(record < rec_count);
 	if (curr_page > record || record > curr_page + PAGE_SIZE) {
@@ -69,12 +69,12 @@ void CumulativeRS::gotoRecord(const size_t record) const {
 	rs->gotoRecord(record % PAGE_SIZE);
 }
 
-int CumulativeRS::getInt(const size_t field, bool &is_null) const {
+int PaginalRS::getInt(const size_t field, bool &is_null) const {
 
 	return rs->getInt(field, is_null);
 }
 
-void CumulativeRS::reload() {
+void PaginalRS::reload() {
 
 	rec_count = stmt_rec_count->execScalar();
 
@@ -87,5 +87,30 @@ void CumulativeRS::reload() {
 		stmt->bindValue(param_limit_size + 1, (int)curr_page);
 	}
 	rs->reload();
+}
+
+const char *PaginalRS::getString(const size_t field) const {
+
+	return rs->getString(field);
+}
+
+const wchar_t *PaginalRS::getWString(const size_t field) const {
+
+	return rs->getWString(field);
+}
+
+ImmutableString<char> PaginalRS::getImmutableString(const size_t field) const {
+
+	return rs->getImmutableString(field);
+}
+
+ImmutableString<wchar_t> PaginalRS::getImmutableWString(const size_t field) const {
+
+	return rs->getImmutableWString(field);
+}
+
+CDate PaginalRS::getDate(const size_t field, bool &is_null) const {
+
+	return rs->getDate(field, is_null);
 }
 

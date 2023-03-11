@@ -176,10 +176,13 @@
     <ClCompile Include="FilteringManager.cpp" />
     <ClCompile Include="MetaInfo.cpp" />
     <ClCompile Include="MetaInfoBasic.cpp" />
+    <ClCompile Include="PaginalRS.cpp" />
+    <ClCompile Include="PaginalStatement.cpp" />
     <ClCompile Include="Query.cpp" />
     <ClCompile Include="QueryModifier.cpp" />
     <ClCompile Include="RevDbResultSet.cpp" />
     <ClCompile Include="SortingManager.cpp" />
+    <ClCompile Include="UniqueRowIdRS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbEventsHandlersContainer.h" />
@@ -195,10 +198,13 @@
     <ClInclude Include="InsParamNoGuard.h" />
     <ClInclude Include="MetaInfo.h" />
     <ClInclude Include="MetaInfoBasic.h" />
+    <ClInclude Include="PaginalRS.h" />
+    <ClInclude Include="PaginalStatement.h" />
     <ClInclude Include="Query.h" />
     <ClInclude Include="QueryModifier.h" />
     <ClInclude Include="RevDbResultSet.h" />
     <ClInclude Include="SortingManager.h" />
+    <ClInclude Include="UniqueRowIdRS.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,18 +1,21 @@
 #pragma once
+#include <unordered_set>
 #include <db/IDbResultSet.h>
+#include "PaginalRS.h"
 
-class UniqueIdRS : public IDbResultSet {
+class UniqueRowIdRS : public IDbResultSet {
 	const int field_id_index;
-	bool not_unique;
-	CumulativeRS rs;
+	mutable bool not_unique;
+	PaginalRS rs;
+	mutable std::unordered_set<int> rec_ids;
 
 public:
-	UniqueIdRS(CumulativeRS rs, int field_id_index_);
+	UniqueRowIdRS(PaginalRS rs, int field_id_index_);
 
-	UniqueIdRS(const UniqueIdRS &obj) = delete;
-	UniqueIdRS(UniqueIdRS &&obj) = default;
-	UniqueIdRS& operator=(const UniqueIdRS &obj) = delete;
-	UniqueIdRS& operator=(UniqueIdRS &&obj) = default;
+	UniqueRowIdRS(const UniqueRowIdRS &obj) = delete;
+	UniqueRowIdRS(UniqueRowIdRS &&obj) = default;
+	UniqueRowIdRS& operator=(const UniqueRowIdRS &obj) = delete;
+	UniqueRowIdRS& operator=(UniqueRowIdRS &&obj) = delete;
 
 	bool empty() const override;
 	size_t getFieldsCount() const override;
@@ -29,5 +32,5 @@ public:
 
 	void reload() override;
 
-	virtual ~UniqueIdRS();
+	virtual ~UniqueRowIdRS();
 };
