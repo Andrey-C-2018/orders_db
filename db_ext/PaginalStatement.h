@@ -1,22 +1,22 @@
 #pragma once
 #include <db/IDbStatement.h>
 
-class IDbConnection;
+struct IDbConnection;
 
 class PaginalStatement : public IDbStatement {
 	std::shared_ptr<IDbStatement> stmt, stmt_rec_count;
 	int field_id_index;
 
 public:
-	PaginalStatement();
+	PaginalStatement(std::shared_ptr<IDbConnection> conn_, \
+						const char *query, int field_id_index_);
 
 	PaginalStatement(const PaginalStatement &obj) = delete;
 	PaginalStatement(PaginalStatement &&obj) = default;
 	PaginalStatement& operator=(const PaginalStatement &obj) = delete;
 	PaginalStatement& operator=(PaginalStatement &&obj) = default;
 
-	std::string& init(std::shared_ptr<IDbConnection> conn_, \
-						std::string &query, int field_id_index_);
+	void init(std::shared_ptr<IDbConnection> conn_, const char* query);
 
 	size_t getParamsCount() const override;
 	void bindValue(const size_t param_no, const int value) override;

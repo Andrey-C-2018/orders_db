@@ -20,10 +20,12 @@ public:
 };
 
 class FieldsList final {
+public:
 	enum {
 		FIELDS_COUNT = 54
 	};
 
+private:
 	size_t indexes[FIELDS_COUNT];
 	static size_t getFieldIndex(std::string field_indexes_str, \
 								size_t first, size_t last);

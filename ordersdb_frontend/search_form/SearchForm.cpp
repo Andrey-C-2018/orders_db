@@ -3,6 +3,7 @@
 #include <db/IDbConnection.h>
 #include <db_ext/DbTable.h>
 #include <db_ext/DependentTableUpdater.h>
+#include <db_ext/PaginalStatement.h>
 #include <xwindows/XLabel.h>
 #include <xwindows/XButton.h>
 #include <xwindows_ex/HorizontalSizer.h>
@@ -616,7 +617,8 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	std::string query = "SELECT ";
 
-	query += fields_list.getFieldsList() + ' ';
+	query += fields_list.getFieldsList();
+	query += ", aa.rec_id ";
 	query += "FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
 	query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat";
 	query += " INNER JOIN order_types t ON a.id_order_type = t.id_type";
@@ -634,7 +636,9 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 	query_modifier.changeWherePart(\
 		ImmutableString<char>(initial_flt.c_str(), initial_flt.size()));
 
-	auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
+	//auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
+	auto stmt = std::make_shared<PaginalStatement>(conn, query_modifier.getQuery().c_str(), \
+													fields_list.FIELDS_COUNT);
 
 	auto db_table = std::make_shared<CDbTable>(conn, stmt, true);
 	db_table->setPrimaryTableForQuery("orders");
@@ -945,7 +949,9 @@ void CSearchForm::OnSortButtonClick(XCommandEvent *eve) {
 		}
 		else
 			query_modifier.changeOrdering(sorting_manager.buildOrderingString());
-		auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
+		//auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
+		auto stmt = std::make_shared<PaginalStatement>(conn, query_modifier.getQuery().c_str(), \
+														fields_list.FIELDS_COUNT);
 		
 		def_binding_target->replaceFirst(stmt);
 		filtering_manager.applyForced(stmt);

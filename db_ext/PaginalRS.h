@@ -9,8 +9,9 @@ class PaginalRS final {
 	mutable std::shared_ptr<IDbStatement> stmt;
 	std::shared_ptr<IDbStatement> stmt_rec_count;
 	size_t rec_count;
-	mutable size_t curr_page;
+	mutable size_t curr_page_first_rec;
 	mutable std::shared_ptr<IDbResultSet> rs;
+	std::shared_ptr<IDbResultSet> rs_rec_count;
 
 public:
 	PaginalRS(std::shared_ptr<IDbStatement> stmt_,
@@ -57,11 +58,11 @@ size_t PaginalRS::getRecordsCount() const {
 void PaginalRS::gotoRecord(const size_t record) const {
 
 	assert(record < rec_count);
-	if (curr_page > record || record > curr_page + PAGE_SIZE) {
+	if (curr_page_first_rec > record || record > curr_page_first_rec + PAGE_SIZE) {
 
-		curr_page = (record / PAGE_SIZE) * PAGE_SIZE;
+		curr_page_first_rec = (record / PAGE_SIZE) * PAGE_SIZE;
 		stmt->bindValue(param_limit_size, (int)PAGE_SIZE);
-		stmt->bindValue(param_limit_size + 1, (int)curr_page);
+		stmt->bindValue(param_limit_size + 1, (int)curr_page_first_rec);
 
 		rs->reload();
 	}
@@ -76,15 +77,18 @@ int PaginalRS::getInt(const size_t field, bool &is_null) const {
 
 void PaginalRS::reload() {
 
-	rec_count = stmt_rec_count->execScalar();
+	rs_rec_count->reload();
+	rs_rec_count->gotoRecord(0);
+	bool is_null;
+	rec_count = rs_rec_count->getInt(0, is_null);
 
-	if (rec_count <= curr_page) {
+	if (rec_count <= curr_page_first_rec) {
 		size_t record = rec_count >= PAGE_SIZE / 2 ? \
 						rec_count - PAGE_SIZE / 2 : rec_count / 2;
 
-		curr_page = (record / PAGE_SIZE) * PAGE_SIZE;
+		curr_page_first_rec = (record / PAGE_SIZE) * PAGE_SIZE;
 		stmt->bindValue(param_limit_size, PAGE_SIZE);
-		stmt->bindValue(param_limit_size + 1, (int)curr_page);
+		stmt->bindValue(param_limit_size + 1, (int)curr_page_first_rec);
 	}
 	rs->reload();
 }

@@ -2,29 +2,34 @@
 #include "PaginalStatement.h"
 #include "UniqueRowIdRS.h"
 
-PaginalStatement::PaginalStatement() : field_id_index(-1) { }
+PaginalStatement::PaginalStatement(std::shared_ptr<IDbConnection> conn_, \
+									const char* query, int field_id_index_) : \
+							field_id_index(field_id_index_) {
+	
+	assert(field_id_index >= 0);
+	init(conn_, query);
+}
 
-std::string& PaginalStatement::init(std::shared_ptr<IDbConnection> conn_, \
-										std::string &query, int field_id_index_) {
+void PaginalStatement::init(std::shared_ptr<IDbConnection> conn_, \
+							const char* query) {
 
 	const char prefix[] = "SELECT COUNT(*) FROM (";
 	const char postfix[] = ") a1b2c3";
-	field_id_index = field_id_index_;
 
-	auto pos = query.rfind("LIMIT");
-	assert (pos == std::string::npos);
+	assert(query != nullptr);
+	const char *p = strstr(query, "LIMIT");
+	assert (p == nullptr);
 
-	query.insert(0, prefix);
-	query += postfix;
-	stmt_rec_count = conn_->PrepareQuery(query.c_str());
+	std::string query_str = prefix;
+	query_str += query;
+	query_str += postfix;
+	stmt_rec_count = conn_->PrepareQuery(query_str.c_str());
 
-	query.erase(0, sizeof(prefix) - 1);
-	query.erase(query.size() - sizeof(prefix) + 1, std::string::npos);
+	query_str.erase(0, sizeof(prefix) - 1);
+	query_str.erase(query_str.size() - sizeof(postfix) + 1, std::string::npos);
 
-	query += " LIMIT ? OFFSET ?";
-	stmt = conn_->PrepareQuery(query.c_str());
-
-	return query;
+	query_str += " LIMIT ? OFFSET ?";
+	stmt = conn_->PrepareQuery(query_str.c_str());
 }
 
 size_t PaginalStatement::getParamsCount() const {
