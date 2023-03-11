@@ -10,6 +10,7 @@ CumulativeRS::CumulativeRS(std::shared_ptr<IDbStatement> stmt_, \
 	rec_count = stmt_rec_count->execScalar();
 	param_limit_size = stmt->getParamsCount() - 2;
 
-	setCurrPageParams(0);
+	stmt->bindValue(param_limit_size, (int)PAGE_SIZE);
+	stmt->bindValue(param_limit_size + 1, (int)curr_page);
 	rs = stmt->exec();
 }
