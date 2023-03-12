@@ -21,9 +21,6 @@
     <ClCompile Include="DbTable.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="Query.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="DependentTableUpdater.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
@@ -57,12 +54,12 @@
     <ClCompile Include="UniqueRowIdRS.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="ScalarQueryCache.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbTable.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="Query.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="IndexedSearchPredicates.h">
@@ -117,6 +114,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="UniqueRowIdRS.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="ScalarQueryCache.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

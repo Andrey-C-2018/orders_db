@@ -34,7 +34,7 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 
 	adv_list.initDbTable(conn);
 	auto adv_db_table = adv_list.getDbTable();
-	size_t id_advocat = adv_db_table->getQuery().getMetaInfo().getFieldIndexByName("id_advocat");
+	size_t id_advocat = adv_db_table->getMetaInfo().getFieldIndexByName("id_advocat");
 
 	constraints = std::make_shared<CPaymentsConstraints>();
 	constraints->old_stage_locked = true;
@@ -52,9 +52,9 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 	adv_list.initDbTableEvtHandler(adv_evt_handler);
 
 	size_t orders_prim_key[3];
-	orders_prim_key[0] = orders_db_table->getQuery().getMetaInfo().getFieldIndexByName("id_center_legalaid");
-	orders_prim_key[1] = orders_db_table->getQuery().getMetaInfo().getFieldIndexByName("id");
-	orders_prim_key[2] = orders_db_table->getQuery().getMetaInfo().getFieldIndexByName("order_date");
+	orders_prim_key[0] = orders_db_table->getMetaInfo().getFieldIndexByName("id_center_legalaid");
+	orders_prim_key[1] = orders_db_table->getMetaInfo().getFieldIndexByName("id");
+	orders_prim_key[2] = orders_db_table->getMetaInfo().getFieldIndexByName("order_date");
 	
 	int def_center = 0, def_order_no = 0;
 	CDate def_order_date;

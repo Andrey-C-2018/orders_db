@@ -33,7 +33,7 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 	this->conn = conn_;
 	db_table = createDbTable(conn_, def_center, def_order, def_order_date);
 
-	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	const auto &meta_info = db_table->getMetaInfo();
 	grid_evt_handler = std::make_shared<CPaymentsGridEvtHandler>(db_table, \
 																	constraints);
 	grid = new CDbGrid(false, db_table, grid_evt_handler);
@@ -362,7 +362,7 @@ void CPaymentsList::displayWidgets(XWindow *parent) {
 	panel_sizer.createWidget(panel, parent, FL_WINDOW_VISIBLE, _T(""));
 	cr_panel = true;
 
-	auto &meta_info = db_table->getQuery().getMetaInfo();
+	auto &meta_info = db_table->getMetaInfo();
 
 	grid->HideField(meta_info.getFieldIndexByName("id_center"));
 	grid->HideField(meta_info.getFieldIndexByName("id_order"));

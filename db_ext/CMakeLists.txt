@@ -25,7 +25,7 @@ add_library(db_ext STATIC DbTable.cpp
         FilteringManager.cpp
         MetaInfoBasic.cpp
         MetaInfo.cpp
-        Query.cpp
+        ScalarQueryCache.cpp
         QueryModifier.cpp
         RevDbResultSet.cpp
         SortingManager.cpp

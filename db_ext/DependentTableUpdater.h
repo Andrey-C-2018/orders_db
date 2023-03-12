@@ -22,7 +22,7 @@ class CDependentTableUpdater {
 
 	inline const CMetaInfo &getDependentMetaInfo() { 
 		
-		return dependent_db_table->getQuery().getMetaInfo(); 
+		return dependent_db_table->getMetaInfo(); 
 	}
 public:
 	CDependentTableUpdater(std::shared_ptr<IDbConnection> conn_, \

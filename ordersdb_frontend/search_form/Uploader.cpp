@@ -101,7 +101,7 @@ void Uploader::upload(const CGrid *grid, std::shared_ptr<IUploadNotifier> progre
 	const size_t fields_count = db_table->GetFieldsCount() - hidden_count;
 	const size_t records_count = db_table->GetRecordsCount();
 	auto rs = db_table->getResultSet();
-	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	const auto &meta_info = db_table->getMetaInfo();
 		
 	if (!cancel_upload) addHeader();
 

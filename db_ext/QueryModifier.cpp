@@ -33,7 +33,7 @@ void CQueryModifier::Init(std::string query_) {
 	auto p = query_.find(mark);
 	if (p == std::string::npos) {
 		CQueryModifierException e(CQueryModifierException::E_NO_WHERE_STMT_MARK, \
-								_T("No WHERE stmt mark in the query: "));
+								_T("No WHERE stmt mark in the scalar_query_cache: "));
 		e << query_;
 		throw e;
 	}

@@ -24,6 +24,7 @@ void UniqueRowIdRS::gotoRecord(const size_t record) const {
 	rs.gotoRecord(record);
 	bool is_null;
 	int rec_id = rs.getInt(field_id_index, is_null);
+	assert(!is_null);
 
 	auto p = rec_ids.insert(rec_id);
 	not_unique = p.second;

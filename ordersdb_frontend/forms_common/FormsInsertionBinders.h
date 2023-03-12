@@ -126,7 +126,7 @@ public:
 				db_table(db_table_), \
 				order_date_no(INVALID_FIELD_INDEX) {
 
-		const CMetaInfo &meta_info = db_table->getQuery().getMetaInfo();
+		const CMetaInfo &meta_info = db_table->getMetaInfo();
 		order_date_no = meta_info.getFieldIndexByName("order_date");
 	}
 

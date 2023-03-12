@@ -80,7 +80,7 @@ std::vector<size_t> CMetaInfoBasic::getAllTableFieldsIndexes(const char *table_n
 	auto p_table_name = findTableRecord(table_name);
 	if (!isTableRecordFound(p_table_name, table_name)) {
 		CMetaInfoBasicException e(CMetaInfoBasicException::E_TABLE, \
-								_T("the query does not refer to such table: "));
+								_T("the scalar_query_cache does not refer to such table: "));
 		e << table_name;
 		throw e;
 	}
@@ -109,7 +109,7 @@ void CMetaInfoBasic::setPrimaryTable(const char *table_name) {
 
 	if (p_table == tables.cend()) {
 		CMetaInfoBasicException e(CMetaInfoBasicException::E_TABLE, \
-							_T("the query does not refer to such table: "));
+							_T("the scalar_query_cache does not refer to such table: "));
 		e << table_name;
 		throw e;
 	}

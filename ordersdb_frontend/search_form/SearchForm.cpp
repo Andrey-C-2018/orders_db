@@ -151,7 +151,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 void CSearchForm::createDbGrid(std::shared_ptr<CPaymentsConstraints> constraints) {
 
-	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	const auto &meta_info = db_table->getMetaInfo();
 	size_t allowed_indexes[] = { meta_info.getFieldIndexByName("reason"), \
 								meta_info.getFieldIndexByName("cancel_order"), \
 								meta_info.getFieldIndexByName("cancel_date"), \
@@ -208,7 +208,7 @@ void CSearchForm::reloadStatisticsControls(std::shared_ptr<IDbStatement> new_stm
 
 void CSearchForm::setFieldsSizes() {
 	
-	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	const auto &meta_info = db_table->getMetaInfo();
 	size_t field_index = meta_info.getFieldIndexByName("zone");
 	grid->SetFieldWidth(field_index, 2);
 	grid->SetFieldLabel(field_index, _T("ЗВ"));
@@ -899,7 +899,7 @@ void CSearchForm::displayWidgets() {
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
 
-	size_t id_stage = db_table->getQuery().getMetaInfo().getFieldIndexByName("id_stage");
+	size_t id_stage = db_table->getMetaInfo().getFieldIndexByName("id_stage");
 	grid->HideField(id_stage);
 	grid->HideField(id_stage + 1);
 	grid->HideField(id_stage + 2);
@@ -921,7 +921,7 @@ void CSearchForm::displayWidgets() {
 void CSearchForm::initOrdering(COrderingComboBox *ordering_box) {
 
 	assert(ordering_box);
-	const auto &meta_info = db_table->getQuery().getMetaInfo();
+	const auto &meta_info = db_table->getMetaInfo();
 	ordering_box->addOrderingField("zone", meta_info, grid);
 	ordering_box->addOrderingField("center_short_name", meta_info, grid);
 	ordering_box->addOrderingField("adv_name_short", meta_info, grid);
@@ -1005,7 +1005,7 @@ void CSearchForm::OnRemoveButtonClick(XCommandEvent *eve) {
 	if (option == IDYES) {
 		std::string query;
 		bool is_null = false;
-		const auto &meta_info = db_table->getQuery().getMetaInfo();
+		const auto &meta_info = db_table->getMetaInfo();
 
 		query.reserve(200);
 		query = "SELECT COUNT(*) FROM payments ";

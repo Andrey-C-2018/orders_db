@@ -9,7 +9,7 @@ CAdvDbTableEventsHandler::CAdvDbTableEventsHandler(std::shared_ptr<const CDbTabl
 							master_table(master_table_), dependent_table(dependent_table_), \
 							dep_param_no(dependent_param_no) {
 
-	master_field = master_table_->getQuery().getMetaInfo().getField(master_field_no_);
+	master_field = master_table_->getMetaInfo().getField(master_field_no_);
 }
 
 void CAdvDbTableEventsHandler::OnCurrRecordNoChanged(const size_t new_record) {

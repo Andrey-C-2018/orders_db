@@ -69,7 +69,7 @@ void CDbGrid::DrawLeftPane(XGC &gc) const {
 
 void CDbGrid::SetWidgetForFieldByName(const char *field_name, IGridCellWidget *field_widget) {
 
-	size_t field = db_table->getQuery().getMetaInfo().getFieldIndexByName(field_name);
+	size_t field = db_table->getMetaInfo().getFieldIndexByName(field_name);
 	CEditableGrid::SetWidgetForField(field, field_widget);
 }
 

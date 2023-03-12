@@ -178,9 +178,9 @@
     <ClCompile Include="MetaInfoBasic.cpp" />
     <ClCompile Include="PaginalRS.cpp" />
     <ClCompile Include="PaginalStatement.cpp" />
-    <ClCompile Include="Query.cpp" />
     <ClCompile Include="QueryModifier.cpp" />
     <ClCompile Include="RevDbResultSet.cpp" />
+    <ClCompile Include="ScalarQueryCache.cpp" />
     <ClCompile Include="SortingManager.cpp" />
     <ClCompile Include="UniqueRowIdRS.cpp" />
   </ItemGroup>
@@ -200,9 +200,9 @@
     <ClInclude Include="MetaInfoBasic.h" />
     <ClInclude Include="PaginalRS.h" />
     <ClInclude Include="PaginalStatement.h" />
-    <ClInclude Include="Query.h" />
     <ClInclude Include="QueryModifier.h" />
     <ClInclude Include="RevDbResultSet.h" />
+    <ClInclude Include="ScalarQueryCache.h" />
     <ClInclude Include="SortingManager.h" />
     <ClInclude Include="UniqueRowIdRS.h" />
   </ItemGroup>

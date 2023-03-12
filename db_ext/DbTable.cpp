@@ -1,3 +1,4 @@
+#include <table/EventsHandlersContainer.h>
 #include "DbTable.h"
 
 CDbTableException::CDbTableException(const int err_code, \
@@ -58,22 +59,27 @@ inline ImmutableString<wchar_t> getFieldName(const CMetaInfo &meta_info, \
 CDbTable::CDbTable(std::shared_ptr<IDbConnection> conn_, \
 					std::shared_ptr<IDbStatement> stmt_, \
 					bool rev_sorting_order_) : \
-				conn(conn_), query(conn_, stmt_), curr_record(0), \
+				conn(conn_), stmt(stmt_), \
+				scalar_query_cache(conn_, meta_info), \
+				curr_record(0), \
 				rev_sorting_order(rev_sorting_order_) {
 
-	result_set = query.exec(rev_sorting_order);
+	auto fields = stmt->getResultSetMetadata();
+	meta_info.clearAndAddFields(fields);
+
+	result_set = std::make_shared<CRevDbResultSet>(stmt->exec(), rev_sorting_order);
 }
 
 bool CDbTable::empty() const {
 
-	bool no_fields = query.getMetaInfo().empty();
+	bool no_fields = meta_info.empty();
 	bool no_records = result_set->empty();
 	return no_fields || no_records;
 }
 
 size_t CDbTable::GetFieldsCount() const{
 
-	return query.getMetaInfo().getFieldsCount();
+	return meta_info.getFieldsCount();
 }
 
 size_t CDbTable::GetRecordsCount() const{
@@ -115,23 +121,23 @@ void CDbTable::AddRecord(){
 
 size_t CDbTable::GetFieldMaxLengthInChars(const size_t field) const {
 
-	return query.getMetaInfo().getFieldSize(field);
+	return meta_info.getFieldSize(field);
 }
 
 const Tchar *CDbTable::GetFieldName(const size_t field) const {
 
-	return getFieldName(query.getMetaInfo(), field, Tchar()).str;
+	return getFieldName(meta_info, field, Tchar()).str;
 }
 
 ImmutableString<Tchar> CDbTable::GetFieldNameAsImmutableStr(const size_t field) const {
 
-	return getFieldName(query.getMetaInfo(), field, Tchar());
+	return getFieldName(meta_info, field, Tchar());
 }
 
 ImmutableString<Tchar> CDbTable::GetCellAsString(const size_t field, const size_t record) const{
 
 	result_set->gotoRecord(record);
-	auto field_ptr = query.getMetaInfo().getField(field);
+	auto field_ptr = meta_info.getField(field);
 	return getCellAsString(result_set, field_ptr, Tchar());
 }
 
@@ -140,8 +146,8 @@ void CDbTable::SetCell(const size_t field, const size_t record, const Tchar *val
 	result_set->gotoRecord(record);
 	std::shared_ptr<IDbStatement> update_stmt;
 
-	auto updated_field_ptr = query.getMetaInfo().getField(field);
-	update_stmt = query.getUpdateStmt(field, result_set);
+	auto updated_field_ptr = meta_info.getField(field);
+	update_stmt = scalar_query_cache.getUpdateStmt(field, result_set);
 	if (value && value[0] != _T('\0'))
 		bindValueAsTString(updated_field_ptr, update_stmt, 0, value);
 	else
@@ -155,7 +161,7 @@ void CDbTable::SetCell(const size_t field, const size_t record, const Tchar *val
 void CDbTable::removeCurrentRecord() {
 
 	result_set->gotoRecord(curr_record);
-	auto del_stmt = query.getDeleteStmt(result_set);
+	auto del_stmt = scalar_query_cache.getDeleteStmt(result_set);
 
 	del_stmt->execScalar();
 	rereadQueryContents();
@@ -168,12 +174,12 @@ void CDbTable::reload(){
 
 void CDbTable::reload(std::shared_ptr<IDbStatement> stmt) {
 
-	query.setStmtWithTheSameMetaInfo(stmt);
-	result_set = query.exec(rev_sorting_order);
+	this->stmt = stmt;
+	result_set = std::make_shared<CRevDbResultSet>(stmt->exec(), rev_sorting_order);
 
 	size_t records_count = result_set->getRecordsCount();
 	event_handlers.OnRecordsCountChanged(records_count);
 	db_event_handlers.OnRecordsCountChanged(records_count);
 }
 
-CDbTable::~CDbTable(){ }
+CDbTable::~CDbTable() { }

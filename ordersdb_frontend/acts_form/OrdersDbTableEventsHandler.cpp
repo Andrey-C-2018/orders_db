@@ -9,9 +9,9 @@ COrdersDbTableEventsHandler::COrdersDbTableEventsHandler(std::shared_ptr<const C
 	::memcpy_s(this->dep_params, sizeof(size_t[MASTER_KEY_SIZE]), \
 				dependent_params, sizeof(size_t[MASTER_KEY_SIZE]));
 
-	master_fields[0] = master_table_->getQuery().getMetaInfo().getField(master_key_[0]);
-	master_fields[1] = master_table_->getQuery().getMetaInfo().getField(master_key_[1]);
-	master_fields[2] = master_table_->getQuery().getMetaInfo().getField(master_key_[2]);
+	master_fields[0] = master_table_->getMetaInfo().getField(master_key_[0]);
+	master_fields[1] = master_table_->getMetaInfo().getField(master_key_[1]);
+	master_fields[2] = master_table_->getMetaInfo().getField(master_key_[2]);
 }
 
 void COrdersDbTableEventsHandler::OnCurrRecordNoChanged(const size_t new_record) {

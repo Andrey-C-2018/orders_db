@@ -12,7 +12,7 @@ class COrderParamsBinder : public IInsertBinder {
 public:
 	COrderParamsBinder(std::shared_ptr<CDbTable> db_table_) : db_table(db_table_) {
 
-		const CMetaInfo &meta_info = db_table->getQuery().getMetaInfo();
+		const CMetaInfo &meta_info = db_table->getMetaInfo();
 		order_params[0] = meta_info.getFieldIndexByName("id_center");
 		order_params[1] = meta_info.getFieldIndexByName("id_order");
 		order_params[2] = meta_info.getFieldIndexByName("order_date");
@@ -116,7 +116,7 @@ void CPaymentsInserter::getCurrRecord() {
 	}
 
 	db_table->gotoCurrentRecord();
-	auto &meta_info = db_table->getQuery().getMetaInfo();
+	auto &meta_info = db_table->getMetaInfo();
 	stage->SetCurrRecord(rs, meta_info.getFieldIndexByName("id_stage"), INT_TYPE_HINT);
 
 	const size_t BUFFER_SIZE = MAX_INT_FIELD_LEN > CDate::GERMAN_FORMAT_LEN + 1 ? \
