@@ -68,4 +68,9 @@ void CRevDbResultSet::reload() {
 	records_count = actual_rs->getRecordsCount();
 }
 
+std::shared_ptr<IDbResultSet> CRevDbResultSet::staticClone() const {
+
+	return nullptr;
+}
+
 CRevDbResultSet::~CRevDbResultSet() { }

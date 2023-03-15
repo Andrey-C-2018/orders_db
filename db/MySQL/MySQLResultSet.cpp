@@ -2,6 +2,7 @@
 #include "MySQLResultSet.h"
 #include "MySQLStmtDataEx.h"
 #include "MySQLBindingItem.h"
+#include "MySQLStaticResultSet.h"
 
 CMySQLResultSetException::CMySQLResultSetException(const int err_code, \
 													const Tchar *err_descr) : \
@@ -235,6 +236,32 @@ void CMySQLResultSet::reload() {
 	}
 	else
 		curr_record = (size_t)-1;
+}
+
+std::shared_ptr<IDbResultSet> CMySQLResultSet::staticClone() const {
+
+	assert(stmt);
+	assert(curr_record != (size_t)-1);
+
+	auto static_clone = std::make_shared<MySQLStaticResultSet>(fields_count, records_count);
+	for (curr_record = 0; curr_record < records_count; curr_record++) {
+
+		mysql_stmt_data_seek(stmt->stmt, curr_record);
+
+		volatile int success = mysql_stmt_fetch(stmt->stmt);
+		if (success == MYSQL_DATA_TRUNCATED)
+			throw CMySQLResultSetException(CMySQLResultSetException::E_TRUNC, \
+										_T("fetched data was truncated"));
+		assert(success == 0);
+
+		for (size_t j = 0; j < fields_count; j++) {
+
+			bool is_null = fields[j].is_null > 0;
+			static_clone->setValue(j, curr_record, \
+									is_null ? CMySQLVariant() : fields[j].value);
+		}
+	}
+	return static_clone;
 }
 
 CMySQLResultSet::~CMySQLResultSet() { }

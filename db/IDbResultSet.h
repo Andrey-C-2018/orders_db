@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <basic/ImmutableString.h>
 #include <date/Date.h>
 
@@ -19,6 +20,7 @@ struct IDbResultSet {
 	virtual CDate getDate(const size_t field, bool &is_null) const = 0;
 
 	virtual void reload() = 0;
+	virtual std::shared_ptr<IDbResultSet> staticClone() const = 0;
 
 	virtual ~IDbResultSet() { }
 };

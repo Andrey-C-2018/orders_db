@@ -70,4 +70,9 @@ void UniqueRowIdRS::reload() {
 	rs.reload();
 }
 
+std::shared_ptr<IDbResultSet> UniqueRowIdRS::staticClone() const {
+
+	return nullptr;
+}
+
 UniqueRowIdRS::~UniqueRowIdRS() { }

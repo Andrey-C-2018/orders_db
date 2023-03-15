@@ -1,25 +1,27 @@
 #pragma once
-#include <unordered_set>
+#include <vector>
 #include <db/IDbResultSet.h>
-#include "PaginalRS.h"
+#include "MySQLVariant.h"
 
-class UniqueRowIdRS : public IDbResultSet {
-	const int field_id_index;
-	mutable bool not_unique;
-	PaginalRS rs;
-	mutable std::unordered_set<int> rec_ids;
+class MySQLStaticResultSet : public IDbResultSet {
+
+	size_t fields_count;
+	std::vector<std::vector<CMySQLVariant> > data;
+	mutable size_t curr_record;
 
 public:
-	UniqueRowIdRS(PaginalRS rs, int field_id_index_);
+	MySQLStaticResultSet(size_t fields_count_, size_t records_count);
 
-	UniqueRowIdRS(const UniqueRowIdRS &obj) = delete;
-	UniqueRowIdRS(UniqueRowIdRS &&obj) = default;
-	UniqueRowIdRS& operator=(const UniqueRowIdRS &obj) = delete;
-	UniqueRowIdRS& operator=(UniqueRowIdRS &&obj) = delete;
+	MySQLStaticResultSet(const MySQLStaticResultSet &obj) = delete;
+	MySQLStaticResultSet(MySQLStaticResultSet &&obj) = default;
+	MySQLStaticResultSet& operator=(const MySQLStaticResultSet &obj) = delete;
+	MySQLStaticResultSet& operator=(MySQLStaticResultSet &&obj) = default;
 
 	bool empty() const override;
 	size_t getFieldsCount() const override;
 	size_t getRecordsCount() const override;
+
+	void setValue(size_t field, size_t record, CMySQLVariant value);
 
 	void gotoRecord(const size_t record) const override;
 
@@ -33,5 +35,5 @@ public:
 	void reload() override;
 	std::shared_ptr<IDbResultSet> staticClone() const override;
 
-	virtual ~UniqueRowIdRS();
+	virtual ~MySQLStaticResultSet();
 };

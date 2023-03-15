@@ -1,3 +1,4 @@
+#include <cstring>
 #include <db/IDbConnection.h>
 #include "PaginalStatement.h"
 #include "UniqueRowIdRS.h"

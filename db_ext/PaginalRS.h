@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
 
@@ -10,7 +11,8 @@ class PaginalRS final {
 	std::shared_ptr<IDbStatement> stmt_rec_count;
 	size_t rec_count;
 	mutable size_t curr_page_first_rec;
-	mutable std::shared_ptr<IDbResultSet> rs;
+	mutable std::unordered_map<size_t, std::shared_ptr<IDbResultSet> > rs_cache;
+	mutable std::shared_ptr<IDbResultSet> rs, curr_rs;
 	std::shared_ptr<IDbResultSet> rs_rec_count;
 
 public:
@@ -61,18 +63,28 @@ void PaginalRS::gotoRecord(const size_t record) const {
 	if (curr_page_first_rec > record || record > curr_page_first_rec + PAGE_SIZE) {
 
 		curr_page_first_rec = (record / PAGE_SIZE) * PAGE_SIZE;
-		stmt->bindValue(param_limit_size, (int)PAGE_SIZE);
-		stmt->bindValue(param_limit_size + 1, (int)curr_page_first_rec);
+		auto p = rs_cache.find(curr_page_first_rec);
+		if (p != rs_cache.end())
+			curr_rs = p->second;
+		else {
 
-		rs->reload();
+			stmt->bindValue(param_limit_size, (int) PAGE_SIZE);
+			stmt->bindValue(param_limit_size + 1, (int) curr_page_first_rec);
+			rs->reload();
+
+			auto cloned = rs->staticClone();
+			assert (cloned != nullptr);
+			rs_cache.emplace(0, cloned);
+			curr_rs = rs;
+		}
 	}
 
-	rs->gotoRecord(record % PAGE_SIZE);
+	curr_rs->gotoRecord(record % PAGE_SIZE);
 }
 
 int PaginalRS::getInt(const size_t field, bool &is_null) const {
 
-	return rs->getInt(field, is_null);
+	return curr_rs->getInt(field, is_null);
 }
 
 void PaginalRS::reload() {
@@ -82,7 +94,7 @@ void PaginalRS::reload() {
 	bool is_null;
 	rec_count = rs_rec_count->getInt(0, is_null);
 
-	if (rec_count <= curr_page_first_rec) {
+	if (rec_count <= curr_page_first_rec || curr_rs != rs) {
 		size_t record = rec_count >= PAGE_SIZE / 2 ? \
 						rec_count - PAGE_SIZE / 2 : rec_count / 2;
 
@@ -91,30 +103,32 @@ void PaginalRS::reload() {
 		stmt->bindValue(param_limit_size + 1, (int)curr_page_first_rec);
 	}
 	rs->reload();
+	curr_rs = rs;
+	rs_cache.clear();
 }
 
 const char *PaginalRS::getString(const size_t field) const {
 
-	return rs->getString(field);
+	return curr_rs->getString(field);
 }
 
 const wchar_t *PaginalRS::getWString(const size_t field) const {
 
-	return rs->getWString(field);
+	return curr_rs->getWString(field);
 }
 
 ImmutableString<char> PaginalRS::getImmutableString(const size_t field) const {
 
-	return rs->getImmutableString(field);
+	return curr_rs->getImmutableString(field);
 }
 
 ImmutableString<wchar_t> PaginalRS::getImmutableWString(const size_t field) const {
 
-	return rs->getImmutableWString(field);
+	return curr_rs->getImmutableWString(field);
 }
 
 CDate PaginalRS::getDate(const size_t field, bool &is_null) const {
 
-	return rs->getDate(field, is_null);
+	return curr_rs->getDate(field, is_null);
 }
 

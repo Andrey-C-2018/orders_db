@@ -28,10 +28,10 @@ SQLiteResultSet::SQLiteResultSet(std::shared_ptr<sqlite3> db_, \
 
 	fields_count = sqlite3_column_count(stmt->stmt);
 
-	reload();
+	reloadInternal();
 }
 
-SQLiteResultSet::SQLiteResultSet(SQLiteResultSet &&obj) : \
+SQLiteResultSet::SQLiteResultSet(SQLiteResultSet &&obj) noexcept : \
 								fields_count(obj.fields_count), \
 								records_count(obj.records_count), \
 								db(std::move(obj.db)), \
@@ -46,7 +46,7 @@ SQLiteResultSet::SQLiteResultSet(SQLiteResultSet &&obj) : \
 	obj.fetched_record_no = 0;
 }
 
-SQLiteResultSet &SQLiteResultSet::operator=(SQLiteResultSet &&obj) {
+SQLiteResultSet &SQLiteResultSet::operator=(SQLiteResultSet &&obj) noexcept {
 
 	assert(fields_count || !records_count);
 	
@@ -146,7 +146,7 @@ ImmutableString<wchar_t> SQLiteResultSet::getImmutableWString(const size_t field
 	assert(field < fields_count);
 	assert(fetched_record_no != 0);
 
-	const wchar_t *value = (const wchar_t *)sqlite3_column_text16(stmt->stmt, (int)field);
+	auto value = (const wchar_t *)sqlite3_column_text16(stmt->stmt, (int)field);
 	size_t len = wcslen(value);
 
 	return ImmutableString<wchar_t>(value, len);
@@ -164,17 +164,7 @@ CDate SQLiteResultSet::getDate(const size_t field, bool &is_null) const {
 
 void SQLiteResultSet::reload() {
 
-	sqlite3_reset(stmt->stmt);
-
-	sqlite3_reset(stmt->stmt_records_count);
-	int rc = sqlite3_step(stmt->stmt_records_count);
-	assert(rc != SQLITE_ERROR && rc != SQLITE_DONE);
-
-	stmt->initial_state = false;
-
-	records_count = sqlite3_column_int(stmt->stmt_records_count, 0);
-	fetched_record_no = 0;
-	eof = false;
+	reloadInternal();
 }
 
 void SQLiteResultSet::Release() {
@@ -183,6 +173,11 @@ void SQLiteResultSet::Release() {
 	
 	stmt.reset();
 	db.reset();
+}
+
+std::shared_ptr<IDbResultSet> SQLiteResultSet::staticClone() const {
+
+	throw XException(0, "staticClone() is not supported");
 }
 
 SQLiteResultSet::~SQLiteResultSet() {

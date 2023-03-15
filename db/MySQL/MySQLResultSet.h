@@ -57,6 +57,8 @@ public:
 	void reload() override;
 	void rebind();
 
+	std::shared_ptr<IDbResultSet> staticClone() const override;
+
 	virtual ~CMySQLResultSet();
 };
 

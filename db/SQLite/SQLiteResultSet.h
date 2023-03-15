@@ -25,14 +25,16 @@ class SQLiteResultSet : public IDbResultSet {
 	mutable size_t fetched_record_no;
 
 	inline int execute_stmt() const;
+	inline void reloadInternal();
+
 public:
 	SQLiteResultSet(std::shared_ptr<sqlite3> db_, \
 					std::shared_ptr<Statement> stmt_);
 
 	SQLiteResultSet(const SQLiteResultSet &obj) = delete;
-	SQLiteResultSet(SQLiteResultSet &&obj);
+	SQLiteResultSet(SQLiteResultSet &&obj) noexcept;
 	SQLiteResultSet &operator=(const SQLiteResultSet &obj) = delete;
-	SQLiteResultSet &operator=(SQLiteResultSet &&obj);
+	SQLiteResultSet &operator=(SQLiteResultSet &&obj) noexcept;
 
 	bool empty() const override;
 	size_t getFieldsCount() const override;
@@ -49,6 +51,8 @@ public:
 
 	void reload() override;
 
+	std::shared_ptr<IDbResultSet> staticClone() const override;
+
 	void Release();
 	virtual ~SQLiteResultSet();
 };
@@ -57,4 +61,19 @@ int SQLiteResultSet::execute_stmt() const {
 
 	stmt->initial_state = false;
 	return sqlite3_step(stmt->stmt);
+}
+
+void SQLiteResultSet::reloadInternal() {
+
+	sqlite3_reset(stmt->stmt);
+
+	sqlite3_reset(stmt->stmt_records_count);
+	int rc = sqlite3_step(stmt->stmt_records_count);
+	assert(rc != SQLITE_ERROR && rc != SQLITE_DONE);
+
+	stmt->initial_state = false;
+
+	records_count = sqlite3_column_int(stmt->stmt_records_count, 0);
+	fetched_record_no = 0;
+	eof = false;
 }
