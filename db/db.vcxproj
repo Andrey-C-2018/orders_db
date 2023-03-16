@@ -28,6 +28,7 @@
     <ClCompile Include="MySQL\MySQLResultSetMetadata.cpp" />
     <ClCompile Include="MySQL\MySQLStatement.cpp" />
     <ClCompile Include="MySQL\MySQLStatementException.cpp" />
+    <ClCompile Include="MySQL\MySQLStaticResultSet.cpp" />
     <ClCompile Include="MySQL\MySQLStmtData.cpp" />
     <ClCompile Include="MySQL\MySQLStmtDataEx.cpp" />
     <ClCompile Include="MySQL\MySQLVariant.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="MySQL\MySQLResultSetMetadata.h" />
     <ClInclude Include="MySQL\MySQLStatement.h" />
     <ClInclude Include="MySQL\MySQLStatementException.h" />
+    <ClInclude Include="MySQL\MySQLStaticResultSet.h" />
     <ClInclude Include="MySQL\MySQLStmtData.h" />
     <ClInclude Include="MySQL\MySQLStmtDataEx.h" />
     <ClInclude Include="MySQL\MySQLVariant.h" />

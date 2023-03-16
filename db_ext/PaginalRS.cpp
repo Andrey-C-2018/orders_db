@@ -17,8 +17,5 @@ PaginalRS::PaginalRS(std::shared_ptr<IDbStatement> stmt_, \
 	stmt->bindValue(param_limit_size + 1, (int)curr_page_first_rec);
 	rs = stmt->exec();
 
-	auto cloned = rs->staticClone();
-	assert (cloned != nullptr);
-	rs_cache.emplace(0, cloned);
-	curr_rs = rs;
+	addRSToCache();
 }

@@ -241,7 +241,6 @@ void CMySQLResultSet::reload() {
 std::shared_ptr<IDbResultSet> CMySQLResultSet::staticClone() const {
 
 	assert(stmt);
-	assert(curr_record != (size_t)-1);
 
 	auto static_clone = std::make_shared<MySQLStaticResultSet>(fields_count, records_count);
 	for (curr_record = 0; curr_record < records_count; curr_record++) {
@@ -257,8 +256,13 @@ std::shared_ptr<IDbResultSet> CMySQLResultSet::staticClone() const {
 		for (size_t j = 0; j < fields_count; j++) {
 
 			bool is_null = fields[j].is_null > 0;
-			static_clone->setValue(j, curr_record, \
-									is_null ? CMySQLVariant() : fields[j].value);
+			CMySQLVariant v;
+			if (!is_null) {
+				if (fields[j].value.IsVectorType()) 
+					fields[j].value.UpdateLength(fields[j].length);
+				v = fields[j].value;
+			}
+			static_clone->setValue(j, curr_record, std::move(v));
 		}
 	}
 	return static_clone;

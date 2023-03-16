@@ -78,6 +78,9 @@
     <ClCompile Include="MySQL\MySQLStatementException.cpp">
       <Filter>MySQL</Filter>
     </ClCompile>
+    <ClCompile Include="MySQL\MySQLStaticResultSet.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IDbResultSet.h">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="dll_definitions.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQL\MySQLStaticResultSet.h">
+      <Filter>MySQL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

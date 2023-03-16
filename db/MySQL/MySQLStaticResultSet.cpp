@@ -47,7 +47,7 @@ int MySQLStaticResultSet::getInt(const size_t field, bool &is_null) const {
 
 	auto &data_item = data[curr_record][field];
 	is_null = data_item.IsNull();
-	return data_item.GetInt();
+	return is_null ? -1 : data_item.GetInt();
 }
 
 const char *MySQLStaticResultSet::getString(const size_t field) const {
@@ -56,7 +56,7 @@ const char *MySQLStaticResultSet::getString(const size_t field) const {
 	assert(field < fields_count);
 
 	auto &data_item = data[curr_record][field];
-	return data_item.GetString();
+	return data_item.IsNull() ? nullptr : data_item.GetString();
 }
 
 const wchar_t *MySQLStaticResultSet::getWString(const size_t field) const {
@@ -65,7 +65,8 @@ const wchar_t *MySQLStaticResultSet::getWString(const size_t field) const {
 	assert(field < fields_count);
 
 	auto &data_item = data[curr_record][field];
-	return data_item.GetWString();
+	bool is_null = data_item.IsNull();
+	return is_null ? nullptr : data_item.GetWString();
 }
 
 ImmutableString<char> MySQLStaticResultSet::getImmutableString(const size_t field) const {
@@ -73,7 +74,9 @@ ImmutableString<char> MySQLStaticResultSet::getImmutableString(const size_t fiel
 	assert(curr_record != (size_t)-1);
 	assert(field < fields_count);
 
-	auto &data_item = data[curr_record][field];
+	auto& data_item = data[curr_record][field];
+	if (data_item.IsNull()) return ImmutableString<char>(nullptr, 0);
+
 	auto str = data_item.GetString();
 	size_t len = data_item.GetValueLength();
 
@@ -86,6 +89,8 @@ ImmutableString<wchar_t> MySQLStaticResultSet::getImmutableWString(const size_t 
 	assert(field < fields_count);
 
 	auto &data_item = data[curr_record][field];
+	if (data_item.IsNull()) return ImmutableString<wchar_t>(nullptr, 0);
+
 	auto str = data_item.GetWString();
 	size_t len = data_item.GetValueLength();
 
@@ -99,7 +104,7 @@ CDate MySQLStaticResultSet::getDate(const size_t field, bool &is_null) const {
 
 	auto &data_item = data[curr_record][field];
 	is_null = data_item.IsNull();
-	return data_item.GetDate();
+	return is_null ? CDate() : data_item.GetDate();
 }
 
 void MySQLStaticResultSet::reload() { }

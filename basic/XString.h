@@ -114,7 +114,8 @@ template <typename Tchar> \
 XString<Tchar>::XString(const XString &obj) : data(nullptr), str_size(0), \
 														allocated_size(0) {
 
-	init(obj.data, obj.str_size);
+	if (obj.str_size > 0)
+		init(obj.data, obj.str_size);
 }
 
 template <typename Tchar> \
@@ -153,7 +154,9 @@ XString<Tchar>::XString(const Tchar ch) : data(nullptr), str_size(0), \
 template <typename Tchar> \
 XString<Tchar> &XString<Tchar>::operator=(const XString &obj) {
 
-	init(obj.data, obj.str_size);
+	if (obj.str_size > 0)
+		init(obj.data, obj.str_size);
+
 	return *this;
 }
 
