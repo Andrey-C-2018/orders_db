@@ -19,4 +19,18 @@ CMySQLVariant::CMySQLVariant(const enum_field_types type, const size_t max_len) 
 		memset(&value_datetime, 0, sizeof(MYSQL_TIME));
 }
 
+Variant CMySQLVariant::toStdVariant() const {
+
+	if (IsDate())
+		return Variant(GetDate());
+
+	if (IsVectorType())
+		return fromString(Tchar());
+
+	if (IsInteger())
+		return Variant(GetInt());
+
+	return Variant();
+}
+
 CMySQLVariant::~CMySQLVariant(){ }

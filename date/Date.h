@@ -4,9 +4,9 @@
 #include "dll_definitions.h"
 
 class DATELIB_DLL_EXPORT CDate {
-	unsigned day;
-	unsigned month;
-	unsigned year;
+	unsigned char day;
+	unsigned char month;
+	unsigned short year;
 
 public:
 	enum Formats {
@@ -18,8 +18,11 @@ public:
 		GERMAN_FORMAT_LEN = 10
 	};
 	CDate() noexcept;
+
 	CDate(const CDate &obj) noexcept;
 	CDate(CDate &&obj) = default;
+	CDate &operator=(const CDate &obj) noexcept;
+	CDate &operator=(CDate &&obj) = default;
 
 	CDate(const unsigned day, \
 			const unsigned month, \
@@ -27,8 +30,6 @@ public:
 
 	template <typename Tchar> \
 		CDate(const Tchar *date_str, const int format) noexcept;
-	CDate &operator=(const CDate &obj) noexcept;
-	CDate &operator=(CDate &&obj) = default;
 
 	inline bool operator==(const CDate &obj) const noexcept;
 	inline bool operator!=(const CDate &obj) const noexcept;
@@ -69,11 +70,11 @@ CDate::CDate(const Tchar *date_str, const int format) noexcept : \
 				day(0), month(0), year(0) {
 
 	switch (format) {
-	case SQL_FORMAT:
-		setDateSQL(date_str);
+		case SQL_FORMAT:
+			setDateSQL(date_str);
 
-	case GERMAN_FORMAT:
-		setDateGerman(date_str);
+		case GERMAN_FORMAT:
+			setDateGerman(date_str);
 	}
 }
 
@@ -121,15 +122,16 @@ void CDate::set(const unsigned day, \
 				const unsigned year) noexcept {
 
 	assert(day <= 31 && month <= 12);
-	this->day = day;
-	this->month = month;
-	this->year = year;
+	this->day = (unsigned char)day;
+	this->month = (unsigned char)month;
+	this->year = (unsigned short)year;
 }
 
 template <typename Tchar> \
 bool CDate::setDateSQL(const Tchar *date_str) noexcept {
 	bool key = false;
-	unsigned Day(day), Month(month), Year(year);
+	unsigned char Day(day), Month(month);
+	unsigned short Year(year);
 	constexpr Tchar _0 = getZeroChar(Tchar());
 	constexpr Tchar _1 = getOneChar(Tchar());
 	constexpr Tchar _9 = getNineChar(Tchar());
@@ -160,7 +162,8 @@ bool CDate::setDateSQL(const Tchar *date_str) noexcept {
 template <typename Tchar> \
 bool CDate::setDateGerman(const Tchar *date_str) noexcept {
 	bool key = false;
-	unsigned Day(day), Month(month), Year(year);
+	unsigned char Day(day), Month(month);
+	unsigned short Year(year);
 	constexpr Tchar _0 = getZeroChar(Tchar());
 	constexpr Tchar _1 = getOneChar(Tchar());
 	constexpr Tchar _9 = getNineChar(Tchar());
@@ -217,7 +220,7 @@ void CDate::toStringGerman(Tchar *buffer) const noexcept {
 
 template <typename Tchar> \
 void CDate::toStringSQL(Tchar *buffer) const noexcept {
-	unsigned Year = year;
+	unsigned short Year = year;
 	constexpr Tchar _0 = getZeroChar(Tchar());
 	constexpr Tchar _minus = getMinusChar(Tchar());
 

@@ -182,7 +182,7 @@
     <ClCompile Include="RevDbResultSet.cpp" />
     <ClCompile Include="ScalarQueryCache.cpp" />
     <ClCompile Include="SortingManager.cpp" />
-    <ClCompile Include="UniqueRowIdRS.cpp" />
+    <ClCompile Include="StaticResultSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbEventsHandlersContainer.h" />
@@ -204,7 +204,7 @@
     <ClInclude Include="RevDbResultSet.h" />
     <ClInclude Include="ScalarQueryCache.h" />
     <ClInclude Include="SortingManager.h" />
-    <ClInclude Include="UniqueRowIdRS.h" />
+    <ClInclude Include="StaticResultSet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

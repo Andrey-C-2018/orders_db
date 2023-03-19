@@ -4,6 +4,7 @@
 #include <date/Date.h>
 
 struct IDbBindingTarget;
+struct IDbStaticResultSet;
 
 struct IDbResultSet {
 	virtual bool empty() const = 0;
@@ -20,7 +21,7 @@ struct IDbResultSet {
 	virtual CDate getDate(const size_t field, bool &is_null) const = 0;
 
 	virtual void reload() = 0;
-	virtual std::shared_ptr<IDbResultSet> staticClone() const = 0;
+	virtual void upload(IDbStaticResultSet &obj) const = 0;
 
 	virtual ~IDbResultSet() { }
 };

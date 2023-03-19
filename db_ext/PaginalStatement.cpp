@@ -1,7 +1,7 @@
 #include <cstring>
 #include <db/IDbConnection.h>
 #include "PaginalStatement.h"
-#include "UniqueRowIdRS.h"
+#include "PaginalRS.h"
 
 PaginalStatement::PaginalStatement(std::shared_ptr<IDbConnection> conn_, \
 									const char* query, int field_id_index_) : \
@@ -97,8 +97,7 @@ void PaginalStatement::bindNull(const size_t param_no) {
 
 std::shared_ptr<IDbResultSet> PaginalStatement::exec() {
 
-	PaginalRS crs(stmt, stmt_rec_count);
-	return std::make_shared<UniqueRowIdRS>(std::move(crs), field_id_index);
+	return std::make_shared<PaginalRS>(stmt, stmt_rec_count, field_id_index);
 }
 
 record_t PaginalStatement::execScalar() {

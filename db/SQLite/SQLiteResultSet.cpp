@@ -175,9 +175,9 @@ void SQLiteResultSet::Release() {
 	db.reset();
 }
 
-std::shared_ptr<IDbResultSet> SQLiteResultSet::staticClone() const {
+void SQLiteResultSet::upload(IDbStaticResultSet &static_rs) const {
 
-	throw XException(0, "staticClone() is not supported");
+	throw XException(0, "upload() is not supported");
 }
 
 SQLiteResultSet::~SQLiteResultSet() {

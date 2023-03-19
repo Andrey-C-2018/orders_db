@@ -1,7 +1,7 @@
 #include "Date.h"
 #include <chrono>
 
-CDate::CDate() noexcept : day(0), month(0), year(0){ }
+CDate::CDate() noexcept : day(0), month(0), year(0) { }
 
 CDate::CDate(const CDate &obj) noexcept : day(obj.day), month(obj.month),\
 									year(obj.year) { }

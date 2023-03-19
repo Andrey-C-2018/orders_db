@@ -22,7 +22,7 @@ endif()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${XLIBS_OUTPUT_FOLDER})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${XLIBS_OUTPUT_FOLDER})
 
-add_library(date STATIC Date.cpp Date.h)
+add_library(date STATIC Date.cpp Date.h Variant.cpp Variant.h)
 target_include_directories(date PRIVATE ${XLIBS_ROOT_FOLDER})
 
 set_target_properties(date PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)

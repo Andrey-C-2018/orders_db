@@ -15,6 +15,8 @@ public:
 	virtual ~SQLiteResultSetException();
 };
 
+struct IDbStaticResultSet;
+
 class SQLiteResultSet : public IDbResultSet {
 	size_t fields_count, records_count;
 
@@ -51,7 +53,7 @@ public:
 
 	void reload() override;
 
-	std::shared_ptr<IDbResultSet> staticClone() const override;
+	void upload(IDbStaticResultSet &static_rs) const override;
 
 	void Release();
 	virtual ~SQLiteResultSet();

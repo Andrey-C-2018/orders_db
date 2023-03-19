@@ -51,10 +51,10 @@
     <ClCompile Include="PaginalStatement.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="UniqueRowIdRS.cpp">
+    <ClCompile Include="ScalarQueryCache.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="ScalarQueryCache.cpp">
+    <ClCompile Include="StaticResultSet.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,10 +113,10 @@
     <ClInclude Include="PaginalStatement.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="UniqueRowIdRS.h">
+    <ClInclude Include="ScalarQueryCache.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="ScalarQueryCache.h">
+    <ClInclude Include="StaticResultSet.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

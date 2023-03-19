@@ -48,17 +48,14 @@ add_library(db STATIC DbException.cpp
         MySQL/MySQLException.cpp
         MySQL/MySQLField.cpp
         MySQL/MySQLResultSet.cpp
-        MySQL/MySQLStaticResultSet.cpp
         MySQL/MySQLResultSetMetadata.cpp
         MySQL/MySQLStatement.cpp
         MySQL/MySQLStatementException.cpp
         MySQL/MySQLStmtData.cpp
         MySQL/MySQLStmtDataEx.cpp
-        MySQL/MySQLVariant.cpp)
+        MySQL/MySQLVariant.cpp IDbStaticResultSet.h)
 
 target_include_directories(db PRIVATE ${XLIBS_ROOT_FOLDER})
 target_include_directories(db PUBLIC ${MARIADB_INCLUDE_DIRS})
-
-target_sources(db PRIVATE MySQL/MySQLStaticResultSet.h)
 
 set_target_properties(db PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)

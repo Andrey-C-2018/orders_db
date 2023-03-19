@@ -1,8 +1,8 @@
 #include "../IDbBindingTarget.h"
+#include "../IDbStaticResultSet.h"
 #include "MySQLResultSet.h"
 #include "MySQLStmtDataEx.h"
 #include "MySQLBindingItem.h"
-#include "MySQLStaticResultSet.h"
 
 CMySQLResultSetException::CMySQLResultSetException(const int err_code, \
 													const Tchar *err_descr) : \
@@ -238,11 +238,10 @@ void CMySQLResultSet::reload() {
 		curr_record = (size_t)-1;
 }
 
-std::shared_ptr<IDbResultSet> CMySQLResultSet::staticClone() const {
+void CMySQLResultSet::upload(IDbStaticResultSet &static_rs) const {
 
 	assert(stmt);
-
-	auto static_clone = std::make_shared<MySQLStaticResultSet>(fields_count, records_count);
+	static_rs.init(fields_count, records_count);
 	for (curr_record = 0; curr_record < records_count; curr_record++) {
 
 		mysql_stmt_data_seek(stmt->stmt, curr_record);
@@ -256,16 +255,15 @@ std::shared_ptr<IDbResultSet> CMySQLResultSet::staticClone() const {
 		for (size_t j = 0; j < fields_count; j++) {
 
 			bool is_null = fields[j].is_null > 0;
-			CMySQLVariant v;
+			Variant v;
 			if (!is_null) {
 				if (fields[j].value.IsVectorType()) 
 					fields[j].value.UpdateLength(fields[j].length);
-				v = fields[j].value;
+				v = fields[j].value.toStdVariant();
 			}
-			static_clone->setValue(j, curr_record, std::move(v));
+			static_rs.setValue(j, curr_record, std::move(v));
 		}
 	}
-	return static_clone;
 }
 
 CMySQLResultSet::~CMySQLResultSet() { }

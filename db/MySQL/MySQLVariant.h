@@ -2,14 +2,9 @@
 #include <mysql.h>
 #include <basic/XString.h>
 #include <basic/TextConv.h>
-#include <date/Date.h>
+#include <date/Variant.h>
 
 class CMySQLVariant final {
-	enum{
-		DEF_BUFFER_SIZE = 30, \
-		MAX_STR_SIZE = 255
-	};
-
 	enum_field_types value_type;
 	union {
 		int value_int;
@@ -18,6 +13,9 @@ class CMySQLVariant final {
 	};
 	XString<char> value_string;
 	mutable XString<wchar_t> conv_buffer;
+
+	inline Variant fromString(char type_hint) const;
+	inline Variant fromString(wchar_t type_hint) const;
 
 public:
 	CMySQLVariant();
@@ -72,6 +70,8 @@ public:
 	inline void SetString(const char *value, const size_t len);
 	inline void SetString(const wchar_t *value);
 	inline void SetString(const wchar_t *value, const size_t len);
+
+	Variant toStdVariant() const;
 
 	~CMySQLVariant();
 };
@@ -245,4 +245,18 @@ void CMySQLVariant::SetString(const wchar_t *value, const size_t len) {
 	UCS16_ToUTF8(value, (int)len, value_string);
 	if (value_string.size())
 		value_string.resize(value_string.size() - 1);
+}
+
+Variant CMySQLVariant::fromString(char type_hint) const {
+
+	auto str = GetString();
+	size_t sz = value_string.size();
+	return Variant(str, sz);
+}
+
+Variant CMySQLVariant::fromString(wchar_t type_hint) const {
+
+	auto str = GetWString();
+	size_t sz = value_string.empty() ? 0 : conv_buffer.size();
+	return Variant(str, sz);
 }

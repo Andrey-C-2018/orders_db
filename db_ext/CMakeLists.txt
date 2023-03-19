@@ -32,9 +32,7 @@ add_library(db_ext STATIC DbTable.cpp
         PaginalRS.cpp
         PaginalRS.h
         PaginalStatement.cpp
-        PaginalStatement.h
-        UniqueRowIdRS.cpp
-        UniqueRowIdRS.h)
+        PaginalStatement.h StaticResultSet.cpp StaticResultSet.h)
 
 target_include_directories(db_ext PRIVATE ${XLIBS_ROOT_FOLDER})
 

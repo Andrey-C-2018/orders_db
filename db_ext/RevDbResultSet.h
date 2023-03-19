@@ -32,7 +32,7 @@ public:
 	CDate getDate(const size_t field, bool &is_null) const override;
 
 	void reload() override;
-	std::shared_ptr<IDbResultSet> staticClone() const override;
+	void upload(IDbStaticResultSet &obj) const override { };
 
 	virtual ~CRevDbResultSet();
 };
