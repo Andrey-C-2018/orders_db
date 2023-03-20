@@ -7,7 +7,7 @@
 class PaginalRS : public IDbResultSet {
 	static constexpr size_t PAGE_SIZE = 100;
 	size_t param_limit_size; // LIMIT row_count OFFSET offset_in_rs
-	size_t field_id_index;
+	size_t field_id_index;   // index of the field containing unique record ids
 
 	mutable std::shared_ptr<IDbStatement> stmt;
 	std::shared_ptr<IDbStatement> stmt_rec_count;

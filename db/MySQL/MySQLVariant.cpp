@@ -22,7 +22,9 @@ CMySQLVariant::CMySQLVariant(const enum_field_types type, const size_t max_len) 
 Variant CMySQLVariant::toStdVariant() const {
 
 	if (IsDate())
-		return Variant(GetDate());
+		return Variant(value_datetime.day, \
+					value_datetime.month, \
+					value_datetime.year);
 
 	if (IsVectorType())
 		return fromString(Tchar());

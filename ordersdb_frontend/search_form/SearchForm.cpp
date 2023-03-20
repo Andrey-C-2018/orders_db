@@ -949,7 +949,7 @@ void CSearchForm::OnSortButtonClick(XCommandEvent *eve) {
 		}
 		else
 			query_modifier.changeOrdering(sorting_manager.buildOrderingString());
-		//auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
+
 		auto stmt = std::make_shared<PaginalStatement>(conn, query_modifier.getQuery().c_str(), \
 														fields_list.FIELDS_COUNT);
 		

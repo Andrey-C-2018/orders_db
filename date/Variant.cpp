@@ -9,7 +9,7 @@ Variant::Variant(int value) noexcept : value_type(TYPE_INT), \
 										int_value(value), str_size(0) { }
 
 Variant::Variant(unsigned value) noexcept : value_type(TYPE_UINT), \
-											unsigned_value(value), str_size(0) { }
+											uint_value(value), str_size(0) { }
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -60,11 +60,30 @@ Variant::Variant(const wchar_t *wstr, size_t len) noexcept : value_type(TYPE_WST
 	}
 }
 
-Variant::Variant(CDate date) noexcept : value_type(TYPE_DATE), \
-												date_value(std::move(date)), \
-												str_size(0) { }
+Variant::Variant(const CDate &date) noexcept : value_type(TYPE_DATE), \
+												str_size(0) {
+
+	uint_value = date.getYear();
+	uint_value <<= 16;
+	uint_value += date.getMonth();
+	uint_value <<= 8;
+	uint_value += date.getDay();
+}
+
+Variant::Variant(unsigned char day, \
+				unsigned char month, \
+				unsigned short year) noexcept : value_type(TYPE_DATE), \
+												str_size(0) {
+
+	uint_value = year;
+	uint_value <<= 8;
+	uint_value += month;
+	uint_value <<= 8;
+	uint_value += day;
+}
 
 Variant::Variant(const Variant &obj) noexcept : value_type(obj.value_type), \
+												int_value(obj.int_value), \
 												str_size(obj.str_size) {
 
 	if (obj.value_type == TYPE_STRING) {
@@ -97,6 +116,7 @@ Variant::Variant(Variant &&obj) noexcept : value_type(obj.value_type), \
 Variant &Variant::operator=(const Variant &obj) noexcept {
 
 	value_type = obj.value_type;
+	int_value = obj.int_value;
 	str_size = obj.str_size;
 
 	if (obj.value_type == TYPE_STRING) {

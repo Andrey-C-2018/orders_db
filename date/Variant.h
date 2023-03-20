@@ -18,10 +18,9 @@ private:
 	Types value_type;
 	union {
 		int int_value;
-		unsigned unsigned_value;
+		unsigned uint_value;
 		char *str_value;
 		wchar_t *wstr_value;
-		CDate date_value;
 	};
 	size_t str_size;
 
@@ -34,7 +33,8 @@ public:
 	Variant(const char *str, size_t len) noexcept;
 	explicit Variant(const wchar_t *wstr) noexcept;
 	Variant(const wchar_t *wstr, size_t len) noexcept;
-	explicit Variant(CDate date) noexcept;
+	explicit Variant(const CDate &date) noexcept;
+	Variant(unsigned char day, unsigned char month, unsigned short year) noexcept;
 
 	Variant(const Variant &obj) noexcept;
 	Variant(Variant &&obj) noexcept;
@@ -47,7 +47,7 @@ public:
 	inline unsigned getUInt() const;
 	inline const char *getString() const;
 	inline const wchar_t *getWString() const;
-	inline const CDate &getDate() const;
+	inline CDate getDate() const;
 
 	inline size_t getStringLength() const;
 
@@ -70,7 +70,7 @@ int Variant::getInt() const {
 unsigned Variant::getUInt() const {
 
 	assert (value_type == TYPE_UINT);
-	return unsigned_value;
+	return uint_value;
 }
 
 const char *Variant::getString() const {
@@ -85,10 +85,16 @@ const wchar_t *Variant::getWString() const {
 	return wstr_value;
 }
 
-const CDate &Variant::getDate() const {
+CDate Variant::getDate() const {
 
 	assert (value_type == TYPE_DATE);
-	return date_value;
+
+	unsigned char day = uint_value % 0x100;
+	unsigned v = uint_value >> 8;
+	unsigned char month = v % 0x100;
+	v >>= 8;
+
+	return CDate(day, month, v);
 }
 
 size_t Variant::getStringLength() const {
