@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <unordered_set>
 #include <db/IDbStatement.h>
 #include <db/IDbResultSet.h>
 #include "StaticResultSet.h"
@@ -8,6 +9,7 @@ class PaginalRS : public IDbResultSet {
 	static constexpr size_t PAGE_SIZE = 100;
 	size_t param_limit_size; // LIMIT row_count OFFSET offset_in_rs
 	size_t field_id_index;   // index of the field containing unique record ids
+	mutable std::unordered_set<int> rec_ids;
 
 	mutable std::shared_ptr<IDbStatement> stmt;
 	std::shared_ptr<IDbStatement> stmt_rec_count;
@@ -55,7 +57,7 @@ public:
 
 void PaginalRS::addRSToCache() const {
 
-	auto new_cached_rs = std::make_shared<StaticResultSet>();
+	auto new_cached_rs = std::make_shared<StaticResultSet>(field_id_index, rec_ids);
 	rs->upload(*new_cached_rs);
 
 	curr_rs = new_cached_rs;

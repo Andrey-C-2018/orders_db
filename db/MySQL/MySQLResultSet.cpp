@@ -242,6 +242,8 @@ void CMySQLResultSet::upload(IDbStaticResultSet &static_rs) const {
 
 	assert(stmt);
 	static_rs.init(fields_count, records_count);
+	size_t field_id_rec = static_rs.getFieldRecId();
+
 	for (curr_record = 0; curr_record < records_count; curr_record++) {
 
 		mysql_stmt_data_seek(stmt->stmt, curr_record);
@@ -251,6 +253,9 @@ void CMySQLResultSet::upload(IDbStaticResultSet &static_rs) const {
 			throw CMySQLResultSetException(CMySQLResultSetException::E_TRUNC, \
 										_T("fetched data was truncated"));
 		assert(success == 0);
+		assert(!fields[field_id_rec].is_null);
+		int id = fields[field_id_rec].value.GetInt();
+		static_rs.gotoRecord(curr_record, id);
 
 		for (size_t j = 0; j < fields_count; j++) {
 
@@ -261,7 +266,7 @@ void CMySQLResultSet::upload(IDbStaticResultSet &static_rs) const {
 					fields[j].value.UpdateLength(fields[j].length);
 				v = fields[j].value.toStdVariant();
 			}
-			static_rs.setValue(j, curr_record, std::move(v));
+			static_rs.setValue(j, std::move(v));
 		}
 	}
 }

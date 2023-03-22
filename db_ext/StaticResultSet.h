@@ -1,16 +1,20 @@
 #pragma once
 #include <vector>
+#include <unordered_set>
 #include <basic/ImmutableString.h>
 #include <date/Variant.h>
 #include <db/IDbStaticResultSet.h>
 
 class StaticResultSet final : public IDbStaticResultSet {
 	size_t fields_count;
+	size_t field_rec_id;
 	std::vector<std::vector<Variant> > data;
+	std::unordered_set<int> *rec_ids;
+	bool is_double;
 	mutable size_t curr_record;
 
 public:
-	StaticResultSet();
+	StaticResultSet(size_t field_rec_id, std::unordered_set<int> &rec_ids_);
 
 	void init(size_t fields_count_, size_t records_count) override;
 
@@ -23,7 +27,9 @@ public:
 	inline size_t getFieldsCount() const;
 	inline size_t getRecordsCount() const;
 
-	void setValue(size_t field, size_t record, Variant value) override;
+	size_t getFieldRecId() const override;
+	bool gotoRecord(size_t record, int field_id_value) override;
+	void setValue(size_t field, Variant value) override;
 
 	inline void gotoRecord(const size_t record) const;
 

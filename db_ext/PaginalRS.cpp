@@ -42,7 +42,7 @@ size_t PaginalRS::getRecordsCount() const {
 void PaginalRS::gotoRecord(const size_t record) const {
 
 	assert(record < rec_count);
-	if (curr_page_first_rec > record || record > curr_page_first_rec + PAGE_SIZE) {
+	if (curr_page_first_rec > record || record >= curr_page_first_rec + PAGE_SIZE) {
 
 		curr_page_first_rec = (record / PAGE_SIZE) * PAGE_SIZE;
 		auto p = rs_cache.find(curr_page_first_rec);
@@ -85,6 +85,7 @@ void PaginalRS::reload() {
 	}
 	rs->reload();
 	rs_cache.clear();
+	rec_ids.clear();
 
 	addRSToCache();
 }
