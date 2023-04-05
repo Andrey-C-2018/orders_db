@@ -53,7 +53,13 @@ if(NOT MSVC OR MSVC_TOOLSET_VERSION LESS_EQUAL 80)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${CMAKE_BUILD_TYPE})
 endif()
 
-add_executable(db_ext_test main.cpp QueryModifierTest.cpp SortingManagerTest.cpp)
+add_executable(db_ext_test main.cpp 
+		QueryModifierTest.cpp 
+		SortingManagerTest.cpp
+		PaginalRSTests.cpp
+		TestResultSet.h
+		TestStatement.h TestResultSet.cpp TestStatement.cpp TestRecCountStatement.cpp TestRecCountStatement.h ITestStatement.h)
+
 set_target_properties(db_ext_test PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
 target_include_directories(db_ext_test PRIVATE ${XLIBS_ROOT_FOLDER})
 target_include_directories(db_ext_test PUBLIC ${SQLite3_INCLUDE_DIRS})

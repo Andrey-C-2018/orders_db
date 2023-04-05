@@ -17,6 +17,7 @@ public:
 	StaticResultSet(size_t field_rec_id, std::unordered_set<int> &rec_ids_);
 
 	void init(size_t fields_count_, size_t records_count) override;
+	inline void appendNullrecords(size_t count);
 
 	StaticResultSet(const StaticResultSet &obj) = delete;
 	StaticResultSet(StaticResultSet &&obj) = default;
@@ -129,4 +130,11 @@ CDate StaticResultSet::getDate(const size_t field, bool &is_null) const {
 	auto &data_item = data[curr_record][field];
 	is_null = data_item.isNull();
 	return is_null ? CDate() : data_item.getDate();
+}
+
+
+void StaticResultSet::appendNullrecords(size_t count) {
+
+	for (size_t i = 0; i < count; i++)
+		data.emplace_back(std::vector<Variant>(fields_count));
 }

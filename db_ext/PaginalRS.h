@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <unordered_map>
 #include <unordered_set>
 #include <db/IDbStatement.h>
@@ -6,7 +7,8 @@
 #include "StaticResultSet.h"
 
 class PaginalRS : public IDbResultSet {
-	static constexpr size_t PAGE_SIZE = 100;
+	static constexpr size_t DEF_PAGE_SIZE = 100;
+	const size_t page_size;
 	size_t param_limit_size; // LIMIT row_count OFFSET offset_in_rs
 	size_t field_id_index;   // index of the field containing unique record ids
 	mutable std::unordered_set<int> rec_ids;
@@ -22,11 +24,17 @@ class PaginalRS : public IDbResultSet {
 	mutable std::shared_ptr<IDbResultSet> rs;
 	std::shared_ptr<IDbResultSet> rs_rec_count;
 
+	void init();
 	inline void addRSToCache() const;
 
 public:
-	PaginalRS(std::shared_ptr<IDbStatement> stmt_,
-			  std::shared_ptr<IDbStatement> stmt_rec_count_,
+	PaginalRS(std::shared_ptr<IDbStatement> stmt_, \
+			  std::shared_ptr<IDbStatement> stmt_rec_count_, \
+			  size_t field_id_index_);
+
+	PaginalRS(size_t page_size, \
+				std::shared_ptr<IDbStatement> stmt_, \
+			  std::shared_ptr<IDbStatement> stmt_rec_count_, \
 			  size_t field_id_index_);
 
 	PaginalRS(const PaginalRS &obj) = delete;
@@ -59,6 +67,11 @@ void PaginalRS::addRSToCache() const {
 
 	auto new_cached_rs = std::make_shared<StaticResultSet>(field_id_index, rec_ids);
 	rs->upload(*new_cached_rs);
+
+	assert (rec_count >= curr_page_first_rec);
+	if (rec_count - curr_page_first_rec > new_cached_rs->getRecordsCount())
+		new_cached_rs->appendNullrecords(rec_count - curr_page_first_rec -
+												 new_cached_rs->getRecordsCount());
 
 	curr_rs = new_cached_rs;
 	auto pair = rs_cache.emplace(curr_page_first_rec, new_cached_rs);

@@ -12,6 +12,5 @@ int main() {
 	setLocaleToCurrOS_Locale();
 	int ret_value = UnitTest::RunAllTests();
 
-	std::cin.get();
 	return ret_value;
 }
