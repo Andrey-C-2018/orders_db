@@ -289,7 +289,14 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	ins_helper.addBinder(42, _T("«м мед"), std::make_shared<CQaParamBinder>(change_med, false));
 	ins_helper.addBinder(43, _T("—кас мед"), std::make_shared<CQaParamBinder>(cancel_med, false));
 
-	std::string query = "INSERT INTO payments VALUES(";
+	std::string query = "INSERT INTO payments(";
+	query += " id_center, id_order, order_date, fee, id_stage, article, id_informer,";
+	query += " id_act, act_no, act_date, cycle, id_user, last_changed, id_act_parus,";
+	query += " is_paid, act_reg_date, payment_date, fee_parus, age, inv, lang, ill, zek,";
+	query += " vpr, reduce, change_, close, zv, min, nm_suv, zv_kr, No_Ch_Ist, Koef,";
+	query += " bank_reg_date, id_checker, outg_post, outg_daynight, appeal_softer,";
+	query += " detect_softer, reject_appeal, change_kval_kr, reduce_ep, change_med, cancel_med)";
+	query += " VALUES(";
 	ins_helper.buildQuery(query);
 	query += ')';
 

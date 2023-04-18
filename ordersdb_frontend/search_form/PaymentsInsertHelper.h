@@ -1,6 +1,7 @@
 #pragma once
 #include <db_ext/DbInsertHelper.h>
 #include <db_controls/InsertionBinders.h>
+#include <db_controls/DbComboBox.h>
 
 struct IDbConnection;
 
@@ -29,6 +30,7 @@ class CPaymentsInsertHelper {
 	CDbComboBox *checker;
 
 	inline void init();
+	inline void appendStageInfo(Tstring& str) const;
 
 public:
 	enum {
@@ -118,4 +120,13 @@ void CPaymentsInsertHelper::setOrderDateBinder(std::shared_ptr<IInsertBinder> bi
 
 	this->order_date_binder = binder;
 	this->order_date = order_date;
+}
+
+void CPaymentsInsertHelper::appendStageInfo(Tstring& str) const {
+
+	str += stage->GetLabel();
+	str += _T(", № розгляду: ");
+	str += cycle->GetLabel();
+	str += _T(", тип акту: ");
+	str += act_no->GetLabel();
 }

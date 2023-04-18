@@ -75,6 +75,7 @@ class CSearchForm : public XTabStopPanel {
 	XProgressBar *progress;
 	FieldsList fields_list;
 
+	std::shared_ptr<IDbStatement> createTableStmt();
 	std::shared_ptr<CDbTable> createDbTable();
 	void createStatisticsStatements();
 	void reloadStatisticsControls();

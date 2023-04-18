@@ -66,14 +66,14 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.17";
-const char def_ordering_str[] = "a.id_center_legalaid,a.order_date,a.id,aa.cycle,aa.id_stage,aa.act_no DESC";
+constexpr char search_form_version[] = "1.0.18";
+const char def_ordering_str[] = "a.id_center_legalaid DESC,a.order_date DESC,a.id DESC,aa.cycle DESC,aa.id_stage DESC,aa.act_no";
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
 					const int X, const int Y, \
 					const int width, const int height) : \
-				sorting_manager(FIELDS_COUNT), uploader(6), \
+				sorting_manager(FIELDS_COUNT), uploader(7), \
 				flt_id(nullptr), flt_act(nullptr), flt_order_date_from(nullptr), \
 				flt_order_date_to(nullptr), flt_act_reg_date_from(nullptr), \
 				flt_act_reg_date_to(nullptr), flt_act_date_from(nullptr), \
@@ -400,7 +400,7 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 	else
 		grid->SetWidgetForFieldByName("center_short_name", readonly_widget);
 	
-	canceling_reasons_list = new CComboBoxCellWidget();
+	canceling_reasons_list = new CComboBoxCellWidget(true);
 	grid->SetWidgetForFieldByName("reason", canceling_reasons_list);
 
 	stmt = conn->PrepareQuery("SELECT id_inf, informer_name FROM informers ORDER BY 2");
@@ -613,13 +613,19 @@ void CSearchForm::initFilteringControls() {
 	flt_paid = new CPaidFilter(filtering_manager);
 }
 
+std::shared_ptr<IDbStatement> CSearchForm::createTableStmt() {
+
+	const char* query = query_modifier.getQuery().c_str();
+	int rec_id_index = fields_list.FIELDS_COUNT - 1;
+	return std::make_shared<PaginalStatement>(conn, query, rec_id_index);
+}
+
 std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	std::string query = "SELECT ";
 
 	query += fields_list.getFieldsList();
-	query += ", aa.rec_id ";
-	query += "FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
+	query += " FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
 	query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat";
 	query += " INNER JOIN order_types t ON a.id_order_type = t.id_type";
 	query += " INNER JOIN informers inf ON aa.id_informer = inf.id_inf";
@@ -636,11 +642,9 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 	query_modifier.changeWherePart(\
 		ImmutableString<char>(initial_flt.c_str(), initial_flt.size()));
 
-	//auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
-	auto stmt = std::make_shared<PaginalStatement>(conn, query_modifier.getQuery().c_str(), \
-													fields_list.FIELDS_COUNT);
+	auto stmt = createTableStmt();
 
-	auto db_table = std::make_shared<CDbTable>(conn, stmt, true);
+	auto db_table = std::make_shared<CDbTable>(conn, stmt, false);
 	db_table->setPrimaryTableForQuery("orders");
 	db_table->markFieldAsPrimaryKey("id_center_legalaid", "orders");
 	db_table->markFieldAsPrimaryKey("id", "orders");
@@ -899,13 +903,13 @@ void CSearchForm::displayWidgets() {
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
 
-	size_t id_stage = db_table->getMetaInfo().getFieldIndexByName("id_stage");
-	grid->HideField(id_stage);
-	grid->HideField(id_stage + 1);
-	grid->HideField(id_stage + 2);
-	grid->HideField(id_stage + 3);
-	grid->HideField(id_stage + 4);
-	grid->HideField(id_stage + 5);
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_stage"));
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_center_legalaid"));
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_adv"));
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_order_type"));
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_informer"));
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_checker"));
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("rec_id"));
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;
@@ -950,8 +954,7 @@ void CSearchForm::OnSortButtonClick(XCommandEvent *eve) {
 		else
 			query_modifier.changeOrdering(sorting_manager.buildOrderingString());
 
-		auto stmt = std::make_shared<PaginalStatement>(conn, query_modifier.getQuery().c_str(), \
-														fields_list.FIELDS_COUNT);
+		auto stmt = createTableStmt();
 		
 		def_binding_target->replaceFirst(stmt);
 		filtering_manager.applyForced(stmt);
@@ -967,13 +970,12 @@ void CSearchForm::OnFilterButtonClick(XCommandEvent *eve) {
 		query_modifier.changeWherePart(new_flt_str);
 		query_aggregate.changeWherePart(new_flt_str);
 
-		auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
+		auto stmt = createTableStmt();
 		auto stmt_aggregate = conn->PrepareQuery(query_aggregate.getQuery().c_str());
 		def_binding_target->replaceFirst(stmt);
 		def_binding_target->replaceSecond(stmt_aggregate);
 
 		filtering_manager.apply(def_binding_target);
-		filtering_manager.apply(stmt);
 		db_table->reload(stmt);
 		reloadStatisticsControls(stmt_aggregate);
 	}

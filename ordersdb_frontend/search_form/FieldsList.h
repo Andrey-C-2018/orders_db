@@ -22,7 +22,7 @@ public:
 class FieldsList final {
 public:
 	enum {
-		FIELDS_COUNT = 54
+		FIELDS_COUNT = 55
 	};
 
 private:

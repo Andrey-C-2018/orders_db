@@ -119,6 +119,7 @@ bool CFilteringManager::applyForced(std::shared_ptr<IDbBindingTarget> parsed_que
 	}
 
 	filtering_changed = false;
+	flt_string_changed = false;
 	return true;
 }
 

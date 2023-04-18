@@ -22,32 +22,32 @@
     <ProjectGuid>{A30A2A57-12A5-467B-A844-65397BC98237}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>db_ext_test</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -92,13 +92,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%UNITTEST_INCLUDE_PATH%;%VLD_PATH%\include;%MYSQL_CONNECTOR_X32_PATH%\include;%SQLITE_CONNECTOR_PATH%</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%ROOT%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/Debug;%MYSQL_CONNECTOR_X32_PATH%\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;table.lib;db.lib;db_ext.lib;libmysql.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/$(Configuration);%ROOT%\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;date.lib;table.lib;db.lib;db_ext.lib;libmariadb.lib;UnitTest++d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -108,13 +108,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%UNITTEST_INCLUDE_PATH%;%VLD_PATH%\include;%MYSQL_CONNECTOR_X64_PATH%\include;%SQLITE_CONNECTOR_PATH%</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%ROOT64%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>basic.lib;date.lib;table.lib;db.lib;db_ext.lib;libmysql.lib;UnitTest++.lib;libsqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../0libs/x64/Debug;%MYSQL_CONNECTOR_X64_PATH%\lib;%SQLITE_CONNECTOR_PATH%\x64\Debug;%UNITTEST_LIB_PATH_X64%\Debug;%VLD_PATH%\lib\Win64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;date.lib;table.lib;db.lib;db_ext.lib;libmariadb.lib;UnitTest++d.lib;libsqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/x64/$(Configuration);%ROOT64%\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -126,15 +126,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%UNITTEST_INCLUDE_PATH%;%VLD_PATH%\include;%MYSQL_CONNECTOR_X32_PATH%\include;%SQLITE_CONNECTOR_PATH%</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%ROOT%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../0libs/Release;%MYSQL_CONNECTOR_X32_PATH%\lib;%SQLITE_CONNECTOR_PATH%\Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>basic.lib;date.lib;table.lib;db.lib;db_ext.lib;libmysql.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/$(Configuration);%ROOT%\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;date.lib;table.lib;db.lib;db_ext.lib;libmariadb.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,21 +146,31 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;%UNITTEST_INCLUDE_PATH%;%VLD_PATH%\include;%MYSQL_CONNECTOR_X64_PATH%\include;%SQLITE_CONNECTOR_PATH%</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;%ROOT64%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>basic.lib;date.lib;table.lib;db.lib;db_ext.lib;libmysql.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../0libs/x64/Release;%MYSQL_CONNECTOR_X64_PATH%\lib;%SQLITE_CONNECTOR_PATH%\x64\Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>basic.lib;date.lib;table.lib;db.lib;db_ext.lib;libmariadb.lib;UnitTest++.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../0libs/x64/$(Configuration);%ROOT64%\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mocks\TestRecCountStatement.cpp" />
+    <ClCompile Include="mocks\TestResultSet.cpp" />
+    <ClCompile Include="mocks\TestStatement.cpp" />
+    <ClCompile Include="PaginalRSTests.cpp" />
     <ClCompile Include="QueryModifierTest.cpp" />
     <ClCompile Include="SortingManagerTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mocks\ITestStatement.h" />
+    <ClInclude Include="mocks\TestRecCountStatement.h" />
+    <ClInclude Include="mocks\TestResultSet.h" />
+    <ClInclude Include="mocks\TestStatement.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

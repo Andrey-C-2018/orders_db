@@ -1,6 +1,6 @@
 #include <UnitTest++/UnitTest++.h>
 #include <db_ext/PaginalRS.h>
-#include "TestStatement.h"
+#include "mocks/TestStatement.h"
 
 const int v[] = {11, 1, 22, 2,
 				 33, 3, 44, 4,

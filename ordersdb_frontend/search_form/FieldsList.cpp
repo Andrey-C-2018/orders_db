@@ -130,7 +130,7 @@ size_t FieldsList::getFieldIndex(std::string field_indexes_str, size_t first, si
 
 std::string FieldsList::getFieldsList() const {
 
-	char field_names[FIELDS_COUNT + 1][21] = {"a.zone", "c.center_short_name", "b.adv_name_short", "a.id", "a.order_date",\
+	const char field_names[FIELDS_COUNT + 1][21] = {"a.zone", "c.center_short_name", "b.adv_name_short", "a.id", "a.order_date",\
 				 "t.type_name", "a.client_name", "a.bdate", "sta.stage_name", "aa.cycle",\
 				 "aa.fee", "aa.fee_parus", "aa.outg_post", "aa.outg_daynight", "aa.act_no", "aa.id_act",\
 				 "aa.act_reg_date", "aa.act_date", "aa.bank_reg_date", "aa.payment_date",\
@@ -139,8 +139,8 @@ std::string FieldsList::getFieldsList() const {
 				 "aa.reject_appeal", "aa.vpr", "aa.reduce", "aa.change_kval_kr", "aa.reduce_ep", "aa.change_", \
 				 "aa.close", "aa.zv", "aa.min", "aa.nm_suv", "aa.zv_kr", "aa.No_Ch_Ist", \
 				 "aa.change_med", "aa.cancel_med", "aa.Koef", \
-				 "aa.id_stage", "a.id_center_legalaid", "a.id_adv", "a.id_order_type", "aa.id_informer", "aa.id_checker",\
-				 "?"};
+				 "aa.id_stage", "a.id_center_legalaid", "a.id_adv", "a.id_order_type", "aa.id_informer", "aa.id_checker", \
+				 "aa.rec_id", "?"};
 
 	std::string list = field_names[indexes[0]];
 	for (int i = 1; i < FIELDS_COUNT; i++) {

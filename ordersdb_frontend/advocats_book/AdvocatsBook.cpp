@@ -51,8 +51,8 @@ CAdvocatsBook::CAdvocatsBook(XWindow *parent, const int flags, \
 	
 std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnection> conn) {
 
-	std::string query = "SELECT b.id_advocat, b.adv_name, b.license_no, b.license_date,";
-	query += " e.exm_name, b.post_index, b.address, b.tel, b.adv_bdate,";
+	std::string query = "SELECT b.id_advocat, b.adv_name, b.adv_name_short, b.license_no,";
+	query += " b.license_date, e.exm_name, b.post_index, b.address, b.tel, b.adv_bdate,";
 	query += " d.distr_center, b.org_name, b.org_type, b.id_exm, b.id_main_district ";
 	query += "FROM advocats b INNER JOIN examiners e ON b.id_exm = e.id_examiner";
 	query += " INNER JOIN districts d ON b.id_main_district = d.id_distr";
@@ -75,15 +75,17 @@ void CAdvocatsBook::setFieldsSizes() {
 	grid->SetFieldLabel(0, _T("ID"));
 	grid->SetFieldWidth(1, 37);
 	grid->SetFieldLabel(1, _T("ПІБ адвоката"));
-	grid->SetFieldWidth(2, 10);
-	grid->SetFieldLabel(2, _T("№ св."));
-	grid->SetFieldWidth(4, 70);
-	grid->SetFieldLabel(4, _T("Орган, який видав свідоцтво"));
-	grid->SetFieldWidth(5, 6);
-	grid->SetFieldWidth(6, 75);
-	grid->SetFieldWidth(7, 25);
-	grid->SetFieldWidth(9, 25);
-	grid->SetFieldWidth(10, 55);
+	grid->SetFieldWidth(2, 25);
+	grid->SetFieldLabel(2, _T("ПІБ коротке"));
+	grid->SetFieldWidth(3, 10);
+	grid->SetFieldLabel(3, _T("№ св."));
+	grid->SetFieldWidth(5, 70);
+	grid->SetFieldLabel(5, _T("Орган, який видав свідоцтво"));
+	grid->SetFieldWidth(6, 6);
+	grid->SetFieldWidth(7, 75);
+	grid->SetFieldWidth(8, 25);
+	grid->SetFieldWidth(10, 25);
+	grid->SetFieldWidth(11, 55);
 }
 
 void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
@@ -273,8 +275,8 @@ void CAdvocatsBook::DisplayWidgets() {
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
 
-	grid->HideField(12);
 	grid->HideField(13);
+	grid->HideField(14);
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;

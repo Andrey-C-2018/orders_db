@@ -193,7 +193,7 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 void CPaymentsInsertHelper::errMsgOnPrimKeyDuplicate(Tstring &err_str) const {
 
 	err_str = _T("Стадія уже існує: ");
-	err_str += stage->GetLabel();
+	appendStageInfo(err_str);
 }
 
 void CPaymentsInsertHelper::errMsgOnInvalidRef(Tstring &err_str) const {
@@ -201,7 +201,7 @@ void CPaymentsInsertHelper::errMsgOnInvalidRef(Tstring &err_str) const {
 	err_str = _T("Стадія не може бути додана, оскільки ");
 	err_str += _T("поточний обліковий запис має право додавати стадії лише до існуючих доручень, а ");
 	err_str += _T("задане доручення в БД не існує.\nСтадія: ");
-	err_str += stage->GetLabel();
+	appendStageInfo(err_str);
 }
 
 void CPaymentsInsertHelper::resetControls() {

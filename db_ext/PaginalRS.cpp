@@ -103,7 +103,7 @@ void PaginalRS::reload() {
 							(rec_count >= page_size ? rec_count - page_size : 0) : \
 							(rec_count / page_size) * page_size;
 
-		stmt->bindValue(param_limit_size, page_size);
+		stmt->bindValue(param_limit_size, (int)page_size);
 		stmt->bindValue(param_limit_size + 1, (int)curr_page_first_rec);
 		last_binded_page = curr_page_first_rec;
 	}

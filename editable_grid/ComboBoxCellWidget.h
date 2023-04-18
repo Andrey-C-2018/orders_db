@@ -6,9 +6,11 @@ class CComboBoxCellWidget : public XComboBox, public IGridCellWidget {
 	enum {
 		DROPDOWN_PART_SIZE = 200
 	};
+	const bool initial_null_item;
 
 public:
 	CComboBoxCellWidget();
+	CComboBoxCellWidget(bool add_null_item);
 
 	CComboBoxCellWidget(const CComboBoxCellWidget &obj) = delete;
 	CComboBoxCellWidget(CComboBoxCellWidget &&obj) = default;

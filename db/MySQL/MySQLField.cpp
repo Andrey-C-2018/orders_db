@@ -204,6 +204,20 @@ CMySQLDateField::~CMySQLDateField() { }
 
 //**************************************************
 
+inline const char* getTStringFromRS(const std::shared_ptr<const IDbResultSet> result_set, \
+									size_t field, char type_hint) {
+
+	return result_set->getString(field);
+}
+
+inline const wchar_t* getTStringFromRS(const std::shared_ptr<const IDbResultSet> result_set, \
+										size_t field, wchar_t type_hint) {
+
+	return result_set->getWString(field);
+}
+
+//**************************************************
+
 CMySQLStringField::CMySQLStringField(std::weak_ptr<const MySQLStmtData> stmt_, const size_t field_) : \
 									CMySQLField(stmt_, field_) { }
 
@@ -249,7 +263,7 @@ void CMySQLStringField::getValueAndBindItTo(const std::shared_ptr<const IDbResul
 											std::shared_ptr<IDbBindingTarget> binding_target, \
 											const size_t param_no) const {
 
-	const char *value = result_set->getString(field);
+	const Tchar* value = getTStringFromRS(result_set, field, Tchar());
 	binding_target->bindValue(param_no, value);
 }
 

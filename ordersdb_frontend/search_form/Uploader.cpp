@@ -36,6 +36,20 @@ public:
 
 //*****************************************************
 
+inline ImmutableString<char> getFieldValueAsString(std::shared_ptr<const IDbField> field, 
+													std::shared_ptr<const IDbResultSet> rs, char type_hint) {
+
+	return field->getValueAsImmutableString(rs);
+}
+
+inline ImmutableString<wchar_t> getFieldValueAsString(std::shared_ptr<const IDbField> field,
+													std::shared_ptr<const IDbResultSet> rs, wchar_t type_hint) {
+
+	return field->getValueAsImmutableWString(rs);
+}
+
+//*****************************************************
+
 Uploader::Uploader(const size_t hidden_count_) : \
 					hidden_count(hidden_count_), cancel_upload(false) { }
 
@@ -122,8 +136,14 @@ void Uploader::upload(const CGrid *grid, std::shared_ptr<IUploadNotifier> progre
 		rs->gotoRecord(i);
 		for (size_t j = 0; j < fields_count; ++j) {
 				
-			auto p_cell = meta_info.getField(j)->getValueAsImmutableString(rs);
-			out << " <td>" << (!p_cell.isNull() ? p_cell.str : "") << "</td>";
+			auto field = meta_info.getField(j);
+			auto p_cell = getFieldValueAsString(field, rs, Tchar());
+			out << " <td>";
+			if (!p_cell.isNull() && p_cell.size > 0) {
+				UCS16_ToUTF8(p_cell.str, -1, buffer);
+				out << buffer.c_str();
+			}
+			out << "</td>";
 		}
 		out << " </tr>" << std::endl;
 		progress->step();

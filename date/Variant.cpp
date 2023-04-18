@@ -29,7 +29,6 @@ Variant::Variant(const char *str) noexcept : value_type(TYPE_STRING), \
 Variant::Variant(const char *str, size_t len) noexcept : value_type(TYPE_STRING), \
 											str_value(nullptr), str_size(len) {
 
-	assert (!str || len > 0);
 	if (str != nullptr) {
 
 		assert(len == strlen(str));
@@ -51,7 +50,6 @@ Variant::Variant(const wchar_t *wstr) noexcept : value_type(TYPE_WSTRING), \
 Variant::Variant(const wchar_t *wstr, size_t len) noexcept : value_type(TYPE_WSTRING), \
 												wstr_value(nullptr), str_size(len) {
 
-	assert (!wstr || len > 0);
 	if (wstr != nullptr) {
 
 		assert(len == wcslen(wstr));

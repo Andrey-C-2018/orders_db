@@ -57,8 +57,10 @@ add_executable(db_ext_test main.cpp
 		QueryModifierTest.cpp 
 		SortingManagerTest.cpp
 		PaginalRSTests.cpp
-		TestResultSet.h
-		TestStatement.h TestResultSet.cpp TestStatement.cpp TestRecCountStatement.cpp TestRecCountStatement.h ITestStatement.h)
+		mocks/TestResultSet.h mocks/TestResultSet.cpp
+		mocks/TestStatement.h mocks/TestStatement.cpp 
+		mocks/TestRecCountStatement.cpp mocks/TestRecCountStatement.h
+		mocks/ITestStatement.h)
 
 set_target_properties(db_ext_test PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
 target_include_directories(db_ext_test PRIVATE ${XLIBS_ROOT_FOLDER})
