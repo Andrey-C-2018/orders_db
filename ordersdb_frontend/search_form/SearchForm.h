@@ -35,7 +35,6 @@ class CSearchForm : public XTabStopPanel {
 		DEF_GUI_ROW_HEIGHT = 30, \
 		DEF_GUI_VERT_GAP = 5, \
 		DEF_GUI_HORZ_GAP = 5, \
-		FIELDS_COUNT = 37
 	};
 
 	CFlexiblePropepties props;

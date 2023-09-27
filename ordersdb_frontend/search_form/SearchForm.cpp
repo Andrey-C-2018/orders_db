@@ -73,7 +73,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
 					const int X, const int Y, \
 					const int width, const int height) : \
-				sorting_manager(FIELDS_COUNT), uploader(7), \
+				sorting_manager(FieldsList::FIELDS_COUNT), uploader(7), \
 				flt_id(nullptr), flt_act(nullptr), flt_order_date_from(nullptr), \
 				flt_order_date_to(nullptr), flt_act_reg_date_from(nullptr), \
 				flt_act_reg_date_to(nullptr), flt_act_date_from(nullptr), \
