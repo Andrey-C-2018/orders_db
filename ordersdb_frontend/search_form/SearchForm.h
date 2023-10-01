@@ -6,7 +6,6 @@
 #include <xwindows_ex/XTabStopPanel.h>
 #include <xwindows/XEdit.h>
 #include <xwindows/XButton.h>
-#include <xwindows/XProgressBar.h>
 #include <forms_common/FlexiblePropepties.h>
 #include "Inserter.h"
 #include "UploadDialog.h"
@@ -71,7 +70,6 @@ class CSearchForm : public XTabStopPanel {
 	XButton *btn_reset, *btn_sort, *btn_upload;
 	CInserter inserter;
 	UploadDialog uploader;
-	XProgressBar *progress;
 	FieldsList fields_list;
 
 	std::shared_ptr<IDbStatement> createTableStmt();

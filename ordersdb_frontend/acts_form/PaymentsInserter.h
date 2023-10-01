@@ -9,7 +9,7 @@ class CDbTable;
 
 class CPaymentsInserter : public IDbInserter {
 	enum {
-		FIELDS_COUNT = 44
+		FIELDS_COUNT = 46
 	};
 	CDbInsertHelper ins_helper;
 

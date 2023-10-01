@@ -49,6 +49,8 @@ add_executable(advocats_book MyApp.cpp MyApp.h
         PostIndexCellWidget.cpp PostIndexCellWidget.h
         resource.h
         Validators.h)
+
 set_target_properties(advocats_book PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
 target_include_directories(advocats_book PRIVATE ${XLIBS_ROOT_FOLDER})
+target_include_directories(advocats_book PRIVATE ${XLIBS_ROOT_FOLDER}/ordersdb_frontend)
 target_include_directories(advocats_book PUBLIC ${MARIADB_INCLUDE_DIRS})

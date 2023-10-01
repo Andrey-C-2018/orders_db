@@ -4,7 +4,6 @@ project(matching3 VERSION 0.5 LANGUAGES CXX)
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
 endif()
-set(CMAKE_SUPPRESS_REGENERATION true)
 
 if(NOT XLIBS_ROOT_FOLDER)
 	set(XLIBS_ROOT_FOLDER ${CMAKE_SOURCE_DIR}/../..)
@@ -54,4 +53,4 @@ set_target_properties(matching3 PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
 target_include_directories(matching3 PRIVATE ${XLIBS_ROOT_FOLDER})
 target_include_directories(matching3 PUBLIC ${MARIADB_INCLUDE_DIRS})
 
-target_link_libraries(matching3 date csv_file db basic mariadb)
+target_link_libraries(matching3 csv_file db date basic mariadb)

@@ -34,7 +34,7 @@ class CPaymentsInsertHelper {
 
 public:
 	enum {
-		FIELDS_COUNT = 18
+		FIELDS_COUNT = 20
 	};
 
 	CPaymentsInsertHelper();

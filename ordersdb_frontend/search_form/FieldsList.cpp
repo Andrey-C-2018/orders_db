@@ -78,7 +78,7 @@ void FieldsList::open(const char *field_indexes_str) {
 
 	if (i < FIELDS_COUNT)
 		throw CFieldsListException(CFieldsListException::E_NOT_ALL_USED, \
-									_T("not all fields used"));
+				_T("not all fields used. Maybe the setting config.ini::query_fields is not OK?"));
 }
 
 void FieldsList::open(const IProperties &props) {
@@ -140,7 +140,7 @@ std::string FieldsList::getFieldsList() const {
 				 "aa.close", "aa.zv", "aa.min", "aa.nm_suv", "aa.zv_kr", "aa.No_Ch_Ist", \
 				 "aa.change_med", "aa.cancel_med", "aa.Koef", \
 				 "aa.id_stage", "a.id_center_legalaid", "a.id_adv", "a.id_order_type", "aa.id_informer", "aa.id_checker", \
-				 "aa.rec_id", "?"};
+				 "aa.rejection_date", "aa.rejection_reason", "aa.rec_id", "?"};
 
 	std::string list = field_names[indexes[0]];
 	for (int i = 1; i < FIELDS_COUNT; i++) {

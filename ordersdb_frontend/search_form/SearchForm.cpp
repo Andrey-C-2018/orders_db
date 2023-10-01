@@ -39,7 +39,7 @@ class CGridCellWidgetCreator final {
 	IGridCellWidget *cell_widget;
 	bool allocated_n_attached;
 public:
-	CGridCellWidgetCreator(CDbGrid *grid_) : grid(grid_), \
+	explicit CGridCellWidgetCreator(CDbGrid *grid_) : grid(grid_), \
 					cell_widget(nullptr), allocated_n_attached(false) { }
 
 	template <typename CellWidget, typename ... Args> \
@@ -66,7 +66,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.18";
+constexpr char search_form_version[] = "1.0.19";
 const char def_ordering_str[] = "a.id_center_legalaid DESC,a.order_date DESC,a.id DESC,aa.cycle DESC,aa.id_stage DESC,aa.act_no";
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
@@ -75,16 +75,17 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const int width, const int height) : \
 				sorting_manager(FieldsList::FIELDS_COUNT), uploader(7), \
 				flt_id(nullptr), flt_act(nullptr), flt_order_date_from(nullptr), \
-				flt_order_date_to(nullptr), flt_act_reg_date_from(nullptr), \
-				flt_act_reg_date_to(nullptr), flt_act_date_from(nullptr), \
-				flt_act_date_to(nullptr), flt_payment_date_from(nullptr), \
-				flt_payment_date_to(nullptr), flt_center(nullptr), flt_informer(nullptr), \
+				flt_order_date_to(nullptr), flt_advocat(nullptr), \
+                flt_act_reg_date_from(nullptr), flt_act_reg_date_to(nullptr), \
+                flt_act_date_from(nullptr), flt_act_date_to(nullptr), \
+                flt_payment_date_from(nullptr), flt_payment_date_to(nullptr), \
+                flt_paid(nullptr), flt_center(nullptr), flt_informer(nullptr), \
 				flt_order_type(nullptr), flt_stage(nullptr), flt_zone(nullptr), \
 				flt_act_no(nullptr), \
 				grid(nullptr), advocats_list(nullptr), flt_client(nullptr), \
 				centers_list(nullptr), order_types_list(nullptr), stages_list(nullptr), \
 				checkers_list(nullptr), canceling_reasons_list(nullptr), act_no_list(nullptr), \
-				qa_widget(nullptr), \
+				informers_list(nullptr), qa_widget(nullptr), \
 				grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0), \
 				total_fee(nullptr), total_paid(nullptr), total_orders(nullptr), \
 				btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
@@ -368,6 +369,14 @@ void CSearchForm::setFieldsSizes() {
 	field_index = meta_info.getFieldIndexByName("user_full_name");
 	grid->SetFieldWidth(field_index, 30);
 	grid->SetFieldLabel(field_index, _T("Перевірив"));
+
+	field_index = meta_info.getFieldIndexByName("rejection_date");
+	grid->SetFieldWidth(field_index, 15);
+	grid->SetFieldLabel(field_index, _T("Дт пов на доопр"));
+
+	field_index = meta_info.getFieldIndexByName("rejection_reason");
+	grid->SetFieldWidth(field_index, 30);
+	grid->SetFieldLabel(field_index, _T("Причина доопр"));
 }
 
 void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
@@ -444,6 +453,7 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 	grid->SetWidgetForFieldByName("payment_date", dt_widget);
 	grid->SetWidgetForFieldByName("cancel_date", dt_widget);
 	grid->SetWidgetForFieldByName("bdate", dt_widget);
+	grid->SetWidgetForFieldByName("rejection_date", dt_widget);
 
 	qa_widget = creator.createAndAttachToGrid<CBooleanCellWidget>("age");
 	grid->SetWidgetForFieldByName("inv", qa_widget);
@@ -940,6 +950,7 @@ void CSearchForm::initOrdering(COrderingComboBox *ordering_box) {
 	ordering_box->addOrderingField("act_date", meta_info, grid);
 	ordering_box->addOrderingField("payment_date", meta_info, grid);
 	ordering_box->addOrderingField("informer_name", meta_info, grid);
+	ordering_box->addOrderingField("rejection_date", meta_info, grid);
 }
 
 void CSearchForm::OnSortButtonClick(XCommandEvent *eve) {

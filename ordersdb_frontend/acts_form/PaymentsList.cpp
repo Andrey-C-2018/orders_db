@@ -22,6 +22,42 @@ CPaymentsList::CPaymentsList(const int margins_, const int db_navigator_height_)
 								stages_list(nullptr), informers_list(nullptr), \
 								checkers_list(nullptr), act_no_widget(nullptr) { }
 
+std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnection> conn, \
+														const int def_center, \
+														const int def_order, \
+														CDate def_order_date) {
+
+	std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date,";
+	query += " aa.is_paid, aa.id_stage, st.stage_name, aa.cycle, aa.article,";
+	query += " aa.fee, aa.outg_post, aa.outg_daynight,";
+	query += " aa.id_informer, inf.informer_name, aa.act_no, aa.id_act, aa.act_date, aa.act_reg_date,";
+	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.appeal_softer,aa.detect_softer,aa.reject_appeal,";
+	query += " aa.vpr, aa.reduce, aa.change_kval_kr, aa.reduce_ep, aa.change_, ";
+	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,";
+	query += " aa.change_med, aa.cancel_med, aa.Koef, u.user_full_name, aa.id_checker ";
+	query += "FROM payments aa INNER JOIN stages st ON aa.id_stage = st.id_st";
+	query += " INNER JOIN informers inf ON aa.id_informer = inf.id_inf";
+	query += " INNER JOIN users u ON aa.id_checker = u.id_user ";
+	query += "WHERE aa.id_center = ? AND aa.id_order = ? AND aa.order_date = ? ";
+	query += "ORDER BY id_center, order_date, id_order, cycle, id_stage, act_no";
+
+	auto stmt = conn->PrepareQuery(query.c_str());
+	stmt->bindValue(0, def_center);
+	stmt->bindValue(1, def_order);
+	stmt->bindValue(2, def_order_date);
+
+	auto db_table = std::make_shared<CDbTable>(conn, stmt);
+	db_table->setPrimaryTableForQuery("payments");
+	db_table->markFieldAsPrimaryKey("id_center", "payments");
+	db_table->markFieldAsPrimaryKey("id_order", "payments");
+	db_table->markFieldAsPrimaryKey("order_date", "payments");
+	db_table->markFieldAsPrimaryKey("cycle", "payments");
+	db_table->markFieldAsPrimaryKey("id_stage", "payments");
+	db_table->markFieldAsPrimaryKey("act_no", "payments");
+
+	return db_table;
+}
+
 void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_center, \
 								const int def_order, CDate def_order_date, \
 								std::shared_ptr<CPaymentsConstraints> constraints) {
@@ -177,42 +213,6 @@ void CPaymentsList::initDbTable(std::shared_ptr<IDbConnection> conn_, const int 
 void CPaymentsList::initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler) {
 
 	db_table->ConnectDbEventsHandler(evt_handler);
-}
-
-std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnection> conn, \
-														const int def_center, \
-														const int def_order, \
-														CDate def_order_date) {
-
-	std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date,";
-	query += " aa.is_paid, aa.id_stage, st.stage_name, aa.cycle, aa.article,";
-	query += " aa.fee, aa.outg_post, aa.outg_daynight,";
-	query += " aa.id_informer, inf.informer_name, aa.act_no, aa.id_act, aa.act_date, aa.act_reg_date,";
-	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.appeal_softer,aa.detect_softer,aa.reject_appeal,";
-	query += " aa.vpr, aa.reduce, aa.change_kval_kr, aa.reduce_ep, aa.change_, ";
-	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,";
-	query += " aa.change_med, aa.cancel_med, aa.Koef, u.user_full_name, aa.id_checker ";
-	query += "FROM payments aa INNER JOIN stages st ON aa.id_stage = st.id_st";
-	query += " INNER JOIN informers inf ON aa.id_informer = inf.id_inf";
-	query += " INNER JOIN users u ON aa.id_checker = u.id_user ";
-	query += "WHERE aa.id_center = ? AND aa.id_order = ? AND aa.order_date = ? ";
-	query += "ORDER BY id_center, order_date, id_order, cycle, id_stage, act_no";
-
-	auto stmt = conn->PrepareQuery(query.c_str());
-	stmt->bindValue(0, def_center);
-	stmt->bindValue(1, def_order);
-	stmt->bindValue(2, def_order_date);
-
-	auto db_table = std::make_shared<CDbTable>(conn, stmt);
-	db_table->setPrimaryTableForQuery("payments");
-	db_table->markFieldAsPrimaryKey("id_center", "payments");
-	db_table->markFieldAsPrimaryKey("id_order", "payments");
-	db_table->markFieldAsPrimaryKey("order_date", "payments");
-	db_table->markFieldAsPrimaryKey("cycle", "payments");
-	db_table->markFieldAsPrimaryKey("id_stage", "payments");
-	db_table->markFieldAsPrimaryKey("act_no", "payments");
-
-	return db_table;
 }
 
 void CPaymentsList::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {

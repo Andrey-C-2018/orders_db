@@ -36,9 +36,9 @@ void CDbInsertHelper::buildQuery(std::string &query) const {
 
 	assert(this->fields_count != (size_t)-1);
 	const size_t QUERY_RESERVED_SIZE = 70;
-	auto appendToStr = [](std::string &str1, const char *str2, const size_t times) {
+	auto appendToStrNTimes = [](std::string &str1, const char *str2, const size_t times) {
 
-		for (size_t i = 0; i < times; ++i)	str1 += str2;
+		for (size_t i = 0; i < times; i++)	str1 += str2;
 	};
 
 	assert(binders.size() + static_insertions.size() <= fields_count);
@@ -49,11 +49,11 @@ void CDbInsertHelper::buildQuery(std::string &query) const {
 	while (p != static_insertions.cend()) {
 
 		while (i < binders.size() && binders[i].field_no < p->first) {
-			appendToStr(query, "?,", binders[i].affected_params_count);
+			appendToStrNTimes(query, "?,", binders[i].affected_params_count);
 			fields += binders[i].affected_params_count;
 			++i;
 		}
-		assert(binders[i].field_no != p->first);
+		assert(i == binders.size() || binders[i].field_no != p->first);
 
 		query += p->second;
 		query += ',';
@@ -62,7 +62,7 @@ void CDbInsertHelper::buildQuery(std::string &query) const {
 	}
 
 	while (i < binders.size()) {
-		appendToStr(query, "?,", binders[i].affected_params_count);
+		appendToStrNTimes(query, "?,", binders[i].affected_params_count);
 		fields += binders[i].affected_params_count;
 		++i;
 	}

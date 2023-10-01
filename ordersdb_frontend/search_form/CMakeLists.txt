@@ -57,6 +57,8 @@ add_executable(search_form MyApp.cpp MyApp.h
         UploadDialog.cpp UploadDialog.h
         Uploader.cpp Uploader.h
         ZoneFilter.cpp ZoneFilter.h)
+
 set_target_properties(search_form PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
 target_include_directories(search_form PRIVATE ${XLIBS_ROOT_FOLDER})
+target_include_directories(search_form PRIVATE ${XLIBS_ROOT_FOLDER}/ordersdb_frontend)
 target_include_directories(search_form PUBLIC ${MARIADB_INCLUDE_DIRS})

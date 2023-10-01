@@ -159,20 +159,16 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 	ins_helper.addBinder(8, _T("Тип акту"), \
 							std::make_shared<CComboBoxInsertBinder>(act_no, false, false));
 
-	ins_helper.addBinder(9, _T("Дата акта"), \
+	ins_helper.addBinder(9, _T("Дата акту"), \
 		std::make_shared<CActDateBinderNoDb>(order_date, act_date, \
 											false, act_reg_date));
 	ins_helper.addBinder(10, _T("№ розгляду"), \
 							std::make_shared<UIIntInsertBinder>(cycle, false));
-	ins_helper.addBinder(12, _T("Дата прийняття акта"), \
+	ins_helper.addBinder(12, _T("Дата прийняття акту"), \
 						std::make_shared<UIDateInsertBinder>(act_reg_date, false));
 	ins_helper.addBinder(13, _T("Дата оплати"), \
 						std::make_shared<UIDateInsertBinder>(payment_date, false));
-	if(def_center == 1)
-		ins_helper.addBinder(14, _T("Дата реєстр. в ДКС"), \
-					std::make_shared<UIDateInsertBinder>(act_date, false));
-	else
-		ins_helper.defStaticInsertion(14, "NULL");
+	ins_helper.defStaticInsertion(14, "NULL"); // bank_reg_date
 
 	ins_helper.addBinder(15, _T("Перевірив"), \
 					std::make_shared<CheckerInsertBinder>(checker, def_center, \
@@ -188,6 +184,9 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 					std::make_shared<CFeeBinder>(outg_daynight, false, true));
 	else
 		ins_helper.defStaticInsertion(17, "0.0");
+
+	ins_helper.defStaticInsertion(18, "NULL"); // rejection_date
+	ins_helper.defStaticInsertion(19, "NULL"); // rejection_reason
 }
 
 void CPaymentsInsertHelper::errMsgOnPrimKeyDuplicate(Tstring &err_str) const {

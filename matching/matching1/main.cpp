@@ -72,8 +72,9 @@ int main() {
 		query = "SELECT adv_name FROM adv_aliases WHERE adv_name_1c = ?";
 		auto adv_check_stmt = sqlite_conn->PrepareQuery(query.c_str());
 
+        const bool check_unique_ids = props.getIntProperty(_T("stop_on_non-unique_id"), props_buffer);
+
 		XDirectory dbf_dir;
-		
 		dbf_folder_str += PATH_SLASH;
 		dbf_folder_str += _T("*.DBF");
 
@@ -128,9 +129,13 @@ int main() {
 				check_stmt->bindValue(0, v);
 				auto rs = check_stmt->exec();
 				if (!rs->empty()) {
-					XException e(0, _T("Рядок з ID = "));
-					e << v << _T(" уже було додано в acts.db");
-					throw e;
+                    XException e(0, _T("Рядок з ID = "));
+                    e << v << _T(" уже було додано в acts.db");
+                    if (check_unique_ids) {
+                        throw e;
+                    } else {
+                        Tcerr << e.what() << std::endl;
+                    }
 				}
 
 				ins_stmt->bindValue(0, v);
