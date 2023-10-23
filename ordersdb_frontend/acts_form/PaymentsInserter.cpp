@@ -271,8 +271,7 @@ void CPaymentsInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
 	ins_helper.addBinder(32, _T("Коеф."), \
 						std::make_shared<CQaKoefBinder>(Koef, false));
-	ins_helper.addBinder(33, _T("Дата реєстр. в ДКС"), \
-						std::make_shared<UIDateInsertBinder>(act_date, false));
+	ins_helper.defStaticInsertion(33, "NULL"); // bank_reg_date
 	ins_helper.addBinder(34, _T("Перевірив"), \
 				std::make_shared<CDbComboBoxInsertBinder>(checker, false, false));
 	
