@@ -21,16 +21,16 @@
     <ClInclude Include="ActsForm.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="AdvocatsListEvtHandler.h">
+    <ClInclude Include="DefendersListEvtHandler.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="OrdersList.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="AdvocatsList.h">
+    <ClInclude Include="DefendersList.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="AdvDbTableEventsHandler.h">
+    <ClInclude Include="DefenderDbTableEvtHandler.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="PaymentsList.h">
@@ -65,16 +65,16 @@
     <ClCompile Include="ActsForm.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="AdvocatsListEvtHandler.cpp">
+    <ClCompile Include="DefendersListEvtHandler.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="OrdersList.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="AdvocatsList.cpp">
+    <ClCompile Include="DefendersList.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="AdvDbTableEventsHandler.cpp">
+    <ClCompile Include="DefenderDbTableEvtHandler.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="PaymentsList.cpp">

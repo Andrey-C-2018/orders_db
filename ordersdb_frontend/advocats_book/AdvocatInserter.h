@@ -8,13 +8,13 @@ class XComboBox;
 
 class CAdvocatInserter : public IDbInserter {
 	enum {
-		FIELDS_COUNT = 15
+        PEOPLE_FIELDS_COUNT = 3,
+		ADV_FIELDS_COUNT = 11
 	};
-	CDbInsertHelper ins_helper;
+	CDbInsertHelper people_ins_helper, adv_ins_helper;
 	std::shared_ptr<IDbConnection> conn;
-	std::shared_ptr<IDbStatement> stmt;
+	std::shared_ptr<IDbStatement> stmt_adv, stmt_people;
 
-	XWidget *id_advocat;
 	XWidget *adv_name;
 	XWidget *license_no;
 	XWidget *license_date;
@@ -38,7 +38,6 @@ public:
 
 	inline void setDbConnection(std::shared_ptr<IDbConnection> conn);
 
-	inline void setIdAdvocatWidget(XWidget *id_advocat) { this->id_advocat = id_advocat; }
 	inline void setAdvNameWidget(XWidget *adv_name) { this->adv_name = adv_name; }
 	inline void setLicenseNoWidget(XWidget *license_no) { this->license_no = license_no; }
 	inline void setLicenseDateWidget(XWidget *license_date) { this->license_date = license_date; }

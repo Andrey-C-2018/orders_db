@@ -51,13 +51,14 @@ CAdvocatsBook::CAdvocatsBook(XWindow *parent, const int flags, \
 	
 std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnection> conn) {
 
-	std::string query = "SELECT b.id_advocat, b.adv_name, b.adv_name_short, b.license_no,";
-	query += " b.license_date, e.exm_name, b.post_index, b.address, b.tel, b.adv_bdate,";
+	std::string query = "SELECT b.id_advocat, p.name, p.name_short, b.license_no,";
+	query += " b.license_date, e.exm_name, b.post_index, b.address, b.tel, p.bdate,";
 	query += " d.distr_center, b.org_name, b.org_type, b.id_exm, b.id_main_district ";
-	query += "FROM advocats b INNER JOIN examiners e ON b.id_exm = e.id_examiner";
+	query += "FROM advocats b INNER JOIN people p ON b.id_advocat = p.id_person";
+	query += " INNER JOIN examiners e ON b.id_exm = e.id_examiner";
 	query += " INNER JOIN districts d ON b.id_main_district = d.id_distr";
 	query += " #### ";
-	query += "ORDER BY adv_name";
+	query += "ORDER BY name";
 	query_modifier.Init(query);
 
 	auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
@@ -124,7 +125,7 @@ void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 		grid->SetWidgetForFieldByName("license_date", date_widget);
 		date = true;
 
-		grid->SetWidgetForFieldByName("adv_bdate", date_widget);
+		grid->SetWidgetForFieldByName("bdate", date_widget);
 	}
 	catch (...) {
 		if (!exm && examiners_list && !examiners_list->IsCreated()) 
@@ -165,7 +166,6 @@ void CAdvocatsBook::DisplayWidgets() {
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(new XLabel(), _T("ID: "), FL_WINDOW_VISIBLE, \
 						XSize(20, DEF_GUI_ROW_HEIGHT));
-		adv_inserter.setIdAdvocatWidget(flt_id);
 		sizer.addWidget(flt_id, _T(""), FL_WINDOW_VISIBLE, \
 						XSize(45, DEF_GUI_ROW_HEIGHT));
 

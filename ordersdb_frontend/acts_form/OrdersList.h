@@ -22,8 +22,9 @@ class COrdersList {
 	XDynamicSizer grid_sizer, nav_sizer, *prev_sizer;
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn, \
-											const int def_adv_id);
+											const int defender_id);
 	void createCellWidgetsAndAttachToGrid(CDbGrid *grid);
+
 public:
 	COrdersList(const int margins_, const float multiplier_, const int db_navigator_height);
 
@@ -32,7 +33,7 @@ public:
 	COrdersList &operator=(const COrdersList &obj) = delete;
 	COrdersList &operator=(COrdersList &&obj) = delete;
 
-	void initDbTable(std::shared_ptr<IDbConnection> conn_, const int def_adv_id, \
+	void initDbTable(std::shared_ptr<IDbConnection> conn_, const int defender_id, \
 						std::shared_ptr<CPaymentsConstraints> constraints);
 	void initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler);
 	inline void initSizers(XPoint initial_coords, XSize parent_size, \

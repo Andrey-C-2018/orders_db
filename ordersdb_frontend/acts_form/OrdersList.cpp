@@ -17,13 +17,13 @@ COrdersList::COrdersList(const int margins_, const float multiplier_, \
 								prev_sizer(nullptr) { }
 
 void COrdersList::initDbTable(std::shared_ptr<IDbConnection> conn_, \
-								const int def_adv_id, \
+								const int defender_id, \
 							std::shared_ptr<CPaymentsConstraints> constraints) {
 
 	assert(!db_table);
 	assert(!grid);
 
-	db_table = createDbTable(conn_, def_adv_id);
+	db_table = createDbTable(conn_, defender_id);
 	grid = new CDbGrid(true, db_table, \
 			std::make_shared<COrdersGridEvtHandler>(db_table, constraints));
 	grid->SetFieldLabel(1, _T("Центр"));
@@ -50,7 +50,7 @@ void COrdersList::initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> e
 }
 
 std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnection> conn, \
-														const int def_adv_id) {
+														const int defender_id) {
 
 	std::string query = "SELECT a.id_center_legalaid, cn.center_short_name, a.id, a.order_date,";
 	query += " t.type_name, a.client_name, a.bdate, a.cancel_date ";
@@ -58,11 +58,11 @@ std::shared_ptr<CDbTable> COrdersList::createDbTable(std::shared_ptr<IDbConnecti
 	query += " INNER JOIN order_types t ON a.id_order_type = t.id_type ";
 	query += "WHERE ";
 	query += CParametersManager::getInstance().getCenterFilteringStr();
-	query += " AND a.id_adv = ? ";
+	query += " AND a.id_defender = ? ";
 	query += "ORDER BY id_center_legalaid, order_date, id";
 
 	auto stmt = conn->PrepareQuery(query.c_str());
-	stmt->bindValue(0, def_adv_id);
+	stmt->bindValue(0, defender_id);
 
 	auto db_table = std::make_shared<CDbTable>(conn, stmt);
 	db_table->setPrimaryTableForQuery("orders");

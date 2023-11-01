@@ -74,7 +74,7 @@ void SQLiteConnection::SetSchema(const char *schema_name) { }
 
 record_t SQLiteConnection::ExecScalarQuery(const char *query_text) {
 	
-	sqlite3_stmt *pStmt =prepareQuery(db.get(), query_text);
+	sqlite3_stmt *pStmt = prepareQuery(db.get(), query_text);
 	if(!pStmt) throw SQLiteConnectionException(db.get());
 
 	if (sqlite3_column_count(pStmt)) {
@@ -88,8 +88,10 @@ record_t SQLiteConnection::ExecScalarQuery(const char *query_text) {
 	record_t records_count = 0;
 
 	err = sqlite3_step(pStmt);
-	if (err == SQLITE_ERROR) 
-		throw SQLiteConnectionException(db.get());
+	if (err == SQLITE_ERROR) {
+        sqlite3_finalize(pStmt);
+        throw SQLiteConnectionException(db.get());
+    }
 
 	records_count = sqlite3_changes(db.get());
 
@@ -113,6 +115,43 @@ std::shared_ptr<IDbResultSet> SQLiteConnection::ExecQuery(const char *query_text
 std::shared_ptr<IDbStatement> SQLiteConnection::PrepareQuery(const char *query_text) const {
 	
 	return std::make_shared<SQLiteStatement>(db, query_text);
+}
+
+unsigned SQLiteConnection::getLastInsertedId() const {
+
+    return sqlite3_last_insert_rowid(db.get());
+}
+
+void SQLiteConnection::executeSQLCommand(const char *cmd) {
+
+    sqlite3_stmt *pStmt = prepareQuery(db.get(), cmd);
+    if(!pStmt) throw SQLiteConnectionException(db.get());
+
+    int err = sqlite3_step(pStmt);
+    if (err == SQLITE_ERROR) {
+        sqlite3_finalize(pStmt);
+        throw SQLiteConnectionException(db.get());
+    }
+    sqlite3_finalize(pStmt);
+}
+
+void SQLiteConnection::setAutocommitMode(bool enabled) {
+
+    if (enabled) {
+        executeSQLCommand("BEGIN TRANSACTION");
+    } else {
+        executeSQLCommand("COMMIT");
+    }
+}
+
+void SQLiteConnection::commit() {
+
+    executeSQLCommand("COMMIT");
+}
+
+void SQLiteConnection::rollback() {
+
+    executeSQLCommand("ROLLBACK");
 }
 
 void SQLiteConnection::Disconnect() {

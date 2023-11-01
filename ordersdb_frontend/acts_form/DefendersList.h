@@ -8,7 +8,7 @@ struct IDbTableEventsHandler;
 class CDbGrid;
 class CDbTable;
 
-class CAdvocatsList {
+class DefendersList {
 	std::shared_ptr<CDbTable> db_table;
 	CDbGrid *grid;
 	XWidget *grid_as_window;
@@ -19,13 +19,14 @@ class CAdvocatsList {
 
 	XDynamicSizer grid_sizer, nav_sizer;
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
-public:
-	CAdvocatsList(const int margins_, const int width_, const int db_navigator_height_);
 
-	CAdvocatsList(const CAdvocatsList &obj) = delete;
-	CAdvocatsList(CAdvocatsList &&obj) = delete;
-	CAdvocatsList &operator=(const CAdvocatsList &obj) = delete;
-	CAdvocatsList &operator=(CAdvocatsList &&obj) = delete;
+public:
+	DefendersList(const int margins_, const int width_, const int db_navigator_height_);
+
+	DefendersList(const DefendersList &obj) = delete;
+	DefendersList(DefendersList &&obj) = delete;
+	DefendersList &operator=(const DefendersList &obj) = delete;
+	DefendersList &operator=(DefendersList &&obj) = delete;
 
 	void initDbTable(std::shared_ptr<IDbConnection> conn_);
 	void initDbTableEvtHandler(std::shared_ptr<IDbTableEventsHandler> evt_handler);
@@ -40,12 +41,12 @@ public:
 	inline bool updateSizers(XSize new_size);
 	inline void resize();
 
-	virtual ~CAdvocatsList();
+	virtual ~DefendersList();
 };
 
 //*****************************************************
 
-void CAdvocatsList::initSizers(XPoint initial_coords, XSize size) {
+void DefendersList::initSizers(XPoint initial_coords, XSize size) {
 
 	grid_sizer.setCoords(initial_coords);
 	grid_sizer.setParentSize(size);
@@ -56,7 +57,7 @@ void CAdvocatsList::initSizers(XPoint initial_coords, XSize size) {
 	nav_sizer.addToVertSizersChain(grid_sizer);
 }
 
-bool CAdvocatsList::updateSizers(XSize new_size) {
+bool DefendersList::updateSizers(XSize new_size) {
 
 	bool ret_value = grid_sizer.setParentSize(new_size);
 	nav_sizer.updateVertSizersChain(grid_sizer);
@@ -64,23 +65,23 @@ bool CAdvocatsList::updateSizers(XSize new_size) {
 	return ret_value;
 }
 
-void CAdvocatsList::resize() {
+void DefendersList::resize() {
 
 	grid_sizer.moveWidget(grid_as_window);
 	nav_sizer.moveWidget(db_navigator);
 }
 
-XDynamicSizer &CAdvocatsList::getFirstSizer() {
+XDynamicSizer &DefendersList::getFirstSizer() {
 
 	return grid_sizer;
 }
 
-const XDynamicSizer &CAdvocatsList::getLastSizer() const {
+const XDynamicSizer &DefendersList::getLastSizer() const {
 
 	return nav_sizer;
 }
 
-std::shared_ptr<const CDbTable> CAdvocatsList::getDbTable() const {
+std::shared_ptr<const CDbTable> DefendersList::getDbTable() const {
 
 	return db_table;
 }

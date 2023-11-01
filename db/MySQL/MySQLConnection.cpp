@@ -104,6 +104,35 @@ std::shared_ptr<IDbStatement> CMySQLConnection::PrepareQuery(const char *query_t
 	return std::make_shared<CMySQLStatement>(conn, stmt);
 }
 
+unsigned CMySQLConnection::getLastInsertedId() const {
+
+    return mysql_insert_id(conn.get());
+}
+
+void CMySQLConnection::setAutocommitMode(bool enabled) {
+
+    bool result = mysql_autocommit(conn.get(), enabled ? 1 : 0);
+    if (result)
+        throw CMySQLConnectionException(CMySQLConnectionException::E_TRANSACTION, \
+				_T("Cannot set autocommit mode"));
+}
+
+void CMySQLConnection::commit() {
+
+    bool result = mysql_commit(conn.get());
+    if (result)
+        throw CMySQLConnectionException(CMySQLConnectionException::E_TRANSACTION, \
+				_T("Cannot commit the transaction"));
+}
+
+void CMySQLConnection::rollback() {
+
+    bool result = mysql_rollback(conn.get());
+    if (result)
+        throw CMySQLConnectionException(CMySQLConnectionException::E_TRANSACTION, \
+				_T("Cannot rollback the transaction"));
+}
+
 void CMySQLConnection::Disconnect() {
 
 	conn.reset();

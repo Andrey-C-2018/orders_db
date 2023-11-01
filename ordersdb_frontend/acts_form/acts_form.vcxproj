@@ -161,9 +161,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActsForm.cpp" />
-    <ClCompile Include="AdvDbTableEventsHandler.cpp" />
-    <ClCompile Include="AdvocatsListEvtHandler.cpp" />
-    <ClCompile Include="AdvocatsList.cpp" />
+    <ClCompile Include="DefenderDbTableEvtHandler.cpp" />
+    <ClCompile Include="DefendersListEvtHandler.cpp" />
+    <ClCompile Include="DefendersList.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />
     <ClCompile Include="OrdersDbTableEventsHandler.cpp" />
@@ -176,9 +176,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActsForm.h" />
-    <ClInclude Include="AdvDbTableEventsHandler.h" />
-    <ClInclude Include="AdvocatsListEvtHandler.h" />
-    <ClInclude Include="AdvocatsList.h" />
+    <ClInclude Include="DefenderDbTableEvtHandler.h" />
+    <ClInclude Include="DefendersListEvtHandler.h" />
+    <ClInclude Include="DefendersList.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
     <ClInclude Include="OrdersDbTableEventsHandler.h" />

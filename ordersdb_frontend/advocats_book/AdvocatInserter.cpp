@@ -4,52 +4,29 @@
 #include <db/IDbResultSet.h>
 #include <db/IDbStatement.h>
 #include <db/DbException.h>
+#include <db/TransactionGuard.h>
 #include <db_ext/InsParamNoGuard.h>
 #include <xwindows/XWidget.h>
 #include <xwindows/XComboBox.h>
 #include <db_controls/DbComboBox.h>
 #include "AdvocatInserter.h"
 
-class CAdvocatIdBinder : public CVisualInsertBinder {
+class AutoincrIdBinder : public IInsertBinder {
 	std::shared_ptr<IDbConnection> conn;
 public:
-	CAdvocatIdBinder(std::shared_ptr<IDbConnection> conn_, 
-						XWidget *id_advocat_, bool free_widget) : \
-							CVisualInsertBinder(id_advocat_, free_widget) , conn(conn_) { }
+
+	explicit AutoincrIdBinder(std::shared_ptr<IDbConnection> conn_) : conn(conn_) { }
 
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override {
 
 		CInsParamNoGuard param_no_guard(params.param_no, 1);
-
-		auto id_advocat_str = widget->GetLabel();
-		if (id_advocat_str && id_advocat_str[0] == _T('\0')) {
-
-			auto rs = conn->ExecQuery("SELECT MAX(id_advocat) FROM advocats");
-			assert(rs);
-			assert(rs->getRecordsCount());
-			rs->gotoRecord(0);
-
-			bool is_null;
-			binding_target->bindValue(params.param_no, rs->getInt(0, is_null) + 1);
-		}
-		else {
-			int err;
-			int id = XConv::ToInt(id_advocat_str, err);
-
-			if (err) {
-				params.error_str += _T("Введене значення для ID адвоката не є числом: ");
-				params.error_str += id_advocat_str;
-				params.error_str += _T('\n');
-				return true;
-			}
-			binding_target->bindValue(params.param_no, id);
-		}
-
+        int id = (int)conn->getLastInsertedId();
+		binding_target->bindValue(params.param_no, id);
 		return true;
 	}
 
-	virtual ~CAdvocatIdBinder() { }
+	virtual ~AutoincrIdBinder() { }
 };
 
 class CAdvNameBinder : public CVisualInsertBinder {
@@ -197,16 +174,16 @@ public:
 
 //*****************************************************
 
-CAdvocatInserter::CAdvocatInserter() : ins_helper(FIELDS_COUNT), \
-						id_advocat(nullptr), adv_name(nullptr), license_no(nullptr), \
-						license_date(nullptr), examiner(nullptr), post_index(nullptr), \
-						address(nullptr), tel(nullptr), email(nullptr), \
+CAdvocatInserter::CAdvocatInserter() : people_ins_helper(PEOPLE_FIELDS_COUNT),\
+                        adv_ins_helper(ADV_FIELDS_COUNT),\
+						adv_name(nullptr), license_no(nullptr),\
+						license_date(nullptr), examiner(nullptr), post_index(nullptr),\
+						address(nullptr), tel(nullptr), email(nullptr),\
 						adv_bdate(nullptr), district(nullptr), org_name(nullptr), \
 						org_type(nullptr) { }
 
 void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 
-	assert(id_advocat);
 	assert(adv_name);
 	assert(license_no);
 	assert(license_date);
@@ -219,61 +196,62 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(district);
 	assert(org_name);
 	assert(org_type);
-	
-	ins_helper.addBinder(0, _T("ID"), \
-					std::make_shared<CAdvocatIdBinder>(conn, id_advocat, false));
-	ins_helper.addBinder(1, _T("ПІБ"), \
+
+    std::string query = "INSERT INTO people(name, name_short, bdate) VALUES(";
+    people_ins_helper.addBinder(0, _T("ПІБ"), \
 						std::make_shared<CAdvNameBinder>(adv_name, false), 2);
-	ins_helper.addBinder(3, _T("mark"), \
-							std::make_shared<CIntInsertBinder>(0));
-	ins_helper.addBinder(4, _T("Номер свідоцтва"), \
-							std::make_shared<UITextInsertBinder>(license_no, false));
-	ins_helper.addBinder(5, _T("Дата свідоцтва"), \
-						std::make_shared<UIDateInsertBinder>(license_date, false));
-	ins_helper.addBinder(6, _T("Екзаменатор"), \
-				std::make_shared<CDbComboBoxInsertBinder>(examiner, false, false));
-	ins_helper.addBinder(7, _T("Поштовий індекс"), \
-						std::make_shared<CPostIndexBinder>(post_index, false));
-	ins_helper.addBinder(8, _T("Адреса"), \
-						std::make_shared<UITextInsertBinder>(address, false));
-	ins_helper.addBinder(9, _T("Телефон"), \
-						std::make_shared<UITextInsertBinder>(tel, false));
-	ins_helper.addBinder(10, _T("E-mail"), \
-							std::make_shared<UITextInsertBinder>(email, false));
-	ins_helper.addBinder(11, _T("Дата народження"), \
+    people_ins_helper.addBinder(2, _T("Дата народження"), \
 						std::make_shared<UIDateInsertBinder>(adv_bdate, false));
-	ins_helper.addBinder(12, _T("Основний район роботи"), \
+
+    people_ins_helper.buildQuery(query);
+    query += ')';
+    stmt_people = conn->PrepareQuery(query.c_str());
+
+    query = "INSERT INTO advocats VALUES(";
+	adv_ins_helper.addBinder(0, _T("ID"), \
+					std::make_shared<AutoincrIdBinder>(conn));
+	adv_ins_helper.addBinder(1, _T("Номер свідоцтва"), \
+							std::make_shared<UITextInsertBinder>(license_no, false));
+	adv_ins_helper.addBinder(2, _T("Дата свідоцтва"), \
+						std::make_shared<UIDateInsertBinder>(license_date, false));
+	adv_ins_helper.addBinder(3, _T("Екзаменатор"), \
+				std::make_shared<CDbComboBoxInsertBinder>(examiner, false, false));
+	adv_ins_helper.addBinder(4, _T("Поштовий індекс"), \
+						std::make_shared<CPostIndexBinder>(post_index, false));
+	adv_ins_helper.addBinder(5, _T("Адреса"), \
+						std::make_shared<UITextInsertBinder>(address, false));
+	adv_ins_helper.addBinder(6, _T("Телефон"), \
+						std::make_shared<UITextInsertBinder>(tel, false));
+	adv_ins_helper.addBinder(7, _T("E-mail"), \
+							std::make_shared<UITextInsertBinder>(email, false));
+	adv_ins_helper.addBinder(8, _T("Основний район роботи"), \
 				std::make_shared<CDbComboBoxInsertBinder>(district, false, false));
-	ins_helper.addBinder(13, _T("Організація"), \
+	adv_ins_helper.addBinder(9, _T("Організація"), \
 				std::make_shared<CAdvOrgBinder>(org_name, org_type, false, false), 2);
 
-	std::string query = "INSERT INTO advocats VALUES(";
-	ins_helper.buildQuery(query);
+	adv_ins_helper.buildQuery(query);
 	query += ')';
-
-	stmt = conn->PrepareQuery(query.c_str());
+    stmt_adv = conn->PrepareQuery(query.c_str());
 }
 
 bool CAdvocatInserter::insert() {
 
 	Tstring error_str;
-	if (!ins_helper.bind(stmt, 0, error_str)) {
+    if (!people_ins_helper.bind(stmt_people, 0, error_str)) {
+        ErrorBox(error_str.c_str());
+        return false;
+    }
+	if (!adv_ins_helper.bind(stmt_adv, 0, error_str)) {
 		ErrorBox(error_str.c_str());
 		return false;
 	}
 
-	try {
-		stmt->execScalar();
-	}
-	catch (CDbException &e) {
-
-		if (e.GetErrorCode() == CDbException::E_DB_PRIMARY_KEY_DUPLICATE) {
-			Tstring error_str = _T("Адвокат із таким ID уже доданий: ");
-			error_str += id_advocat->GetLabel();
-			ErrorBox(error_str.c_str());
-			return false;
-		}
-		else throw;
+	{
+        TransactionGuard guard(conn);
+        stmt_people->execScalar();
+		stmt_adv->execScalar();
+        // FIXME: bind the autoincr ID
+        guard.commit();
 	}
 	return true;
 }

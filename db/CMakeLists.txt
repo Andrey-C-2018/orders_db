@@ -52,7 +52,8 @@ add_library(db STATIC DbException.cpp
         MySQL/MySQLStatementException.cpp
         MySQL/MySQLStmtData.cpp
         MySQL/MySQLStmtDataEx.cpp
-        MySQL/MySQLVariant.cpp IDbStaticResultSet.h)
+        MySQL/MySQLVariant.cpp IDbStaticResultSet.h
+        TransactionGuard.cpp TransactionGuard.h)
 
 target_include_directories(db PRIVATE ${XLIBS_ROOT_FOLDER})
 target_include_directories(db PUBLIC ${MARIADB_INCLUDE_DIRS})

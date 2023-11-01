@@ -9,7 +9,7 @@
 #include <forms_common/CommonRoutines.h>
 #include <forms_common/VernamOneTimePad.h>
 #include "ActsForm.h"
-#include "AdvDbTableEventsHandler.h"
+#include "DefenderDbTableEvtHandler.h"
 #include "OrdersDbTableEventsHandler.h"
 
 constexpr char acts_form_version[] = "1.0.24";
@@ -18,7 +18,7 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
 					const int X, const int Y, \
 					const int width, const int height) : \
-				adv_list(DEF_GUI_MARGIN, ADV_LIST_WIDTH, DEF_DBNAVIGATOR_HEIGHT), \
+				defenders_list(DEF_GUI_MARGIN, DEFENDERS_LIST_WIDTH, DEF_DBNAVIGATOR_HEIGHT), \
 				orders_list(DEF_GUI_MARGIN, 0.5F, DEF_DBNAVIGATOR_HEIGHT), \
 				payments_list(DEF_GUI_MARGIN, DEF_DBNAVIGATOR_HEIGHT) {
 
@@ -32,9 +32,9 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 
 	setLastChangedUser();
 
-	adv_list.initDbTable(conn);
-	auto adv_db_table = adv_list.getDbTable();
-	size_t id_advocat = adv_db_table->getMetaInfo().getFieldIndexByName("id_advocat");
+	defenders_list.initDbTable(conn);
+	auto defenders_db_table = defenders_list.getDbTable();
+	size_t id_person_index = defenders_db_table->getMetaInfo().getFieldIndexByName("id_person");
 
 	constraints = std::make_shared<CPaymentsConstraints>();
 	constraints->old_stage_locked = true;
@@ -42,14 +42,14 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 	constraints->old_order_locked = true;
 
 	bool is_null;
-	const int def_adv_id = adv_db_table->getResultSet()->getInt(id_advocat, is_null);
+	const int defender_id = defenders_db_table->getResultSet()->getInt(id_person_index, is_null);
 	assert(!is_null);
-	orders_list.initDbTable(conn, def_adv_id, constraints);
+	orders_list.initDbTable(conn, defender_id, constraints);
 		
 	auto orders_db_table = orders_list.getDbTable();
-	auto adv_evt_handler = std::make_shared<CAdvDbTableEventsHandler>(adv_db_table, \
-																orders_db_table, id_advocat, 0);
-	adv_list.initDbTableEvtHandler(adv_evt_handler);
+	auto defender_evt_handler = std::make_shared<DefenderDbTableEvtHandler>(defenders_db_table, \
+																orders_db_table, id_person_index, 0);
+	defenders_list.initDbTableEvtHandler(defender_evt_handler);
 
 	size_t orders_prim_key[3];
 	orders_prim_key[0] = orders_db_table->getMetaInfo().getFieldIndexByName("id_center_legalaid");
@@ -89,25 +89,25 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 	XRect rc;
 	GetClientRect(rc);
 
-	adv_list.initSizers(XPoint(DEF_GUI_MARGIN, DEF_GUI_MARGIN), \
+	defenders_list.initSizers(XPoint(DEF_GUI_MARGIN, DEF_GUI_MARGIN), \
 						XSize(rc.right, rc.bottom));
 	orders_list.initSizers(XPoint(DEF_GUI_MARGIN, DEF_GUI_MARGIN), \
-						XSize(rc.right, rc.bottom), &adv_list.getFirstSizer());
+						XSize(rc.right, rc.bottom), &defenders_list.getFirstSizer());
 	payments_list.initSizers(XPoint(DEF_GUI_MARGIN, DEF_GUI_MARGIN), \
 						XSize(rc.right, rc.bottom), &orders_list.getLastSizer());
 
-	adv_list.displayWidgets(this);
+	defenders_list.displayWidgets(this);
 	orders_list.displayWidgets(this);
 	payments_list.displayWidgets(this);
 }
 
 void CActsForm::OnSize(XSizeEvent *eve) {
 
-	if(!adv_list.updateSizers(XSize(eve->GetWidth(), eve->GetHeight()))) return;
+	if(!defenders_list.updateSizers(XSize(eve->GetWidth(), eve->GetHeight()))) return;
 	orders_list.updateSizers();
 	payments_list.updateSizers();
 
-	adv_list.resize();
+	defenders_list.resize();
 	orders_list.resize();
 	payments_list.resize();
 }

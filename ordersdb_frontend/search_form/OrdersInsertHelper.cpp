@@ -212,7 +212,7 @@ public:
 COrdersInsertHelper::COrdersInsertHelper() : ins_helper(FIELDS_COUNT), \
 						admin_logged(false), \
 						center(nullptr), id_order(nullptr), order_date(nullptr), \
-						order_type(nullptr), advocat(nullptr), client(nullptr), \
+						order_type(nullptr), defender(nullptr), client(nullptr), \
 						bdate(nullptr) { }
 
 void COrdersInsertHelper::SetCenterBox(CDbComboBox *center) {
@@ -245,7 +245,7 @@ void COrdersInsertHelper::createBinders() {
 	assert(id_order);
 	assert(order_date);
 	assert(order_type);
-	assert(advocat);
+	assert(defender);
 	assert(client);
 	assert(bdate);
 
@@ -259,7 +259,7 @@ void COrdersInsertHelper::createBinders() {
 	ins_helper.addBinder(3, _T("Тип доручення"), \
 			std::make_shared<CDbComboBoxInsertBinder>(order_type, false, false));
 	ins_helper.addBinder(4, _T("Адвокат"), \
-			std::make_shared<CDbComboBoxInsertBinder>(advocat, false, false));
+			std::make_shared<CDbComboBoxInsertBinder>(defender, false, false));
 	ins_helper.addBinder(5, _T("Клієнт"), \
 						std::make_shared<UITextInsertBinder>(client, false));
 	ins_helper.addBinder(6, _T("Дата народж. клієнта"), \

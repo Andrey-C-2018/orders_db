@@ -14,7 +14,7 @@ class COrdersInsertHelper {
 	XWidget *id_order;
 	XWidget *order_date;
 	CDbComboBox *order_type;
-	CDbComboBox *advocat;
+	CDbComboBox *defender;
 	XWidget *client;
 	XWidget *bdate;
 
@@ -40,7 +40,7 @@ public:
 	void SetIdOrderWidget(XWidget *id_order);
 	void SetOrderDateWidget(XWidget *order_date);
 	inline void SetOrderTypeWidget(CDbComboBox *order_type);
-	inline void SetAdvocatWidget(CDbComboBox *advocat);
+	inline void SetDefenderWidget(CDbComboBox *defender);
 	inline void SetClientWidget(XWidget *client);
 	inline void SetClientBirthDateWidget(XWidget *bdate);
 
@@ -77,9 +77,9 @@ void COrdersInsertHelper::SetOrderTypeWidget(CDbComboBox *order_type) {
 	this->order_type = order_type;
 }
 
-void COrdersInsertHelper::SetAdvocatWidget(CDbComboBox *advocat) {
+void COrdersInsertHelper::SetDefenderWidget(CDbComboBox *defender) {
 
-	this->advocat = advocat;
+	this->defender = defender;
 }
 
 void COrdersInsertHelper::SetClientWidget(XWidget *client) {

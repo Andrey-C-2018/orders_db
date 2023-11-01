@@ -51,9 +51,9 @@ add_executable(acts_form MyApp.cpp
                 MyApp.h
                 MyFrame.cpp MyFrame.h
                 ActsForm.cpp ActsForm.h
-                AdvDbTableEventsHandler.cpp AdvDbTableEventsHandler.h
-                AdvocatsList.cpp AdvocatsList.h
-                AdvocatsListEvtHandler.cpp AdvocatsListEvtHandler.h
+                DefenderDbTableEvtHandler.cpp DefenderDbTableEvtHandler.h
+                DefendersList.cpp DefendersList.h
+                DefendersListEvtHandler.cpp DefendersListEvtHandler.h
                 OrdersDbTableEventsHandler.cpp OrdersDbTableEventsHandler.h
                 OrdersGridEvtHandler.cpp OrdersGridEvtHandler.h
                 OrdersList.cpp OrdersList.h
@@ -62,6 +62,7 @@ add_executable(acts_form MyApp.cpp
                 PaymentsList.cpp PaymentsList.h
                 PaymentsNavPanel.cpp PaymentsNavPanel.h
                 resource.h)
+
 set_target_properties(acts_form PROPERTIES C_STANDARD 14 C_STANDARD_REQUIRED ON)
 target_include_directories(acts_form PRIVATE ${XLIBS_ROOT_FOLDER})
 target_include_directories(acts_form PUBLIC ${MARIADB_INCLUDE_DIRS})

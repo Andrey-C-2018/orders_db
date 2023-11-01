@@ -78,6 +78,9 @@
     <ClCompile Include="MySQL\MySQLStatementException.cpp">
       <Filter>MySQL</Filter>
     </ClCompile>
+    <ClCompile Include="TransactionGuard.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IDbResultSet.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="IDbStaticResultSet.h">
       <Filter>interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="TransactionGuard.h">
+      <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

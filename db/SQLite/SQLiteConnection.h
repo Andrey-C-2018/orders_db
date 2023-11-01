@@ -11,7 +11,7 @@ public:
 	};
 
 	SQLiteConnectionException(const int err_code, const Tchar *err_descr);
-	SQLiteConnectionException(sqlite3 *db);
+	explicit SQLiteConnectionException(sqlite3 *db);
 
 	SQLiteConnectionException(const SQLiteConnectionException &obj);
 	SQLiteConnectionException(SQLiteConnectionException &&obj) = default;
@@ -21,6 +21,7 @@ public:
 
 class DBLIB_DLL_EXPORT SQLiteConnection : public IDbConnection {
 	std::shared_ptr<sqlite3> db;
+    void executeSQLCommand(const char *cmd);
 
 public:
 	SQLiteConnection();
@@ -39,6 +40,12 @@ public:
 	record_t ExecScalarQuery(const char *query_text) override;
 	std::shared_ptr<IDbResultSet> ExecQuery(const char *query_text) const override;
 	std::shared_ptr<IDbStatement> PrepareQuery(const char *query_text) const override;
+
+    unsigned getLastInsertedId() const override;
+
+    void setAutocommitMode(bool enabled) override;
+    void commit() override;
+    void rollback() override;
 
 	void Disconnect() override;
 

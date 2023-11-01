@@ -6,6 +6,11 @@
 #include <db/IDbResultSet.h>
 #include <db/IDbResultSetMetadata.h>
 #include <db/IDbField.h>
+#include <db/TransactionGuard.h>
+
+// CREATE DATABASE IF NOT EXISTS test_db COLLATE utf8_unicode_ci;
+// CREATE USER 'test_user'@'localhost' IDENTIFIED BY '12345';
+// GRANT ALL PRIVILEGES ON test_db.* TO 'test_user'@'localhost';
 
 class CMySQLTest {
 	static std::shared_ptr<CMySQLConnection> conn;
@@ -19,7 +24,7 @@ protected:
 				
 			try {
 				conn = std::make_shared<CMySQLConnection>();
-				conn->Connect("127.0.0.1", 3306, "root", "12345", "");
+				conn->Connect("localhost", 3306, "test_user", "12345", "test_db");
 			}
 			catch (XException &e) {
 
@@ -32,19 +37,6 @@ protected:
 	std::shared_ptr<CMySQLConnection> getConn() {
 
 		return conn;
-	}
-
-	void createDatabase() {
-
-		try {
-
-			conn->ExecScalarQuery("CREATE DATABASE IF NOT EXISTS test_db COLLATE utf8_unicode_ci");
-			conn->SetSchema("test_db");
-		}
-		catch (XException &e) {
-
-			Tcerr << _T("Cannot create database test_db: ") << e.what() << std::endl;
-		}
 	}
 
 	void dropTable(const char *table_name) {
@@ -194,8 +186,6 @@ SUITE(MySQL_tests) {
 
 	TEST_FIXTURE(CMySQLTest, Preparation) {
 
-		createDatabase();
-
 		dropTable("orders");
 		createTableOrders();
 	}
@@ -290,4 +280,34 @@ SUITE(MySQL_tests) {
 		auto value_type = field_type->getValueAsImmutableString(rs);
 		CHECK_EQUAL("ZZP", value_type.str);
 	}
+
+    TEST_FIXTURE(CMySQLTest, LastInsertedId) {
+
+        dropTable("test_dependent");
+        dropTable("test_autoinc");
+        getConn()->ExecScalarQuery("CREATE TABLE test_autoinc(id INTEGER AUTO_INCREMENT PRIMARY KEY, name CHAR(30) NOT NULL)");
+        getConn()->ExecScalarQuery("CREATE TABLE test_dependent(id_dep INTEGER NOT NULL PRIMARY KEY, bdate DATE NOT NULL, FOREIGN KEY(id_dep) REFERENCES test_autoinc(id))");
+
+        auto stmt = getConn()->PrepareQuery("INSERT INTO test_autoinc(name) VALUES(?)");
+        stmt->bindValue(0, "John Doe");
+        auto stmt2 = getConn()->PrepareQuery("INSERT INTO test_dependent VALUES(?,?)");
+        stmt2->bindValue(1, CDate(2, 3, 2020));
+
+        {
+            TransactionGuard guard(getConn());
+
+            stmt->execScalar();
+            int id = (int) getConn()->getLastInsertedId();
+            stmt2->bindValue(0, id);
+            stmt2->execScalar();
+
+            guard.commit();
+        }
+
+        std::string query = "SELECT t1.id, t1.name, t2.bdate ";
+        query += "FROM test_autoinc t1 INNER JOIN test_dependent t2";
+        query += " ON t1.id = t2.id_dep";
+        auto rs = getConn()->ExecQuery(query.c_str());
+        CHECK_EQUAL(1, rs->getRecordsCount());
+    }
 }

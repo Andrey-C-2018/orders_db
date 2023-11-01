@@ -75,14 +75,14 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const int width, const int height) : \
 				sorting_manager(FieldsList::FIELDS_COUNT), uploader(7), \
 				flt_id(nullptr), flt_act(nullptr), flt_order_date_from(nullptr), \
-				flt_order_date_to(nullptr), flt_advocat(nullptr), \
+				flt_order_date_to(nullptr), flt_defender(nullptr), \
                 flt_act_reg_date_from(nullptr), flt_act_reg_date_to(nullptr), \
                 flt_act_date_from(nullptr), flt_act_date_to(nullptr), \
                 flt_payment_date_from(nullptr), flt_payment_date_to(nullptr), \
                 flt_paid(nullptr), flt_center(nullptr), flt_informer(nullptr), \
 				flt_order_type(nullptr), flt_stage(nullptr), flt_zone(nullptr), \
 				flt_act_no(nullptr), \
-				grid(nullptr), advocats_list(nullptr), flt_client(nullptr), \
+				grid(nullptr), defenders_list(nullptr), flt_client(nullptr), \
 				centers_list(nullptr), order_types_list(nullptr), stages_list(nullptr), \
 				checkers_list(nullptr), canceling_reasons_list(nullptr), act_no_list(nullptr), \
 				informers_list(nullptr), qa_widget(nullptr), \
@@ -161,7 +161,7 @@ void CSearchForm::createDbGrid(std::shared_ptr<CPaymentsConstraints> constraints
 	auto orders_indexes = meta_info.getAllTableFieldsIndexes("orders");
 	orders_indexes.erase(orders_indexes.end() - 3, orders_indexes.end());
 	orders_indexes.push_back(meta_info.getFieldIndexByName("center_short_name"));
-	orders_indexes.push_back(meta_info.getFieldIndexByName("adv_name_short"));
+	orders_indexes.push_back(meta_info.getFieldIndexByName("name_short")); // defender_name_short
 	orders_indexes.push_back(meta_info.getFieldIndexByName("type_name"));
 	
 	grid = new CDbGrid(false, db_table, \
@@ -218,7 +218,7 @@ void CSearchForm::setFieldsSizes() {
 	grid->SetFieldWidth(field_index, 12);
 	grid->SetFieldLabel(field_index, _T("Центр"));
 
-	field_index = meta_info.getFieldIndexByName("adv_name_short");
+	field_index = meta_info.getFieldIndexByName("name_short");
 	grid->SetFieldWidth(field_index, 17);
 	grid->SetFieldLabel(field_index, _T("Адвокат"));
 
@@ -382,7 +382,7 @@ void CSearchForm::setFieldsSizes() {
 void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 
 	assert(grid);
-	assert(!advocats_list);
+	assert(!defenders_list);
 	assert(!centers_list);
 	CGridCellWidgetCreator creator(grid);
 	
@@ -390,14 +390,14 @@ void CSearchForm::createCellWidgetsAndAttachToGrid(const bool db_admin) {
 										"zone", true);
 	creator.createAndAttachToGrid<CDateCellWidget>("order_date", false);
 		
-	auto stmt = conn->PrepareQuery("SELECT id_advocat, adv_name_short, adv_name FROM advocats ORDER BY 2");
+	auto stmt = conn->PrepareQuery("SELECT id_person, name_short, name FROM people ORDER BY 2");
 	auto result_set = stmt->exec();
 	auto rs_metadata = stmt->getResultSetMetadata();
-	advocats_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
-										"adv_name_short", \
+	defenders_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
+										"name_short", \
 										conn, 1, result_set, rs_metadata, \
 										"orders", db_table);
-	advocats_list->AddRelation("id_advocat", "id_adv");
+	defenders_list->AddRelation("id_person", "id_defender");
 
 	if (db_admin) {
 		centers_list = creator.createAndAttachToGrid<CDbComboBoxCellWidget>(\
@@ -559,11 +559,11 @@ void CSearchForm::initFilteringControls() {
 	id_expr = filtering_manager.addExpr("a.id_order_type = ?", combo_binder);
 	flt_order_type->setExprId(id_expr);
 
-	flt_advocat = new CFilteringDbComboBox(filtering_manager, \
-											advocats_list->getMasterResultSet(), 2, 0);
-	combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_advocat);
-	id_expr = filtering_manager.addExpr("a.id_adv = ?", combo_binder);
-	flt_advocat->setExprId(id_expr);
+	flt_defender = new CFilteringDbComboBox(filtering_manager, \
+											defenders_list->getMasterResultSet(), 2, 0);
+	combo_binder = std::make_shared<CDbComboBoxBinderControl>(flt_defender);
+	id_expr = filtering_manager.addExpr("a.id_defender = ?", combo_binder);
+	flt_defender->setExprId(id_expr);
 
 	flt_client = new CFilteringEdit(filtering_manager, this);
 	auto str_binder = std::make_shared<CStringWidgetBinderControl>(flt_client);
@@ -636,7 +636,7 @@ std::shared_ptr<CDbTable> CSearchForm::createDbTable() {
 
 	query += fields_list.getFieldsList();
 	query += " FROM orders a INNER JOIN payments aa ON a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
-	query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat";
+	query += " INNER JOIN people p ON a.id_defender = p.id_person";
 	query += " INNER JOIN order_types t ON a.id_order_type = t.id_type";
 	query += " INNER JOIN informers inf ON aa.id_informer = inf.id_inf";
 	query += " INNER JOIN centers c ON a.id_center_legalaid = c.id_center";
@@ -688,10 +688,10 @@ void CSearchForm::displayWidgets() {
 	main_sizer.pushNestedSizer(sizer);
 		sizer.addWidget(new XLabel(), _T("Адвокат: "), FL_WINDOW_VISIBLE, \
 						XSize(60, DEF_GUI_ROW_HEIGHT));
-		sizer.addResizeableWidget(flt_advocat, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+		sizer.addResizeableWidget(flt_defender, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(250, DEF_GUI_ROW_HEIGHT), 250);
-		flt_advocat->setTabStopManager(this);
-		inserter.getOrdersInsertHelper().SetAdvocatWidget(flt_advocat);
+		flt_defender->setTabStopManager(this);
+		inserter.getOrdersInsertHelper().SetDefenderWidget(flt_defender);
 
 		sizer.addWidget(new XLabel(), _T("Центр: "), FL_WINDOW_VISIBLE, \
 						XSize(50, DEF_GUI_ROW_HEIGHT));
@@ -915,7 +915,7 @@ void CSearchForm::displayWidgets() {
 
 	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_stage"));
 	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_center_legalaid"));
-	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_adv"));
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_defender"));
 	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_order_type"));
 	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_informer"));
 	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_checker"));
@@ -938,7 +938,7 @@ void CSearchForm::initOrdering(COrderingComboBox *ordering_box) {
 	const auto &meta_info = db_table->getMetaInfo();
 	ordering_box->addOrderingField("zone", meta_info, grid);
 	ordering_box->addOrderingField("center_short_name", meta_info, grid);
-	ordering_box->addOrderingField("adv_name_short", meta_info, grid);
+	ordering_box->addOrderingField("name_short", meta_info, grid);
 	ordering_box->addOrderingField("order_date", meta_info, grid);
 	ordering_box->addOrderingField("id", meta_info, grid);
 	ordering_box->addOrderingField("type_name", meta_info, grid);
@@ -1107,7 +1107,7 @@ CSearchForm::~CSearchForm() {
 	if (flt_center && !flt_center->IsCreated()) delete flt_center;
 	if (flt_client && !flt_client->IsCreated()) delete flt_client;
 	if (flt_informer && !flt_informer->IsCreated()) delete flt_informer;
-	if (flt_advocat && !flt_advocat->IsCreated()) delete flt_advocat;
+	if (flt_defender && !flt_defender->IsCreated()) delete flt_defender;
 	if (flt_payment_date_from && !flt_payment_date_from->IsCreated()) delete flt_payment_date_from;
 	if (flt_payment_date_to && !flt_payment_date_to->IsCreated()) delete flt_payment_date_to;
 	if (flt_act_date_to && !flt_act_date_to->IsCreated()) delete flt_act_date_to;

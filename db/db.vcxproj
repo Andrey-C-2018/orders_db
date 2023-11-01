@@ -37,6 +37,7 @@
     <ClCompile Include="SQLite\SQLiteResultSet.cpp" />
     <ClCompile Include="SQLite\SQLiteResultSetMetadata.cpp" />
     <ClCompile Include="SQLite\SQLiteStatement.cpp" />
+    <ClCompile Include="TransactionGuard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DbException.h" />
@@ -68,6 +69,7 @@
     <ClInclude Include="SQLite\SQLiteResultSet.h" />
     <ClInclude Include="SQLite\SQLiteResultSetMetadata.h" />
     <ClInclude Include="SQLite\SQLiteStatement.h" />
+    <ClInclude Include="TransactionGuard.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E4BB857A-1E17-4203-BBE6-A4DAF82913FB}</ProjectGuid>

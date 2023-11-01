@@ -1,7 +1,7 @@
 #pragma once
 #include <db_controls/DbGridEventsHandler.h>
 
-class CAdvocatsListEvtHandler : public CDbGridEventsHandler {
+class DefendersListEvtHandler : public CDbGridEventsHandler {
 
 	void OnCellChanged(IGridCellWidget *cell_widget, \
 						IOnCellChangedAction &action) override;
@@ -9,7 +9,7 @@ class CAdvocatsListEvtHandler : public CDbGridEventsHandler {
 	void OnCellChangedIndirectly(IGridCellWidget *cell_widget, \
 								IOnCellChangedAction &action) override;
 public:
-	CAdvocatsListEvtHandler(std::shared_ptr<CDbTable> db_table);
-	virtual ~CAdvocatsListEvtHandler();
+	DefendersListEvtHandler(std::shared_ptr<CDbTable> db_table);
+	virtual ~DefendersListEvtHandler();
 };
 
