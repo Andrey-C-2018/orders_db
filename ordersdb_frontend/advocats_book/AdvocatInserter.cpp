@@ -11,24 +11,6 @@
 #include <db_controls/DbComboBox.h>
 #include "AdvocatInserter.h"
 
-class AutoincrIdBinder : public IInsertBinder {
-	std::shared_ptr<IDbConnection> conn;
-public:
-
-	explicit AutoincrIdBinder(std::shared_ptr<IDbConnection> conn_) : conn(conn_) { }
-
-	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
-				Params &params, const Tchar *field_name) override {
-
-		CInsParamNoGuard param_no_guard(params.param_no, 1);
-        int id = (int)conn->getLastInsertedId();
-		binding_target->bindValue(params.param_no, id);
-		return true;
-	}
-
-	virtual ~AutoincrIdBinder() { }
-};
-
 class CAdvNameBinder : public CVisualInsertBinder {
 	std::string adv_surname, adv_name_full, adv_patr; // cache
 public:
@@ -182,7 +164,7 @@ CAdvocatInserter::CAdvocatInserter() : people_ins_helper(PEOPLE_FIELDS_COUNT),\
 						adv_bdate(nullptr), district(nullptr), org_name(nullptr), \
 						org_type(nullptr) { }
 
-void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
+void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn_) {
 
 	assert(adv_name);
 	assert(license_no);
@@ -197,6 +179,7 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
 	assert(org_name);
 	assert(org_type);
 
+	conn = conn_;
     std::string query = "INSERT INTO people(name, name_short, bdate) VALUES(";
     people_ins_helper.addBinder(0, _T("ПІБ"), \
 						std::make_shared<CAdvNameBinder>(adv_name, false), 2);
@@ -208,8 +191,7 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn) {
     stmt_people = conn->PrepareQuery(query.c_str());
 
     query = "INSERT INTO advocats VALUES(";
-	adv_ins_helper.addBinder(0, _T("ID"), \
-					std::make_shared<AutoincrIdBinder>(conn));
+	adv_ins_helper.defStaticInsertion(0, "LAST_INSERT_ID()");
 	adv_ins_helper.addBinder(1, _T("Номер свідоцтва"), \
 							std::make_shared<UITextInsertBinder>(license_no, false));
 	adv_ins_helper.addBinder(2, _T("Дата свідоцтва"), \
@@ -250,7 +232,6 @@ bool CAdvocatInserter::insert() {
         TransactionGuard guard(conn);
         stmt_people->execScalar();
 		stmt_adv->execScalar();
-        // FIXME: bind the autoincr ID
         guard.commit();
 	}
 	return true;

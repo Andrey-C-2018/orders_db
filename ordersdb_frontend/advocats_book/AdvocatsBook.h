@@ -26,7 +26,7 @@ class CAdvocatsBook : public XTabStopPanel {
 
 	CQueryModifier query_modifier;
 	CFilteringManager filtering_manager;
-	CFilteringEdit *flt_id;
+	CFilteringEdit *flt_id, *flt_name;
 	
 	CDbGrid *grid;
 	CDbComboBoxCellWidget *examiners_list, *districts_list;

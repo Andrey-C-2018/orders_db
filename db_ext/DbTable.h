@@ -147,11 +147,11 @@ void CDbTable::markFieldAsPrimaryKey(const char *field_name, \
 }
 
 void CDbTable::addPrimaryKeyAsRef(const char *field_name, const char *table_name, \
-									const char *referenved_field_name, \
+									const char *referenced_field_name, \
 									const char *referenced_table_name) {
 
 	meta_info.addInvisibleFieldAsRef(field_name, table_name, \
-									referenved_field_name,
+									referenced_field_name,
 									 referenced_table_name, true);
 }
 

@@ -20,11 +20,15 @@ ALTER table advocats DROP COLUMN mark;
 
 UPDATE advocats b, people p SET b.id_advocat = p.id_person WHERE p.temp_id = b.id_advocat;
 ALTER table people DROP COLUMN temp_id;
+ALTER table advocats ADD FOREIGN KEY fkey_people(id_advocat) REFERENCES people(id_person) 
+	ON UPDATE CASCADE ON DELETE CASCADE;
 COMMIT;
 
 ALTER table orders DROP FOREIGN KEY `orders_ibfk_1`;
 #ALTER TABLE orders RENAME COLUMN id_adv TO id_defender;
-ALTER table orders ADD FOREIGN KEY fkey_defender(id_adv) REFERENCES people(id_person) ON UPDATE CASCADE;
+ALTER TABLE orders CHANGE COLUMN id_adv id_defender INTEGER(10);
+ALTER table orders ADD FOREIGN KEY fkey_defender(id_defender) REFERENCES people(id_person) 
+	ON UPDATE CASCADE ON DELETE RESTRICT;
 
 DROP TABLE IF EXISTS psychologists;
 CREATE TABLE psychologists(

@@ -24,7 +24,8 @@ CAdvocatsBook::CAdvocatsBook(XWindow *parent, const int flags, \
 							const Tchar *label, \
 							const int X, const int Y, \
 							const int width, const int height) : \
-	flt_id(nullptr), btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
+	flt_id(nullptr), flt_name(nullptr), \
+	btn_apply_filter(nullptr), btn_add(nullptr), btn_remove(nullptr), \
 	grid(nullptr), examiners_list(nullptr), adv_org_types_list(nullptr), districts_list(nullptr), \
 	grid_x(0), grid_y(0), grid_margin_x(0), grid_margin_y(0) {
 
@@ -64,9 +65,10 @@ std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnec
 	auto stmt = conn->PrepareQuery(query_modifier.getQuery().c_str());
 
 	auto db_table = std::make_shared<CDbTable>(conn, stmt);
-	db_table->setPrimaryTableForQuery("advocats");
+	db_table->setPrimaryTableForQuery("people");
 	db_table->markFieldAsPrimaryKey("id_advocat", "advocats");
 
+	db_table->addPrimaryKeyAsRef("id_person", "people", "id_advocat", "advocats");
 	return db_table;
 }
 
@@ -95,12 +97,17 @@ void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 	assert(!examiners_list);
 	assert(!districts_list);
 	assert(!adv_org_types_list);
+	CEditableCellWidget* readonly_widget = nullptr;
 	CPostIndexCellWidget *post_index_widget = nullptr;
 	CDateCellWidget *date_widget = nullptr;
 
 	bool exm = false, post = false, distr = false;
-	bool adv = false, date = false;
+	bool adv = false, date = false, readonly = false;
 	try {
+		readonly_widget = new CEditableCellWidget(true);
+		grid->SetWidgetForFieldByName("id_advocat", readonly_widget);
+		readonly = true;
+
 		examiners_list = new CDbComboBoxCellWidget(conn, "exm_name", \
 										"examiners", "advocats", db_table);
 		examiners_list->AddRelation("id_examiner", "id_exm");
@@ -138,6 +145,8 @@ void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
 			delete adv_org_types_list;
 		if (!date && date_widget && !date_widget->IsCreated())
 			delete date_widget;
+		if (!readonly && readonly_widget && !readonly_widget->IsCreated())
+			delete readonly_widget;
 
 		throw;
 	}
@@ -171,9 +180,8 @@ void CAdvocatsBook::DisplayWidgets() {
 
 		sizer.addWidget(new XLabel(), _T("ПІБ: "), FL_WINDOW_VISIBLE, \
 						XSize(30, DEF_GUI_ROW_HEIGHT));
-		XTabStopEdit *edit_adv_name = new XTabStopEdit(this);
-		adv_inserter.setAdvNameWidget(edit_adv_name);
-		sizer.addWidget(edit_adv_name, _T(""), edit_flags, XSize(280, DEF_GUI_ROW_HEIGHT));
+		adv_inserter.setAdvNameWidget(flt_name);
+		sizer.addWidget(flt_name, _T(""), edit_flags, XSize(280, DEF_GUI_ROW_HEIGHT));
 		
 		sizer.addWidget(new XLabel(), _T("№ свід.: "), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
@@ -297,6 +305,13 @@ void CAdvocatsBook::initFilteringControls() {
 	ImmutableString<char> expr("b.id_advocat = ?", sizeof("b.id_advocat = ?") - 1);
 	int id_expr = filtering_manager.addExpr(expr, id_binder);
 	flt_id->setExprId(id_expr);
+
+	flt_name = new CFilteringEdit(filtering_manager, this);
+	std::shared_ptr<IBinder> name_binder = std::make_shared<CStringWidgetBinderControl>(flt_name);
+
+	ImmutableString<char> expr2("p.name LIKE ?", sizeof("p.name LIKE ?") - 1);
+	int name_expr = filtering_manager.addExpr(expr2, name_binder);
+	flt_name->setExprId(name_expr);
 }
 
 void CAdvocatsBook::OnFilterButtonClick(XCommandEvent *eve) {
@@ -345,4 +360,5 @@ CAdvocatsBook::~CAdvocatsBook() {
 
 	if (grid && !grid->IsCreated()) delete grid;
 	if (flt_id && !flt_id->IsCreated()) delete flt_id;
+	if (flt_name && !flt_name->IsCreated()) delete flt_name;
 }
