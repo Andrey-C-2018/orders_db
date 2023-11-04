@@ -54,7 +54,7 @@ XTabStopWidget<TWidget>::XTabStopWidget(ITabStopManager *manager_, XWindow *pare
 										const Tchar *label, \
 										const int x, const int y, \
 										const int width, const int height) : \
-									XEdit(parent, flags, label, x, y, width, height), \
+									TWidget(parent, flags, label, x, y, width, height), \
 									manager(manager_), action(nullptr) {
 
 	assert(manager);

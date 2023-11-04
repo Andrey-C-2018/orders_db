@@ -11,8 +11,8 @@ CDbGrid::CDbGrid(const bool readonly, std::shared_ptr<CDbTable> db_table_) : CEd
 }
 
 CDbGrid::CDbGrid(const bool readonly, std::shared_ptr<CDbTable> db_table_, \
-					std::shared_ptr<CDbGridEventsHandler> dbgrid_evt_handler) : CEditableGrid(readonly), \
-				db_table(db_table_), dbgrid_event_handler(dbgrid_evt_handler), \
+					std::shared_ptr<CDbGridEventsHandler> dbgrid_evt_handler_) : CEditableGrid(readonly), \
+				db_table(db_table_), dbgrid_event_handler(dbgrid_evt_handler_), \
 				pointer_brush(0, 255, 0) {
 
 	assert(dbgrid_event_handler);

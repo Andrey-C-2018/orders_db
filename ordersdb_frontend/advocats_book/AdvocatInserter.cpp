@@ -1,68 +1,12 @@
-#include <basic/XConv.h>
-#include <basic/TextConv.h>
 #include <db/IDbConnection.h>
 #include <db/IDbResultSet.h>
 #include <db/IDbStatement.h>
 #include <db/DbException.h>
 #include <db/TransactionGuard.h>
-#include <db_ext/InsParamNoGuard.h>
-#include <xwindows/XWidget.h>
 #include <xwindows/XComboBox.h>
 #include <db_controls/DbComboBox.h>
+#include <forms_common/BindersEx.h>
 #include "AdvocatInserter.h"
-
-class CAdvNameBinder : public CVisualInsertBinder {
-	std::string adv_surname, adv_name_full, adv_patr; // cache
-public:
-	CAdvNameBinder(XWidget *adv_name_, bool free_widget) : \
-						CVisualInsertBinder(adv_name_, free_widget)	{ }
-
-	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
-				Params &params, const Tchar *field_name) override {
-
-		CInsParamNoGuard param_no_guard(params.param_no, 2);
-
-		auto err = _T("Невірний формат імені адвоката, має бути: '{Прізвище} {Імя} {По-батькові}'\n");
-
-		size_t size;
-		auto adv_name_str = widget->GetLabel(size);
-		auto p = Tstrchr(adv_name_str, _T(' '));
-		if (!p) { params.error_str += err; return true;	}
-		UCS16_ToUTF8(adv_name_str, (int)(p - adv_name_str), adv_surname);
-
-		while (*p == _T(' ')) ++p;
-
-		auto p2 = Tstrchr(p, _T(' '));
-		if (!p2) { params.error_str += err; return true; }
-		UCS16_ToUTF8(p, (int)(p2 - p), adv_name_full);
-
-		while (*p2 == _T(' ')) ++p2;
-		if (*p2 == _T('\0')) { params.error_str += err; return true; }
-		UCS16_ToUTF8(p2, (int)(adv_name_str + size - p2), adv_patr);
-
-		adv_surname += ' ';
-		size_t adv_surname_size = adv_surname.size();
-		adv_surname += adv_name_full;
-		adv_surname += ' ';
-		adv_surname += adv_patr;
-		binding_target->bindValue(params.param_no, adv_surname.c_str());
-
-		adv_surname.erase(adv_surname_size, adv_surname.size() - adv_surname_size);
-		size_t ln = getUnicodeSymbolLength(adv_name_full[0]);
-		for (size_t i = 0; i < ln && i < 4; ++i)
-			adv_surname += adv_name_full[i];
-		adv_surname += ". ";
-		ln = getUnicodeSymbolLength(adv_patr[0]);
-		for (size_t i = 0; i < ln && i < 4; ++i)
-			adv_surname += adv_patr[i];
-		adv_surname += '.';
-		binding_target->bindValue(params.param_no + 1, adv_surname.c_str());
-
-		return true;
-	}
-
-	virtual ~CAdvNameBinder() { }
-};
 
 class CPostIndexBinder : public CVisualInsertBinder {
 public:
@@ -114,7 +58,7 @@ public:
 			if (Tstrncmp(org_type_str, _T("АО"), type_size) && \
 				Tstrncmp(org_type_str, _T("АБ"), type_size)) {
 
-				params.error_str += _T("Невірне знаяення типу організації: ");
+				params.error_str += _T("Невірне значення типу організації: ");
 				params.error_str += org_type_str;
 				params.error_str += _T("Має бути: АО, АБ або ІНД\n");
 				return true;
@@ -182,7 +126,7 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn_) {
 	conn = conn_;
     std::string query = "INSERT INTO people(name, name_short, bdate) VALUES(";
     people_ins_helper.addBinder(0, _T("ПІБ"), \
-						std::make_shared<CAdvNameBinder>(adv_name, false), 2);
+						std::make_shared<CNameBinder>(adv_name, false), 2);
     people_ins_helper.addBinder(2, _T("Дата народження"), \
 						std::make_shared<UIDateInsertBinder>(adv_bdate, false));
 
@@ -205,7 +149,7 @@ void CAdvocatInserter::prepare(std::shared_ptr<IDbConnection> conn_) {
 	adv_ins_helper.addBinder(6, _T("Телефон"), \
 						std::make_shared<UITextInsertBinder>(tel, false));
 	adv_ins_helper.addBinder(7, _T("E-mail"), \
-							std::make_shared<UITextInsertBinder>(email, false));
+							std::make_shared<CEmailBinder>(email, false));
 	adv_ins_helper.addBinder(8, _T("Основний район роботи"), \
 				std::make_shared<CDbComboBoxInsertBinder>(district, false, false));
 	adv_ins_helper.addBinder(9, _T("Організація"), \

@@ -12,7 +12,8 @@ public:
 		E_DB_WRONG_VALUE = 4, \
 		E_DB_NO_REF_IN_MASTER_TABLE = 5, \
 		E_DB_CONNECTION_KILLED = 6, \
-		E_DB_REPREP_NEEDED = 7
+		E_DB_REPREP_NEEDED = 7, \
+		E_DB_PARENT_NO_ROW_UPD_DEL = 8
 	};
 
 	CDbException(const int err_code, const char *err_descr);

@@ -53,7 +53,7 @@ CAdvocatsBook::CAdvocatsBook(XWindow *parent, const int flags, \
 std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnection> conn) {
 
 	std::string query = "SELECT b.id_advocat, p.name, p.name_short, b.license_no,";
-	query += " b.license_date, e.exm_name, b.post_index, b.address, b.tel, p.bdate,";
+	query += " b.license_date, e.exm_name, b.post_index, b.address, b.tel, b.email, p.bdate,";
 	query += " d.distr_center, b.org_name, b.org_type, b.id_exm, b.id_main_district ";
 	query += "FROM advocats b INNER JOIN people p ON b.id_advocat = p.id_person";
 	query += " INNER JOIN examiners e ON b.id_exm = e.id_examiner";
@@ -74,21 +74,58 @@ std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnec
 
 void CAdvocatsBook::setFieldsSizes() {
 
-	grid->SetFieldWidth(0, 4);
-	grid->SetFieldLabel(0, _T("ID"));
-	grid->SetFieldWidth(1, 37);
-	grid->SetFieldLabel(1, _T("ПІБ адвоката"));
-	grid->SetFieldWidth(2, 25);
-	grid->SetFieldLabel(2, _T("ПІБ коротке"));
-	grid->SetFieldWidth(3, 10);
-	grid->SetFieldLabel(3, _T("№ св."));
+	const auto& meta_info = db_table->getMetaInfo();
+	size_t field_index = meta_info.getFieldIndexByName("id_advocat");
+
+	grid->SetFieldWidth(field_index, 4);
+	grid->SetFieldLabel(field_index, _T("ID"));
+
+	field_index = meta_info.getFieldIndexByName("name");
+	grid->SetFieldWidth(field_index, 37);
+	grid->SetFieldLabel(field_index, _T("ПІБ адвоката"));
+
+	field_index = meta_info.getFieldIndexByName("name_short");
+	grid->SetFieldWidth(field_index, 25);
+	grid->SetFieldLabel(field_index, _T("ПІБ коротке"));
+
+	field_index = meta_info.getFieldIndexByName("license_no");
+	grid->SetFieldWidth(field_index, 10);
+	grid->SetFieldLabel(field_index, _T("№ св."));
+
+	field_index = meta_info.getFieldIndexByName("license_date");
+	grid->SetFieldWidth(field_index, 10);
+	grid->SetFieldLabel(field_index, _T("Дата св."));
+
+	field_index = meta_info.getFieldIndexByName("exm_name");
 	grid->SetFieldWidth(5, 70);
 	grid->SetFieldLabel(5, _T("Орган, який видав свідоцтво"));
-	grid->SetFieldWidth(6, 6);
-	grid->SetFieldWidth(7, 75);
-	grid->SetFieldWidth(8, 25);
-	grid->SetFieldWidth(10, 25);
-	grid->SetFieldWidth(11, 55);
+
+	field_index = meta_info.getFieldIndexByName("post_index");
+	grid->SetFieldWidth(field_index, 11);
+	grid->SetFieldLabel(field_index, _T("Пошт індекс"));
+
+	field_index = meta_info.getFieldIndexByName("address");
+	grid->SetFieldWidth(meta_info.getFieldIndexByName("address"), 75);
+	grid->SetFieldLabel(field_index, _T("Адреса"));
+
+	grid->SetFieldWidth(meta_info.getFieldIndexByName("tel"), 25);
+	grid->SetFieldWidth(meta_info.getFieldIndexByName("email"), 20);
+
+	field_index = meta_info.getFieldIndexByName("bdate");
+	grid->SetFieldWidth(field_index, 12);
+	grid->SetFieldLabel(field_index, _T("Дата народж"));
+
+	field_index = meta_info.getFieldIndexByName("distr_center");
+	grid->SetFieldWidth(field_index, 25);
+	grid->SetFieldLabel(field_index, _T("Основний район роботи"));
+
+	field_index = meta_info.getFieldIndexByName("org_name");
+	grid->SetFieldWidth(field_index, 55);
+	grid->SetFieldLabel(field_index, _T("Назва організації"));
+
+	field_index = meta_info.getFieldIndexByName("org_type");
+	grid->SetFieldWidth(field_index, 12);
+	grid->SetFieldLabel(field_index, _T("Тип орг."));
 }
 
 void CAdvocatsBook::createCellWidgetsAndAttachToGrid(CDbGrid *grid) {
@@ -283,8 +320,8 @@ void CAdvocatsBook::DisplayWidgets() {
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
 
-	grid->HideField(13);
-	grid->HideField(14);
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_exm"));
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_main_district"));
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;
@@ -340,8 +377,17 @@ void CAdvocatsBook::OnAddRecordButtonClick(XCommandEvent *eve) {
 void CAdvocatsBook::OnRemoveButtonClick(XCommandEvent *eve) {
 
 	int option = _plMessageBoxYesNo(_T("Видалити поточний запис?"));
-	if(option == IDYES)
-		db_table->removeCurrentRecord();
+	if (option == IDYES) {
+		try {
+			db_table->removeCurrentRecord();
+		}
+		catch (CDbException& e) {
+			if (e.E_DB_PARENT_NO_ROW_UPD_DEL)
+				ErrorBox(_T("до цього адвоката прив'язані доручення, тому видалення неможливе"));
+			else
+				ErrorBox(e.what());
+		}
+	}
 }
 
 void CAdvocatsBook::OnSize(XSizeEvent *eve) {

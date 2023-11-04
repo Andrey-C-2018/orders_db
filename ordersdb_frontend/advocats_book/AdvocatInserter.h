@@ -1,10 +1,10 @@
 #pragma once
 #include <db_ext/IDbInserter.h>
 #include <db_ext/DbInsertHelper.h>
-#include <db_controls/InsertionBinders.h>
 
 struct IDbStatement;
 class XComboBox;
+class CDbComboBox;
 
 class CAdvocatInserter : public IDbInserter {
 	enum {
@@ -36,8 +36,6 @@ public:
 	CAdvocatInserter &operator=(const CAdvocatInserter &obj) = delete;
 	CAdvocatInserter &operator=(CAdvocatInserter &&obj) = delete;
 
-	inline void setDbConnection(std::shared_ptr<IDbConnection> conn);
-
 	inline void setAdvNameWidget(XWidget *adv_name) { this->adv_name = adv_name; }
 	inline void setLicenseNoWidget(XWidget *license_no) { this->license_no = license_no; }
 	inline void setLicenseDateWidget(XWidget *license_date) { this->license_date = license_date; }
@@ -56,11 +54,3 @@ public:
 
 	virtual ~CAdvocatInserter();
 };
-
-//*****************************************************
-
-void CAdvocatInserter::setDbConnection(std::shared_ptr<IDbConnection> conn) {
-
-	assert(!this->conn);
-	this->conn = conn;
-}
