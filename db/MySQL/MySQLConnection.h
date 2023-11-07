@@ -49,7 +49,7 @@ public:
 	std::shared_ptr<IDbStatement> PrepareQuery(const char *query_text) const override;
 	static MYSQL_STMT *PrepareQuery(MYSQL *conn_handle, const char *query_text);
 
-    unsigned getLastInsertedId() const override;
+    record_t getLastInsertedId() const override;
 
     void setAutocommitMode(bool enabled) override;
     void commit() override;

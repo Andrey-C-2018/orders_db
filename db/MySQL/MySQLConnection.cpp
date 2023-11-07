@@ -104,7 +104,7 @@ std::shared_ptr<IDbStatement> CMySQLConnection::PrepareQuery(const char *query_t
 	return std::make_shared<CMySQLStatement>(conn, stmt);
 }
 
-unsigned CMySQLConnection::getLastInsertedId() const {
+record_t CMySQLConnection::getLastInsertedId() const {
 
     return mysql_insert_id(conn.get());
 }

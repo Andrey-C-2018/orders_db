@@ -59,8 +59,10 @@ UIIntInsertBinder::~UIIntInsertBinder() { }
 //*****************************************************
 
 UITextInsertBinder::UITextInsertBinder(XWidget *widget_, \
-										const bool deallocate_widget_object_) : \
-								CVisualInsertBinder(widget_, deallocate_widget_object_) { }
+										const bool deallocate_widget_object_, \
+										bool nullable_) : \
+								CVisualInsertBinder(widget_, deallocate_widget_object_), \
+								nullable(nullable_) { }
 
 bool UITextInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 								Params &params, const Tchar *field_name) {
@@ -69,8 +71,12 @@ bool UITextInsertBinder::bind(std::shared_ptr<IDbBindingTarget> binding_target, 
 	auto text = widget->GetLabel(size);
 	if (text && text[0] == _T('\0')) {
 
-		params.error_str += field_name;
-		params.error_str += _T(" не може бути порожнім\n");
+		if (nullable)
+			binding_target->bindNull(params.param_no);
+		else {
+			params.error_str += field_name;
+			params.error_str += _T(" не може бути порожнім\n");
+		}
 		++params.param_no;
 		return true;
 	}

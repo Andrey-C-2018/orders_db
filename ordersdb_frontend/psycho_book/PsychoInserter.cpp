@@ -38,11 +38,11 @@ void PsychoInserter::prepare(std::shared_ptr<IDbConnection> conn_) {
 	query = "INSERT INTO psychologists(id_psycho, address, tel, email) VALUES(";
 	psycho_ins_helper.defStaticInsertion(0, "LAST_INSERT_ID()");
 	psycho_ins_helper.addBinder(1, _T("Адреса"), \
-							std::make_shared<UITextInsertBinder>(field_val_holders["address"], false));
+					std::make_shared<UITextInsertBinder>(field_val_holders["address"], false, true));
 	psycho_ins_helper.addBinder(2, _T("Телефон"), \
-							std::make_shared<UITextInsertBinder>(field_val_holders["tel"], false));
+					std::make_shared<UITextInsertBinder>(field_val_holders["tel"], false, true));
 	psycho_ins_helper.addBinder(3, _T("E-mail"), \
-							std::make_shared<CEmailBinder>(field_val_holders["email"], false));
+					std::make_shared<CEmailBinder>(field_val_holders["email"], false));
 
 	psycho_ins_helper.buildQuery(query);
 	query += ')';

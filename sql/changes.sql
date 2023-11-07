@@ -25,8 +25,8 @@ ALTER table advocats ADD FOREIGN KEY fkey_people(id_advocat) REFERENCES people(i
 COMMIT;
 
 ALTER table orders DROP FOREIGN KEY `orders_ibfk_1`;
-#ALTER TABLE orders RENAME COLUMN id_adv TO id_defender;
-ALTER TABLE orders CHANGE COLUMN id_adv id_defender INTEGER(10);
+ALTER TABLE orders RENAME COLUMN id_adv TO id_defender;
+#ALTER TABLE orders CHANGE COLUMN id_adv id_defender INTEGER(10);
 ALTER table orders ADD FOREIGN KEY fkey_defender(id_defender) REFERENCES people(id_person) 
 	ON UPDATE CASCADE ON DELETE RESTRICT;
 
@@ -46,5 +46,8 @@ INSERT INTO psychologists(id_psycho, address, tel, email)
 DELETE FROM advocats WHERE license_no = '0';
 COMMIT;
 
-GRANT SELECT ON `orders`.`people` TO `orders_user_new`@`%`;
-GRANT SELECT ON `orders`.`psychologists` TO `orders_user_new`@`%`;
+GRANT SELECT,INSERT,UPDATE,DELETE ON `orders`.`people` TO `orders_user_new`@`%`;
+GRANT SELECT,INSERT,UPDATE,DELETE ON `orders`.`advocats` TO `orders_user_new`@`%`;
+GRANT SELECT,INSERT,UPDATE,DELETE ON `orders`.`psychologists` TO `orders_user_new`@`%`;
+
+UPDATE parameters SET search_form_version='1.1.0', acts_form_version='1.1.0' WHERE version='100';

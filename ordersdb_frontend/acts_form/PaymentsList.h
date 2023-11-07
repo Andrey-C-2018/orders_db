@@ -29,7 +29,6 @@ class CPaymentsList {
 		NAV_PANEL_HEIGHT = 170
 	};
 	int db_navigator_height;
-	float multiplier;
 
 	XDynamicSizer grid_sizer, nav_sizer, panel_sizer;
 	const XDynamicSizer *prev_sizer;

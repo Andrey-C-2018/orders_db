@@ -66,7 +66,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.0.19";
+constexpr char search_form_version[] = "1.1.0";
 const char def_ordering_str[] = "a.id_center_legalaid DESC,a.order_date DESC,a.id DESC,aa.cycle DESC,aa.id_stage DESC,aa.act_no";
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
@@ -745,7 +745,7 @@ void CSearchForm::displayWidgets() {
 						XSize(90, DEF_GUI_ROW_HEIGHT));
 		inserter.getPaymentsInsertHelper().setActWidget(flt_act);
 
-		sizer.addWidget(new XLabel(), _T("Тип акта: "), FL_WINDOW_VISIBLE, \
+		sizer.addWidget(new XLabel(), _T("Тип акту: "), FL_WINDOW_VISIBLE, \
 						XSize(65, DEF_GUI_ROW_HEIGHT));
 		flt_act_no->setTabStopManager(this);
 		sizer.addResizeableWidget(flt_act_no, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \

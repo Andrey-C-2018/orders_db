@@ -32,8 +32,10 @@ public:
 };
 
 class UITextInsertBinder : public CVisualInsertBinder {
+	const bool nullable;
 public:
-	UITextInsertBinder(XWidget *widget_, const bool deallocate_widget_object_);
+	UITextInsertBinder(XWidget *widget_, const bool deallocate_widget_object_, \
+						bool nullable = false);
 
 	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
 				Params &params, const Tchar *field_name) override;

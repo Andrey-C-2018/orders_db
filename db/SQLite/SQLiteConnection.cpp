@@ -117,9 +117,9 @@ std::shared_ptr<IDbStatement> SQLiteConnection::PrepareQuery(const char *query_t
 	return std::make_shared<SQLiteStatement>(db, query_text);
 }
 
-unsigned SQLiteConnection::getLastInsertedId() const {
+record_t SQLiteConnection::getLastInsertedId() const {
 
-    return sqlite3_last_insert_rowid(db.get());
+    return (record_t)sqlite3_last_insert_rowid(db.get());
 }
 
 void SQLiteConnection::executeSQLCommand(const char *cmd) {
