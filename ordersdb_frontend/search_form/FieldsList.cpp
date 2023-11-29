@@ -138,9 +138,9 @@ std::string FieldsList::getFieldsList() const {
 				 "aa.age", "aa.inv", "aa.lang", "aa.ill", "aa.zek", "aa.appeal_softer", "aa.detect_softer", \
 				 "aa.reject_appeal", "aa.vpr", "aa.reduce", "aa.change_kval_kr", "aa.reduce_ep", "aa.change_", \
 				 "aa.close", "aa.zv", "aa.min", "aa.nm_suv", "aa.zv_kr", "aa.No_Ch_Ist", \
-				 "aa.change_med", "aa.cancel_med", "aa.Koef", \
-				 "aa.id_stage", "a.id_center_legalaid", "a.id_defender", "a.id_order_type", "aa.id_informer", "aa.id_checker", \
-				 "aa.rejection_date", "aa.rejection_reason", "aa.rec_id", "?"};
+				 "aa.change_med", "aa.cancel_med", "aa.Koef", "aa.rejection_date", "aa.rejection_reason", \
+				 "aa.id_stage", "a.id_center_legalaid", "a.id_defender", "a.id_order_type", \
+				 "aa.id_informer", "aa.id_checker", "aa.rec_id", "?"};
 
 	std::string list = field_names[indexes[0]];
 	for (int i = 1; i < FIELDS_COUNT; i++) {

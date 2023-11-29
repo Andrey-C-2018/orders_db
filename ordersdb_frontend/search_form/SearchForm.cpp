@@ -68,12 +68,13 @@ public:
 
 constexpr char search_form_version[] = "1.1.0";
 const char def_ordering_str[] = "a.id_center_legalaid DESC,a.order_date DESC,a.id DESC,aa.cycle DESC,aa.id_stage DESC,aa.act_no";
+constexpr size_t HIDDEN_FIELDS_COUNT = 7; // hidden field must be at the end of the field list
 
 CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 					const Tchar *label, \
 					const int X, const int Y, \
 					const int width, const int height) : \
-				sorting_manager(FieldsList::FIELDS_COUNT), uploader(7), \
+				sorting_manager(FieldsList::FIELDS_COUNT), uploader(HIDDEN_FIELDS_COUNT), \
 				flt_id(nullptr), flt_act(nullptr), flt_order_date_from(nullptr), \
 				flt_order_date_to(nullptr), flt_defender(nullptr), \
                 flt_act_reg_date_from(nullptr), flt_act_reg_date_to(nullptr), \
