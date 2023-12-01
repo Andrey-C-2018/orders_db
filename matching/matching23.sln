@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matching2", "matching2\matching2.vcxproj", "{820ADC9D-FF0E-4599-A026-3F19B179998A}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -33,13 +33,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matching3", "matching3\matc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csv_file", "..\csv_file\csv_file.vcxproj", "{B658C6AE-9482-4044-B0EE-CEF432814523}"
 	ProjectSection(ProjectDependencies) = postProject
-		{DBFEF8CA-2A19-4DC6-A718-157D039532BF} = {DBFEF8CA-2A19-4DC6-A718-157D039532BF}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matching2_test", "matching2_test\matching2_test.vcxproj", "{BD604B7C-A8F0-4D25-82BC-550F1868D77E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E80E0509-21D7-4A1E-AE33-C16633261EF4} = {E80E0509-21D7-4A1E-AE33-C16633261EF4}
-		{820ADC9D-FF0E-4599-A026-3F19B179998A} = {820ADC9D-FF0E-4599-A026-3F19B179998A}
 		{DBFEF8CA-2A19-4DC6-A718-157D039532BF} = {DBFEF8CA-2A19-4DC6-A718-157D039532BF}
 	EndProjectSection
 EndProject
@@ -99,14 +92,6 @@ Global
 		{B658C6AE-9482-4044-B0EE-CEF432814523}.Release|x64.Build.0 = Release|x64
 		{B658C6AE-9482-4044-B0EE-CEF432814523}.Release|x86.ActiveCfg = Release|Win32
 		{B658C6AE-9482-4044-B0EE-CEF432814523}.Release|x86.Build.0 = Release|Win32
-		{BD604B7C-A8F0-4D25-82BC-550F1868D77E}.Debug|x64.ActiveCfg = Debug|x64
-		{BD604B7C-A8F0-4D25-82BC-550F1868D77E}.Debug|x64.Build.0 = Debug|x64
-		{BD604B7C-A8F0-4D25-82BC-550F1868D77E}.Debug|x86.ActiveCfg = Debug|Win32
-		{BD604B7C-A8F0-4D25-82BC-550F1868D77E}.Debug|x86.Build.0 = Debug|Win32
-		{BD604B7C-A8F0-4D25-82BC-550F1868D77E}.Release|x64.ActiveCfg = Release|x64
-		{BD604B7C-A8F0-4D25-82BC-550F1868D77E}.Release|x64.Build.0 = Release|x64
-		{BD604B7C-A8F0-4D25-82BC-550F1868D77E}.Release|x86.ActiveCfg = Release|Win32
-		{BD604B7C-A8F0-4D25-82BC-550F1868D77E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -43,20 +43,20 @@ int main() {
 
 		auto mysql_conn = CMySQLConnectionFactory::createConnection(props);
 		std::string query = "SELECT aa.id_center, aa.id_order, aa.order_date, aa.id_stage, aa.cycle, aa.act_no,";
-		query += " b.adv_name, aa.act_date, aa.fee as fee_DB, ";
+		query += " b.name as adv_name, aa.act_date, aa.fee as fee_DB, ";
 		if (params.useCachedActsNamesIfPossible())
 			query += "IF(ISNULL(aa.id_act_parus), aa.id_act, aa.id_act_parus) as id_act ";
 		else
 			query += "aa.id_act ";
 		query += "FROM orders a INNER JOIN payments aa ON";
 		query += " a.id_center_legalaid = aa.id_center AND a.id = aa.id_order AND a.order_date = aa.order_date";
-		query += " INNER JOIN advocats b ON a.id_adv = b.id_advocat ";
+		query += " INNER JOIN people b ON a.id_defender = b.id_person ";
 		query += "WHERE (a.zone = ? OR a.id_center_legalaid = 9) AND aa.act_date >= '";
 		query += params.getInitialDate();
 		query += "' AND aa.fee <> 0 ";
 		if (params.processOnlyUnpaidActs()) 
 			query += "AND aa.is_paid IS NULL ";
-		query += "ORDER BY adv_name, id_act";
+		query += "ORDER BY name, id_act";
 
 		auto sqlite_conn = createSQLiteConnection(props);
 		if(params.checkAlreadyProcessed())
