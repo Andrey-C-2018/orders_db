@@ -8,12 +8,12 @@ struct IDbConnection;
 class CPaymentsInsertHelper {
 	
 	bool incl_order_props;
-
-	std::shared_ptr<IInsertBinder> center_binder;
+	bool admin_logged;
 	std::shared_ptr<IInsertBinder> id_order_binder;
 	std::shared_ptr<IInsertBinder> order_date_binder;
 	
 	CDbInsertHelper ins_helper;
+	CDbComboBox *center;
 	XWidget *order_date;
 
 	CDbComboBox *stage;
@@ -61,12 +61,12 @@ public:
 	inline void setPaymentDateWidget(XWidget *payment_date) { this->payment_date = payment_date; }
 	inline void setCheckerWidget(CDbComboBox *checker) { this->checker = checker; }
 
-	inline void setCenterBinder(std::shared_ptr<IInsertBinder> binder, \
-								CDbComboBox *center);
+	inline void setCenterWidget(CDbComboBox *center_);
 	inline void setIdOrderBinder(std::shared_ptr<IInsertBinder> binder);
 	inline void setOrderDateBinder(std::shared_ptr<IInsertBinder> binder, \
 									XWidget *order_date);
 
+	inline void adminLogged(const bool admin_logged_);
 	void createBinders(std::shared_ptr<IDbConnection> conn);
 	inline const CDbInsertHelper &getHelper() const { return ins_helper; }
 	void errMsgOnPrimKeyDuplicate(Tstring &err_str) const;
@@ -104,10 +104,14 @@ void CPaymentsInsertHelper::includeOrdersProps(const bool incl_order_props_) {
 												FIELDS_COUNT - 4);
 }
 
-void CPaymentsInsertHelper::setCenterBinder(std::shared_ptr<IInsertBinder> binder, \
-										CDbComboBox *center) {
+void CPaymentsInsertHelper::adminLogged(const bool admin_logged_) {
 
-	this->center_binder = binder;
+	this->admin_logged = admin_logged_;
+}
+
+void CPaymentsInsertHelper::setCenterWidget(CDbComboBox *center_) {
+
+	this->center = center_;
 }
 
 void CPaymentsInsertHelper::setIdOrderBinder(std::shared_ptr<IInsertBinder> binder) {

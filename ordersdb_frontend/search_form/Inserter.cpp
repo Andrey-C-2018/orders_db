@@ -14,11 +14,14 @@ void CInserter::evalPermissions() {
 	auto &perm_mgr = CParametersManager::getInstance().getPermissions();
 
 	const bool admin = perm_mgr.isAdmin();
-	allow_orders = admin || (!admin && perm_mgr.isOrdersInserter());
-	allow_payments = admin || (!admin && perm_mgr.isPaymentsInserter());
+	const bool local_admin = perm_mgr.isLocalAdmin();
+	allow_orders = admin || local_admin || perm_mgr.isOrdersInserter();
+	allow_payments = admin || local_admin || perm_mgr.isPaymentsInserter();
 
 	ins_orders.adminLogged(admin);
 	ins_payments.includeOrdersProps(!allow_orders);
+
+	ins_payments.adminLogged(admin);
 }
 
 void CInserter::prepare(std::shared_ptr<IDbConnection> conn) {
@@ -56,7 +59,7 @@ bool CInserter::insert() {
 	}
 
 	auto &pay_hlp = ins_payments.getHelper();
-	success = pay_hlp.bind(stmt, initial_param_no, err_str) && success;
+	success = success && pay_hlp.bind(stmt, initial_param_no, err_str);
 	if (!success) {
 		ErrorBox(err_str.c_str());
 		return false;

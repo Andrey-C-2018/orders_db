@@ -38,3 +38,12 @@ std::string getFormVersion(std::shared_ptr<IDbConnection> conn, const char *form
 
 	return version ? std::string(version) : std::string();
 }
+
+void checkIsAdmin() {
+
+	const auto& params_manager = CParametersManager::getInstance();
+	const auto& perm_mgr = CParametersManager::getInstance().getPermissions();
+
+	if (!perm_mgr.isAdmin())
+		throw XException(0, _T("Лише адміністратор РЦ може використовувати цю форму"));
+}

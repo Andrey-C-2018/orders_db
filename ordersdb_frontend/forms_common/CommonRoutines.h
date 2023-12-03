@@ -16,3 +16,5 @@ inline std::shared_ptr<TDbTable> getDbTablePtr(std::weak_ptr<TDbTable> &db_table
 }
 
 std::string getFormVersion(std::shared_ptr<IDbConnection>, const char *form_param);
+
+void checkIsAdmin();

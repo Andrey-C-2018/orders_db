@@ -41,7 +41,7 @@ public:
 void CInserter::SetCenterBox(CDbComboBox *center) {
 
 	ins_orders.SetCenterBox(center);
-	ins_payments.setCenterBinder(ins_orders.getCenterBinder(), center);
+	ins_payments.setCenterWidget(center);
 }
 
 void CInserter::SetIdOrderWidget(XWidget *id_order) {

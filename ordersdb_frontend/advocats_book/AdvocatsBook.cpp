@@ -14,6 +14,8 @@
 #include <xwindows_ex/XTabStopEdit.h>
 #include <xwindows_ex/XDateField.h>
 #include <forms_common/VernamOneTimePad.h>
+#include <forms_common/ParametersManager.h>
+#include <forms_common/CommonRoutines.h>
 #include "AdvocatsBook.h"
 #include "AdvocatsGridEvtHandler.h"
 #include "PostIndexCellWidget.h"
@@ -34,6 +36,9 @@ CAdvocatsBook::CAdvocatsBook(XWindow *parent, const int flags, \
 	initFilteringControls();
 
 	conn = CMySQLConnectionFactory::createConnection(props, vernam_one_time_pad);
+    CParametersManager::init(&props, conn);
+    checkIsAdmin();
+
 	db_table = createDbTable(conn);
 	
 	grid = new CDbGrid(false, db_table, std::make_shared<CAdvocatsGridEvtHandler>(db_table));
@@ -49,7 +54,7 @@ CAdvocatsBook::CAdvocatsBook(XWindow *parent, const int flags, \
 	Connect(EVT_COMMAND, btn_add->GetId(), this, &CAdvocatsBook::OnAddRecordButtonClick);
 	Connect(EVT_COMMAND, btn_remove->GetId(), this, &CAdvocatsBook::OnRemoveButtonClick);
 }
-	
+
 std::shared_ptr<CDbTable> CAdvocatsBook::createDbTable(std::shared_ptr<IDbConnection> conn) {
 
 	std::string query = "SELECT b.id_advocat, p.name, p.name_short, b.license_no,";

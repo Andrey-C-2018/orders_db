@@ -31,6 +31,7 @@ add_library(forms_common STATIC ActDateCellWidget.cpp ActDateCellWidget.h
             FormsInsertionBinders.h
             Messages.h
             ParametersManager.cpp ParametersManager.h
+            PermissionsManager.cpp PermissionsManager.h
             PaymentsDbTableEvtHandler.cpp PaymentsDbTableEvtHandler.h
             PermissionsManager.cpp PermissionsManager.h
             Validators.h

@@ -6,59 +6,8 @@
 #include <db_controls/DbComboBox.h>
 #include <forms_common/ParametersManager.h>
 #include <forms_common/Constants.h>
+#include "CenterBinder.h"
 #include "OrdersInsertHelper.h"
-
-class CCenterBinder : public CVisualInsertBinder {
-	CDbComboBox *center_widget;
-	int def_center;
-	const bool is_admin;
-public:
-	CCenterBinder(CDbComboBox *center_widget_, const bool deallocate, \
-					const bool is_admin_) : \
-				CVisualInsertBinder(center_widget_, deallocate), \
-				center_widget(center_widget_), is_admin(is_admin_) {
-	
-		const auto &params_manager = CParametersManager::getInstance();
-		def_center = params_manager.getDefaultCenter();
-	}
-
-	bool bind(std::shared_ptr<IDbBindingTarget> binding_target, \
-				Params &params, const Tchar *field_name) override {
-
-		CInsParamNoGuard param_no_guard(params.param_no, 1);
-
-		if (center_widget->isEmptySelection()) {
-			params.error_str += field_name;
-			params.error_str += _T(": не вибраний зі списку");
-			params.error_str += _T('\n');
-			return true;
-		}
-		
-		int center = center_widget->getPrimaryKeyAsInteger();
-		if (def_center != REGIONAL && center == MEDIATION) {
-			params.error_str += field_name;
-			params.error_str += _T(": медіацію може додавати тільки РЦ");
-			params.error_str += _T('\n');
-			return true;
-		}
-
-		if (!is_admin && ((def_center == REGIONAL && def_center != center && \
-								center != MEDIATION) || \
-						(def_center != REGIONAL && ((center != REGIONAL && \
-								def_center != center) || center == MEDIATION)))) {
-
-			params.error_str += field_name;
-			params.error_str += _T(": заборонено додавати доручення іншого центру");
-			params.error_str += _T('\n');
-			return true;
-		}
-
-		binding_target->bindValue(params.param_no, center);
-		return true;
-	}
-
-	virtual ~CCenterBinder() { }
-};
 
 class COrderNoBinder : public CVisualInsertBinder {
 public:
@@ -220,7 +169,6 @@ void COrdersInsertHelper::SetCenterBox(CDbComboBox *center) {
 	assert(center);
 	assert(!this->center);
 	this->center = center;
-	center_binder = std::make_shared<CCenterBinder>(center, false, admin_logged);
 }
 
 void COrdersInsertHelper::SetIdOrderWidget(XWidget *id_order) {
@@ -253,7 +201,8 @@ void COrdersInsertHelper::createBinders() {
 	int id_user = params_manager.getIdUser();
 	assert(id_user != -1);
 
-	ins_helper.addBinder(0, _T("Центр"), center_binder);
+	ins_helper.addBinder(0, _T("Центр"), \
+						std::make_shared<CCenterBinder>(center, false, admin_logged, false));
 	ins_helper.addBinder(1, _T("Номер доручення"), id_order_binder);
 	ins_helper.addBinder(2, _T("Дата доручення"), order_date_binder);
 	ins_helper.addBinder(3, _T("Тип доручення"), \

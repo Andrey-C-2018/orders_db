@@ -13,6 +13,8 @@
 #include <db_controls/FilteringEdit.h>
 #include <db_controls/DbNavigator.h>
 #include <forms_common/VernamOneTimePad.h>
+#include <forms_common/ParametersManager.h>
+#include <forms_common/CommonRoutines.h>
 #include "PsychoBook.h"
 
 PsychoBook::PsychoBook(XWindow *parent, const int flags, \
@@ -28,6 +30,9 @@ PsychoBook::PsychoBook(XWindow *parent, const int flags, \
 	initFilteringControls();
 
 	conn = CMySQLConnectionFactory::createConnection(props, vernam_one_time_pad);
+	CParametersManager::init(&props, conn);
+	checkIsAdmin();
+
 	db_table = createDbTable(conn);
 	
 	grid = new CDbGrid(false, db_table);

@@ -18,7 +18,6 @@ class COrdersInsertHelper {
 	XWidget *client;
 	XWidget *bdate;
 
-	std::shared_ptr<IInsertBinder> center_binder;
 	std::shared_ptr<IInsertBinder> id_order_binder;
 	std::shared_ptr<IInsertBinder> order_date_binder;
 
@@ -44,7 +43,6 @@ public:
 	inline void SetClientWidget(XWidget *client);
 	inline void SetClientBirthDateWidget(XWidget *bdate);
 
-	inline std::shared_ptr<IInsertBinder> getCenterBinder();
 	inline std::shared_ptr<IInsertBinder> getIdOrderBinder();
 	inline std::shared_ptr<IInsertBinder> getOrderDateBinder();
 
@@ -90,11 +88,6 @@ void COrdersInsertHelper::SetClientWidget(XWidget *client) {
 void COrdersInsertHelper::SetClientBirthDateWidget(XWidget *bdate) {
 
 	this->bdate = bdate;
-}
-
-std::shared_ptr<IInsertBinder> COrdersInsertHelper::getCenterBinder() {
-
-	return center_binder;
 }
 
 std::shared_ptr<IInsertBinder> COrdersInsertHelper::getIdOrderBinder() {

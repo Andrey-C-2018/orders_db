@@ -6,6 +6,7 @@
 #include <db_controls/DbComboBox.h>
 #include <forms_common/FormsInsertionBinders.h>
 #include <forms_common/ParametersManager.h>
+#include "CenterBinder.h"
 #include "PaymentsInsertHelper.h"
 
 class CheckerInsertBinder : public IInsertBinder {
@@ -117,6 +118,7 @@ CPaymentsInsertHelper::CPaymentsInsertHelper(const bool incl_order_props_) : \
 
 void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 
+	assert(center);
 	assert(id_order_binder);
 	assert(order_date_binder);
 
@@ -140,7 +142,8 @@ void CPaymentsInsertHelper::createBinders(std::shared_ptr<IDbConnection> conn) {
 	const char *qa_part = def_center == 1 ? "NULL" : "0";
 	
 	if (incl_order_props) {
-		ins_helper.addBinder(0, _T("Центр"), center_binder);
+		ins_helper.addBinder(0, _T("Центр"), \
+								std::make_shared<CCenterBinder>(center, false, admin_logged, true));
 		ins_helper.addBinder(1, _T("Номер доручення"), id_order_binder);
 		ins_helper.addBinder(2, _T("Дата доручення"), order_date_binder);
 		ins_helper.addBinder(11, _T("Користувач"), \
