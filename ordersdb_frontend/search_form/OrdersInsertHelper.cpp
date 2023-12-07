@@ -32,9 +32,9 @@ public:
 			return true;
 		}
 
-		if(value < 1 || value > 20000) {
+		if(value < 1 || value > 70000) {
 			params.error_str += field_name;
-			params.error_str += _T(": невірне значення (має бути від 1 до 20000):");
+			params.error_str += _T(": невірне значення (має бути від 1 до 70000):");
 			params.error_str += order_no_text;
 			params.error_str += _T('\n');
 			return true;
@@ -147,8 +147,8 @@ public:
 		}
 
 		int center = center_widget->getPrimaryKeyAsInteger();
-		const Tchar *zone = (center != REGIONAL && order_date >= CDate(1, 1, 2017) ? \
-							_T("МЦ") : _T("РЦ"));
+        const Tchar *zone = (center == REGIONAL || center == MEDIATION || \
+                                order_date < CDate(1, 1, 2017) ? _T("РЦ") : _T("МЦ"));
 		binding_target->bindValue(params.param_no, zone);
 		return true;
 	}

@@ -31,7 +31,7 @@ BEGIN
                         rejection_date, rejection_reason) 
     VALUES(id_center, id, order_date, fee, id_stage, article, id_informer, id_act, 
            act_no, act_date, cycle, id_user, NOW(), NULL, 
-           IF(payment_date IS NOT NULL,IF(id_center<>1 AND order_date>="2017-01-01",'МЦ','РЦ'),NULL), 
+           IF(payment_date IS NOT NULL, IF(id_center = 1 OR id_center = 9 OR order_date < "2017-01-01",'РЦ','МЦ'),NULL), 
            act_reg_date, payment_date, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, 
            bank_reg_date, id_checker, outg_post, outg_daynight, 0, 0, 0, 0, 0, 0, 0,
            rejection_date, rejection_reason);

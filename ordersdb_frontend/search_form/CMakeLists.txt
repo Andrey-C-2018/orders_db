@@ -51,6 +51,7 @@ add_executable(search_form MyApp.cpp MyApp.h
         OrdersInsertHelper.cpp OrdersInsertHelper.h
         PaidFilter.cpp PaidFilter.h
         PaymentsInsertHelper.cpp PaymentsInsertHelper.h
+        CenterBinder.cpp CenterBinder.h
         resource.h
         SearchForm.cpp SearchForm.h
         SearchFormGridEvtHandler.cpp SearchFormGridEvtHandler.h
