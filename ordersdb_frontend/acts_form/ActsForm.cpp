@@ -38,6 +38,7 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 
 	constraints = std::make_shared<CPaymentsConstraints>();
 	constraints->old_stage_locked = true;
+	constraints->stage_finalized = true;
 	constraints->wrong_zone = true;
 	constraints->old_order_locked = true;
 
@@ -80,7 +81,11 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 	def_center = CParametersManager::getInstance().getDefaultCenter();
 	auto payments_evt_handler = std::make_shared<CPaymentsDbTableEvtHandler>(payments_db_table, \
 										def_center, "id_center", \
-										true, true, true, constraints);
+										constraints->old_stage_locked, \
+										constraints->wrong_zone, \
+										constraints->old_order_locked, \
+										constraints->stage_finalized, \
+										constraints);
 	payments_list.initDbTableEvtHandler(payments_evt_handler);
 
 	Create(parent, FL_WINDOW_VISIBLE | FL_WINDOW_CLIPCHILDREN, \
@@ -99,6 +104,8 @@ CActsForm::CActsForm(XWindow *parent, const int flags, \
 	defenders_list.displayWidgets(this);
 	orders_list.displayWidgets(this);
 	payments_list.displayWidgets(this);
+
+	payments_evt_handler->calcConstraintsValues();
 }
 
 void CActsForm::OnSize(XSizeEvent *eve) {

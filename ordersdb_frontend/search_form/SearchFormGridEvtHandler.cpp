@@ -3,12 +3,6 @@
 #include <forms_common/Constraints.h>
 #include <forms_common/Messages.h>
 
-const wchar_t *E_ENTRIES[] = { E_OLD_ORDER, E_OLD_STAGE };
-enum E_Indexes {
-	E_OLD_ORDER_INDEX = 0, \
-	E_OLD_STAGE_INDEX = 1
-};
-
 void CSearchFormGridEvtHandler::OnSearchFormCellChanged(IGridCellWidget *cell_widget, \
 												IOnCellChangedAction &action) const {
 
@@ -18,21 +12,24 @@ void CSearchFormGridEvtHandler::OnSearchFormCellChanged(IGridCellWidget *cell_wi
 		ErrorBox(E_WRONG_ZONE);
 		return;
 	}
-	else {
-		auto p_field = orders_fields_indexes.find(field);
-		bool orders_field = p_field != orders_fields_indexes.cend();
 
-		int msg_index = 0;
-		msg_index = (E_OLD_ORDER_INDEX + 1) * \
-					(orders_field && constraints->old_order_locked);
-		msg_index += (E_OLD_STAGE_INDEX + 1) * \
-					(!orders_field && constraints->old_stage_locked);
-		msg_index *= !changesAllowed(this->getActiveField());
-		
-		if (msg_index) {
-			ErrorBox(E_ENTRIES[msg_index - 1]);
-			return;
-		}
+	auto p_field = orders_fields_indexes.find(field);
+	bool orders_field_to_change = p_field != orders_fields_indexes.cend();
+	bool constraints_override = changesAllowed(field);
+
+	if (constraints->stage_finalized) {
+		ErrorBox(E_FINALIZED_STAGE);
+		return;
+	}
+
+	if (constraints->old_order_locked && orders_field_to_change && !constraints_override) {
+		ErrorBox(E_OLD_ORDER);
+		return;
+	}
+
+	if (constraints->old_stage_locked && !constraints_override) {
+		ErrorBox(E_OLD_STAGE);
+		return;
 	}
 
 	ProceedWithChanging(cell_widget, action);

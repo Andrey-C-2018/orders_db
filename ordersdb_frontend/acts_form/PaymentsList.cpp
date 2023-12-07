@@ -34,7 +34,7 @@ std::shared_ptr<CDbTable> CPaymentsList::createDbTable(std::shared_ptr<IDbConnec
 	query += " aa.age,aa.inv,aa.lang,aa.ill,aa.zek,aa.appeal_softer,aa.detect_softer,aa.reject_appeal,";
 	query += " aa.vpr, aa.reduce, aa.change_kval_kr, aa.reduce_ep, aa.change_, ";
 	query += " aa.close,aa.zv,aa.min,aa.nm_suv,aa.zv_kr,aa.No_Ch_Ist,";
-	query += " aa.change_med, aa.cancel_med, aa.Koef, u.user_full_name, aa.id_checker ";
+	query += " aa.change_med, aa.cancel_med, aa.Koef, u.user_full_name, aa.id_checker, aa.payment_date ";
 	query += "FROM payments aa INNER JOIN stages st ON aa.id_stage = st.id_st";
 	query += " INNER JOIN informers inf ON aa.id_informer = inf.id_inf";
 	query += " INNER JOIN users u ON aa.id_checker = u.id_user ";
@@ -370,6 +370,7 @@ void CPaymentsList::displayWidgets(XWindow *parent) {
 	grid->HideField(meta_info.getFieldIndexByName("id_stage"));
 	grid->HideField(meta_info.getFieldIndexByName("id_informer"));
 	grid->HideField(meta_info.getFieldIndexByName("id_checker"));
+	grid->HideField(meta_info.getFieldIndexByName("payment_date"));
 
 	size_t index = meta_info.getFieldIndexByName("article");
 	grid_evt_handler->addAllowedField(grid->GetFieldRelativeIndex(index));

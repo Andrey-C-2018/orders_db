@@ -4,8 +4,8 @@
 #include "PaymentsGridEvtHandler.h"
 
 CPaymentsGridEvtHandler::CPaymentsGridEvtHandler(std::shared_ptr<CDbTable> db_table, \
-							std::shared_ptr<CPaymentsConstraints> constraints_) : \
-					CFormsGridEvtHandler(db_table, constraints_) { }
+												std::shared_ptr<CPaymentsConstraints> constraints_) : \
+										CFormsGridEvtHandler(db_table, constraints_) { }
 
 void CPaymentsGridEvtHandler::OnSearchFormCellChanged(IGridCellWidget *cell_widget, \
 												IOnCellChangedAction &action) const {
@@ -14,7 +14,14 @@ void CPaymentsGridEvtHandler::OnSearchFormCellChanged(IGridCellWidget *cell_widg
 		ErrorBox(E_WRONG_ZONE);
 		return;
 	}
-	else if (constraints->old_stage_locked && !changesAllowed(getActiveField())) {
+
+	if (constraints->stage_finalized) {
+		ErrorBox(E_FINALIZED_STAGE);
+		return;
+	}
+
+	bool constraints_override = changesAllowed(getActiveField());
+	if (constraints->old_stage_locked && !constraints_override) {
 		ErrorBox(E_OLD_STAGE);
 		return;
 	}

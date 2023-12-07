@@ -111,9 +111,10 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 
 	constraints = std::make_shared<CPaymentsConstraints>();
 	constraints->old_stage_locked = !db_admin && !db_local_admin;
+	constraints->stage_finalized = !db_admin && !db_local_admin;
 	constraints->wrong_zone = !db_admin;
 	constraints->old_order_locked = !db_admin && !db_local_admin;
-
+	
 	db_table = createDbTable();
 	int def_center = CParametersManager::getInstance().getDefaultCenter();
 	std::shared_ptr<CPaymentsDbTableEvtHandler> payments_evt_handler = \
@@ -122,6 +123,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 												constraints->old_stage_locked, \
 												constraints->wrong_zone, \
 												constraints->old_order_locked, \
+												constraints->stage_finalized, \
 												constraints);
 	db_table->ConnectDbEventsHandler(payments_evt_handler);
 	
@@ -157,10 +159,13 @@ void CSearchForm::createDbGrid(std::shared_ptr<CPaymentsConstraints> constraints
 	size_t allowed_indexes[] = { meta_info.getFieldIndexByName("reason"), \
 								meta_info.getFieldIndexByName("cancel_order"), \
 								meta_info.getFieldIndexByName("cancel_date"), \
-								meta_info.getFieldIndexByName("article") };
+								meta_info.getFieldIndexByName("article"), \
+								meta_info.getFieldIndexByName("fee_parus"), \
+								meta_info.getFieldIndexByName("bank_reg_date"), \
+								meta_info.getFieldIndexByName("payment_date") };
 		
 	auto orders_indexes = meta_info.getAllTableFieldsIndexes("orders");
-	orders_indexes.erase(orders_indexes.end() - 3, orders_indexes.end());
+	//orders_indexes.erase(orders_indexes.end() - 3, orders_indexes.end());
 	orders_indexes.push_back(meta_info.getFieldIndexByName("center_short_name"));
 	orders_indexes.push_back(meta_info.getFieldIndexByName("name_short")); // defender_name_short
 	orders_indexes.push_back(meta_info.getFieldIndexByName("type_name"));
