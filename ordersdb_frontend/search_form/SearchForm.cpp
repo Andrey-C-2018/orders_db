@@ -66,7 +66,7 @@ public:
 
 //*****************************************************
 
-constexpr char search_form_version[] = "1.1.0";
+constexpr char search_form_version[] = "1.1.2";
 const char def_ordering_str[] = "a.id_center_legalaid DESC,a.order_date DESC,a.id DESC,aa.cycle DESC,aa.id_stage DESC,aa.act_no";
 constexpr size_t HIDDEN_FIELDS_COUNT = 7; // hidden field must be at the end of the field list
 
@@ -156,6 +156,7 @@ CSearchForm::CSearchForm(XWindow *parent, const int flags, \
 void CSearchForm::createDbGrid(std::shared_ptr<CPaymentsConstraints> constraints) {
 
 	const auto &meta_info = db_table->getMetaInfo();
+	// allowed stage fields if the order is locked
 	size_t allowed_indexes[] = { meta_info.getFieldIndexByName("reason"), \
 								meta_info.getFieldIndexByName("cancel_order"), \
 								meta_info.getFieldIndexByName("cancel_date"), \
