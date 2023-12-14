@@ -140,11 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="InformersBook.cpp" />
+    <ClCompile Include="InformersInserter.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyFrame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InformersBook.h" />
+    <ClInclude Include="InformersInserter.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
   </ItemGroup>
