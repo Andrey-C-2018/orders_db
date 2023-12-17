@@ -161,11 +161,13 @@ void InformersBook::DisplayWidgets() {
 
 		sizer.addWidget(new XLabel(), _T("Інформатор скор: "), FL_WINDOW_VISIBLE, \
 						XSize(125, DEF_GUI_ROW_HEIGHT));
+        inserter.addFieldValueHolder("informer_name", flt_informer);
 		sizer.addWidget(flt_informer, _T(""), edit_flags, XSize(280, DEF_GUI_ROW_HEIGHT));
 		
 		sizer.addWidget(new XLabel(), _T("Інформатор повн: "), FL_WINDOW_VISIBLE, \
 						XSize(125, DEF_GUI_ROW_HEIGHT));
 		XTabStopEdit *informer_full = new XTabStopEdit(this);
+        inserter.addFieldValueHolder("informer_full_name", informer_full);
 		sizer.addWidget(informer_full, _T(""), edit_flags, XSize(380, DEF_GUI_ROW_HEIGHT));
 	main_sizer.popNestedSizer();
 
@@ -173,12 +175,14 @@ void InformersBook::DisplayWidgets() {
 		sizer.addWidget(new XLabel(), _T("Місцезнаходження:"), FL_WINDOW_VISIBLE, \
 						XSize(130, DEF_GUI_ROW_HEIGHT + 10));
 		CDbComboBox* distr = new CDbComboBox(districts_list->getMasterResultSet(), 2, 0);
-		sizer.addResizeableWidget(distr, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
+        inserter.setLocationsWidget(distr);
+        sizer.addResizeableWidget(distr, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED, \
 						XSize(190, DEF_GUI_ROW_HEIGHT), 150);
 
 		sizer.addWidget(new XLabel(), _T("Тип:"), FL_WINDOW_VISIBLE, \
 						XSize(40, DEF_GUI_ROW_HEIGHT + 10));
 		XTabStopComboBox* org_type = new XTabStopComboBox(this);
+        inserter.addFieldValueHolder("inf_class", org_type);
 		sizer.addResizeableWidget(org_type, _T(""), FL_WINDOW_VISIBLE | FL_WINDOW_BORDERED | \
 						FL_COMBOBOX_DROPDOWN, XSize(170, DEF_GUI_ROW_HEIGHT), 150);
 
@@ -208,6 +212,7 @@ void InformersBook::DisplayWidgets() {
 
 	XRect grid_coords = main_sizer.addLastWidget(grid);
 
+	grid->HideField(db_table->getMetaInfo().getFieldIndexByName("id_location"));
 	grid->SetFocus();
 
 	grid_x = grid_coords.left;
@@ -216,6 +221,8 @@ void InformersBook::DisplayWidgets() {
 	XRect margins = main_sizer.getMargins();
 	grid_margin_x = margins.left;
 	grid_margin_y = margins.top;
+
+    inserter.prepare(conn);
 }
 
 void InformersBook::initFilteringControls() {
@@ -254,7 +261,8 @@ void InformersBook::OnFilterButtonClick(XCommandEvent *eve) {
 
 void InformersBook::OnAddRecordButtonClick(XCommandEvent *eve) {
 
-
+    if (inserter.insert())
+        db_table->reload();
 }
 
 void InformersBook::OnRemoveButtonClick(XCommandEvent *eve) {

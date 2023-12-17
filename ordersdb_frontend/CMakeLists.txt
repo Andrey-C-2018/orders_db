@@ -11,5 +11,6 @@ if (NOT XLIBS_ROOT_FOLDER)
 endif ()
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/advocats_book adv_build)
+add_subdirectory(${CMAKE_SOURCE_DIR}/informers_form informers_build)
 add_subdirectory(${CMAKE_SOURCE_DIR}/acts_form acts_build)
 add_subdirectory(${CMAKE_SOURCE_DIR}/search_form search_build)

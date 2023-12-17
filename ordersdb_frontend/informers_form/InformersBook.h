@@ -5,6 +5,7 @@
 #include <xwindows/XButton.h>
 #include <xwindows_ex/XTabStopPanel.h>
 #include <forms_common/FlexiblePropepties.h>
+#include "InformersInserter.h"
 
 struct IDbConnection;
 class CDbTable;
@@ -36,6 +37,7 @@ class InformersBook : public XTabStopPanel {
 	int grid_margin_x, grid_margin_y;
 
 	XButton *btn_apply_filter, *btn_add, *btn_remove;
+    InformersInserter inserter;
 
 	std::shared_ptr<CDbTable> createDbTable(std::shared_ptr<IDbConnection> conn);
 	void setFieldsSizes();

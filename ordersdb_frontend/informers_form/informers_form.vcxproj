@@ -149,6 +149,10 @@
     <ClInclude Include="InformersInserter.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyFrame.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="informers_form.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
